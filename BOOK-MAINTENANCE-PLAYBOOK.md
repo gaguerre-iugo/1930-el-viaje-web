@@ -177,6 +177,182 @@ Antes de confirmar los cambios, se puede inspeccionar o descartar esta acción m
 
 ---
 
+## Acción 2: limitar los pesos tipográficos a 400 y 700
+
+### Objetivo
+
+Solicitar únicamente los pesos que existen como archivos embebidos de Atkinson Hyperlegible:
+
+- `400`: texto regular.
+- `700`: texto en negrita.
+
+Evitar que el navegador sintetice pesos inexistentes, cuyo aspecto puede variar entre motores y sistemas operativos.
+
+### Áreas que deben revisarse
+
+- Bloques `@font-face` y archivos tipográficos disponibles.
+- Clases Tailwind de peso presentes en todos los HTML.
+- Valores `font-weight` inline y dentro de bloques `<style>`.
+- Variables de peso en la salida compilada de Tailwind.
+- Reglas de peso en las hojas de reflow.
+- Estilos del runtime de interfaz.
+- Copias serializadas dentro del paquete offline.
+
+### Correspondencia de pesos
+
+Aplicar esta normalización:
+
+| Peso solicitado | Peso disponible |
+| ---: | ---: |
+| 100, 200, 300 | 400 |
+| 400 | 400 |
+| 500 | 400 |
+| 600 | 700 |
+| 700 | 700 |
+| 800, 900 | 700 |
+
+Para clases Tailwind:
+
+- `font-thin`, `font-extralight`, `font-light` y `font-medium` → `font-normal`.
+- `font-semibold`, `font-extrabold` y `font-black` → `font-bold`.
+
+### Refuerzo CSS recomendado
+
+```css
+.font-thin, .font-extralight, .font-light,
+.font-normal, .font-medium {
+  font-weight: 400 !important;
+}
+
+.font-semibold, .font-bold, .font-extrabold, .font-black {
+  font-weight: 700 !important;
+}
+```
+
+Este refuerzo protege contenido generado dinámicamente, pero no reemplaza la limpieza de las fuentes HTML y CSS.
+
+### Procedimiento
+
+1. Confirmar mediante `@font-face` cuáles son los pesos realmente embebidos.
+2. Contar las clases y declaraciones que solicitan otros valores.
+3. Normalizar los HTML según la correspondencia anterior.
+4. Actualizar las variables `--font-weight-*` de Tailwind.
+5. Normalizar las reglas explícitas de reflow y del runtime.
+6. Resincronizar el paquete offline desde los archivos modificados.
+7. Verificar que no queden solicitudes activas de otros pesos.
+
+### Validación estática
+
+```powershell
+rg -n -i "font-weight\s*:\s*(100|200|300|500|600|800|900)" `
+  -g "*.html" -g "*.css" -g "*.js" .
+
+rg -n "font-(thin|extralight|light|medium|semibold|extrabold|black)" `
+  -g "*.html" .
+```
+
+Revisar por separado dependencias, mapas de fuentes y documentación histórica antes de excluirlos de la auditoría.
+
+### Validación en navegador
+
+Después de `document.fonts.ready`, recorrer todos los elementos con texto y agrupar `getComputedStyle(element).fontWeight`. El conjunto de resultados permitido es únicamente:
+
+```text
+400
+700
+```
+
+También se deben revisar títulos, botones, cuestionarios, menús, mensajes y paneles de configuración.
+
+### Resultado obtenido en este proyecto
+
+- Todas las solicitudes editoriales fueron normalizadas a 400 o 700.
+- Se actualizaron páginas, estilos, Tailwind y el runtime de interfaz.
+- El paquete offline quedó resincronizado.
+- Se conservaron las diferencias semánticas entre texto regular y negrita.
+
+### Riesgos y excepciones
+
+- No convertir todo el libro a un único peso: se perdería la jerarquía visual.
+- No modificar pesos usados exclusivamente para dibujar iconos.
+- Si en otro proyecto se incorporan archivos reales para 300, 500, 600 u 800, actualizar esta receta antes de aplicarla.
+
+### Reversión
+
+Revertir el commit correspondiente mediante Git. Si se añaden nuevos archivos de peso en el futuro, restaurar las clases originales solamente después de declarar correctamente sus respectivos `@font-face`.
+
+---
+
+## Acción 3: aplicar tamaños mínimos de texto y controles
+
+### Objetivo
+
+Evitar textos de interfaz difíciles de leer y dar una jerarquía consistente a los controles:
+
+- `16 px` como mínimo para información secundaria, etiquetas y metadatos.
+- `18 px` como mínimo para controles importantes y sus opciones interactivas.
+
+### Áreas que deben revisarse
+
+- Metadatos editoriales, como fechas y remitentes de conversaciones.
+- Barra principal del lector.
+- Paneles de navegación, configuración, texto a voz y glosario.
+- Etiquetas y opciones de cuestionarios, incluso en reglas responsivas.
+- Contenedores cuyo tamaño calculado puede ser menor aunque todo su texto visible esté en descendientes más grandes.
+- Copias serializadas dentro del paquete offline.
+
+### Procedimiento
+
+1. Auditar en el navegador los elementos visibles que contienen texto directo y registrar su tamaño calculado.
+2. Clasificar cada caso como texto secundario, control importante, contenido principal o elemento oculto semántico.
+3. Elevar etiquetas y metadatos secundarios a un mínimo de `1rem`.
+4. Elevar los controles importantes a `1.125rem` y conservar una altura táctil adecuada.
+5. Usar `max(1rem, calc(1rem * var(--reflow-font-scale)))` cuando el texto secundario deba crecer con la preferencia tipográfica sin bajar nunca de 16 px.
+6. Revisar reglas para pantallas bajas o estrechas para que no vuelvan a reducir el texto por debajo del mínimo.
+7. Resincronizar el paquete offline y repetir la auditoría en el navegador.
+
+### Validación estática
+
+Buscar tamaños explícitos inferiores a los mínimos en los estilos activos y revisar cada resultado según su función:
+
+```powershell
+rg -n "font-size:\s*(\.(7|8|9)[0-9]*rem|1[0-5](\.[0-9]+)?px)" `
+  -g "*.css" -g "*.html" content assets .
+```
+
+Las utilidades generadas pueden conservar valores pequeños si las reglas de reflow las sustituyen de forma comprobable. No basta con reemplazar texto dentro del CSS compilado sin verificar qué regla gana en el navegador.
+
+### Validación en navegador
+
+- Esperar a que finalicen la carga de fuentes y la paginación.
+- Medir elementos visibles con nodos de texto directos para evitar falsos positivos de contenedores.
+- Confirmar que el texto secundario visible sea de al menos 16 px.
+- Confirmar que los controles importantes sean de al menos 18 px.
+- Abrir los paneles de navegación, configuración, voz y glosario para medir también su contenido dinámico.
+- Repetir la comprobación con una ventana estrecha y confirmar que no haya recortes ni solapamientos.
+- Registrar el nuevo total de páginas, ya que un aumento de tamaño puede cambiar la paginación.
+
+### Riesgos y excepciones
+
+- `.reflow-scene-separator` conserva `font-size: 0`: su frase existe para lectura semántica y los asteriscos visibles se dibujan con pseudo-elementos. Mostrar ambos produciría contenido duplicado.
+- Un contenedor puede informar menos de 16 px sin renderizar texto propio. Si sus descendientes visibles cumplen el mínimo, no debe modificarse solo para silenciar la auditoría.
+- Aumentar controles puede exigir más espacio horizontal; comprobar siempre estados abiertos y ventanas estrechas.
+- No reducir altura, espaciado o área táctil para compensar el aumento de fuente.
+
+### Resultado obtenido en este proyecto
+
+- Metadatos de chat elevados a un mínimo de 16 px.
+- Controles principales y opciones interactivas relevantes elevados a 18 px.
+- Etiquetas secundarias de los paneles normalizadas a 16 px.
+- Separadores semánticos conservados como excepción documentada.
+- Identificador de caché actualizado y copia offline de `index.html` resincronizada.
+
+### Reversión
+
+Revertir el commit correspondiente mediante Git. Si se ajustan estos mínimos en otro proyecto, conservar las excepciones semánticas y volver a validar la paginación y el diseño responsivo.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

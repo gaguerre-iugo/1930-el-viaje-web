@@ -47,3 +47,13 @@ input, textarea, select, option, li, dt, dd, blockquote,
 figcaption, table, th, td, small, strong, em, code, pre {
   font-family: "Atkinson Hyperlegible", sans-serif !important;
 }
+
+/* Only the embedded 400 and 700 faces may be requested. */
+.font-thin, .font-extralight, .font-light,
+.font-normal, .font-medium {
+  font-weight: 400 !important;
+}
+
+.font-semibold, .font-bold, .font-extrabold, .font-black {
+  font-weight: 700 !important;
+}
