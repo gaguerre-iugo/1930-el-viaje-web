@@ -1,0 +1,109 @@
+/* Keep illustrated sections inside the available reading viewport. */
+:root {
+  --adt-reading-height: calc(100dvh - var(--nav-height, 80px));
+}
+
+/* A single, readable paragraph scale throughout the book. Headings are untouched. */
+#content p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 48rem) {
+  #content p {
+    font-size: 1.0625rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  #content p {
+    font-size: 1.125rem;
+  }
+}
+
+section[data-section-id="pg036_sec001"] {
+  min-height: var(--adt-reading-height);
+}
+
+section[data-section-id="pg036_sec001"] img {
+  max-height: var(--adt-reading-height) !important;
+  width: auto;
+}
+
+/* Chapter opener: title and illustration divide the available height. */
+section[data-section-id="pg037_sec001"] {
+  min-height: var(--adt-reading-height);
+  display: flex;
+  align-items: stretch;
+}
+
+section[data-section-id="pg037_sec001"] > div {
+  min-height: var(--adt-reading-height);
+}
+
+section[data-section-id="pg037_sec001"] > div > div:first-child {
+  flex: 0 0 auto;
+  padding-top: clamp(2rem, 7vh, 6rem);
+  padding-bottom: clamp(1rem, 3vh, 3rem);
+}
+
+section[data-section-id="pg037_sec001"] img {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(var(--adt-reading-height) - clamp(7rem, 18vh, 12rem));
+  width: auto;
+  object-fit: contain;
+}
+
+section[data-section-id="pg047_sec001"] img {
+  max-height: var(--adt-reading-height);
+  width: auto;
+  margin-inline: auto;
+}
+
+/* On wide screens, pair the illustration and its short passage side by side. */
+@media (min-width: 48rem) {
+  section[data-section-id="pg052_sec001"] > div {
+    min-height: var(--adt-reading-height);
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    padding: clamp(1rem, 3vh, 2rem) clamp(1.5rem, 4vw, 4rem);
+  }
+
+  section[data-section-id="pg052_sec001"] > div > div:first-child,
+  section[data-section-id="pg052_sec001"] > div > div:last-child {
+    width: 50%;
+    padding: 0;
+  }
+
+  section[data-section-id="pg052_sec001"] img {
+    max-height: calc(var(--adt-reading-height) - clamp(2rem, 6vh, 4rem));
+    width: auto;
+    margin-inline: auto;
+  }
+}
+
+/* The message screen has lead-in and closing text, so reserve room for both. */
+section[data-section-id="pg117_sec001"] {
+  min-height: var(--adt-reading-height);
+  padding-block: clamp(.75rem, 2vh, 1.5rem);
+}
+
+section[data-section-id="pg117_sec001"] > div {
+  min-height: calc(var(--adt-reading-height) - clamp(1.5rem, 4vh, 3rem));
+}
+
+section[data-section-id="pg117_sec001"] .relative > img {
+  max-height: calc(var(--adt-reading-height) - clamp(9rem, 22vh, 12rem));
+  width: auto;
+}
+
+@media (max-width: 47.999rem) {
+  /* Stacked prose is intentionally allowed to continue below the fold. */
+  section[data-section-id="pg037_sec001"],
+  section[data-section-id="pg117_sec001"],
+  section[data-section-id="pg117_sec001"] > div {
+    min-height: auto;
+  }
+}

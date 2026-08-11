@@ -1,0 +1,72 @@
+1930 — El viaje · Web Export portable
+=========================================
+
+Versión: 46 integrada (`46-integrated-50-final`)
+Contenido: introducción, capítulo 1 y capítulo 2 completos
+
+Esta entrega conserva los textos normales y de Lectura fácil, audios,
+imágenes, descripciones, glosario y tiempos de resaltado. Los capítulos 1 y 2
+terminan con tres cuestionarios, uno por cada dimensión de comprensión.
+
+Con Lectura fácil desactivada, las oraciones conservan sus identificadores de
+audio pero fluyen juntas dentro de los párrafos originales; los espacios entre
+párrafos siguen respetando los puntos y aparte de la fuente. Con Lectura fácil
+activada se permiten las separaciones necesarias para la adaptación cognitiva.
+Las ventanas de WhatsApp ocupan el mismo ancho útil que la caja de texto y se
+mantienen como estructuras semánticas únicas, sin copias visuales duplicadas.
+
+La interfaz y el contenido usan Atkinson Hyperlegible. La lista enumera las
+páginas reflowables reales, elimina el rótulo «Imprimir» y cada número lleva
+directamente a su página.
+
+También incorpora el sistema unificado de subtítulos de la versión 39, el
+ancho compacto y el anclaje lateral de los paneles de la versión 40, el control
+de texto a voz de la versión 41 y las tres páginas de cuestionario con fondo
+turquesa Ceibal y tarjetas blancas de la versión 42. Los símbolos de resultado
+del cuestionario cuentan con un margen propio y no cubren las respuestas. En
+TTS, activarlo desde Configuración inicia la lectura; el icono del parlante
+sólo abre el reproductor; y una pausa manual se conserva al cambiar de página.
+
+La opción Mayúsculas fue retirada del panel y también del estado persistente.
+El libro conserva siempre la capitalización editorial original.
+
+Los encabezados del índice se calculan desde el contenido visible y usan
+mayúscula inicial con el resto en minúsculas. La lista se regenera si cambia la
+paginación por el ancho de pantalla, el tamaño de letra o la Lectura fácil.
+
+En escritorio se reserva un lateral fijo de 18,75 rem a cada lado. Por eso el
+ancho exterior del libro no cambia entre Normal, Grande y Extra grande y los
+paneles izquierdo y derecho no se solapan con el contenido. En una pantalla
+más angosta, el panel se comporta como una vista modal.
+
+En páginas ilustradas, el borde superior del texto coincide con el de la
+imagen. La igualdad del borde inferior se aplica sólo cuando caben unidades
+paragráficas completas; preservar el texto y el interlineado tiene prioridad.
+
+Este paquete conserva la estructura web/SCORM exportada por ADT Studio e
+incluye las páginas HTML, imágenes, audios, lectura fácil, texto a voz,
+descripciones y quizzes.
+
+APERTURA DIRECTA (sin VS Code ni instalación)
+----------------------------------------------
+
+1. Descomprimir completamente el archivo ZIP.
+2. Entrar en la carpeta descomprimida.
+3. Abrir index.html con doble clic.
+
+Es importante descomprimir primero el ZIP: no se debe abrir index.html desde
+la vista previa del archivo comprimido.
+
+PUBLICACIÓN O INTEGRACIÓN
+---------------------------
+
+La misma carpeta puede subirse a un servidor web. imsmanifest.xml conserva
+la entrada SCORM 1.2 para plataformas compatibles. No hay que modificar las
+rutas internas ni separar index.html de las carpetas assets, content e images.
+
+Servidor local opcional para desarrollo
+----------------------------------------
+
+  python3 -m http.server 5501
+
+Luego abrir http://127.0.0.1:5501/index.html

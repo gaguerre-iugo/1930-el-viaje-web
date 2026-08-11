@@ -1,0 +1,4426 @@
+/* Reflowable, viewport-paginated reading mode matched to chapter 5. */
+:root {
+  --reflow-font-scale: 1;
+  --reflow-controls-height: 0rem;
+  --reflow-text-measure: 72ch;
+  --reflow-panel-reserve: 18.75rem;
+  --reflow-gutter: 1.25rem;
+  --reflow-block-padding: clamp(1.5rem, 4vh, 3rem);
+  --reflow-page-height: calc(100dvh - var(--nav-height, 80px) - var(--reflow-controls-height));
+
+  /* EVA Ceibal interface tokens, extracted from the supplied design-system
+     references. They intentionally apply to reader chrome and activities,
+     never to the book artwork or editorial content. */
+  --ceibal-institutional-100: #d2ebea;
+  --ceibal-institutional-200: #a7d7d5;
+  --ceibal-institutional-300: #7ec4bf;
+  --ceibal-institutional-400: #479e96;
+  --ceibal-institutional-500: #377e78;
+  --ceibal-institutional-600: #29615d;
+  --ceibal-institutional-700: #204f4b;
+  --ceibal-institutional-800: #183f3c;
+  --ceibal-institutional-900: #102f2d;
+  --ceibal-quiz-page: #16b8ac;
+  --ceibal-gray-50: #f8f9fa;
+  --ceibal-gray-100: #f1f2f4;
+  --ceibal-gray-200: #e5e7eb;
+  --ceibal-gray-300: #d2d5da;
+  --ceibal-gray-400: #a9afbb;
+  --ceibal-gray-600: #6c727f;
+  --ceibal-gray-700: #4d5562;
+  --ceibal-gray-800: #212936;
+  --ceibal-gray-900: #121826;
+  --ceibal-success-surface: #edf8f1;
+  --ceibal-success-text: #275e2e;
+  --ceibal-error-surface: #fbefef;
+  --ceibal-error-text: #68160f;
+  --ceibal-space-1: .25rem;
+  --ceibal-space-2: .5rem;
+  --ceibal-space-3: .75rem;
+  --ceibal-space-4: 1rem;
+  --ceibal-space-6: 1.5rem;
+  --ceibal-space-8: 2rem;
+  --ceibal-radius-sm: .5rem;
+  --ceibal-radius-md: .75rem;
+  --ceibal-radius-lg: 1rem;
+  --ceibal-shadow-card: 0 .25rem .75rem rgb(18 24 38 / 8%);
+  --ceibal-focus-on-light: var(--ceibal-institutional-500);
+  --ceibal-focus-on-dark: var(--ceibal-institutional-200);
+}
+
+/* From laptop width upward, the book owns one stable central viewport and
+   permanently reserves the exact width of both reader panels. Font scaling
+   therefore changes only line wrapping and page count, never the width of
+   the text/image box; an open panel cannot cover the book. */
+@media (min-width: 72rem) {
+  :root {
+    --reflow-gutter: var(--reflow-panel-reserve);
+  }
+}
+
+/* Below that physical width a 300 px panel and a useful two-column book
+   cannot coexist without overlap. Treat the panel as a modal surface and
+   temporarily hide the book rather than covering readable content. */
+@media (max-width: 71.999rem) {
+  body.reflow-book:has(.reflow-reader-panel) main {
+    visibility: hidden;
+  }
+}
+
+html,
+body.reflow-book {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.reflow-book {
+  display: block;
+  min-height: 0;
+  background: #fff;
+}
+
+body.reflow-book main {
+  width: 100vw;
+  height: var(--reflow-page-height);
+  overflow: hidden;
+  transform: none !important;
+  transition: none;
+}
+
+@media (min-width: 48rem) {
+  body.reflow-book.reflow-panel-left-open main {
+    transform: none !important;
+  }
+
+  body.reflow-book.reflow-panel-right-open main {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.reflow-book main {
+    transition: none;
+  }
+}
+
+body.reflow-book #content {
+  box-sizing: border-box;
+  width: 100vw;
+  max-width: none;
+  height: var(--reflow-page-height);
+  margin: 0;
+  padding: var(--reflow-block-padding) var(--reflow-gutter);
+  overflow-x: auto;
+  overflow-y: hidden;
+  column-width: calc(100vw - (2 * var(--reflow-gutter)));
+  column-gap: calc(2 * var(--reflow-gutter));
+  column-fill: auto;
+  /* Navigation is page-based. Native smooth/horizontal scrolling must not
+     compete with the discrete paginator, especially during trackpad inertia. */
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  overscroll-behavior: none;
+  background: #fff;
+  font-size: 1rem;
+}
+
+/* v42: paint the viewport only while a quiz panel occupies the current
+   visual page, so the turquoise does not bleed into adjacent columns. */
+body.reflow-book.reflow-quiz-page,
+body.reflow-book.reflow-quiz-page #content {
+  background: var(--ceibal-quiz-page);
+}
+
+/* The synopsis may fragment when the viewport is short or the reader enlarges
+   the type. Paint the complete visible column black, including the unused
+   lower portion of a continuation page and the institutional closing page. */
+body.reflow-book.reflow-back-matter-page,
+body.reflow-book.reflow-back-matter-page main,
+body.reflow-book.reflow-back-matter-page #content {
+  background: #000 !important;
+}
+
+body.reflow-book #content::-webkit-scrollbar {
+  display: none;
+}
+
+body.reflow-book #content section,
+body.reflow-book #content section > div,
+body.reflow-book #content section > div > div {
+  max-width: none !important;
+  min-height: 0 !important;
+  width: auto !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body.reflow-book #content section[data-section-type="text_only"] {
+  display: contents !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content section[data-section-type="text_only"] p {
+  display: inline;
+  margin: 0 !important;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+  orphans: 3;
+  widows: 3;
+}
+
+body.reflow-book #content section[data-section-type="text_only"] p::after {
+  content: " ";
+}
+
+body.reflow-book #content section[data-section-type="text_only"] div:has(> p) {
+  margin-top: .85rem;
+  text-align: left;
+}
+
+body.reflow-book #content section[data-section-type="text_only"] div:has(> p):first-child {
+  margin-top: 0;
+}
+
+body.reflow-book #content section[data-section-type="text_only"]
+  [aria-hidden="true"]:not(.reflow-paragraph-break) {
+  display: none !important;
+}
+
+@media (min-width: 48rem) {
+  body.reflow-book #content,
+  body.reflow-book #content section[data-section-type="text_only"] p {
+    font-size: 1.0625rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  body.reflow-book #content,
+  body.reflow-book #content section[data-section-type="text_only"] p {
+    font-size: 1.125rem;
+  }
+}
+
+/* The first two source pages are the two halves of one chapter-cover image. */
+body.reflow-book #content > .chapter-cover {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  height: 100%;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg036_sec001"],
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg037_sec001"],
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg036_sec001"] > div,
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg037_sec001"] > div {
+  display: contents !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg037_sec001"] > div > div:first-child {
+  display: flex !important;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(.5rem, 2vh, 1.25rem) 0 !important;
+  text-align: center;
+}
+
+body.reflow-book #content > .chapter-cover h1 {
+  font-size: 67.2px !important;
+  line-height: 67.2px !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  letter-spacing: 5.376px !important;
+  text-transform: none !important;
+}
+
+body.reflow-book #content > .chapter-cover h2 {
+  font-size: 33.6px !important;
+  line-height: 42px !important;
+  font-weight: 700 !important;
+  font-style: normal !important;
+  letter-spacing: 1.008px !important;
+  text-transform: none !important;
+}
+
+/* Chapter 2 follows the same subtitle weight as Chapter 1. The source h2
+   carries a fixed-page `font-bold` class, which must not leak into reflow. */
+body.reflow-book #content > .chapter-cover.chapter-two-cover h2 {
+  font-weight: 500 !important;
+}
+
+body.reflow-book #content > .chapter-cover .chapter-cover-source {
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+body.reflow-book #content > .chapter-cover .chapter-cover-composite {
+  display: block;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  object-fit: contain;
+}
+
+/* Page 47: the illustration forms one deliberate page, followed by reflowed prose. */
+body.reflow-book #content > section[data-section-id="pg047_sec001"] {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg047_sec001"] > div {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg047_sec001"] img {
+  box-sizing: border-box;
+  display: block;
+  width: auto !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  margin: auto;
+  object-fit: contain;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section[data-section-id="pg047_sec001"] p {
+  display: inline;
+  margin: 0 !important;
+  padding: 0;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+body.reflow-book #content > section[data-section-id="pg047_sec001"] p::after {
+  content: " ";
+}
+
+/* Page 52 mirrors the chapter-5 illustration-and-short-passage composition. */
+body.reflow-book #content > section[data-section-id="pg052_sec001"] {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section[data-section-id="pg052_sec001"] > div {
+  height: 100%;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, .9fr);
+  align-items: center;
+  gap: clamp(1rem, 4vw, 3rem);
+  padding: 0 !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg052_sec001"] > div > div {
+  width: auto !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg052_sec001"] img {
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: calc(var(--reflow-page-height) - 2.5rem) !important;
+  margin: auto;
+  object-fit: contain;
+}
+
+/* Keep the activity on its own viewport page. */
+body.reflow-book #content > section[data-section-type="activity_quiz"] {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 0 !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+  overflow: hidden;
+}
+
+body.reflow-book #content > section[data-section-type="activity_quiz"] > div {
+  gap: 1rem !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content > section[data-section-type="activity_quiz"] > div > div {
+  padding: 1rem !important;
+}
+
+body.reflow-book #content > section[data-section-type="activity_quiz"] [role="group"] {
+  gap: .75rem !important;
+  margin-top: 1rem !important;
+}
+
+body.reflow-book #content > section[data-section-type="activity_quiz"] .activity-option {
+  padding: .75rem 1.25rem !important;
+}
+
+@media (max-width: 47.999rem) {
+  :root { --reflow-gutter: 1.25rem; }
+  body.reflow-book #content > section[data-section-id="pg052_sec001"] > div {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: .75rem;
+  }
+  body.reflow-book #content > section[data-section-id="pg052_sec001"] img {
+    max-height: 42% !important;
+  }
+}
+
+/* Keep complete sentences and dialogue units on one visual page. */
+body.reflow-book #content .reading-block {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+  orphans: 3;
+  widows: 3;
+  break-inside: auto;
+  -webkit-column-break-inside: auto;
+  page-break-inside: auto;
+}
+
+/* Paragraph spacing, rather than indentation or a narrower centred measure,
+   is the sole visual separator between prose units. Imported source wrappers
+   and sentence chains must inherit the full fixed text-box width. */
+body.reflow-book #content .reading-block :is(.reading-sentence, .sentence-chain),
+body.reflow-book #content .sentence-chain > .reading-sentence {
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* Illustrated copy uses the complete text column of the fixed outer box. */
+body.reflow-book #content :is(.illustrated-copy, .attic-illustrated-copy) {
+  max-width: none !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+body.reflow-book #content .reading-block.reading-block-long {
+  break-inside: auto;
+}
+
+body.reflow-book #content .reading-block
+  + .reading-block.reflow-original-paragraph-block {
+  margin-top: .85rem !important;
+}
+
+body.reflow-book.reflow-easy-read #content .reading-block
+  + .reading-block.reflow-original-paragraph-block {
+  margin-top: .85rem !important;
+}
+
+body.reflow-book #content .reading-sentence {
+  display: inline-block !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 .24em 0 0 !important;
+  text-indent: 0 !important;
+  vertical-align: top;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  line-height: 1.55 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Easy Read is sentence-by-sentence. Full-width synchronized rows prevent
+   adjacent imported source sections from sharing a line or overlapping. */
+body.reflow-book.reflow-easy-read #content .reading-sentence,
+body.reflow-book.reflow-easy-read #content .sentence-chain > .reading-sentence {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Easy Read already supplies a generous 1.55 line height. Keep a clear but
+   compact sentence separation so the illustrated column can include the next
+   complete semantic unit. */
+body.reflow-book.reflow-easy-read #content .illustrated-copy .reading-sentence,
+body.reflow-book.reflow-easy-read #content .attic-illustrated-copy .reading-sentence {
+  margin-block-end: .42em !important;
+}
+
+/* Audio-only context for the two WhatsApp panels. Keep a 1 px in-flow
+   anchor so pagination associates the spoken introduction with the chat
+   itself, while it remains visually hidden and consumes no usable space. */
+body.reflow-book #content .whatsapp-chat-intro {
+  position: static !important;
+  display: block !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 0 -1px 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* Preserve the chat UI as an interface fragment instead of reformatting it
+   as book prose. These rules deliberately outrank the generic section and
+   reading-flow resets above. */
+body.reflow-book #content .whatsapp-chat-window {
+  box-sizing: border-box;
+  display: block !important;
+  min-height: 0 !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  border-radius: 1rem;
+  background: #f5f5f4;
+  break-inside: avoid-column;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+body.reflow-book #content [data-section-id="pg020_sec001"] .whatsapp-chat-window {
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  max-width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  margin-top: .75rem !important;
+  padding: .625rem !important;
+}
+
+body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-window {
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  max-width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  margin-top: 1rem !important;
+  padding: .75rem 1.25rem !important;
+}
+
+body.reflow-book #content .whatsapp-chat-date {
+  box-sizing: border-box;
+  display: block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin-top: 0 !important;
+  border-radius: 999px !important;
+  background: #e7e5e4 !important;
+  color: #78716c !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-weight: 400 !important;
+  line-height: 1.25 !important;
+  text-align: center !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / .08);
+}
+
+body.reflow-book #content [data-id="pg020_n0024"].whatsapp-chat-date {
+  margin-right: auto !important;
+  margin-bottom: .5rem !important;
+  margin-left: auto !important;
+  padding: .25rem 1rem !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+}
+
+body.reflow-book #content [data-id="pg021_n0014"].whatsapp-chat-date {
+  margin-right: 0 !important;
+  margin-bottom: .5rem !important;
+  margin-left: 0 !important;
+  padding: .5rem 1rem !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+}
+
+body.reflow-book #content .whatsapp-message {
+  box-sizing: border-box;
+  display: block !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 2px 5px rgb(0 0 0 / .12);
+}
+
+body.reflow-book #content .whatsapp-message-incoming {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .625rem .75rem !important;
+  background: #fff !important;
+  box-shadow: 0 2px 5px rgb(0 0 0 / .12), inset 0 0 0 1px #e7e5e4;
+}
+
+body.reflow-book #content .whatsapp-message-outgoing {
+  width: fit-content !important;
+  max-width: 15rem !important;
+  margin: 0 0 0 auto !important;
+  padding: .5rem 1rem !important;
+  background: #d9f99d !important;
+}
+
+body.reflow-book #content .whatsapp-chat-sender,
+body.reflow-book #content .whatsapp-chat-text {
+  display: block !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+body.reflow-book #content [data-section-id="pg020_sec001"] .whatsapp-chat-sender {
+  margin: 0 0 .25rem !important;
+  color: #db2777 !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: .025em !important;
+}
+
+body.reflow-book #content [data-section-id="pg020_sec001"] .whatsapp-chat-text {
+  margin: 0 !important;
+  color: #1f2937 !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  line-height: 1.35 !important;
+}
+
+body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-sender {
+  margin: 0 !important;
+  color: #44403c !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  text-transform: uppercase !important;
+}
+
+body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-text {
+  margin: .25rem 0 0 !important;
+  color: #292524 !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  line-height: 1.3 !important;
+}
+
+@media (max-width: 47.999rem) {
+  body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-window {
+    padding: .75rem !important;
+  }
+
+  body.reflow-book #content .whatsapp-message-outgoing {
+    max-width: 13.5rem !important;
+    padding: .5rem .75rem !important;
+  }
+}
+
+body.reflow-book #content p.reading-sentence::after {
+  content: none !important;
+}
+
+/* In standard reading mode, the source sentence IDs remain available for
+   TTS/highlighting but flow inline inside their original paragraph wrapper.
+   Easy Read may continue presenting those units separately. */
+body.reflow-book:not(.reflow-easy-read) #content .reading-block > .reading-sentence,
+body.reflow-book:not(.reflow-easy-read) #content .sentence-chain > .reading-sentence {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+  padding-right: 0 !important;
+  vertical-align: baseline;
+}
+
+body.reflow-book:not(.reflow-easy-read) #content .reading-block > .reading-sentence:not(:last-child)::after,
+body.reflow-book:not(.reflow-easy-read) #content .sentence-chain > .reading-sentence:not(:last-child)::after {
+  content: " " !important;
+}
+
+/* Sentence chains already carry a real text-space inside each following
+   semantic fragment for copying and TTS. Avoid adding a second visual space. */
+body.reflow-book:not(.reflow-easy-read) #content
+  .sentence-chain > .reading-sentence:not(:last-child)::after {
+  content: none !important;
+}
+
+/* Plain prose is flattened after its PDF-derived paragraph starts are
+   registered. The source section and its former .reading-block wrappers no
+   longer impose line breaks: only .reflow-paragraph-break begins a paragraph.
+   This makes punto seguido flow naturally across imported wrapper edges. */
+body.reflow-book #content > section.reflow-flat-prose {
+  display: contents !important;
+}
+
+body.reflow-book:not(.reflow-easy-read) #content
+  > section.reflow-flat-prose > .reading-sentence,
+body.reflow-book:not(.reflow-easy-read) #content
+  > section.reflow-flat-prose > .sentence-chain:not(.sentence-chain-dialogue-attribution) {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+  vertical-align: baseline !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  > section.reflow-flat-prose > :is(.reading-sentence, .sentence-chain) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Paragraph boundaries audited against the original PDF. The zero-height
+   block starts a new paragraph while each following sentence remains inline,
+   so a punto seguido never becomes an artificial line or paragraph break. */
+body.reflow-book:not(.reflow-easy-read) #content
+  .reflow-paragraph-break.reflow-paragraph-break[aria-hidden="true"] {
+  display: block !important;
+  width: 100% !important;
+  height: 0 !important;
+  margin: .85rem 0 0 !important;
+  padding: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  .reflow-paragraph-break.reflow-paragraph-break[aria-hidden="true"] {
+  display: block !important;
+  width: 100% !important;
+  height: 0 !important;
+  margin: .85rem 0 0 !important;
+  padding: 0 !important;
+}
+
+/* Every WhatsApp panel uses the complete useful width of its surrounding
+   text box. The pg029 source is rebuilt as one responsive semantic chat. */
+body.reflow-book #content [data-section-id="pg029_sec001"] .chapter-one-chat-window {
+  display: contents !important;
+}
+
+/* The source marks two complete Chapter 1 cards. Keeping a shared outer
+   card made the conversation fragment at LF grande/extragrande; each card
+   now owns an indivisible visual boundary. */
+body.reflow-book #content [data-section-id="pg029_sec001"] .chapter-one-chat-part {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  max-width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  margin: 1rem auto .75rem !important;
+  padding: .5rem .75rem !important;
+  border-radius: 1rem !important;
+  background: #f5f5f4 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-chat-date {
+  margin-right: auto !important;
+  margin-bottom: .125rem !important;
+  margin-left: auto !important;
+  padding: .3rem 1rem !important;
+  font-size: calc(1rem * var(--reflow-font-scale)) !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-chat-sender {
+  margin: 0 0 .2rem !important;
+  color: #44403c !important;
+  font-size: calc(1rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+/* Preserve the source chat's speaker convention: FEDE/incoming is fuchsia,
+   while JAVI/outgoing retains the neutral dark label. */
+body.reflow-book #content [data-section-id="pg029_sec001"]
+  .whatsapp-message-incoming .whatsapp-chat-sender {
+  color: #db2777 !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-chat-text {
+  margin: 0 !important;
+  color: #292524 !important;
+  font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
+  line-height: 1.35 !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-message-incoming,
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-message-outgoing {
+  width: fit-content !important;
+  max-width: 82% !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-message-incoming {
+  padding: .45rem .75rem !important;
+}
+
+body.reflow-book #content [data-section-id="pg029_sec001"] .whatsapp-message-outgoing {
+  padding: .4rem .75rem !important;
+}
+
+body.reflow-book #content .sentence-chain {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* A semantic chain that contains a real paragraph marker cannot keep the
+   shrink-to-fit width or horizontal position of the preceding sentence.
+   Making the chain a full-width block returns every following paragraph to
+   the common page margin in all font/Easy Read combinations. */
+body.reflow-book #content .sentence-chain:has(> .reflow-paragraph-break) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-inline: 0 !important;
+}
+
+body.reflow-book #content .sentence-chain > .reading-sentence {
+  display: inline !important;
+}
+
+/* A few short passages are single semantic units. Keeping them in one
+   wrapper prevents a credit, an attribution or a follow-up from becoming
+   the only text on a visual page as font size changes. */
+body.reflow-book #content .sentence-chain-closing-credit {
+  display: block;
+  width: 100%;
+}
+
+body.reflow-book #content .sentence-chain-list-followup {
+  display: contents;
+  break-inside: auto !important;
+}
+
+body.reflow-book.reflow-easy-read[data-reflow-font-size="normal"] #content
+  .sentence-chain-list-followup {
+  display: block;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .sentence-chain-closing-credit {
+  text-align: left;
+}
+
+/* Keep the closing passage as three stable block rows so Chromium cannot
+   paint an inline fragment in both adjacent columns while TTS highlighting
+   is moving through it. */
+body.reflow-book #content .sentence-chain-closing-credit > .reading-sentence {
+  display: block !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+body.reflow-book #content .sentence-chain-closing-credit > .reading-sentence
+  + .reading-sentence {
+  margin-top: .2rem !important;
+}
+
+body.reflow-book #content .sentence-chain-closing-credit > [data-id="pg015_n0011"] {
+  display: block !important;
+  width: 100% !important;
+  margin-top: .85rem !important;
+  padding-right: 1.5rem !important;
+  text-align: right !important;
+}
+
+body.reflow-book #content .sentence-chain-dialogue-attribution {
+  display: block;
+  width: 100%;
+  break-inside: avoid-column;
+}
+
+/* A closing institutional signature belongs to the sentence immediately
+   before it. Keeping the pair together prevents a one-line orphan without
+   dragging the entire preceding paragraph to a new page. */
+body.reflow-book #content .reading-block:has(> .sentence-chain-signature) {
+  margin-top: .55rem !important;
+  padding-top: 0 !important;
+}
+
+body.reflow-book #content .sentence-chain-signature {
+  display: block !important;
+  width: 100% !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .sentence-chain-signature > .reading-sentence {
+  display: block !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+body.reflow-book #content .sentence-chain-signature > [data-id="pg011_n0011"] {
+  margin-top: .4rem !important;
+  margin-right: 1.5rem !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
+
+/* Fragmenting the imported wrapper of the long Hardy Grüne quotation can
+   reserve the full remainder of a column after only its final lines. Let the
+   long Easy Read unit participate directly in the column flow. */
+body.reflow-book.reflow-easy-read #content
+  .reading-block.reading-block-long:has([data-id="pg011_n0007"]) {
+  display: contents !important;
+}
+
+body.reflow-book.reflow-easy-read #content [data-id="pg011_n0007"] {
+  break-inside: auto !important;
+}
+
+body.reflow-book #content .sentence-chain-dialogue-attribution > [data-id="pg026_n0030"] {
+  padding-right: 0 !important;
+}
+
+/* Easy-read replacements with explicit line breaks must remain in DOM order.
+   As full-width blocks they cannot rise beside the preceding list. */
+body.reflow-book #content .reading-sentence.reading-sentence-multiline,
+body.reflow-book #content .sentence-chain > .reading-sentence.reading-sentence-multiline {
+  display: block !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Image pages share their viewport with a compact passage of prose. */
+body.reflow-book #content > section[data-section-id="pg047_sec001"],
+body.reflow-book #content > section[data-section-id="pg052_sec001"] {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg047_sec001"] > .illustrated-page,
+body.reflow-book #content > section[data-section-id="pg052_sec001"] > .illustrated-page {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+  grid-template-rows: max-content;
+  align-items: start;
+  align-content: center;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  width: 100% !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .illustrated-page > img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: calc(var(--reflow-page-height) - 5.5rem) !important;
+  margin: 0 auto !important;
+  object-fit: contain;
+  break-before: auto !important;
+  break-after: auto !important;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .illustrated-copy {
+  align-self: start;
+  min-height: 0;
+  margin-top: 0 !important;
+  /* The complete image/copy grid is already the indivisible page. Keeping the
+     inner copy itself `avoid-column` makes WebKit eject an otherwise fitting
+     extra sentence and leaves the side column artificially short. */
+  break-inside: auto !important;
+  -webkit-column-break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+body.reflow-book #content .illustrated-copy > :is(.reading-sentence, .sentence-chain) {
+  break-before: auto !important;
+  break-after: auto !important;
+}
+
+body.reflow-book #content .illustrated-overflow {
+  display: block !important;
+}
+
+/* Page 52's legacy selector gives every direct div the image/copy grid.
+   Continuation prose is a different semantic page and must retain linear
+   DOM order instead of being distributed in a visual zigzag. */
+body.reflow-book #content
+  > section[data-section-id="pg052_sec001"] > .illustrated-overflow {
+  display: block !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  height: auto !important;
+  grid-template-columns: none !important;
+  align-items: initial !important;
+  gap: 0 !important;
+}
+
+/* The runtime adds this class to the currently spoken word. */
+body.reflow-book #content .bg-yellow-300 {
+  color: #111827 !important;
+  background: #fde047 !important;
+  border-radius: .12em;
+  opacity: 1 !important;
+  transition: none !important;
+  animation: none !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Native ranges paint the active word or sentence without inserting spans
+   into already-paginated prose, so TTS cannot alter column geometry. */
+::highlight(adt-tts-active) {
+  color: #111827;
+  background: #fde047;
+}
+
+/* A glossary wrapper has its own green background. While its text intersects
+   the active TTS range, paint that same wrapper yellow; removing the class on
+   the next tick reveals the original green again. */
+body.reflow-book #content .glossary-term.tts-glossary-covered {
+  color: #111827 !important;
+  background: #fde047 !important;
+}
+
+body.reflow-book #content [data-sentence-index] {
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* TTS wrappers must be typographically transparent. In particular, they
+   preserve the line boxes established before pagination at easy/xlarge. */
+body.reflow-book #content [data-word-index],
+body.reflow-book #content [data-sentence-index] {
+  position: static !important;
+  display: inline !important;
+  float: none !important;
+  inset: auto !important;
+  box-sizing: content-box !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  white-space: inherit;
+  vertical-align: baseline !important;
+  transform: none !important;
+}
+
+/* Sentence highlighting uses the same yellow treatment as word tracking. */
+body.reflow-book #content .tts-active-block:not(img) {
+  color: #111827 !important;
+  background: #fde047 !important;
+  border-radius: .12em !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transition: none !important;
+  animation: none !important;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Replace the original blue TTS ring with a slightly deeper opaque yellow.
+   Against detailed artwork this reads perceptually like the #fde047 text
+   highlight. The zero-offset shadow hugs the image without repagination. */
+body.reflow-book #content img.tts-active-block {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Some responsive illustrations use object-fit: contain inside a taller
+   pagination box. This fixed overlay follows the pixels actually painted by
+   the image, rather than outlining the empty object-fit letterbox. */
+body.reflow-book .tts-image-highlight-overlay {
+  position: fixed;
+  z-index: 45;
+  box-sizing: border-box;
+  border: 4px solid #facc15;
+  pointer-events: none;
+  background: transparent;
+  transition: none;
+}
+
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > section[data-section-id="pg047_sec001"] > .illustrated-page,
+  body.reflow-book #content > section[data-section-id="pg052_sec001"] > .illustrated-page {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: .75rem;
+  }
+
+  body.reflow-book #content .illustrated-page > img {
+    max-height: 42% !important;
+  }
+}
+
+#reflow-pagination {
+  position: fixed;
+  z-index: 64;
+  left: 50%;
+  bottom: .5rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 2.75rem;
+  padding: 0 .35rem;
+  border: 0;
+  border-radius: .7rem;
+  color: #f8fafc;
+  background: transparent;
+  box-shadow: none;
+}
+
+#reflow-pagination button {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--ceibal-radius-md);
+  color: #f8fafc;
+  background: rgb(255 255 255 / 8%);
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+#reflow-pagination button:hover:not(:disabled) { background: rgb(255 255 255 / 16%); }
+#reflow-pagination button:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+}
+#reflow-pagination button:disabled { opacity: .35; cursor: default; }
+
+#reflow-page-status {
+  min-width: 4.8rem;
+  text-align: center;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The activity submit dock must not float over ordinary reading pages. */
+body.reflow-book [aria-label="dock-label"]:has(button[title="Enviar"]) {
+  display: none !important;
+}
+
+#reflow-loading {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #111827;
+  background: #fff;
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.reflow-book #content { scroll-behavior: auto; }
+}
+
+/* Chapter 1 uses the final Chapter 2 reading system with its own source layouts. */
+body.reflow-book #content > section[data-section-type="boxed_text"],
+body.reflow-book #content > section[data-section-type="text_and_single_image"] {
+  display: contents !important;
+  padding: 0 !important;
+}
+
+/* v35 final cover: preserve the complete artwork and place live Atkinson text
+   only over its clear areas, with no bordeaux copy block or image cropping. */
+body.reflow-book #content > .book-cover-final {
+  box-sizing: border-box;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  height: 100%;
+  margin: 0;
+  padding: 0 !important;
+  break-after: column;
+  break-inside: avoid-column;
+  overflow: visible;
+  background: #fff;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-layout {
+  --book-cover-title-color: #f4bd32;
+  box-sizing: border-box;
+  position: relative;
+  width: min(100%, 57dvh, 40rem) !important;
+  height: auto;
+  aspect-ratio: 738 / 1078;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: hidden;
+  color: var(--book-cover-title-color);
+  background: #210f1c;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-copy {
+  position: absolute;
+  z-index: 2;
+  top: 3.2%;
+  right: 18%;
+  left: 18%;
+  display: grid;
+  justify-items: center;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--book-cover-title-color);
+  text-align: center;
+  pointer-events: none;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-copy h1,
+body.reflow-book #content .book-cover-final .book-cover-copy h2 {
+  box-sizing: border-box;
+  display: block;
+  width: 100% !important;
+  margin: 0 !important;
+  color: var(--book-cover-title-color) !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-copy h1 {
+  font-size: clamp(3.35rem, 9.5vh, 6.2rem) !important;
+  line-height: .98 !important;
+  letter-spacing: .025em !important;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-copy h2 {
+  margin-top: clamp(.3rem, .8vh, .55rem) !important;
+  font-size: clamp(1.85rem, 4.4vh, 2.8rem) !important;
+  line-height: 1.1 !important;
+  letter-spacing: .09em !important;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-site {
+  position: absolute;
+  z-index: 2;
+  right: auto;
+  bottom: 3.8%;
+  left: 50%;
+  width: max-content !important;
+  max-width: 68%;
+  transform: translateX(-50%);
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--book-cover-title-color) !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-size: clamp(1.08rem, 1.85vh, 1.22rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: .01em !important;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-art,
+body.reflow-book #content .book-cover-final .book-cover-art img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-art img {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* v39: all preliminary subtitles share one visual system. Their source HTML
+   used three unrelated sizes, alignments and wrapper paddings. Neutralizing
+   those wrappers makes each subtitle begin on the same page-content line. */
+body.reflow-book #content div:has(> [data-id="pg009_n0002"]),
+body.reflow-book #content div:has(> [data-id="pg013_n0002"]) {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  text-align: center !important;
+}
+
+body.reflow-book #content [data-id="pg009_n0002"],
+body.reflow-book #content [data-id="pg013_n0002"] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #000 !important;
+  font-size: calc(2rem * var(--reflow-font-scale)) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: .025em !important;
+  text-align: center !important;
+  text-transform: none !important;
+  break-before: column;
+  break-after: avoid-column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .preliminary-title-continuous {
+  white-space: pre-line;
+}
+
+/* Word highlighting rebuilds the title as individual spans. Keep the visual
+   line break before “QUE” even while that temporary markup is active. */
+body.reflow-book #content .preliminary-title-continuous
+  > [data-word-index="2"]::before {
+  content: "";
+  display: block;
+}
+
+/* Use the same subtitle-to-copy rhythm in all three preliminary sections. */
+body.reflow-book #content div:has(> [data-id="pg009_n0002"])
+  + div:has(> p),
+body.reflow-book #content div:has(> [data-id="pg013_n0002"])
+  + div:has(> p) {
+  margin-top: 1.6rem !important;
+}
+
+/* “De la historia al mito” belongs to the Red Global de Aprendizajes essay
+   headed by “La historia que nos une”. It is an internal subsection, not a
+   second preliminary chapter, so it keeps the original smaller bold rank and
+   remains in the continuous prose flow. */
+body.reflow-book #content div:has(> [data-id="pg010_n0008"]) {
+  margin-top: 1.6rem !important;
+  padding: 0 !important;
+  text-align: left !important;
+  break-after: avoid-column !important;
+}
+
+body.reflow-book #content [data-id="pg010_n0008"] {
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #000 !important;
+  font-size: calc(var(--reflow-subheading-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  text-align: left !important;
+  text-transform: none !important;
+  break-before: auto !important;
+  break-after: avoid-column !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content div:has(> [data-id="pg010_n0008"])
+  + div:has(> p) {
+  margin-top: .8rem !important;
+}
+
+/* Pages 16 and 17 are the two halves of one chapter-opening illustration. */
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg016_sec001"],
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg017_sec001"],
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg016_sec001"] > div,
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg017_sec001"] > div {
+  display: contents !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg017_sec001"] > div > div:first-child {
+  display: flex !important;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(.9rem, 2vh, 1.4rem) 0 clamp(1.25rem, 2.8vh, 2rem) !important;
+  text-align: center;
+}
+
+body.reflow-book #content > .chapter-cover {
+  height: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+body.reflow-book #content > .chapter-cover h1 {
+  margin: 0 !important;
+  font-size: clamp(4.2rem, 6.5vw, 5.6rem) !important;
+  line-height: 1 !important;
+  font-weight: 400 !important;
+  letter-spacing: .045em !important;
+  white-space: nowrap;
+}
+
+body.reflow-book #content > .chapter-cover [data-id="pg017_n0004"] {
+  margin: .85rem 0 0 !important;
+  font-size: clamp(1.55rem, 2.2vw, 2rem) !important;
+  line-height: 1.16 !important;
+  font-weight: 500 !important;
+  font-style: normal !important;
+  letter-spacing: .045em !important;
+  white-space: nowrap;
+  text-transform: none !important;
+}
+
+body.reflow-book #content > .chapter-cover .chapter-cover-composite {
+  width: 94% !important;
+  max-width: 94% !important;
+  max-height: calc(100% - .5rem) !important;
+  margin: 0 auto !important;
+}
+
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > .chapter-cover h1 {
+    font-size: clamp(3rem, 11vw, 4.2rem) !important;
+  }
+
+  body.reflow-book #content > .chapter-cover [data-id="pg017_n0004"] {
+    font-size: clamp(1.15rem, 4.5vw, 1.55rem) !important;
+    white-space: normal;
+  }
+}
+
+body.reflow-book #content > .chapter-cover > section[data-section-id="pg016_sec001"] p,
+body.reflow-book #content > .chapter-cover .chapter-cover-source {
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* The dining-room illustration shares a page with its opening passage. */
+body.reflow-book #content > section[data-section-id="pg025_sec001"] {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrated-page {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  grid-template-rows: max-content;
+  align-items: start;
+  align-content: center;
+  gap: clamp(.75rem, 1.5vw, 1rem);
+  width: 100% !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  /* Its full-page height plus break-inside already advances to a fresh
+     column. An additional forced break can create a completely blank one. */
+  break-before: auto;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrated-page > img {
+  max-height: calc(var(--reflow-page-height) - 1rem) !important;
+}
+
+/* The attic scene shares a page with its continuation instead of occupying
+   a standalone image page. */
+body.reflow-book #content > section[data-section-id="pg031_sec001"] {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg031_sec001"] > .attic-illustrated-page {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  grid-template-rows: max-content;
+  align-items: start;
+  align-content: center;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  width: 100% !important;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-before: auto;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section[data-section-id="pg031_sec001"]
+  > .attic-illustrated-page > img {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: calc(var(--reflow-page-height) - 4rem) !important;
+  margin: 0 auto !important;
+  object-fit: contain;
+}
+
+body.reflow-book #content .attic-illustrated-copy,
+body.reflow-book #content .attic-illustrated-copy p {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+body.reflow-book #content .attic-illustrated-copy {
+  box-sizing: border-box;
+  align-self: start;
+}
+
+body.reflow-book #content .attic-illustrated-copy p {
+  line-height: 1.55 !important;
+}
+
+/* In Easy Read the complete sentence rows retain their normal 1.55 rhythm,
+   while the semantic units span the same measured height as the adjacent
+   illustration. This aligns both top and bottom without enlarging letters or
+   manufacturing line breaks inside a sentence. */
+body.reflow-book.reflow-easy-read #content
+  .attic-illustrated-source.attic-easy-height-balanced {
+  box-sizing: border-box !important;
+  display: block !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  .attic-illustrated-source.attic-easy-height-balanced
+  > .sentence-chain:only-child {
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+}
+
+body.reflow-book #content .attic-illustrated-overflow {
+  box-sizing: border-box;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+body.reflow-book #content .attic-illustrated-overflow[hidden] {
+  display: none !important;
+}
+
+body.reflow-book #content .attic-illustrated-overflow p {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* Fixed-page source wrappers carried their own horizontal padding. Reflow
+   owns the gutter, so every imported prose line begins at the same edge. */
+body.reflow-book #content :is(
+  [data-section-id="pg030_sec001"],
+  [data-section-id="pg032_sec001"],
+  [data-section-id="pg033_sec001"],
+  [data-section-id="pg034_sec001"],
+  [data-section-id="pg035_sec001"]
+) :where(div, p, span) {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+}
+
+/* Each chapter assessment is one semantic section containing three
+   consecutive quiz pages, in the shared reading-dimension order. */
+body.reflow-book #content > section[data-section-type="quiz_sequence"] {
+  display: contents !important;
+}
+
+/* A runtime text replacement changes the column count before the semantic
+   quiz anchor is restored. Preserve the last committed quiz for those few
+   layout frames so a neighbouring question is never painted transiently. */
+body.reflow-book.reflow-quiz-repaginating #content
+  > :not(.reflow-quiz-repagination-overlay) {
+  visibility: hidden !important;
+}
+
+body.reflow-book > .reflow-quiz-repagination-overlay,
+body.reflow-book #content > .reflow-quiz-repagination-overlay {
+  position: fixed !important;
+  z-index: 30;
+  display: block !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  visibility: visible !important;
+  pointer-events: none;
+  background: var(--ceibal-institutional-400, #16b8ac);
+  column-width: auto !important;
+  column-count: auto !important;
+  column-gap: 0 !important;
+}
+
+body.reflow-book #content > .reflow-quiz-repagination-overlay
+  > .reflow-quiz-repagination-card {
+  position: absolute !important;
+  left: var(--reflow-frozen-card-left) !important;
+  top: var(--reflow-frozen-card-top) !important;
+  width: var(--reflow-frozen-card-width) !important;
+  height: var(--reflow-frozen-card-height) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  break-before: auto !important;
+  break-after: auto !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content .quiz-panel {
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+  color: var(--ceibal-gray-900);
+}
+
+body.reflow-book #content .quiz-panel:last-child {
+  break-after: auto;
+}
+
+body.reflow-book #content .quiz-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 52rem) !important;
+  margin: 0 auto !important;
+  padding: clamp(1.25rem, 3vh, 1.75rem) clamp(1rem, 2.5vw, 1.5rem) !important;
+  border: 1px solid var(--ceibal-gray-200);
+  border-radius: var(--ceibal-radius-lg);
+  background: #fff;
+  box-shadow: var(--ceibal-shadow-card);
+  max-height: 100%;
+  overflow: hidden;
+}
+
+body.reflow-book #content .quiz-confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+body.reflow-book #content .quiz-confetti > i {
+  position: absolute;
+  top: -.9rem;
+  left: var(--confetti-x);
+  width: .42rem;
+  height: .7rem;
+  border-radius: .08rem;
+  background: var(--confetti-color);
+  opacity: 0;
+  animation: quiz-confetti-fall var(--confetti-duration) cubic-bezier(.15, .68, .36, 1)
+    var(--confetti-delay) forwards;
+}
+
+body.reflow-book #content .quiz-confetti > i:nth-child(3n) {
+  width: .65rem;
+  height: .34rem;
+}
+
+body.reflow-book #content .quiz-confetti > i:nth-child(4n) {
+  border-radius: 999px;
+}
+
+@keyframes quiz-confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -1rem, 0) rotate(0deg);
+  }
+  10% { opacity: 1; }
+  88% { opacity: 1; }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--confetti-drift), 70vh, 0) rotate(var(--confetti-turn));
+  }
+}
+
+body.reflow-book #content .quiz-kicker,
+body.reflow-book #content .quiz-dimension {
+  display: none !important;
+}
+
+body.reflow-book #content .quiz-kicker {
+  color: var(--ceibal-gray-700);
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+body.reflow-book #content .quiz-dimension {
+  margin-top: .25rem;
+  color: var(--ceibal-institutional-700);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+body.reflow-book #content .quiz-question {
+  margin: 0 auto;
+  text-align: center;
+  font-size: calc(clamp(1.15rem, 2vw, 1.45rem) * var(--reflow-font-scale)) !important;
+  line-height: 1.35 !important;
+  font-weight: 700;
+}
+
+body.reflow-book #content .quiz-options {
+  display: grid;
+  gap: .875rem;
+  width: 100%;
+  margin-top: var(--ceibal-space-4);
+}
+
+body.reflow-book #content .quiz-option {
+  --reflow-quiz-option-pad-block: var(--ceibal-space-3);
+  --reflow-quiz-option-pad-inline: var(--ceibal-space-4);
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.2rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--ceibal-space-3);
+  padding: var(--reflow-quiz-option-pad-block)
+    var(--reflow-quiz-option-pad-inline);
+  border: 2px solid var(--ceibal-gray-400);
+  border-radius: var(--ceibal-radius-md);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease;
+  width: 100% !important;
+  max-width: none !important;
+  text-align: left !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.reflow-book #content .quiz-option:hover {
+  border-color: var(--ceibal-institutional-400);
+  box-shadow: none;
+}
+
+body.reflow-book #content .quiz-option:focus-within {
+  border-color: var(--ceibal-institutional-400);
+  outline: 0;
+  box-shadow: none;
+}
+
+body.reflow-book #content .quiz-option.is-selected {
+  border-color: var(--ceibal-institutional-300);
+  background: #fff;
+  outline: 0 !important;
+  box-shadow: none;
+}
+
+body.reflow-book #content .quiz-option.is-correct {
+  border-color: #16803a;
+  background: #fff;
+  box-shadow: none;
+}
+
+body.reflow-book #content .quiz-option.is-incorrect {
+  border-color: #c42b24;
+  background: #fff;
+  box-shadow: none;
+}
+
+body.reflow-book #content .quiz-result-mark {
+  position: absolute;
+  top: .45rem;
+  right: .25rem;
+  display: grid;
+  place-items: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #16803a;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Reserve a dedicated right gutter once the answer is evaluated. The result
+   icon sits closer to the outer border and can no longer cover the final
+   letters of a wrapped option. */
+body.reflow-book #content .quiz-option.is-correct,
+body.reflow-book #content .quiz-option.is-incorrect {
+  padding-right: 2.35rem !important;
+}
+
+body.reflow-book #content .quiz-option.is-incorrect .quiz-result-mark {
+  background: #c42b24;
+}
+
+body.reflow-book #content .quiz-option input {
+  margin-top: .25rem;
+  accent-color: var(--ceibal-institutional-500);
+}
+
+body.reflow-book #content .quiz-option-text {
+  grid-column: 2;
+  min-width: 0;
+  width: 100%;
+  font-size: calc(1rem * var(--reflow-font-scale));
+  line-height: 1.4;
+}
+
+body.reflow-book #content .quiz-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--ceibal-space-5);
+}
+
+body.reflow-book #content .quiz-submit {
+  min-height: 2.75rem;
+  padding: var(--ceibal-space-2) var(--ceibal-space-6);
+  border: 0;
+  border-radius: var(--ceibal-radius-md);
+  color: #fff;
+  background: var(--ceibal-institutional-500);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body.reflow-book #content .quiz-submit:hover:not(:disabled) {
+  background: var(--ceibal-institutional-600);
+}
+
+body.reflow-book #content .quiz-submit:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-light);
+  outline-offset: 3px;
+}
+
+body.reflow-book #content .quiz-submit:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+body.reflow-book #content .quiz-feedback {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--ceibal-space-3);
+  min-height: 4.75rem;
+  margin-top: var(--ceibal-space-3);
+  padding: var(--ceibal-space-3);
+  border-radius: var(--ceibal-radius-md);
+  background: var(--ceibal-gray-100);
+  font-size: calc(.95rem * var(--reflow-font-scale));
+  line-height: 1.35;
+}
+
+body.reflow-book #content .quiz-feedback:empty {
+  visibility: hidden;
+}
+
+body.reflow-book #content .quiz-feedback-icon {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #16803a;
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+body.reflow-book #content .quiz-feedback.is-incorrect .quiz-feedback-icon {
+  background: #c42b24;
+}
+
+body.reflow-book #content .quiz-feedback:not(:empty) {
+  animation: quiz-feedback-in 160ms ease-out;
+}
+
+@keyframes quiz-feedback-in {
+  from { opacity: 0; transform: translateY(.25rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+body.reflow-book #content .quiz-feedback.is-correct {
+  color: var(--ceibal-success-text);
+  background: var(--ceibal-success-surface);
+}
+
+body.reflow-book #content .quiz-feedback.is-incorrect {
+  color: var(--ceibal-error-text);
+  background: var(--ceibal-error-surface);
+}
+
+/* TTS may mark the feedback as its active block. The validation state must
+   remain visually green or red instead of being replaced by TTS yellow. */
+body.reflow-book #content .quiz-feedback.is-correct.tts-active-block {
+  color: var(--ceibal-success-text) !important;
+  background: var(--ceibal-success-surface) !important;
+}
+
+body.reflow-book #content .quiz-feedback.is-incorrect.tts-active-block {
+  color: var(--ceibal-error-text) !important;
+  background: var(--ceibal-error-surface) !important;
+}
+
+body.reflow-book #content .quiz-explanation-bank {
+  display: none !important;
+}
+
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrated-page {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    gap: .75rem;
+  }
+
+  body.reflow-book #content .quiz-card {
+    padding: .8rem !important;
+  }
+
+  body.reflow-book #content .quiz-option {
+    padding: .55rem .7rem;
+  }
+}
+
+/* Reading size is part of the accessibility settings panel. */
+#reflow-font-settings {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem 0;
+}
+
+#reflow-font-settings > header {
+  padding: 0 0 .5rem;
+}
+
+#reflow-font-settings h3 {
+  margin: 0;
+  color: rgb(255 255 255 / 58%);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.reflow-font-settings-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ceibal-space-3);
+  padding: var(--ceibal-space-3);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: var(--ceibal-radius-lg);
+  color: #f8fafc;
+  background: rgb(0 0 0 / 44%);
+}
+
+#reflow-font-settings-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.reflow-font-settings-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--ceibal-space-1);
+  padding: var(--ceibal-space-1);
+  border-radius: var(--ceibal-radius-md);
+  background: rgb(255 255 255 / 7%);
+}
+
+.reflow-font-settings-options button {
+  min-height: 2.75rem;
+  padding: var(--ceibal-space-2) var(--ceibal-space-1);
+  border: 1px solid transparent;
+  border-radius: var(--ceibal-radius-sm);
+  color: rgb(255 255 255 / 72%);
+  background: transparent;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.reflow-font-settings-options button[aria-pressed="true"] {
+  border-color: rgb(255 255 255 / 20%);
+  color: #fff;
+  background: var(--ceibal-institutional-500);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
+}
+
+.reflow-font-settings-options button:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+}
+
+/* Navigation and accessibility menus overlay the page, following the CLE 3
+   interaction: opening either panel never moves or repaginates the book. */
+body.reflow-book :where(
+  #interface-container,
+  #nav-container,
+  #navPopup,
+  [data-slot="popover-content"],
+  [role="dialog"]
+) {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+body.reflow-book :where(
+  #interface-container,
+  #nav-container,
+  #navPopup,
+  [data-slot="popover-content"],
+  [role="dialog"]
+) :where(button, input, select, textarea, label, p, span, a, h1, h2, h3, h4, h5, h6, ol, ul, li) {
+  font-family: inherit !important;
+}
+
+/* A repeated dialog attribute raises specificity without coupling the
+   unified Atkinson rule to generated utility classes. */
+body.reflow-book [role="dialog"][role="dialog"],
+body.reflow-book [role="dialog"][role="dialog"] * {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+body.reflow-book .reflow-reader-panel {
+  width: min(18.75rem, 100vw) !important;
+  max-width: min(18.75rem, 100vw) !important;
+}
+
+body.reflow-book .reflow-reader-panel.reflow-navigation-panel {
+  width: min(18rem, 100vw) !important;
+  max-width: min(18rem, 100vw) !important;
+  border-radius: 0 var(--ceibal-radius-md) var(--ceibal-radius-md) 0 !important;
+  color: var(--ceibal-gray-50) !important;
+  background: #242424 !important;
+  box-shadow: var(--ceibal-shadow-card), 0 .5rem 1.5rem rgb(0 0 0 / 22%) !important;
+}
+
+body.reflow-book .reflow-navigation-panel > div:first-child {
+  gap: .75rem !important;
+  padding: 1rem !important;
+}
+
+body.reflow-book .reflow-navigation-panel h4 {
+  margin: 0 !important;
+  color: var(--ceibal-gray-50) !important;
+  font-size: 1.5rem !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+}
+
+body.reflow-book .reflow-navigation-panel input[placeholder="Buscar"] {
+  height: 3.5rem !important;
+  padding-left: 2.75rem !important;
+  border: 2px solid var(--ceibal-gray-600) !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  color: var(--ceibal-gray-50) !important;
+  background: #242424 !important;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 4%) !important;
+}
+
+body.reflow-book .reflow-navigation-panel input[placeholder="Buscar"]:focus {
+  border-color: var(--ceibal-institutional-300) !important;
+  outline: 2px solid var(--ceibal-institutional-300) !important;
+  outline-offset: 1px !important;
+}
+
+body.reflow-book .reflow-reader-panel.reflow-accessibility-panel {
+  width: min(18rem, 100vw) !important;
+  max-width: min(18rem, 100vw) !important;
+  border-radius: var(--ceibal-radius-md) 0 0 var(--ceibal-radius-md) !important;
+}
+
+body.reflow-book .reflow-reader-panel.reflow-language-panel {
+  width: min(18rem, 100vw) !important;
+  max-width: min(18rem, 100vw) !important;
+  border-radius: var(--ceibal-radius-md) 0 0 var(--ceibal-radius-md) !important;
+}
+
+body.reflow-book .reflow-panel-pending {
+  visibility: hidden !important;
+}
+
+body.reflow-book .reflow-reader-panel.reflow-glossary-panel {
+  width: min(18.75rem, 100vw) !important;
+  max-width: min(18.75rem, 100vw) !important;
+  border-radius: var(--ceibal-radius-md) 0 0 var(--ceibal-radius-md) !important;
+}
+
+body.reflow-book .reflow-reader-panel > div:first-child {
+  width: 100% !important;
+  max-width: none !important;
+  padding-inline: .625rem !important;
+}
+
+body.reflow-book .reflow-reader-panel.reflow-glossary-panel > div:first-child {
+  padding-inline: .75rem !important;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button {
+  padding-inline: .5rem !important;
+}
+
+/* Base UI gives the settings scroller a fit-content inner width. At the
+   compact panel size that preserves the former 20rem layout and creates a
+   hidden horizontal strip. Let the settings column use the available width
+   and reclaim only redundant card padding; labels may wrap naturally. */
+body.reflow-book .reflow-accessibility-panel
+  > div:first-child
+  > [role="presentation"]
+  > [role="presentation"]
+  > [role="presentation"] {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  > div:first-child
+  > [role="presentation"]
+  > [role="presentation"]
+  > [role="presentation"]
+  > div {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  padding-inline: .5rem !important;
+}
+
+body.reflow-book .reflow-accessibility-panel section > .rounded-xl,
+body.reflow-book .reflow-accessibility-panel .reflow-font-settings-card {
+  padding-inline: .5rem !important;
+}
+
+/* Keep the full Resaltado control inside the compact settings panel without
+   reducing Verdana. The label keeps its natural width; the segmented buttons
+   give back only redundant horizontal padding. */
+body.reflow-book .reflow-accessibility-panel
+  [role="group"]:has(> span + div > [role="radio"]) {
+  min-width: 0 !important;
+  gap: .25rem !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  [role="group"]:has(> span + div > [role="radio"]) > span {
+  flex: 0 0 auto !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  [role="group"]:has(> span + div > [role="radio"]) > div {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  [role="group"]:has(> span + div > [role="radio"]) > div > [role="radio"] {
+  padding-inline: .45rem !important;
+}
+
+/* The second navigation tab needs slightly more room than the first one.
+   Redistribute the existing tab-list width instead of widening the panel. */
+body.reflow-book .reflow-navigation-panel [role="tablist"] {
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+  height: 3.25rem !important;
+  padding: .25rem !important;
+  border: 1px solid var(--ceibal-gray-700) !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  background: #1b1b1b !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tab"] {
+  border-radius: .6rem !important;
+  color: var(--ceibal-gray-400) !important;
+  font-size: .9375rem !important;
+  font-weight: 500 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tab"][aria-selected="true"] {
+  border-color: var(--ceibal-institutional-500) !important;
+  color: #fff !important;
+  background: var(--ceibal-quiz-page) !important;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 22%) !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] ul {
+  padding: .25rem 0 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button {
+  box-sizing: border-box !important;
+  min-height: 2.75rem !important;
+  margin: 0 0 .375rem !important;
+  padding: .625rem .75rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .625rem !important;
+  color: var(--ceibal-gray-100) !important;
+  background: rgb(255 255 255 / 4%) !important;
+  font-size: .9rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  text-align: left !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:hover,
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:focus-visible {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: rgb(126 196 191 / 16%) !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-current] {
+  border-color: var(--ceibal-institutional-400) !important;
+  color: #fff !important;
+  background: var(--ceibal-quiz-page) !important;
+}
+
+body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
+  li[data-chapter-id] {
+  padding: .75rem .25rem .35rem !important;
+  color: var(--ceibal-institutional-200) !important;
+  font-size: .78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .045em !important;
+}
+
+/* A single green convention communicates every active accessible mode. */
+body.reflow-book :is(
+  .reflow-accessibility-panel,
+  .reflow-language-panel,
+  .reflow-glossary-panel
+)
+  [role="switch"][aria-checked="true"],
+body.reflow-book .reflow-accessibility-panel
+  [role="radio"][aria-checked="true"] {
+  color: #fff !important;
+  background: var(--ceibal-quiz-page) !important;
+}
+
+/* Every active switch uses the same white thumb. */
+body.reflow-book :is(
+  .reflow-accessibility-panel,
+  .reflow-language-panel,
+  .reflow-glossary-panel
+)
+  [role="switch"][aria-checked="true"] > span {
+  background: #fff !important;
+}
+
+body.reflow-book .reflow-panel-anchor {
+  top: 0 !important;
+  bottom: auto !important;
+  transform: translateY(var(--reflow-panel-top, 0)) !important;
+}
+
+body.reflow-book .reflow-panel-anchor-left {
+  right: auto !important;
+  left: 0 !important;
+}
+
+body.reflow-book .reflow-panel-anchor-right {
+  right: 0 !important;
+  left: auto !important;
+}
+
+body.reflow-book .reflow-reader-panel-tall {
+  height: calc(100dvh - var(--nav-height, 60px) - 1rem) !important;
+  max-height: calc(100dvh - var(--nav-height, 60px) - 1rem) !important;
+}
+
+body.reflow-book .reflow-reader-panel-tall > div:first-child {
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+@media (max-height: 700px) {
+  body.reflow-book #content .quiz-panel { padding: .25rem 0; }
+  body.reflow-book #content .quiz-card { padding: .65rem !important; }
+  body.reflow-book #content .quiz-kicker { font-size: .78rem; }
+  body.reflow-book #content .quiz-dimension {
+    margin-top: .15rem;
+    font-size: .9rem;
+  }
+  body.reflow-book #content .quiz-question {
+    margin-top: .35rem;
+    line-height: 1.25 !important;
+  }
+  body.reflow-book #content .quiz-options {
+    gap: .35rem;
+    margin-top: .5rem;
+  }
+  body.reflow-book #content .quiz-option {
+    --reflow-quiz-option-pad-block: .45rem;
+    --reflow-quiz-option-pad-inline: .65rem;
+    padding: var(--reflow-quiz-option-pad-block)
+      var(--reflow-quiz-option-pad-inline);
+  }
+  body.reflow-book #content .quiz-option-text { line-height: 1.3; }
+  body.reflow-book #content .quiz-actions { margin-top: .45rem; }
+  body.reflow-book #content .quiz-submit {
+    min-height: 2.35rem;
+    padding: .4rem .9rem;
+  }
+  body.reflow-book #content .quiz-feedback {
+    min-height: 4.15rem;
+    margin-top: .4rem;
+    padding: .4rem .55rem;
+  }
+}
+
+/* Enlarged quiz text must remain accessible without turning the card into a
+   nested scroll area. Wider and tighter rows keep Enviar and its complete
+   feedback visible on every one of the three quiz pages. */
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card {
+  width: min(100%, 56rem) !important;
+  padding: .65rem !important;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-kicker {
+  font-size: .76rem;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-dimension {
+  margin-top: .1rem;
+  font-size: .86rem;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-question {
+  margin-top: 0;
+  font-size: calc(1.35rem * var(--reflow-font-scale)) !important;
+  line-height: 1.22 !important;
+}
+
+body.reflow-book #content .reflow-glossary-target {
+  border-radius: .25rem;
+  outline: .2rem solid rgb(22 184 172 / .75);
+  outline-offset: .12rem;
+  background: rgb(22 184 172 / .2) !important;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options {
+  gap: .3rem;
+  margin-top: .45rem;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-option {
+  --reflow-quiz-option-pad-block: .38rem;
+  --reflow-quiz-option-pad-inline: .6rem;
+  gap: .55rem;
+  padding: var(--reflow-quiz-option-pad-block)
+    var(--reflow-quiz-option-pad-inline);
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-option-text {
+  font-size: calc(.9rem * var(--reflow-font-scale));
+  line-height: 1.22;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-actions {
+  margin-top: .7rem;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-submit {
+  min-height: 2.2rem;
+  padding: .3rem .85rem;
+}
+
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-feedback {
+  min-height: 4rem;
+  margin-top: .35rem;
+  padding: .38rem .55rem;
+  font-size: calc(.8rem * var(--reflow-font-scale));
+  line-height: 1.22;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.reflow-book #content .quiz-feedback:not(:empty) { animation: none; }
+  body.reflow-book #content .quiz-confetti { display: none; }
+}
+
+/* v45 typography specification.
+   Mobile and desktop use the exact values supplied in the design table.
+   Tablet is deliberately isolated as a provisional fluid interpolation so
+   its future confirmed values can be replaced without touching either end. */
+body.reflow-book {
+  --reflow-body-size: 1.125rem;          /* 18 px */
+  --reflow-chapter-title-size: 1.75rem;  /* 28 px */
+  --reflow-subheading-size: 1.125rem;    /* 18 px */
+  --reflow-caption-size: 1rem;           /* 16 px */
+}
+
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  body.reflow-book {
+    --reflow-body-size: calc(.75rem + .78125vw);
+    --reflow-chapter-title-size: calc(.25rem + 3.125vw);
+    --reflow-subheading-size: calc(.375rem + 1.5625vw);
+  }
+}
+
+@media (min-width: 64rem) {
+  body.reflow-book {
+    --reflow-body-size: 1.25rem;         /* 20 px */
+    --reflow-chapter-title-size: 2.25rem;/* 36 px */
+    --reflow-subheading-size: 1.375rem;  /* 22 px */
+  }
+}
+
+/* Atkinson is the unified typeface for editorial content and reader UI. */
+body.reflow-book #content,
+body.reflow-book #content [data-id],
+body.reflow-book #content :where(
+  p, h1, h2, h3, h4, h5, h6, span, button, input, textarea, select, label,
+  figcaption
+) {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+/* Body copy, synchronized sentences and activity answers share one scale. */
+body.reflow-book #content,
+body.reflow-book #content section[data-section-type="text_only"] p,
+body.reflow-book #content .reading-sentence,
+body.reflow-book #content .illustrated-copy p,
+body.reflow-book #content .attic-illustrated-copy p,
+body.reflow-book #content .illustrated-overflow p,
+body.reflow-book #content .attic-illustrated-overflow p,
+body.reflow-book #content .whatsapp-chat-text,
+body.reflow-book #content .quiz-option-text,
+body.reflow-book #content .quiz-feedback {
+  font-size: calc(var(--reflow-body-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.55 !important;
+}
+
+body.reflow-book #content .attic-illustrated-copy p {
+  line-height: 1.55 !important;
+}
+
+/* Captions include image notes and the date/speaker metadata of semantic
+   chats. They stay 16 px at both responsive endpoints before user scaling. */
+body.reflow-book #content :where(figcaption, .adt-caption, .whatsapp-chat-date,
+  .whatsapp-chat-sender, .quiz-kicker, .quiz-dimension) {
+  font-size: calc(var(--reflow-caption-size) * var(--reflow-font-scale)) !important;
+}
+
+body.reflow-book #content :where(h2, h3, .adt-subheading, .quiz-question),
+body.reflow-book #content .chapter-cover [data-id="pg017_n0004"] {
+  font-size: calc(var(--reflow-subheading-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.3 !important;
+}
+
+/* Main editorial headings. The artistic front cover remains an intentional
+   exception; its overlay follows the geometry of the underlying artwork. */
+body.reflow-book #content > .chapter-cover h1,
+body.reflow-book #content [data-id="pg009_n0002"],
+body.reflow-book #content [data-id="pg013_n0002"] {
+  font-size: calc(var(--reflow-chapter-title-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.2 !important;
+}
+
+body.reflow-book #content > .chapter-cover h2 {
+  font-size: calc(var(--reflow-subheading-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.3 !important;
+}
+
+body.reflow-book #content .book-cover-final .book-cover-copy h1,
+body.reflow-book #content .book-cover-final .book-cover-copy h2,
+body.reflow-book #content .book-cover-final .book-cover-site {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+/* Voice selection follows the same Ceibal segmented-control language used
+   by font size, highlighting and navigation tabs. */
+#reflow-tts-voice-setting {
+  box-sizing: border-box;
+  display: grid !important;
+  gap: .5rem !important;
+  width: 100% !important;
+  padding: .75rem .5rem !important;
+  border-top: 1px solid var(--ceibal-gray-800) !important;
+}
+
+#reflow-tts-voice-label {
+  color: var(--ceibal-gray-100) !important;
+  font-size: .9375rem !important;
+  font-weight: 700 !important;
+}
+
+.reflow-tts-voice-options {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .25rem;
+  width: 100% !important;
+  padding: .25rem;
+  border-radius: var(--ceibal-radius-md);
+  background: #252525;
+}
+
+.reflow-tts-voice-options button {
+  min-width: 0 !important;
+  min-height: 2.75rem;
+  padding: .5rem .35rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .6rem !important;
+  color: var(--ceibal-gray-300) !important;
+  background: transparent !important;
+  font-size: .875rem !important;
+  font-weight: 700 !important;
+}
+
+.reflow-tts-voice-options button[aria-checked="true"] {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-500) !important;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 22%);
+}
+
+.reflow-tts-voice-options:has(> button[hidden]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.reflow-tts-voice-options > button[hidden] {
+  display: none !important;
+}
+
+/* Glossary: same surface, controls and active-state hierarchy as Index and
+   Configuration. Equal minmax columns plus a real gap prevent tab overlap. */
+body.reflow-book .reflow-reader-panel.reflow-glossary-panel {
+  border: 1px solid var(--ceibal-gray-700) !important;
+  background: #242424 !important;
+  box-shadow: 0 .5rem 1.5rem rgb(0 0 0 / 24%) !important;
+}
+
+body.reflow-book .reflow-glossary-panel
+  > div:first-child > div:first-child {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  column-gap: 1rem !important;
+  align-items: center !important;
+}
+
+body.reflow-book .reflow-glossary-panel
+  > div:first-child > div:first-child > h4 {
+  min-width: 0 !important;
+  font-size: 1.125rem !important;
+  line-height: 1.2 !important;
+}
+
+body.reflow-book .reflow-glossary-panel
+  > div:first-child > div:first-child > div {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: .35rem !important;
+  min-width: 0 !important;
+  font-size: .75rem !important;
+  line-height: 1.15 !important;
+}
+
+body.reflow-book .reflow-glossary-panel input:is([type="search"], [placeholder="Buscar"]) {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 1px solid var(--ceibal-gray-600) !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  color: #fff !important;
+  background: #242424 !important;
+}
+
+body.reflow-book .reflow-glossary-panel input:is([type="search"], [placeholder="Buscar"]):focus {
+  border-color: var(--ceibal-institutional-300) !important;
+  outline: 2px solid var(--ceibal-institutional-300) !important;
+  outline-offset: 1px;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tablist"] {
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .35rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: auto !important;
+  padding: .25rem !important;
+  border: 1px solid var(--ceibal-gray-700) !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  background: #1b1b1b !important;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tab"] {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 3rem !important;
+  padding: .55rem .3rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .6rem !important;
+  color: var(--ceibal-gray-400) !important;
+  background: transparent !important;
+  font-size: .8125rem !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tab"][aria-selected="true"] {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-quiz-page) !important;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 22%) !important;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  margin-bottom: .4rem !important;
+  padding: .65rem .6rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .625rem !important;
+  color: var(--ceibal-gray-100) !important;
+  background: rgb(255 255 255 / 4%) !important;
+  text-align: left !important;
+}
+
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:hover,
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:focus-visible {
+  border-color: var(--ceibal-institutional-300) !important;
+  background: rgb(126 196 191 / 16%) !important;
+}
+
+/* The four dock options use one state convention. This selector deliberately
+   excludes the context-specific activity submit dock. */
+body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"])) button {
+  border: 1px solid transparent !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  color: var(--ceibal-gray-200) !important;
+  background: transparent !important;
+}
+
+body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"]))
+  button:hover {
+  color: #fff !important;
+  background: rgb(126 196 191 / 14%) !important;
+}
+
+body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"]))
+  button:is([aria-pressed="true"], [data-state="open"]) {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-quiz-page) !important;
+}
+
+#reflow-tts-voice-setting[hidden] {
+  display: none !important;
+}
+
+/* Evaluated quizzes trade the now-redundant submit action for the complete
+   feedback. Options become slightly denser, but retain the specified font
+   size; no nested scrolling or clipped text is introduced. */
+body.reflow-book #content .quiz-option-text,
+body.reflow-book #content .quiz-feedback {
+  line-height: 1.3 !important;
+}
+
+body.reflow-book #content .quiz-feedback {
+  min-height: 0 !important;
+  height: auto !important;
+  grid-template-columns: 1.6rem minmax(0, 1fr) !important;
+  gap: .5rem !important;
+  padding: .45rem .55rem !important;
+  overflow: visible !important;
+}
+
+body.reflow-book #content .quiz-feedback-icon {
+  width: 1.6rem !important;
+  height: 1.6rem !important;
+  font-size: 1rem !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
+  display: none !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
+  gap: .25rem !important;
+  margin-top: .4rem !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-option {
+  gap: var(--reflow-quiz-option-gap, var(--ceibal-space-3)) !important;
+  min-height: var(--reflow-quiz-option-interaction-height, auto) !important;
+  height: var(--reflow-quiz-option-interaction-height, auto) !important;
+  padding-top: var(--reflow-quiz-option-padding-top, var(--ceibal-space-3)) !important;
+  padding-right: var(--reflow-quiz-option-padding-right, var(--ceibal-space-4)) !important;
+  padding-bottom: var(--reflow-quiz-option-padding-bottom, var(--ceibal-space-3)) !important;
+  padding-left: var(--reflow-quiz-option-padding-left, var(--ceibal-space-4)) !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty))
+  .quiz-option:is(.is-correct, .is-incorrect) {
+  padding-top: calc(var(--reflow-quiz-option-padding-top) + 2px) !important;
+  padding-right: max(
+    calc(var(--reflow-quiz-option-padding-right) + 2px),
+    2.35rem
+  ) !important;
+  padding-bottom: calc(var(--reflow-quiz-option-padding-bottom) + 2px) !important;
+  padding-left: calc(var(--reflow-quiz-option-padding-left) + 2px) !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty))
+  > :is(.quiz-question, .quiz-options, .quiz-actions, .quiz-feedback) {
+  transform: translateY(var(--reflow-quiz-content-shift, 0px)) !important;
+}
+
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-feedback {
+  margin-top: .35rem !important;
+}
+
+/* Give the unevaluated action a clear visual separation from the final
+   answer row. The evaluated action still disappears to make room for the
+   complete feedback text. */
+body.reflow-book #content .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions {
+  margin-top: 1rem !important;
+}
+
+/* Spacious quiz experiment requested for the integrated reader. The card may
+   approach twice its former natural height, but remains bounded by the live
+   viewport. Only spacing and the selected outline change; typography,
+   feedback colours and evaluation marks retain their established design. */
+body.reflow-book #content .quiz-card {
+  height: auto !important;
+  min-height: max(
+    min(28rem, calc(100dvh - var(--nav-height, 60px) - 5rem)),
+    var(--reflow-quiz-interaction-height, 0px)
+  );
+  max-height: calc(100dvh - var(--nav-height, 60px) - 5rem) !important;
+  justify-content: center;
+}
+
+body.reflow-book #content .quiz-options,
+body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options,
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
+  gap: 1.75rem !important;
+  margin-top: 1.5rem !important;
+}
+
+body.reflow-book #content .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions,
+body.reflow-book[data-reflow-font-size="xlarge"] #content
+  .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions {
+  margin-top: 2rem !important;
+}
+
+/* The selected state replaces the original grey border in the same box. Its
+   four-pixel light-green stroke is twice the base two-pixel outline, without
+   creating the second, larger frame that previously cluttered the option. */
+body.reflow-book #content .quiz-option.is-selected:not(.is-correct):not(.is-incorrect) {
+  border-width: 4px !important;
+  border-color: var(--ceibal-institutional-300) !important;
+  padding: calc(var(--reflow-quiz-option-pad-block) - 2px)
+    calc(var(--reflow-quiz-option-pad-inline) - 2px) !important;
+  background: #fff !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Alfredo Etchandy is a closing signature, not another inline sentence of
+   the preceding paragraph. This late rule intentionally outranks the generic
+   standard-reading inline flow used by other sentence chains. */
+body.reflow-book #content .sentence-chain-closing-credit
+  > [data-id="pg015_n0011"].reading-sentence {
+  display: block !important;
+  width: fit-content !important;
+  margin-top: .85rem !important;
+  margin-right: 1.5rem !important;
+  margin-left: auto !important;
+  padding-right: 0 !important;
+  text-align: right !important;
+}
+
+/* At fast narration rates only sentence highlighting is meaningful. The
+   runtime also enforces the setting; this state explains the restriction to
+   sighted pointer and keyboard users. */
+body.reflow-book .reflow-accessibility-panel [role="radio"].reflow-speed-disabled {
+  opacity: .42 !important;
+  cursor: not-allowed !important;
+  color: var(--ceibal-gray-500) !important;
+  box-shadow: none !important;
+}
+
+
+/* v47 complete-book chapter covers. Each later separator owns exactly one
+   viewport column, matching the audited Chapter 1/2 cover behavior. */
+body.reflow-book #content > section.reflow-later-chapter-cover {
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover > .reflow-later-cover-title {
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  justify-content: center !important;
+  width: 100% !important;
+  padding: clamp(.5rem, 2vh, 1.25rem) 0 !important;
+  text-align: center !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover > .reflow-later-cover-title {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover h1 {
+  margin: 0 !important;
+  font-size: clamp(2.4rem, 6vh, 4.2rem) !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+  text-transform: none !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover h2 {
+  margin: .45rem 0 0 !important;
+  font-size: clamp(1.45rem, 3.4vh, 2.1rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 500 !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover > .reflow-later-cover-art {
+  display: flex !important;
+  flex: 0 1 auto !important;
+  width: 100% !important;
+  max-height: 72% !important;
+  overflow: hidden !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover > .reflow-later-cover-art img {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: block !important;
+  min-width: 0 !important;
+  width: 50% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+body.reflow-book #content > section.reflow-later-chapter-cover
+  > .reflow-later-cover-art img:only-child {
+  width: 100% !important;
+}
+
+/* The full source supplied a fixed desktop screenshot and a separate mobile
+   chat for page 117. The semantic version scales cleanly at every font size. */
+body.reflow-book #content .chapter5-chat-tail {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .35rem 0 !important;
+  text-align: left !important;
+}
+
+body.reflow-book #content .chapter5-chat-page {
+  --chapter5-chat-scale: 1;
+  box-sizing: border-box;
+  position: relative;
+  display: grid !important;
+  place-items: center;
+  width: 100% !important;
+  height: 100%;
+  padding: .75rem !important;
+  overflow: hidden;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .chapter5-chat-page + .chapter5-chat-page {
+  break-before: auto;
+}
+
+body.reflow-book #content .chapter5-chat-composition {
+  box-sizing: border-box;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: scale(var(--chapter5-chat-scale));
+  transform-origin: center;
+}
+
+body.reflow-book #content .chapter5-chat-window {
+  box-sizing: border-box;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: .75rem !important;
+  border: 1px solid #d8d3c8;
+  border-radius: 1.25rem;
+  background: #f4f1eb;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .chapter5-chat-date {
+  width: fit-content;
+  margin: 0 auto .45rem !important;
+  padding: .3rem .65rem !important;
+  border-radius: 999px;
+  color: #4d5562;
+  background: #ebe8df;
+  font-family: inherit !important;
+  font-size: calc(.8rem * var(--reflow-font-scale)) !important;
+  font-weight: 700;
+  line-height: 1.3 !important;
+  text-align: center;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .chapter5-chat-bubble {
+  display: block !important;
+  width: min(88%, 46rem) !important;
+  margin: .32rem 0 !important;
+  padding: .46rem .68rem !important;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgb(18 24 38 / 10%);
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content .chapter5-chat-incoming {
+  margin-right: auto !important;
+  background: #fff;
+}
+
+body.reflow-book #content .chapter5-chat-outgoing {
+  margin-left: auto !important;
+  background: #e5d5a8;
+}
+
+body.reflow-book #content .chapter5-chat-sender,
+body.reflow-book #content .chapter5-chat-text {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+}
+
+body.reflow-book #content .chapter5-chat-sender {
+  color: #4d5562;
+  font-size: calc(.78rem * var(--reflow-font-scale)) !important;
+  font-weight: 700;
+  line-height: 1.3 !important;
+}
+
+body.reflow-book #content .chapter5-chat-text {
+  margin-top: .2rem !important;
+  color: #121826;
+  font-size: var(--reflow-chat-message-size, calc(var(--reflow-body-size) * var(--reflow-font-scale))) !important;
+  line-height: var(--reflow-chat-message-line-height, 1.55) !important;
+}
+
+body.reflow-book #content .chapter5-chat-source-image {
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+}
+
+/* Later source chapters painted empty chat bubbles as bitmap backgrounds and
+   positioned their real text elsewhere (sometimes screen-reader-only).  The
+   reconstructed window keeps every message in normal document flow, which
+   restores the text and lets large type paginate without overlap. */
+body.reflow-book #content .reflow-book-chat-window {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: clamp(.65rem, 1.8vh, 1rem) auto !important;
+  padding: clamp(.7rem, 1.6vw, 1rem) !important;
+  border: 1px solid #d8d3c8 !important;
+  border-radius: 1.25rem !important;
+  background: #f4f1eb !important;
+  box-decoration-break: slice !important;
+  -webkit-box-decoration-break: slice !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+body.reflow-book #content .reflow-chat-source-image {
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+body.reflow-book #content .reflow-chat-date {
+  display: block !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  margin: 0 auto .55rem !important;
+  padding: .28rem .65rem !important;
+  border-radius: 999px !important;
+  color: #4d5562 !important;
+  background: #ebe8df !important;
+  font-family: inherit !important;
+  font-size: calc(.8rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  text-align: center !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-chat-bubble {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: min(88%, 46rem) !important;
+  max-width: 100% !important;
+  margin-block: .42rem !important;
+  padding: .5rem .72rem !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 1px 2px rgb(18 24 38 / 10%) !important;
+  break-inside: avoid-column !important;
+}
+
+/* A chat date and its first message are one conversational unit.  This is
+   deliberately limited to the composed head so long chats may still continue
+   on the following viewport without leaving a date by itself. */
+body.reflow-book #content .reflow-chat-head {
+  break-inside: avoid-column !important;
+}
+
+/* These nodes are the two semantic halves of one sentence that the source PDF
+   happened to divide at a physical-page boundary. They remain separate for
+   TTS/highlighting, but the responsive paginator must keep them together. */
+body.reflow-book #content .reflow-cross-page-opening {
+  break-after: avoid-column !important;
+}
+
+body.reflow-book #content [data-reflow-cross-page-opening="true"] {
+  break-after: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-cross-page-continuation {
+  break-before: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-chat-incoming {
+  margin-inline: 0 auto !important;
+  background: #fff !important;
+}
+
+body.reflow-book #content .reflow-chat-outgoing {
+  margin-inline: auto 0 !important;
+  background: #e5d5a8 !important;
+}
+
+body.reflow-book #content .reflow-chat-sender,
+body.reflow-book #content .reflow-chat-text {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: inherit !important;
+  text-align: left !important;
+}
+
+body.reflow-book #content .reflow-chat-sender {
+  color: #4d5562 !important;
+  font-size: calc(.78rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+}
+
+body.reflow-book #content .reflow-chat-text {
+  margin-top: .18rem !important;
+  color: #121826 !important;
+  font-size: var(--reflow-chat-message-size, calc(var(--reflow-body-size) * var(--reflow-font-scale))) !important;
+  line-height: var(--reflow-chat-message-line-height, 1.55) !important;
+}
+
+body.reflow-book #content :is(.chapter5-chat-text, .reflow-chat-text)
+  :where(span, p, strong, em, b, i, a) {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+body.reflow-book #content .reflow-chat-emoji {
+  position: static !important;
+  display: inline-block !important;
+  width: auto !important;
+  height: 1.35em !important;
+  margin: .15rem 0 0 !important;
+  object-fit: contain !important;
+  vertical-align: text-bottom !important;
+}
+
+/* Image/text rebalancing moves semantic sentences between the side column
+   and continuation blocks. The PDF-derived start class must therefore carry
+   its own block boundary; relying only on a separate invisible marker leaves
+   that marker behind and can superimpose two original paragraphs. */
+body.reflow-book:not(.reflow-easy-read) #content
+  :is(.illustrated-copy, .illustrated-overflow)
+  > .reading-sentence.reflow-paragraph-start,
+body.reflow-book:not(.reflow-easy-read) #content
+  :is(.illustrated-copy, .illustrated-overflow)
+  > .sentence-chain:has(> .reading-sentence.reflow-paragraph-start) {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin-top: .85rem !important;
+}
+
+body.reflow-book:not(.reflow-easy-read) #content
+  :is(.illustrated-copy, .illustrated-overflow)
+  > :is(.reading-sentence, .sentence-chain):first-child {
+  margin-top: 0 !important;
+}
+
+/* Large narrative illustrations use the same indivisible two-column page
+   geometry as the audited chapter 1/2 examples. */
+body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr) !important;
+  grid-template-rows: max-content !important;
+  align-items: start !important;
+  align-content: center !important;
+  gap: clamp(1.5rem, 4vw, 3rem) !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+body.reflow-book #content > section.reflow-later-illustrated > .illustrated-overflow {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Contents, author, promotional and closing pages are independent semantic
+   destinations. Prevent the tail of one from sharing the next page. */
+body.reflow-book #content > section.reflow-backmatter-page {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-before: column;
+  break-after: column;
+  break-inside: avoid-column;
+}
+
+/* v47.12 structural QA: semantic chats are assembled before reading-flow
+   chains. Keep their date plus first message indivisible, preserve the warm
+   1930 palette, and never let PDF absolute-positioning leak into the rebuilt
+   bubbles. */
+body.reflow-book #content .reflow-chat-head {
+  display: flow-root !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+body.reflow-book #content .reflow-chat-short {
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+body.reflow-book #content .reflow-chat-historical {
+  border-color: #cbbd9d !important;
+  background: #f4efe7 !important;
+}
+
+/* The chapter 3/4 conversations take place in 2030.  Their source captures
+   use the contemporary WhatsApp-like cream canvas, white incoming bubbles
+   and pale-green outgoing bubbles.  They must not inherit the ochre palette
+   that provides the period look for the 1930 conversations. */
+body.reflow-book #content .reflow-chat-modern {
+  border-color: #ece8dd !important;
+  background: #f5f1ec !important;
+}
+
+body.reflow-book #content .reflow-chat-modern .reflow-chat-date {
+  color: #5f6368 !important;
+  background: #ece8dd !important;
+}
+
+body.reflow-book #content .reflow-chat-modern .reflow-chat-incoming {
+  background: #fff !important;
+}
+
+body.reflow-book #content .reflow-chat-modern .reflow-chat-outgoing {
+  background: #dae5a6 !important;
+}
+
+/* In the source UI the sender colour conveys the direction of a message,
+   rather than the character's identity: white/incoming bubbles use fuchsia
+   labels and green/outgoing bubbles use the neutral dark label. */
+body.reflow-book #content .reflow-chat-modern
+  .reflow-chat-incoming .reflow-chat-sender {
+  color: #d22d7c !important;
+}
+
+body.reflow-book #content .reflow-chat-modern
+  .reflow-chat-outgoing .reflow-chat-sender {
+  color: #575756 !important;
+}
+
+body.reflow-book #content .reflow-chat-historical .reflow-chat-date,
+body.reflow-book #content .reflow-chat-historical .chapter5-chat-date {
+  color: #625c54 !important;
+  background: #e9e2d6 !important;
+}
+
+body.reflow-book #content .reflow-chat-historical .reflow-chat-incoming,
+body.reflow-book #content .reflow-chat-historical .chapter5-chat-incoming {
+  background: #fffdfa !important;
+}
+
+body.reflow-book #content .reflow-chat-historical .reflow-chat-outgoing,
+body.reflow-book #content .reflow-chat-historical .chapter5-chat-outgoing {
+  background: #dccaa5 !important;
+}
+
+body.reflow-book #content .reflow-chat-notched,
+body.reflow-book #content .reflow-chat-historical :is(
+  .reflow-chat-date, .chapter5-chat-date,
+  .reflow-chat-incoming, .reflow-chat-outgoing,
+  .chapter5-chat-incoming, .chapter5-chat-outgoing
+) {
+  --reflow-chat-corner: .72rem;
+  --reflow-chat-step: .22rem;
+  border-radius: 0 !important;
+  clip-path: polygon(
+    var(--reflow-chat-corner) 0,
+    calc(100% - var(--reflow-chat-corner)) 0,
+    calc(100% - var(--reflow-chat-corner)) var(--reflow-chat-step),
+    calc(100% - var(--reflow-chat-step)) var(--reflow-chat-step),
+    calc(100% - var(--reflow-chat-step)) var(--reflow-chat-corner),
+    100% var(--reflow-chat-corner),
+    100% calc(100% - var(--reflow-chat-corner)),
+    calc(100% - var(--reflow-chat-step)) calc(100% - var(--reflow-chat-corner)),
+    calc(100% - var(--reflow-chat-step)) calc(100% - var(--reflow-chat-step)),
+    calc(100% - var(--reflow-chat-corner)) calc(100% - var(--reflow-chat-step)),
+    calc(100% - var(--reflow-chat-corner)) 100%,
+    var(--reflow-chat-corner) 100%,
+    var(--reflow-chat-corner) calc(100% - var(--reflow-chat-step)),
+    var(--reflow-chat-step) calc(100% - var(--reflow-chat-step)),
+    var(--reflow-chat-step) calc(100% - var(--reflow-chat-corner)),
+    0 calc(100% - var(--reflow-chat-corner)),
+    0 var(--reflow-chat-corner),
+    var(--reflow-chat-step) var(--reflow-chat-corner),
+    var(--reflow-chat-step) var(--reflow-chat-step),
+    var(--reflow-chat-corner) var(--reflow-chat-step)
+  ) !important;
+}
+
+/* Easy Read changes syntax, not casing. Imported fixed-layout utilities must
+   never turn narrative prose into capitals. */
+body.reflow-book.reflow-easy-read #content :where(
+  p, span, .reading-sentence, .sentence-chain, .illustrated-copy,
+  .illustrated-overflow, .reflow-chat-text, .reflow-chat-sender
+) {
+  text-transform: none !important;
+}
+
+/* A complete illustrated sentence is the atomic unit. Image and copy own the
+   same stretched grid row, while the glyphs keep normal line spacing (no
+   artificial space-between gaps). */
+body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
+  grid-template-rows: minmax(0, auto) !important;
+  align-items: start !important;
+}
+
+body.reflow-book #content > section.reflow-later-illustrated
+  > .illustrated-page > img {
+  align-self: start !important;
+  justify-self: center !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  object-position: center top !important;
+}
+
+body.reflow-book #content > section.reflow-later-illustrated
+  > .illustrated-page > .illustrated-copy {
+  box-sizing: border-box !important;
+  align-self: start !important;
+  min-height: var(--illustrated-target-height, 100%) !important;
+  height: var(--illustrated-target-height, 100%) !important;
+  text-align: left !important;
+  /* The DOM boxes already share the same top coordinate, but the first
+     painted glyph starts lower because of the font ascender/leading. Move
+     the copy by a quarter em so its visible ink aligns with the painted
+     upper edge of the illustration at every supported font size. */
+  transform: translateY(var(--illustrated-copy-translate-y, 0px)) !important;
+  transform-origin: left top !important;
+}
+
+/* pg142 LF keeps the complete text in one semantic/TTS source node. This
+   hidden portion remains available to assistive reading, while its visible
+   sentence is a separate layout unit that can continue after the image. */
+body.reflow-book #content .reflow-tts-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Easy Read can group several short sentences under one audio/highlight id.
+   If that indivisible unit is too tall for the narrow right column, keep the
+   image and side copy in their normal first row and place the intact unit in
+   a measured full-width second row. A real grid row avoids the cross-column
+   overlap caused by float fragmentation and preserves the normal typography. */
+body.reflow-book #content .illustrated-below-copy {
+  display: none !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
+  > .illustrated-page {
+  height: auto !important;
+  min-height: 0 !important;
+  grid-template-rows: max-content max-content !important;
+  align-content: start !important;
+  column-gap: clamp(1.5rem, 4vw, 3rem) !important;
+  row-gap: .85em !important;
+  overflow: hidden !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
+  > .illustrated-page > img {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
+  > .illustrated-page > .illustrated-copy {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
+  > .illustrated-page > .illustrated-below-copy:not(:empty) {
+  box-sizing: border-box !important;
+  display: block !important;
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+  overflow: visible !important;
+}
+
+body.reflow-book #content :where(.reading-block, .reading-sentence,
+  .sentence-chain, .illustrated-copy, .illustrated-overflow) {
+  orphans: 3 !important;
+  widows: 3 !important;
+  text-align: left !important;
+}
+
+/* The fixed-layout source used nested horizontal padding and narrow centred
+   wrappers around prose that happened to share a page with a chat or image.
+   Once those pages are semantic reading flow, their narrative copy must use
+   the same full text box and left edge as every other body paragraph. */
+body.reflow-book #content > section.reflow-story-section {
+  padding-inline: 0 !important;
+}
+
+body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
+  > div:not(.whatsapp-chat-window, .reflow-book-chat-window),
+body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
+  > div > div:not(.whatsapp-chat-window, .reflow-book-chat-window) {
+  padding-inline: 0 !important;
+}
+
+/* Vertical page padding belongs to the former fixed PDF canvas. Retaining it
+   between adjacent source files creates apparent blank paragraphs in the
+   continuous reading flow, especially around reconstructed chats. */
+body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
+  > div:not(.whatsapp-chat-window, .reflow-book-chat-window) {
+  padding-block: 0 !important;
+}
+
+/* Pagination may move complete semantic units between an illustrated column
+   and its overflow page, but it must never split one sentence internally. */
+body.reflow-book #content
+  :is(.illustrated-copy, .attic-illustrated-copy)
+  > :is(.reading-sentence, .sentence-chain) {
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+}
+
+/* The fixed-layout source encoded several ordinary prose fragments with
+   ad-hoc centering classes that described PDF coordinates, not authorial
+   alignment. Reflow prose must always occupy the full text measure and start
+   on the common left edge; genuine titles, chat dates, quizzes and scene
+   separators have their own structural classes and are intentionally exempt. */
+body.reflow-book #content .adt-body.text-center:not(.reflow-scene-separator),
+body.reflow-book #content .adt-paragraph.text-center {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  text-align: left !important;
+}
+
+/* Locale refreshes replace a semantic node's textContent and therefore erase
+   separator text nodes inserted inside that element. Give adjacent semantic
+   fragments a typographic space at layout level so “mano” + “jo” can never
+   render as “manojo”, without changing either fragment's TTS identifier. */
+body.reflow-book #content .sentence-chain > [data-id] + [data-id] {
+  margin-inline-start: 0 !important;
+}
+
+/* The first two bespoke illustrated spreads predate the generic later-book
+   selector above. They use the same measured target so a complete sentence
+   can enlarge image and copy together by the few pixels it needs. */
+body.reflow-book #content > section[data-section-id="pg025_sec001"]
+  > .illustrated-page > img,
+body.reflow-book #content > section[data-section-id="pg031_sec001"]
+  > .attic-illustrated-page > img {
+  width: auto !important;
+  height: var(--illustrated-target-height, auto) !important;
+  max-width: 100% !important;
+  justify-self: center !important;
+  align-self: start !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg025_sec001"]
+  > .illustrated-page > .illustrated-copy,
+body.reflow-book #content > section[data-section-id="pg031_sec001"]
+  > .attic-illustrated-page > .attic-illustrated-copy {
+  height: var(--illustrated-target-height, auto) !important;
+  min-height: var(--illustrated-target-height, 0) !important;
+  align-self: start !important;
+  /* Align the first painted glyph—not only the CSS box—with the upper edge
+     of the image, matching the later illustrated spreads. */
+  /* These two early source pages retain an extra imported line box before
+     the first glyph. Subtract it as well as the normal font ascender so the
+     visible text—not merely its wrapper—starts at the painted image edge. */
+  transform: translateY(var(--illustrated-copy-translate-y, 0px)) !important;
+  transform-origin: left top !important;
+}
+
+/* Apply the same painted-edge calculation to every early image/text spread,
+   including the two chapter-two compositions that predate the generic class. */
+body.reflow-book #content .illustrated-page
+  > :is(.illustrated-copy, .attic-illustrated-copy) {
+  transform: translateY(var(--illustrated-copy-translate-y, 0px)) !important;
+  transform-origin: left top !important;
+}
+
+/* The virtual-reality composition has short copy but still owns a complete
+   page. Centre the image and prose together inside the usable column. */
+body.reflow-book #content > section[data-section-id="pg068_sec001"]
+  > .illustrated-page {
+  height: calc(var(--reflow-page-height) - (2 * var(--reflow-block-padding))) !important;
+  min-height: calc(var(--reflow-page-height) - (2 * var(--reflow-block-padding))) !important;
+  align-content: center !important;
+}
+
+/* “FIN” is a terminal marker, not the next paragraph. Give it three times
+   the ordinary paragraph separation while preserving its centred setting. */
+body.reflow-book #content [data-id="pg215_n0023"] {
+  display: block !important;
+  width: 100% !important;
+  margin-top: 2.55em !important;
+  text-align: center !important;
+  break-before: avoid-column !important;
+}
+
+/* The source's three asterisks are visual, while the DOM phrase supplies the
+   requested TTS reading “Mientras tanto”. The two pseudo-elements reproduce
+   the compact two-over-one arrangement used in the original edition. */
+body.reflow-book #content .reflow-scene-separator {
+  display: block !important;
+  width: 100% !important;
+  margin: 1.5rem 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  break-before: avoid-column !important;
+  break-after: avoid-column !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-scene-separator::before {
+  content: "*  *";
+  display: block;
+  white-space: pre;
+  color: #858585;
+  font-size: calc(1rem * var(--reflow-font-scale));
+  font-weight: 700;
+  line-height: .72;
+  letter-spacing: 0;
+}
+body.reflow-book #content .reflow-scene-separator::after {
+  content: "*";
+  display: block;
+  color: #858585;
+  font-size: calc(1rem * var(--reflow-font-scale));
+  font-weight: 700;
+  line-height: .72;
+}
+
+/* Restore the original semantic contents table instead of treating its rows
+   as overlapping PDF coordinates. */
+body.reflow-book #content > section.reflow-original-contents-page {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  min-height: 100% !important;
+  height: auto !important;
+  padding: clamp(.5rem, 2vh, 1.25rem) 1rem !important;
+  overflow: visible !important;
+  -webkit-box-decoration-break: clone !important;
+  box-decoration-break: clone !important;
+  break-after: column !important;
+  break-inside: auto !important;
+  page-break-after: always !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page
+  > .pt-10 {
+  display: block !important;
+  padding-top: .25rem !important;
+  padding-bottom: 1rem !important;
+  break-after: avoid-column !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page
+  > div:last-child {
+  display: block !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page table {
+  position: static !important;
+  display: block !important;
+  width: min(100%, 52rem) !important;
+  margin: 0 auto !important;
+  border-collapse: collapse !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page
+  :where(tbody, thead, tfoot) {
+  position: static !important;
+  display: block !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page tr {
+  box-sizing: border-box !important;
+  position: static !important;
+  display: grid !important;
+  grid-template-columns: clamp(3.5rem, 8vw, 5rem) minmax(0, 1fr) !important;
+  width: 100% !important;
+  margin: 0 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page tr + tr {
+  margin-top: .25rem !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page tr:nth-child(n + 3) {
+  margin-top: .75rem !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page
+  :where(td, th) {
+  position: static !important;
+  display: table-cell !important;
+  inset: auto !important;
+  transform: none !important;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 .45rem !important;
+  text-align: left !important;
+  vertical-align: top !important;
+}
+
+body.reflow-book #content > section.reflow-original-contents-page
+  :where(td, th):first-child {
+  padding-right: .8rem !important;
+  text-align: right !important;
+}
+
+/* Promotional cover and montage pages must show their complete bitmap rather
+   than a crop inherited from the PDF viewport. */
+body.reflow-book #content > section.reflow-promotional-cover-page,
+body.reflow-book #content > section.reflow-full-image-page {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+body.reflow-book #content > section.reflow-promotional-cover-page img,
+body.reflow-book #content > section.reflow-full-image-page img {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: calc(var(--reflow-page-height) - 3rem) !important;
+  margin: auto !important;
+  object-fit: contain !important;
+}
+
+body.reflow-book #content .reflow-visual-caption-hidden {
+  display: none !important;
+}
+
+/* Applied only after measuring the current column layout. This preserves
+   natural inline paragraphs while moving a sentence that would otherwise be
+   divided between two visual pages as one accessible unit. */
+body.reflow-book:not(.reflow-easy-read) #content
+  .reading-sentence.reflow-avoid-page-split.reflow-avoid-page-split {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  vertical-align: baseline !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  .reading-sentence.reflow-avoid-page-split.reflow-avoid-page-split {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* Added only after measuring a page whose sole prose is one short line. Keep
+   that line with the beginning of the following paragraph in every reading
+   mode, including Extra grande + Lectura fácil. */
+body.reflow-book #content
+  .reading-sentence.reflow-keep-with-next.reflow-keep-with-next {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  break-after: avoid-column !important;
+  -webkit-column-break-after: avoid !important;
+  page-break-after: avoid !important;
+}
+
+/* Editorially connected beats remain together without tightening their
+   typography. This avoids one-line Easy Read pages at large sizes while
+   preserving the global line-height and paragraph spacing. */
+body.reflow-book #content .editorial-unit-group {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* CSS multi-column pagination honors inline-block as one atomic fragment
+   more consistently than a plain block. This short lead-in and its WhatsApp
+   window must never be split, but retain the full text-column width. */
+body.reflow-book #content
+  .editorial-unit-group.reflow-chat-lead-group {
+  display: inline-block !important;
+  vertical-align: top !important;
+}
+
+body.reflow-book #content .sentence-chain.editorial-cross-section-chain {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book #content
+  .sentence-chain.editorial-cross-section-chain > .reading-sentence {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* A closing sentence can cross the harmless wrapper left by the source PDF.
+   Treat it as one indivisible editorial unit so its last line cannot become a
+   page by itself. */
+body.reflow-book #content .sentence-chain.editorial-closing-chain {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book #content
+  .sentence-chain.editorial-closing-chain > .reading-sentence {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+body.reflow-book #content .sentence-chain.editorial-stadium-intro-chain {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book #content
+  .sentence-chain.editorial-stadium-intro-chain > .reading-sentence {
+  display: inline !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* Fragment chains are one grammatical sentence reconstructed from several
+   source nodes. Flat-prose rules normally make them inline; restore an atomic
+   inline box for these ordinary chapter sentences so columns cannot divide
+   the reconstruction internally. */
+body.reflow-book:not(.reflow-easy-read) #content > section.reflow-flat-prose
+  > .sentence-chain:is(.chapter-one-sentence-chain, .chapter-two-sentence-chain,
+    .later-book-sentence-chain):not(:has(> .reflow-paragraph-break)) {
+  display: inline-block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  vertical-align: baseline !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* Backmatter headings keep their own row. They must never be absorbed into
+   the flowing biography that follows (the source PDF positions these nodes
+   independently, which otherwise allows the title to overlap the first
+   paragraph after repagination). */
+body.reflow-book #content > section[data-section-id="pg221_sec001"],
+body.reflow-book #content > section[data-section-id="pg221_sec001"] > *,
+body.reflow-book #content > section[data-section-id="pg221_sec001"] > * > * {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"] > .mb-10 {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 2rem !important;
+  text-align: center !important;
+  break-before: column !important;
+  break-after: avoid-column !important;
+  -webkit-column-break-after: avoid !important;
+  page-break-after: avoid !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  > .space-y-0 {
+  break-inside: avoid-column !important;
+  break-after: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  -webkit-column-break-after: avoid !important;
+  page-break-inside: avoid !important;
+  page-break-after: avoid !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  [data-id="pg221_n0008"] {
+  break-before: avoid-column !important;
+  -webkit-column-break-before: avoid !important;
+  page-break-before: avoid !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  [data-id="pg221_n0002"] {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 2rem !important;
+  font-size: calc(var(--reflow-chapter-title-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+  font-weight: 700 !important;
+}
+
+/* The author biography is continuous backmatter. Its imported middle and
+   closing wrappers must not jump wholesale to a fresh page; expose their
+   paragraphs to the column flow so the preceding page is filled normally. */
+body.reflow-book #content > section[data-section-id="pg221_sec001"] {
+  break-before: column !important;
+  break-inside: auto !important;
+  -webkit-column-break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+/* Freeze only the current quiz while its columns settle. This layer is white,
+   preserves the exact card position and sits below the reader controls; it
+   never paints the former turquoise intermediary page. */
+body.reflow-book.reflow-quiz-repaginating #content > :not(.reflow-quiz-repagination-overlay) {
+  visibility: visible !important;
+}
+
+body.reflow-book #content > .reflow-quiz-repagination-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 30;
+  display: block !important;
+  box-sizing: border-box;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  visibility: visible !important;
+  pointer-events: none;
+  background: #fff !important;
+  column-width: auto !important;
+  column-count: auto !important;
+  column-gap: 0 !important;
+}
+
+/* During settings repagination, no provisional quiz state may paint the
+   reader canvas. The frozen card itself is attached to body, outside the
+   multi-column fragmentainer, so unrelated chats and quiz columns cannot
+   enter its backdrop. */
+body.reflow-book.reflow-quiz-repaginating,
+body.reflow-book.reflow-quiz-repaginating main,
+body.reflow-book.reflow-quiz-repaginating #content {
+  background: #fff !important;
+}
+
+body.reflow-book > .reflow-quiz-repagination-overlay
+  > .reflow-quiz-repagination-card,
+body.reflow-book #content > .reflow-quiz-repagination-overlay
+  > .reflow-quiz-repagination-card {
+  position: absolute !important;
+  left: var(--reflow-frozen-card-left) !important;
+  top: var(--reflow-frozen-card-top) !important;
+  width: var(--reflow-frozen-card-width) !important;
+  height: var(--reflow-frozen-card-height) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  break-before: auto !important;
+  break-after: auto !important;
+  break-inside: auto !important;
+}
+
+/* The contents table and the author biography are distinct backmatter
+   pieces. A break after the complete table is more reliable in Chromium's
+   multi-column flow than asking the first biography heading to break away
+   from a fragmented table row. */
+body.reflow-book #content > section[data-section-id="pg219_sec001"] {
+  break-after: column !important;
+}
+
+body.reflow-book .reflow-editorial-keep-block {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  break-inside: avoid-column !important;
+  -webkit-column-break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  > :is(.mt-6, .mt-0) {
+  display: contents !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  > :is(.mt-6, .mt-0) > [data-id] {
+  display: block !important;
+  width: 100% !important;
+  margin-top: .85rem !important;
+  text-indent: 0 !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  [data-id="pg221_n0009"] {
+  display: block !important;
+  width: 100% !important;
+  break-inside: auto !important;
+  -webkit-column-break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+body.reflow-book #content > section[data-section-id="pg221_sec001"]
+  .reading-sentence.reflow-avoid-page-split.reflow-avoid-page-split[data-id="pg221_n0009"] {
+  display: block !important;
+  width: 100% !important;
+  break-inside: auto !important;
+  -webkit-column-break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-backmatter-page:not(.reflow-full-image-page) {
+  text-align: left !important;
+}
+
+/* The institutional signature uses the same right-edge treatment as the
+   Alfredo Etchandy credit: its text width stays natural while the complete
+   signature is pushed to the right edge of the reading measure. */
+body.reflow-book #content .sentence-chain-signature
+  > [data-id="pg011_n0011"] {
+  display: block !important;
+  width: fit-content !important;
+  max-width: calc(100% - 1.5rem) !important;
+  margin-right: 1.5rem !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
+
+body.reflow-book:not(.reflow-easy-read) #content
+  .sentence-chain.sentence-chain-signature.sentence-chain-signature
+  > .reading-sentence[data-id="pg011_n0011"] {
+  display: block !important;
+  width: fit-content !important;
+  max-width: calc(100% - 1.5rem) !important;
+  margin-right: 1.5rem !important;
+  margin-left: auto !important;
+  text-align: right !important;
+}
+
+/* Final cascade guard: paragraph reconstruction and the measured
+   no-page-split helper are intentionally declared late and can otherwise
+   turn a scene separator back into inline prose. Keep the semantic phrase
+   hidden, the ornament full-width, and its lower star present after every
+   reading-mode rule has been applied. */
+body.reflow-book #content
+  .reading-sentence.reflow-scene-separator.reflow-scene-separator.reflow-scene-separator.reflow-scene-separator {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 1.5rem 0 !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  vertical-align: initial !important;
+}
+
+body.reflow-book #content
+  .reading-sentence.reflow-scene-separator.reflow-scene-separator.reflow-scene-separator.reflow-scene-separator::after {
+  content: "*" !important;
+  display: block !important;
+  color: #858585 !important;
+  font-size: calc(1rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: .72 !important;
+}
+
+/* The last two source folios are editorial pages, not ordinary chapter
+   prose. Rebuild their original composition while keeping every caption and
+   synopsis sentence as real, selectable and Easy-Read-aware text. */
+body.reflow-book #content > section.reflow-promotional-cover-page {
+  flex-direction: column !important;
+  gap: clamp(1rem, 2.5vh, 2rem) !important;
+  padding: clamp(.5rem, 1.5vh, 1rem) 0 !important;
+  text-align: center !important;
+}
+
+body.reflow-book #content > section.reflow-promotional-cover-page img {
+  flex: 0 1 auto !important;
+  min-height: 0 !important;
+  max-height: calc(var(--reflow-page-height) - (10.5rem * var(--reflow-font-scale))) !important;
+}
+
+body.reflow-book #content .reflow-promotional-cover-caption {
+  flex: 0 0 auto !important;
+  width: min(100%, 46rem) !important;
+  margin: 0 auto !important;
+  color: #111 !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-size: calc(1.25rem * var(--reflow-font-scale)) !important;
+  line-height: 1.55 !important;
+  text-align: center !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-promotional-cover-caption p {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font: inherit !important;
+  text-align: inherit !important;
+}
+
+body.reflow-book #content .reflow-promotional-cover-caption
+  > p.reading-sentence.reading-sentence {
+  display: block !important;
+  width: 100% !important;
+  padding-right: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  text-align: center !important;
+}
+
+body.reflow-book #content > section.reflow-back-cover-page {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  min-height: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
+  background: #000 !important;
+  box-shadow: 0 0 0 var(--reflow-gutter) #000 !important;
+  -webkit-box-decoration-break: clone !important;
+  box-decoration-break: clone !important;
+  break-before: column !important;
+  /* The following institutional page owns the only terminal column break.
+     Leaving the break on this full-height multicolumn block made Chromium
+     paint that sibling one column beyond the reported scroll extent. */
+  break-after: auto !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-back-cover-page
+  > .reflow-back-cover-synopsis {
+  box-sizing: border-box !important;
+  display: block !important;
+  width: 100% !important;
+  min-height: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: clamp(.5rem, 2vh, 1.25rem) 0 !important;
+  background: #000 !important;
+  -webkit-box-decoration-break: clone !important;
+  box-decoration-break: clone !important;
+}
+
+body.reflow-book #content .reflow-back-cover-inner {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  text-align: left !important;
+}
+
+body.reflow-book #content .reflow-back-cover-inner h1 {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 0 clamp(1.25rem, 3vh, 2.25rem) !important;
+  color: #f4ca43 !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-size: clamp(2.4rem, 6vh, 4.2rem) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: .04em !important;
+  text-align: left !important;
+  text-transform: none !important;
+  break-after: avoid-column !important;
+}
+
+body.reflow-book #content .reflow-back-cover-inner p {
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #fff !important;
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-size: calc(var(--reflow-body-size) * var(--reflow-font-scale)) !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  text-align: left !important;
+  text-indent: 0 !important;
+  orphans: 3 !important;
+  widows: 3 !important;
+  break-inside: auto !important;
+}
+
+body.reflow-book #content > section.reflow-back-cover-page
+  .reflow-back-cover-inner p.reading-block.reading-block {
+  font-size: calc(var(--reflow-body-size) * var(--reflow-font-scale)) !important;
+  line-height: 1.55 !important;
+}
+
+body.reflow-book #content > section.reflow-back-cover-page
+  .reflow-back-cover-inner p > .reading-sentence.reading-sentence {
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+body.reflow-book #content .reflow-back-cover-inner p + p {
+  margin-top: .85rem !important;
+}
+
+/* At the largest accessible setting the synopsis misses the available page
+   height by only a few pixels, leaving its final question alone in a new
+   column.  Tighten only the outer padding and paragraph separation for this
+   composition; type size and line-height remain identical to the book body. */
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content > section.reflow-back-cover-page
+  > .reflow-back-cover-synopsis {
+  padding-block: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content .reflow-back-cover-inner p + p {
+  margin-top: 0 !important;
+}
+
+body.reflow-book #content .reflow-back-cover-inner
+  :is(h1, p, p > .reading-sentence) {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
+}
+
+/* Easy Read must operate on grammatical sentences, not on the arbitrary
+   fragments created by fixed-PDF page boundaries. Sentence chains already
+   reconstruct one complete sentence and are atomic for pagination; keep
+   their ordinary children inline so continuations cannot appear as indented,
+   repeated or isolated rows. Purpose-built credit/signature constructions
+   retain their explicit block layout. */
+body.reflow-book.reflow-easy-read #content
+  .sentence-chain:not(.sentence-chain-closing-credit):not(.sentence-chain-signature):not(.sentence-chain-dialogue-attribution):not(.editorial-closing-chain)
+  > .reading-sentence:not(.reading-sentence-multiline) {
+  display: inline !important;
+  width: auto !important;
+  max-width: 100% !important;
+  padding-right: 0 !important;
+}
+
+/* Suppressed source-page residues must not reserve an empty row or become a
+   TTS/search landmark in the visible Easy Read flow. */
+body.reflow-book.reflow-easy-read #content
+  :is(p, span)[data-id]:empty {
+  display: none !important;
+}
+
+body.reflow-book.reflow-easy-read #content .reflow-empty-easy-read {
+  display: none !important;
+}
+
+/* This source-PDF residue is only a detached conjunction, not narrative
+   content. Hide it in every typography/mode combination so it cannot create
+   an orphan line, an empty column or a phantom TTS stop. */
+body.reflow-book #content
+  :is([data-id="pg076_n0035"], .reflow-source-residue) {
+  display: none !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  :is([data-id="pg067_n0029"], [data-id="pg113_n0002"]) {
+  display: none !important;
+}
+
+body.reflow-book.reflow-easy-read #content
+  .sentence-chain > :is(p, span)[data-id]:empty {
+  display: none !important;
+}
+
+/* Keep a symmetric narrative rhythm around every reconstructed WhatsApp
+   window. Imported per-page margins otherwise made the prose below look
+   attached to the chat while the prose above retained normal spacing. */
+body.reflow-book.reflow-easy-read #content > section
+  :is(.whatsapp-chat-window, .reflow-book-chat-window) {
+  margin-block: clamp(1rem, 2.4vh, 1.25rem) !important;
+}
+
+/* Fixed-layout coordinates must never survive as Easy Read indentation. */
+body.reflow-book.reflow-easy-read #content
+  :is(.reading-sentence, .sentence-chain) {
+  margin-inline: 0 !important;
+  text-indent: 0 !important;
+}
+
+body.reflow-book #content > section.reflow-collaborators-page {
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: clamp(2rem, 6vh, 4.5rem) !important;
+  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: clamp(2rem, 7vh, 5rem) clamp(1rem, 5vw, 5rem) !important;
+  color: #fff !important;
+  background: #000 !important;
+  box-shadow: 0 0 0 var(--reflow-gutter) #000 !important;
+  text-align: center !important;
+  /* Own the single break between synopsis and institutions here. Chromium
+     then includes this terminal column in scrollWidth and it becomes
+     reachable with the ordinary next-page button. */
+  break-before: column !important;
+  /* This is the terminal section. A forced break after it creates a real,
+     navigable empty column at the end of the book in every font mode. */
+  break-after: auto !important;
+  break-inside: avoid-column !important;
+}
+
+body.reflow-book #content > section.reflow-collaborators-page h2 {
+  display: block !important;
+  margin: 0 !important;
+  color: #fff !important;
+  font-size: calc(1.15rem * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: .11em !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+}
+
+body.reflow-book #content > section.reflow-collaborators-page img {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: min(100%, 68rem) !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: 58% !important;
+  margin: 0 auto !important;
+  object-fit: contain !important;
+  filter: invert(1) !important;
+}
+
+body.reflow-book #content .reflow-visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* A settings change can briefly expose the old fragmented column before the
+   semantic anchor is restored. On the black back matter keep that transient
+   frame black instead of flashing an unrelated chat from another column. */
+body.reflow-book.reflow-backmatter-repaginating,
+body.reflow-book.reflow-backmatter-repaginating main,
+body.reflow-book.reflow-backmatter-repaginating #content {
+  background: #000 !important;
+}
+
+body.reflow-book.reflow-backmatter-repaginating #content {
+  visibility: hidden !important;
+}
+
+/* Source-image alternatives are semantic TTS cues, not independent fixed
+   canvases. Leave a one-pixel in-flow anchor immediately before the rendered
+   chat so pagination cannot map the cue to a remote (sometimes final) page. */
+body.reflow-book #content :is(
+  .reflow-chat-source-image,
+  .chapter5-chat-source-image
+) {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  width: 1px !important;
+  min-width: 1px !important;
+  max-width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  max-height: 1px !important;
+  margin: 0 0 -1px 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  object-fit: none !important;
+  pointer-events: none !important;
+}
+
+/* Imported PDF wrappers used several centred max-width boxes. In reading
+   flow every ordinary prose block and every reconstructed chat owns the same
+   text measure and starts on the same page margin. */
+body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
+  > div:not(.chapter5-chat-page),
+body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
+  > div:not(.chapter5-chat-page) > div:not(.whatsapp-chat-window, .reflow-book-chat-window) {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+body.reflow-book #content :is(
+  .reading-block,
+  .reading-sentence,
+  .sentence-chain,
+  .whatsapp-chat-window,
+  .reflow-book-chat-window
+) {
+  box-sizing: border-box !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+body.reflow-book #content
+  .reading-block > .reading-sentence[data-id="pg069_n0002"] {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  text-align: left !important;
+}
+
+/* These two short continuations were the only ordinary-prose pages left by
+   the six-mode orphan audit. Keep each continuation with the sentence that
+   introduces it; Chromium may move the pair, but must not leave the final
+   clause alone at the head of a column. */
+body.reflow-book #content :is(
+  [data-id="pg030_n0030"],
+  [data-id="pg098_n0026"],
+  [data-id="pg116_n0035"]
+) {
+  break-after: avoid-column !important;
+  -webkit-column-break-after: avoid !important;
+  page-break-after: avoid !important;
+}
+
+body.reflow-book #content :is(
+  [data-id="pg030_n0031"],
+  [data-id="pg098_n0027"],
+  [data-id="pg116_n0036"]
+) {
+  break-before: avoid-column !important;
+  -webkit-column-break-before: avoid !important;
+  page-break-before: avoid !important;
+}
+
+/* Only this six-mode corner case needs a tighter terminal composition. The
+   prose line-height and font size remain untouched: we remove only the four
+   paragraph gaps inside the final exchange and retain a small, explicit gap
+   before FIN. This keeps “No duden.” and the terminal marker with the rest
+   of the closing passage instead of producing a two-line orphan page. */
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reading-block.reflow-original-paragraph-block {
+  margin-top: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0008"]),
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0009"]),
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0010"]),
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0011"]),
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0013"]),
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-section-id="pg215_sec001"]
+  .reflow-paragraph-break:has(+ [data-id="pg215_n0014"]) {
+  margin-top: 0 !important;
+}
+
+body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
+  #content [data-id="pg215_n0023"] {
+  margin-top: .5em !important;
+}

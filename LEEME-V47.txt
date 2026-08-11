@@ -1,0 +1,3 @@
+1930: El viaje — versión 47, libro completo
+
+Esta versión conserva la interfaz y las soluciones auditadas de la v46 y agrega los capítulos 3 a 8 y las páginas finales desde la exportación completa. Abrir index.html.
