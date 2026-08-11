@@ -31,28 +31,19 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-@font-face {
-  font-family: 'Merriweather';
-  src: url('./fonts/Merriweather-VariableFont.woff2') format('woff2');
-  font-weight: 300 800;
-  font-style: normal;
-  font-display: swap;
+/* Atkinson Hyperlegible is the book's only editorial typeface. Tailwind's
+   sans, serif and monospace utilities all resolve to the same family. */
+:root {
+  --font-sans: "Atkinson Hyperlegible", sans-serif;
+  --font-serif: "Atkinson Hyperlegible", sans-serif;
+  --font-mono: "Atkinson Hyperlegible", sans-serif;
+  --default-font-family: "Atkinson Hyperlegible", sans-serif;
+  --default-mono-font-family: "Atkinson Hyperlegible", sans-serif;
 }
 
-@font-face {
-  font-family: 'Merriweather';
-  src: url('./fonts/Merriweather-Italic-VariableFont.woff2') format('woff2');
-  font-weight: 300 800;
-  font-style: italic;
-  font-display: swap;
-}
-
-/* Apply the accessible project typeface globally. */
-body, p, h1, h2, h3, h4, h5, h6, span, div, button, input, textarea, select {
-  font-family: "Atkinson Hyperlegible", sans-serif;
-}
-
-#nav-container, #nav-container *,
-#interface-container, #interface-container * {
-  font-family: 'Atkinson Hyperlegible', sans-serif;
+html, body, main, section, article, header, footer, nav, aside,
+p, h1, h2, h3, h4, h5, h6, span, div, a, label, button,
+input, textarea, select, option, li, dt, dd, blockquote,
+figcaption, table, th, td, small, strong, em, code, pre {
+  font-family: "Atkinson Hyperlegible", sans-serif !important;
 }

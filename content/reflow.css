@@ -2126,7 +2126,7 @@ body.reflow-book .reflow-accessibility-panel .reflow-font-settings-card {
 }
 
 /* Keep the full Resaltado control inside the compact settings panel without
-   reducing Verdana. The label keeps its natural width; the segmented buttons
+   reducing legacy text widths. The label keeps its natural width; the segmented buttons
    give back only redundant horizontal padding. */
 body.reflow-book .reflow-accessibility-panel
   [role="group"]:has(> span + div > [role="radio"]) {
