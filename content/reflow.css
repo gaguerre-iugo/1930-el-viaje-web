@@ -2154,7 +2154,7 @@ body.reflow-book .reflow-accessibility-panel
    Redistribute the existing tab-list width instead of widening the panel. */
 body.reflow-book .reflow-navigation-panel [role="tablist"] {
   grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
-  height: 3.25rem !important;
+  height: 3.5rem !important;
   padding: .25rem !important;
   border: 1px solid var(--ceibal-gray-700) !important;
   border-radius: var(--ceibal-radius-md) !important;
@@ -2214,6 +2214,19 @@ body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
   font-size: 1rem !important;
   font-weight: 700 !important;
   letter-spacing: .045em !important;
+}
+
+/* Keep the familiar 40 x 24 px switch track while expanding its real focus
+   and pointer target to 44 x 44 px. Padding belongs to the interactive
+   element, so the enlarged area works for touch, mouse and keyboard alike. */
+body.reflow-book [role="switch"] {
+  box-sizing: border-box !important;
+  width: 2.75rem !important;
+  min-width: 2.75rem !important;
+  height: 2.75rem !important;
+  min-height: 2.75rem !important;
+  padding: .5625rem .0625rem !important;
+  background-clip: content-box !important;
 }
 
 /* A single green convention communicates every active accessible mode. */
@@ -2756,6 +2769,14 @@ body.reflow-book #content .quiz-option.is-selected:not(.is-correct):not(.is-inco
   background: #fff !important;
   outline: 0 !important;
   box-shadow: none !important;
+}
+
+/* Quiz cards are scaled slightly by the responsive paginator. A 48 px CSS
+   minimum here produces a measured target of at least 44 px after that scale
+   is applied, for both the complete answer label and the submit action. */
+body.reflow-book #content .quiz-option,
+body.reflow-book #content .quiz-submit {
+  min-height: 3rem !important;
 }
 
 /* Alfredo Etchandy is a closing signature, not another inline sentence of

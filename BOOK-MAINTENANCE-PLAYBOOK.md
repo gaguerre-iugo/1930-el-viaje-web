@@ -353,6 +353,96 @@ Revertir el commit correspondiente mediante Git. Si se ajustan estos mínimos en
 
 ---
 
+## Acción 4: asegurar áreas táctiles de 44–48 px
+
+### Objetivo
+
+Ofrecer objetivos fáciles de activar con tacto, ratón o puntero:
+
+- `44–48 px` como dimensión recomendada para controles importantes.
+- `24 × 24 CSS px` como mínimo absoluto para objetivos operables por el usuario.
+
+La medición corresponde al área interactiva completa, no al icono o indicador visual contenido dentro de ella.
+
+### Áreas que deben revisarse
+
+- Barra principal, flechas y paginación.
+- Pestañas y opciones de navegación.
+- Búsquedas, glosario, idioma y configuración.
+- Interruptores y grupos de opciones.
+- Tarjetas de respuesta y botones de envío de cuestionarios.
+- Controles compactos que aparecen únicamente al abrir paneles.
+
+### Procedimiento
+
+1. Recorrer todos los elementos interactivos visibles y medir su `getBoundingClientRect()`.
+2. Medir la etiqueta pulsable completa cuando un `input` esté contenido en un `<label>`; el círculo del radio no representa por sí solo el objetivo efectivo.
+3. Clasificar por separado controles internos, ocultos o no destinados a interacción directa.
+4. Elevar los controles principales a un área efectiva de entre 44 y 48 px.
+5. Si el paginador aplica una transformación de escala, definir un mínimo previo suficientemente grande para que la medida final siga siendo de al menos 44 px.
+6. En interruptores, ampliar el elemento interactivo y de foco sin deformar la pista visual de 40 × 24 px.
+7. Abrir cada panel y repetir la medición; después comprobar el diseño en una ventana estrecha.
+
+### Refuerzo CSS recomendado
+
+```css
+.quiz-option,
+.quiz-submit {
+  min-height: 3rem; /* conserva al menos 44 px tras un escalado leve */
+}
+
+[role="switch"] {
+  box-sizing: border-box;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: .5625rem .0625rem;
+  background-clip: content-box;
+}
+```
+
+El relleno del interruptor forma parte del objetivo real. `background-clip: content-box` mantiene la pista visual en su tamaño original.
+
+### Validación estática
+
+Buscar dimensiones pequeñas en controles y revisar las reglas responsivas que puedan reducirlas:
+
+```powershell
+rg -n "(min-)?(width|height):\s*([0-9]|1[0-9]|2[0-3])px" `
+  -g "*.css" -g "*.html" content assets .
+```
+
+Esta búsqueda es orientativa: el cumplimiento debe decidirse mediante el objetivo efectivo calculado en el navegador.
+
+### Validación en navegador
+
+- Medir botones, enlaces, etiquetas pulsables, campos, pestañas, radios e interruptores.
+- Confirmar que ningún objetivo destinado al usuario mida menos de `24 × 24 CSS px`.
+- Confirmar que los controles principales queden entre 44 y 48 px como mínimo en su dimensión corta.
+- Abrir navegación, glosario, idioma, voz y configuración.
+- Probar cuestionarios antes y después de responder.
+- Verificar foco, estados activos y ausencia de solapamientos.
+
+### Resultado obtenido en este proyecto
+
+- Opciones y botones de cuestionario elevados para conservar al menos 44 px después del escalado del paginador.
+- Pestañas de navegación ampliadas a la franja recomendada.
+- Interruptores con objetivo y foco de 44 × 44 px, conservando su pista visual de 40 × 24 px.
+- Barra principal, navegación, búsqueda y glosario conservados porque ya cumplían la recomendación.
+- Controles internos de control de calidad de 1 px excluidos por no ser objetivos operables de la interfaz.
+
+### Riesgos y excepciones
+
+- No evaluar solamente el radio nativo cuando toda la tarjeta `<label>` es pulsable.
+- No agrandar iconos para simular un área táctil mayor: debe crecer el elemento interactivo real.
+- Los enlaces integrados en frases pueden estar sujetos a excepciones normativas, pero conviene mantener separación suficiente siempre que el diseño lo permita.
+- Un aumento de altura puede modificar la paginación o el espacio disponible en paneles bajos.
+
+### Reversión
+
+Revertir el commit correspondiente mediante Git y restaurar el identificador de caché anterior. Después de revertir, volver a medir los objetivos efectivos, no solo sus iconos.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
