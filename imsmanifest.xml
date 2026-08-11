@@ -54,6 +54,12 @@
       <file href="qz006.html"/>
       <file href="content/viewport-layout.css"/>
       <file href="content/reflow.css"/>
+      <file href="assets/fonts.css"/>
+      <file href="assets/font-validation.js"/>
+      <file href="assets/fonts/AtkinsonHyperlegible-400-latin.woff2"/>
+      <file href="assets/fonts/AtkinsonHyperlegible-400-latin-ext.woff2"/>
+      <file href="assets/fonts/AtkinsonHyperlegible-700-latin.woff2"/>
+      <file href="assets/fonts/AtkinsonHyperlegible-700-latin-ext.woff2"/>
       <file href="assets/reflow-book.js"/>
       <file href="assets/reflow-redirect.js"/>
       <file href="assets/quiz-sequence.js"/>

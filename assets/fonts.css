@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Atkinson Hyperlegible';
-  src: url('./fonts/AtkinsonHyperlegible-400-latin.woff2') format('woff2');
+  src: url('./fonts/AtkinsonHyperlegible-400-latin.woff2?v=2-atkinson-runtime') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -8,7 +8,7 @@
 }
 @font-face {
   font-family: 'Atkinson Hyperlegible';
-  src: url('./fonts/AtkinsonHyperlegible-400-latin-ext.woff2') format('woff2');
+  src: url('./fonts/AtkinsonHyperlegible-400-latin-ext.woff2?v=2-atkinson-runtime') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -16,7 +16,7 @@
 }
 @font-face {
   font-family: 'Atkinson Hyperlegible';
-  src: url('./fonts/AtkinsonHyperlegible-700-latin.woff2') format('woff2');
+  src: url('./fonts/AtkinsonHyperlegible-700-latin.woff2?v=2-atkinson-runtime') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -24,7 +24,7 @@
 }
 @font-face {
   font-family: 'Atkinson Hyperlegible';
-  src: url('./fonts/AtkinsonHyperlegible-700-latin-ext.woff2') format('woff2');
+  src: url('./fonts/AtkinsonHyperlegible-700-latin-ext.woff2?v=2-atkinson-runtime') format('woff2');
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -44,7 +44,9 @@
 html, body, main, section, article, header, footer, nav, aside,
 p, h1, h2, h3, h4, h5, h6, span, div, a, label, button,
 input, textarea, select, option, li, dt, dd, blockquote,
-figcaption, table, th, td, small, strong, em, code, pre {
+output, summary, fieldset, legend, figcaption, table, th, td,
+small, strong, em, code, pre, [role="button"], [role="tab"],
+[role="switch"], [role="radio"], [role="status"] {
   font-family: "Atkinson Hyperlegible", sans-serif !important;
 }
 

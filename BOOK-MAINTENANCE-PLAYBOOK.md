@@ -443,6 +443,95 @@ Revertir el commit correspondiente mediante Git y restaurar el identificador de 
 
 ---
 
+## Acción 5: garantizar la carga y el renderizado efectivo de Atkinson
+
+### Objetivo
+
+Comprobar que Atkinson Hyperlegible no solo figure en CSS, sino que sus archivos se carguen y que la familia calculada de la interfaz sea realmente Atkinson en servidor, ejecución local y paquete SCORM.
+
+### Áreas que deben revisarse
+
+- Dígitos distintivos: el `3` del contador y el `0` del título «1930».
+- Índice, pestañas, botones, formularios y actividades.
+- Pesos 400 y 700, incluida la cobertura de caracteres en español.
+- Carga mediante servidor HTTP, apertura local y LMS/SCORM.
+- Reglas de Tailwind, componentes base y estilos incrustados.
+- Caché del CSS, del validador y de los archivos WOFF2.
+
+### Procedimiento
+
+1. Versionar la URL de `assets/fonts.css` y las URLs WOFF2 para invalidar copias anteriores de caché.
+2. Precargar las caras latinas 400 y 700 desde cada documento completo.
+3. Mantener una regla global con `!important` que cubra texto editorial y controles, incluidas funciones ARIA.
+4. Esperar `document.fonts.ready`, solicitar ambas caras con `document.fonts.load()` y confirmarlas con `document.fonts.check()`.
+5. Recorrer los controles visibles y comparar su `font-family` calculada con `Atkinson Hyperlegible`.
+6. Repetir la auditoría cuando se incorporen controles dinámicos y después de interacciones del usuario, sin observar las animaciones continuas del paginador.
+7. Incluir CSS, validador y los cuatro WOFF2 en `imsmanifest.xml`.
+8. Sincronizar las páginas serializadas dentro del paquete de ejecución offline.
+
+### Archivos modificados o añadidos
+
+- `assets/fonts.css`: versionado de fuentes y cobertura reforzada de controles.
+- `assets/font-validation.js`: auditoría automática en tiempo de ejecución.
+- Todos los HTML completos: precargas, CSS versionado y carga del auditor.
+- `assets/offline-preloader.js`: copia sincronizada de los HTML.
+- `imsmanifest.xml`: recursos tipográficos declarados para SCORM.
+
+El fragmento `content/navigation/nav.html` no carga hojas ni scripts por sí mismo: hereda los recursos del documento que lo contiene.
+
+### Validación estática
+
+Comprobar que cada HTML completo contiene las dos precargas, la hoja versionada y el validador; que el manifiesto enumera los seis recursos tipográficos; y que no quedan enlaces directos sin versionar:
+
+```powershell
+rg -l 'fonts.css\?v=2-atkinson-runtime' -g '*.html' .
+rg -l 'font-validation.js\?v=4-atkinson-runtime' -g '*.html' .
+rg -n '<file href="assets/(fonts.css|font-validation.js|fonts/Atkinson)' imsmanifest.xml
+rg -n 'href="./assets/fonts.css"' -g '*.html' .
+```
+
+Los WOFF2 deben existir, empezar con la firma `wOF2` y servirse como `font/woff2`.
+
+### Validación automática en navegador
+
+Después de cargar una página, inspeccionar:
+
+```javascript
+document.documentElement.dataset.atkinsonFontAudit
+JSON.parse(document.documentElement.dataset.atkinsonFontAuditDetails)
+```
+
+El primer valor debe ser `pass`. El segundo conserva fecha, caras ausentes y controles infractores. Cuando el entorno permite ampliar `window`, el mismo informe también queda disponible en `window.__ATKINSON_FONT_AUDIT__`. Además, cada ejecución emite el evento `atkinson-font-audit`; un fallo queda registrado en la consola.
+
+Para una comprobación puntual:
+
+```javascript
+document.fonts.check('400 16px "Atkinson Hyperlegible"', '30 áéíóúñ¿¡')
+document.fonts.check('700 16px "Atkinson Hyperlegible"', '1930')
+getComputedStyle(document.querySelector('output')).fontFamily
+```
+
+### Resultado obtenido en este proyecto
+
+- Las caras esenciales 400 y 700 se solicitan antes del renderizado normal y se validan después de cargarse.
+- El contador, «1930» y los controles se incluyen explícitamente en el criterio automático.
+- La auditoría vuelve a ejecutarse cuando aparecen paneles, actividades o controles dinámicos y después de interacciones del usuario.
+- Las fuentes y el validador forman parte del manifiesto SCORM.
+- Las URLs versionadas evitan reutilizar indefinidamente una versión anterior de `fonts.css` o de los WOFF2.
+
+### Riesgos y excepciones
+
+- La precarga no sustituye una prueba real dentro del LMS usado en producción.
+- Un icono dibujado mediante una fuente de iconos no debe confundirse con texto de interfaz; el auditor revisa controles, no cada glifo decorativo descendiente.
+- Si se cambia el contenido de CSS, JavaScript o WOFF2, incrementar su identificador de versión en todas las páginas y volver a sincronizar el paquete offline.
+- Una interfaz que se mantenga con la fuente de respaldo producirá estado `fail`; la UI continúa operativa para no bloquear el contenido.
+
+### Reversión
+
+Revertir el commit correspondiente. Si se revierte parcialmente, eliminar también las referencias del manifiesto, las precargas, el script de auditoría y restaurar de forma coherente los identificadores de caché.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
