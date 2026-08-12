@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  document.documentElement.dataset.reflowBuild = "47-full-book-62";
+  document.documentElement.dataset.reflowBuild = "47-full-book-66";
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -223,6 +223,10 @@
     "adt-reflow-default-reader-state:47-full-book-45";
   var retiredTextCaseStorageKey = "adt-reflow-text-case:1930-libro-completo-v47";
   var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
+  var editorialTocTitles = {
+    pg221_sec001: "Ana Solari",
+    pg223_sec001: "Misterio de Cabo Frío"
+  };
   var fontScales = { normal: 1, large: 1.2, xlarge: 1.4 };
   var ttsVoices = { valentina: "Valentina", mateo: "Mateo" };
   var ttsVoiceCatalogs = {
@@ -302,6 +306,7 @@
     ttsManualHandoffGeneration: 0,
     ttsManualHandoffTimer: 0,
     sentencePaginationKey: "",
+    runtimeMenu: null,
     fontSize: "normal",
     ttsVoice: "valentina"
   };
@@ -472,6 +477,11 @@
           data = data.filter(function (entry) {
             return entry.section_id !== "pg010_sec001";
           });
+          data.forEach(function (entry) {
+            if (editorialTocTitles[entry.section_id]) {
+              entry.title = editorialTocTitles[entry.section_id];
+            }
+          });
         }
         data.forEach(function (entry) {
           entry.href = "index.html#" + entry.section_id;
@@ -490,6 +500,17 @@
         headers: { "Content-Type": "application/json" }
       });
     };
+  }
+
+  async function loadIndexMetadata() {
+    try {
+      var response = await fetch("./content/toc.json?v=3-index-hierarchy");
+      if (!response.ok) throw new Error("No se pudo cargar el índice editorial.");
+      var entries = await response.json();
+      if (Array.isArray(entries)) window.__adtReflowTocEntries = entries;
+    } catch (error) {
+      console.warn("No se pudieron precargar los metadatos del índice.", error);
+    }
   }
 
   function isInteractive(element) {
@@ -1716,6 +1737,39 @@
     if (element.getAttribute(name) !== normalized) element.setAttribute(name, normalized);
   }
 
+  function restoreIndexFocus() {
+    requestAnimationFrame(function () {
+      if (!indexButton || !document.documentElement.contains(indexButton)) return;
+      try {
+        indexButton.focus({ preventScroll: true });
+      } catch (_error) {
+        indexButton.focus();
+      }
+    });
+  }
+
+  function restoreIndexFocusAfterResult() {
+    [0, 80, 240].forEach(function (delay) {
+      window.setTimeout(function () {
+        var currentMenu = typeof window.__adtReflowGetDockMenu === "function"
+          ? window.__adtReflowGetDockMenu()
+          : "";
+        if (currentMenu !== "" || indexButton.getAttribute("aria-expanded") !== "false") return;
+        var active = document.activeElement;
+        var focusWasLost = !active || active === document.body ||
+          active === document.documentElement || !active.isConnected || Boolean(
+            active.closest && active.closest(
+              ".reflow-navigation-panel, .reflow-upstream-dock"
+            )
+          );
+        /* Do not steal focus if the reader has already moved deliberately to
+           another visible control during the short closing transition. */
+        if (active !== indexButton && !focusWasLost) return;
+        restoreIndexFocus();
+      }, delay);
+    });
+  }
+
   function syncPrimaryToolbar() {
     if (!indexButton || !readButton || !toolsButton) return;
     var indexTrigger = runtimeDockButton(["Menú principal", "Main Menu"]);
@@ -1730,6 +1784,8 @@
       typeof window.__adtReflowGetDockMenu === "function"
     );
     var currentMenu = runtimeMenuReady ? window.__adtReflowGetDockMenu() : "";
+    var previousMenu = state.runtimeMenu;
+    state.runtimeMenu = currentMenu;
     var toolbarHasFocus = Boolean(primaryToolbar && primaryToolbar.matches(":focus-within"));
     var upstreamWantsHidden = Boolean(
       upstreamDock && upstreamDock.classList.contains("opacity-0")
@@ -1757,6 +1813,11 @@
     );
     document.body.classList.toggle("reflow-tts-playing", playing);
     markUpstreamDock();
+    /* Closing the index can happen through its button, Escape, an outside
+       click or after choosing a result. Only return focus when the panel was
+       actually dismissed; switching directly to Tools must keep focus on the
+       newly requested control instead. */
+    if (previousMenu === "toc" && currentMenu === "") restoreIndexFocus();
   }
 
   function toggleRuntimePanel(labels) {
@@ -2935,12 +2996,20 @@
       "focus:outline-none focus:bg-accent focus:text-accent-foreground " +
       "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset";
     var currentPageClass = " bg-accent text-accent-foreground font-medium";
-    var chapterLabelClass =
-      "px-1 pt-3 pb-1 text-base font-semibold tracking-wide " +
-      "text-muted-foreground";
+    var chapterLabelClass = "reflow-index-group";
 
     function normalized(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function tocLevel(entry) {
+      var level = Number(entry && entry.level);
+      return level >= 1 && level <= 3 ? level : 2;
+    }
+
+    function tocKind(entry) {
+      var level = tocLevel(entry);
+      return level === 1 ? "chapter" : level === 2 ? "section" : "page";
     }
 
     function isNavigationPanel(panel) {
@@ -3011,7 +3080,7 @@
 
       if (!chapters.length || chapters[0].pageIndex > 0) {
         chapters.unshift({
-          entry: { title: "Páginas", chapter_id: "", section_id: "" },
+          entry: { title: "Páginas", chapter_id: "", section_id: "", level: 1 },
           pageIndex: 0
         });
       }
@@ -3067,11 +3136,18 @@
       var fragment = document.createDocumentFragment();
       result.groups.forEach(function (group) {
         var chapterItem = document.createElement("li");
+        var chapterHeading = document.createElement("span");
+        var groupLevel = tocLevel(group.chapter.entry);
         chapterItem.className = chapterLabelClass;
+        chapterItem.dataset.reflowIndexLevel = String(groupLevel);
         if (group.chapter.entry.chapter_id) {
           chapterItem.dataset.chapterId = group.chapter.entry.chapter_id;
         }
-        chapterItem.textContent = group.chapter.entry.title;
+        chapterHeading.className = "reflow-index-group-title";
+        chapterHeading.setAttribute("role", "heading");
+        chapterHeading.setAttribute("aria-level", String(Math.min(6, groupLevel + 1)));
+        chapterHeading.textContent = group.chapter.entry.title;
+        chapterItem.appendChild(chapterHeading);
         fragment.appendChild(chapterItem);
 
         group.pages.forEach(function (pageIndex) {
@@ -3083,6 +3159,8 @@
           button.type = "button";
           button.className = pageButtonClass + (pageIndex === state.current ? currentPageClass : "");
           button.dataset.reflowPageIndex = String(pageIndex);
+          button.dataset.reflowEntryKind = "page";
+          button.classList.add("reflow-index-page-button");
           button.setAttribute("aria-label", "Página " + pageLabel);
           button.setAttribute("title", "Ir a la página " + pageLabel);
           if (pageIndex === state.current) button.setAttribute("aria-current", "page");
@@ -3115,7 +3193,11 @@
       Array.prototype.slice.call(tabpanel.querySelectorAll("button")).forEach(function (button, index) {
         var entry = tocEntryForButton(button, panel) || toc[index];
         if (!entry) return;
+        var level = tocLevel(entry);
         button.dataset.reflowTocSectionId = entry.section_id;
+        button.dataset.reflowTocLevel = String(level);
+        button.dataset.reflowEntryKind = tocKind(entry);
+        button.classList.add("reflow-toc-entry");
         if (entry.chapter_id) button.dataset.reflowAnchorId = entry.chapter_id;
         button.removeAttribute("aria-current");
         if (
@@ -3134,6 +3216,7 @@
       var legacyClose = document.getElementById("nav-close");
       if (legacyClose && legacyClose.getClientRects().length) {
         legacyClose.click();
+        restoreIndexFocusAfterResult();
         return;
       }
       var trigger = document.querySelector(
@@ -3148,7 +3231,10 @@
           return /menú principal|navegación|índice/i.test(label);
         });
       }
-      if (trigger) trigger.click();
+      if (trigger) {
+        trigger.click();
+        restoreIndexFocusAfterResult();
+      }
     }
 
     function removePrintLabel(button) {
@@ -3364,8 +3450,41 @@
     document.addEventListener("mousedown", preserveTtsPanel, true);
     document.addEventListener("touchstart", preserveTtsPanel, true);
 
+    function movePrimaryToolbarFocus(event) {
+      var toolbar = event.target && event.target.closest
+        ? event.target.closest("#reflow-pagination")
+        : null;
+      if (!toolbar || !/^Arrow(?:Left|Right|Up|Down)$/.test(event.key)) return false;
+      var controls = Array.prototype.slice.call(
+        toolbar.querySelectorAll("button:not([disabled])")
+      ).filter(function (button) {
+        return button.getAttribute("aria-hidden") !== "true" && button.getClientRects().length;
+      });
+      var currentIndex = controls.indexOf(event.target.closest("button"));
+      if (currentIndex < 0 || controls.length < 2) return false;
+      var direction = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : -1;
+      var nextIndex = (currentIndex + direction + controls.length) % controls.length;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      try {
+        controls[nextIndex].focus({ preventScroll: true });
+      } catch (_error) {
+        controls[nextIndex].focus();
+      }
+      return true;
+    }
+
     document.addEventListener("keydown", function (event) {
-      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || isInteractive(event.target)) {
+      if (movePrimaryToolbarFocus(event)) return;
+      var focusedInPrimaryToolbar = Boolean(
+        event.target && event.target.closest && event.target.closest("#reflow-pagination")
+      );
+      var pageShortcutFromToolbar = focusedInPrimaryToolbar &&
+        /^(?:PageUp|PageDown|Home|End)$/.test(event.key);
+      if (
+        event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey ||
+        (isInteractive(event.target) && !pageShortcutFromToolbar)
+      ) {
         return;
       }
 
@@ -3378,6 +3497,9 @@
 
       event.preventDefault();
       event.stopImmediatePropagation();
+      /* Outside the toolbar the horizontal arrows turn pages. Page Up/Down,
+         Home and End remain explicit page shortcuts even while a toolbar
+         control has focus. */
       goToPage(destination, { explicit: true });
     }, true);
 
@@ -8831,6 +8953,7 @@
     loadTtsVoicePreference();
     installReflowDataAdapter();
     var voiceCatalogPromise = loadTtsVoiceCatalogs();
+    var indexMetadataPromise = loadIndexMetadata();
 
     var loading = document.createElement("div");
     loading.id = "reflow-loading";
@@ -8867,6 +8990,7 @@
       }
 
       await voiceCatalogPromise;
+      await indexMetadataPromise;
       await loadRuntime();
       normalizeLaterBookStructure();
       createPagination();

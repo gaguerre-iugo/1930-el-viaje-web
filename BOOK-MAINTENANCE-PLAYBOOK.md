@@ -793,7 +793,7 @@ Dar prioridad perceptiva y operativa a Anterior y Siguiente, conservar sus equiv
 2. Usar una superficie y un borde con mayor contraste que el fondo general de la barra.
 3. Diferenciar el estado deshabilitado mediante color, fondo y borde discontinuo; no depender únicamente de opacidad.
 4. Mantener el contador visual abreviado, con números tabulares, y actualizar su nombre accesible como «Página actual de total».
-5. Exponer los atajos mediante `aria-keyshortcuts` y conservar flechas, Page Up, Page Down, Inicio y Fin, sin capturarlos dentro de controles interactivos.
+5. Exponer los atajos mediante `aria-keyshortcuts`. Cuando un control de la barra principal tiene foco, usar las flechas para recorrer sus opciones, omitiendo controles deshabilitados y conservando Tab. Fuera de la barra, usar las flechas izquierda/derecha para cambiar de página. Page Up, Page Down, Inicio y Fin mantienen su función de navegación de página en ambos contextos. No capturar estas teclas dentro de formularios, actividades o paneles.
 6. Medir la altura real de la barra con `ResizeObserver` y `visualViewport`, publicarla en `--reflow-toolbar-reserve` y usarla para calcular el alto disponible del libro.
 7. Incluir `env(safe-area-inset-bottom)` en la barra para dispositivos con área segura inferior.
 
@@ -813,6 +813,42 @@ Dar prioridad perceptiva y operativa a Anterior y Siguiente, conservar sus equiv
 ### Reversión
 
 Restaurar conjuntamente los estilos de navegación, los metadatos de teclado y el cálculo anterior de `--reflow-page-height`.
+
+---
+
+## Acción 9: rediseñar el índice con jerarquía semántica
+
+### Objetivo
+
+Presentar capítulos, secciones y páginas con una jerarquía perceptible y navegable, conservar los títulos editoriales en sentence case y mantener una gestión de foco predecible.
+
+### Procedimiento
+
+1. Corregir el sentence case en `content/toc.json`; no aplicar `lowercase` global desde CSS o JavaScript porque dañaría nombres propios, siglas y textos históricos.
+2. Conservar en cada entrada el nivel editorial `level` y exponerlo en la interfaz mediante `data-reflow-toc-level` y `data-reflow-entry-kind`.
+3. Diferenciar los niveles con tamaño, peso y sangría: capítulo en primer nivel, sección en segundo y página o detalle en tercero.
+4. Construir la lista de páginas con encabezados semánticos y resultados subordinados visualmente.
+5. Mantener `aria-current="location"` en la entrada activa del índice y `aria-current="page"` en la página visual actual.
+6. Garantizar un mínimo de 44 px para todos los botones de resultado.
+7. Detectar el cierre real del índice, ya sea mediante el botón, Escape, clic exterior o selección de un resultado, y devolver el foco a `#reflow-index`. Tras elegir un resultado, repetir la comprobación durante la transición breve del componente base, sin robar el foco si el usuario ya lo movió a otro control. No moverlo al cambiar directamente a Herramientas.
+
+### Validación
+
+- Revisar todos los títulos de `toc.json`, con atención especial a nombres propios como «Ana Solari» y «Cabo Frío».
+- Inspeccionar los tres niveles y confirmar que se distinguen sin depender de color ni mayúsculas.
+- En la consola, comprobar que el resultado activo tiene `aria-current` y que cada botón mide al menos 44 px de alto.
+- Abrir el índice con teclado, cerrarlo con Escape y confirmar que `document.activeElement.id` devuelve `reflow-index`.
+- Seleccionar una entrada y repetir la comprobación de foco después de que se cierre el panel.
+
+### Riesgos y excepciones
+
+- Sentence case es una decisión editorial: cualquier importación nueva debe corregir su fuente de datos y preservar conscientemente nombres propios y siglas.
+- No inferir el nivel por color, mayúsculas o posición DOM; usar siempre el campo `level`.
+- No devolver el foco a Índice cuando el usuario haya cambiado directamente a otro panel.
+
+### Reversión
+
+Restaurar conjuntamente los datos del índice, su decorador JavaScript y los estilos de jerarquía para no dejar niveles declarados sin representación visual.
 
 ---
 

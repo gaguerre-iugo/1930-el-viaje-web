@@ -2387,15 +2387,63 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-cur
   border-color: var(--ceibal-institutional-400) !important;
   color: #fff !important;
   background: var(--ceibal-quiz-page) !important;
+  box-shadow: inset .25rem 0 0 var(--ceibal-institutional-200) !important;
 }
 
 body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
-  li[data-chapter-id] {
-  padding: .75rem .25rem .35rem !important;
+  .reflow-index-group {
+  padding: .875rem .25rem .4rem !important;
   color: var(--ceibal-institutional-200) !important;
-  font-size: 1rem !important;
+  font-size: 1.125rem !important;
   font-weight: 700 !important;
-  letter-spacing: .045em !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
+  .reflow-index-group[data-reflow-index-level="2"] {
+  margin-left: .75rem !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
+  .reflow-index-group[data-reflow-index-level="3"] {
+  margin-left: 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  button[data-reflow-toc-level="1"] {
+  min-height: 3rem !important;
+  font-size: 1.125rem !important;
+  font-weight: 700 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  button[data-reflow-toc-level="2"] {
+  width: calc(100% - .75rem) !important;
+  margin-left: .75rem !important;
+  font-size: 1.0625rem !important;
+  font-weight: 600 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  button[data-reflow-toc-level="3"] {
+  width: calc(100% - 1.5rem) !important;
+  margin-left: 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+}
+
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  .reflow-index-page-button {
+  width: calc(100% - 1.5rem) !important;
+  min-height: 2.75rem !important;
+  margin-left: 1.5rem !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
 }
 
 /* Keep the familiar 40 x 24 px switch track while expanding its real focus
