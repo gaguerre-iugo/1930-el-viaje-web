@@ -602,7 +602,6 @@ body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-sender
   font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
   font-weight: 700 !important;
   line-height: 1.25 !important;
-  text-transform: uppercase !important;
 }
 
 body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-text {
@@ -1198,7 +1197,6 @@ body.reflow-book #content .book-cover-final .book-cover-copy h2 {
   font-family: "Atkinson Hyperlegible", sans-serif !important;
   font-style: normal !important;
   font-weight: 700 !important;
-  text-transform: uppercase;
 }
 
 body.reflow-book #content .book-cover-final .book-cover-copy h1 {
@@ -1680,7 +1678,6 @@ body.reflow-book #content .quiz-kicker {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: .04em;
-  text-transform: uppercase;
 }
 
 body.reflow-book #content .quiz-dimension {
@@ -1935,7 +1932,6 @@ body.reflow-book #content .quiz-explanation-bank {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: .06em;
-  text-transform: uppercase;
 }
 
 .reflow-font-settings-card {
@@ -4286,7 +4282,13 @@ body.reflow-book #content > section.reflow-collaborators-page h2 {
   line-height: 1.2 !important;
   letter-spacing: .11em !important;
   text-align: center !important;
-  text-transform: uppercase !important;
+}
+
+/* Preserve the casing authored in the source. Interface and activity styles
+   must never manufacture capitals, including styles injected at runtime. */
+body.reflow-book,
+body.reflow-book * {
+  text-transform: none !important;
 }
 
 body.reflow-book #content > section.reflow-collaborators-page img {

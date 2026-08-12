@@ -532,6 +532,88 @@ Revertir el commit correspondiente. Si se revierte parcialmente, eliminar tambi�
 
 ---
 
+## Acción 6: preservar la capitalización editorial sin transformaciones CSS
+
+### Objetivo
+
+Mostrar la interfaz y las actividades en formato oración y conservar únicamente las mayúsculas que estén escritas de forma intencional en el contenido. CSS y los componentes no deben transformar automáticamente nombres propios, siglas ni textos históricos.
+
+### Áreas que deben revisarse
+
+- Etiquetas de accesibilidad, especialmente «Lectura en voz alta», «Tamaño de letra» y «Descripción de imágenes».
+- Encabezados de navegación, configuración, índice y actividades.
+- Clases utilitarias `uppercase`, `capitalize` y `lowercase`.
+- Declaraciones `text-transform` en CSS general, estilos de reflujo y estilos incrustados.
+- Componentes compilados que construyen clases dinámicamente.
+- Copias de HTML, traducciones y componentes incluidas en el paquete offline.
+
+### Procedimiento
+
+1. Buscar declaraciones `text-transform` y utilidades que modifiquen la capitalización.
+2. Eliminar `uppercase` de documentos y componentes; no convertir el texto fuente a minúsculas de forma mecánica.
+3. Eliminar las declaraciones `text-transform: uppercase` del CSS compilado y del CSS de reflujo.
+4. Aplicar `text-transform: none !important` como protección contra estilos incrustados o componentes de terceros.
+5. Normalizar las etiquetas de interfaz en el archivo de traducciones.
+6. Versionar CSS y JavaScript modificados y resincronizar el paquete offline.
+7. Revisar por separado las mayúsculas escritas en el contenido y registrar las excepciones editoriales.
+
+### Excepciones editoriales de este proyecto
+
+Estas excepciones se conservan como texto fuente, nunca mediante transformación CSS:
+
+- Siglas institucionales: `ANEP` y `UTEC`.
+- Títulos y divisores cuya composición original usa mayúsculas, por ejemplo `EL VIAJE`, `CAPÍTULO 4` y `CONTENIDO`.
+- Identificadores de hablantes en conversaciones reproducidas gráficamente, como `JAVI` y `FEDE`.
+- Rótulos históricos o reproducidos desde la obra, como `CONTE VERDE`.
+- Créditos y nombres escritos originalmente en mayúsculas cuando la decisión editorial esté confirmada.
+
+Los nombres propios dentro del texto narrativo —por ejemplo Javier, Federica, Josephine Baker o Conte Verde— mantienen su capitalización lingüística normal.
+
+### Archivos modificados
+
+- `content/reflow.css` y `content/tailwind_output.css`.
+- `assets/tailwind_css.css`.
+- `assets/base.bundle.local.js` y `assets/base.bundle.min.js`.
+- `assets/interface_translations/es-UY/interface_translations.json`.
+- HTML que contenían la utilidad `uppercase` y referencias compartidas versionadas.
+- `assets/offline-preloader.js`.
+
+### Validación estática
+
+```powershell
+rg -n -i "text-transform\s*:\s*uppercase" -g "*.css" .
+rg -n "\buppercase\b" -g "*.html" .
+rg -n "uppercase" assets/base.bundle.local.js assets/base.bundle.min.js
+```
+
+La primera y segunda búsquedas deben devolver cero resultados. En los bundles puede permanecer la palabra `uppercase` únicamente como metadato interno de Tailwind; no debe formar parte de ningún `className` renderizado.
+
+### Validación en navegador
+
+1. Abrir configuración, navegación, índice y al menos una actividad.
+2. Confirmar que las etiquetas usan formato oración.
+3. Recorrer los elementos textuales visibles y comprobar que `getComputedStyle(element).textTransform` sea `none`.
+4. Confirmar que siglas y excepciones editoriales siguen en mayúsculas porque así están escritas en el DOM.
+
+### Resultado obtenido en este proyecto
+
+- «Lectura en voz alta», «Tamaño de letra» y «Descripción de imágenes» quedan en formato oración.
+- Se eliminaron las transformaciones automáticas de páginas, actividades, navegación y configuración.
+- Las mayúsculas editoriales se conservan en el texto fuente.
+- Una regla protectora impide que Tailwind o un componente vuelva a imponer capitalización.
+
+### Riesgos y excepciones
+
+- No convertir masivamente textos escritos en mayúsculas: puede destruir siglas, nombres o decisiones de la edición original.
+- Una excepción nueva debe documentarse y escribirse explícitamente en el contenido.
+- Si se recompila Tailwind o el componente base, repetir la búsqueda estática y comprobar que no reaparezcan utilidades activas.
+
+### Reversión
+
+Revertir el commit correspondiente y restaurar conjuntamente los identificadores de caché. Después, volver a sincronizar `assets/offline-preloader.js`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
