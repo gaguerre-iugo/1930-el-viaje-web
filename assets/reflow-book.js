@@ -262,6 +262,7 @@
     ttsSeeking: false,
     ttsResumeAfterSeek: true,
     ttsManuallyPaused: false,
+    ttsExplicitlyStarted: false,
     ttsAudio: null,
     /* The runtime assigns its stock source just before it calls play(). Keep
        the semantic id independently so the bridge can reject that source if
@@ -305,6 +306,9 @@
     ttsManualHandoffPending: false,
     ttsManualHandoffGeneration: 0,
     ttsManualHandoffTimer: 0,
+    ttsPlayerVisible: false,
+    ttsPlayerReserve: 0,
+    ttsPlayerStopPendingUntil: 0,
     sentencePaginationKey: "",
     runtimeMenu: null,
     glossaryHighlightEnabled: false,
@@ -339,8 +343,13 @@
   var currentOutput;
   var totalOutput;
   var indexButton;
-  var readButton;
   var toolsButton;
+  var ttsPlayer;
+  var ttsPlayerPreviousButton;
+  var ttsPlayerToggleButton;
+  var ttsPlayerNextButton;
+  var ttsPlayerSettingsButton;
+  var ttsPlayerStopButton;
   var announcer;
   var ttsWordTickerRefs = new WeakMap();
   var ttsWordTickerRuns = new WeakMap();
@@ -1243,6 +1252,32 @@
     );
   }
 
+  var readAloudEnabledSelector = [
+    'button[aria-label="Desactivar texto a voz"]',
+    'button[aria-label="Desactivar lectura en voz alta"]'
+  ].join(",");
+  var readAloudDisabledSelector = [
+    'button[aria-label="Activar texto a voz"]',
+    'button[aria-label="Activar lectura en voz alta"]'
+  ].join(",");
+
+  function readAloudSettingIsEnabled() {
+    if (document.querySelector(readAloudEnabledSelector)) return true;
+    if (document.querySelector(readAloudDisabledSelector)) return false;
+    var labelledSwitch = Array.prototype.slice.call(
+      document.querySelectorAll('[role="switch"][aria-checked]')
+    ).find(function (control) {
+      var labelledBy = control.getAttribute("aria-labelledby");
+      var label = labelledBy && document.getElementById(labelledBy);
+      return label && /lectura en voz alta/i.test(label.textContent || "");
+    });
+    if (labelledSwitch) return labelledSwitch.getAttribute("aria-checked") === "true";
+    /* React briefly unmounts the dock while repaginating. Preserve the last
+       confirmed session state during that gap instead of hiding and showing
+       the player repeatedly. */
+    return state.ttsPlayerVisible;
+  }
+
   function clearTtsAlignmentState() {
     window.clearTimeout(state.ttsTimer);
     window.clearTimeout(state.ttsNavigationUnlockTimer);
@@ -1306,7 +1341,7 @@
   function startTtsFromSettings(attempts) {
     window.clearTimeout(state.ttsActivationTimer);
     var remaining = typeof attempts === "number" ? attempts : 40;
-    var enabled = document.querySelector('button[aria-label="Desactivar texto a voz"]');
+    var enabled = readAloudSettingIsEnabled();
     var api = window.__adtReflowAudio;
     if (!enabled || !api || !api.play) {
       if (remaining > 0) {
@@ -1328,6 +1363,7 @@
   }
 
   function startTtsFromUserGesture() {
+    state.ttsExplicitlyStarted = true;
     var api = window.__adtReflowAudio;
     if (!api || !api.items || !api.playAtIndex) {
       startTtsFromSettings();
@@ -1340,6 +1376,23 @@
        on the stack. Start the selected item now; alignment cleanup may remain
        asynchronous after play() has already received that authorization. */
     scheduleTtsAlignment(state.current, true, true);
+  }
+
+  function activateTtsFromSettings() {
+    window.clearTimeout(state.ttsActivationTimer);
+    clearTtsAlignmentState();
+    state.ttsPlayerStopPendingUntil = 0;
+    state.ttsManuallyPaused = true;
+    state.ttsResumeAfterSeek = false;
+    state.ttsExplicitlyStarted = false;
+    var api = window.__adtReflowAudio;
+    if (api && api.pause) api.pause();
+    if (announcer) {
+      announcer.textContent =
+        "Lectura en voz alta activada. Pulse Reproducir para comenzar.";
+    }
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 160);
   }
 
   function stopTtsFromSettings() {
@@ -1355,6 +1408,7 @@
       state.ttsAudio.load();
     }
     state.ttsManuallyPaused = false;
+    state.ttsExplicitlyStarted = false;
     state.ttsCurrentItemIndex = -1;
     window.setTimeout(clearTtsRangeHighlight, 0);
   }
@@ -1469,9 +1523,7 @@
        before the next explicit navigation click (especially after uppercase
        and Easy Read repaginate the book). Keep every page change atomic; the
        reader's page controls are discrete, not a continuous scroll gesture. */
-    var ttsIsActive = Boolean(
-      document.querySelector('button[aria-label="Desactivar texto a voz"]')
-    );
+    var ttsIsActive = readAloudSettingIsEnabled();
     if (nextPage !== previousPage && !settings.fromTts && ttsIsActive) {
       /* An explicit visual-page change invalidates the former semantic audio
          cursor immediately. The target playback installs its new index. */
@@ -1493,7 +1545,7 @@
     if (
       nextPage !== previousPage &&
       !settings.fromTts &&
-      document.querySelector('button[aria-label="Desactivar texto a voz"]')
+      readAloudSettingIsEnabled()
     ) {
       if (state.ttsManuallyPaused) {
         /* Enabled-but-idle TTS can still retain a stale active element. Clear
@@ -1504,6 +1556,7 @@
         /* An already-running narration follows the explicit page change. */
         scheduleTtsAlignment(nextPage, false);
       } else if (
+        state.ttsExplicitlyStarted &&
         window.__adtReflowGetAutoplay &&
         window.__adtReflowGetAutoplay()
       ) {
@@ -1710,9 +1763,7 @@
       clearExplicitPageLock();
       recalculate({
         anchorId: anchorId,
-        preserveTts: Boolean(
-          document.querySelector('button[aria-label="Desactivar texto a voz"]')
-        )
+        preserveTts: readAloudSettingIsEnabled()
       });
     } else {
       recalculate({ preserveTts: true });
@@ -2243,8 +2294,103 @@
     });
   }
 
+  function ttsSessionIsActive() {
+    if (Date.now() < state.ttsPlayerStopPendingUntil) return false;
+    return readAloudSettingIsEnabled();
+  }
+
+  function focusVisibleReadingContent() {
+    var target = activeTtsElement();
+    if (!target || !target.getClientRects().length) {
+      var anchorId = visibleSemanticAnchorId() || state.currentAnchorId;
+      target = anchorId && content.querySelector(
+        '[data-id="' + CSS.escape(anchorId) + '"]'
+      );
+    }
+    if (!target || !target.getClientRects().length) target = content;
+    var temporaryTabIndex = !target.hasAttribute("tabindex");
+    if (temporaryTabIndex) target.setAttribute("tabindex", "-1");
+    requestAnimationFrame(function () {
+      try {
+        target.focus({ preventScroll: true });
+      } catch (_error) {
+        target.focus();
+      }
+      if (temporaryTabIndex) {
+        window.setTimeout(function () {
+          if (target !== document.activeElement) target.removeAttribute("tabindex");
+        }, 0);
+      }
+    });
+  }
+
+  function syncToolbarReserve() {
+    var pagination = document.getElementById("reflow-pagination");
+    if (!pagination) return;
+    var toolbarHeight = Math.ceil(pagination.getBoundingClientRect().height);
+    var rootStyles = getComputedStyle(document.documentElement);
+    var laneValue = rootStyles
+      .getPropertyValue("--reflow-tts-player-lane")
+      .trim();
+    var playerLane = parseFloat(laneValue);
+    if (laneValue.endsWith("rem")) {
+      playerLane *= parseFloat(rootStyles.fontSize) || 16;
+    }
+    if (!playerLane) playerLane = 72;
+    var reserve = toolbarHeight + playerLane;
+    document.documentElement.style.setProperty(
+      "--reflow-primary-toolbar-height",
+      toolbarHeight + "px"
+    );
+    if (reserve <= 0 || reserve === state.ttsPlayerReserve) return;
+    state.ttsPlayerReserve = reserve;
+    document.documentElement.style.setProperty(
+      "--reflow-toolbar-reserve",
+      reserve + "px"
+    );
+  }
+
+  function syncFloatingTtsPlayer() {
+    if (!ttsPlayer || !ttsPlayerToggleButton) return;
+    var active = ttsSessionIsActive();
+    var playing = active && ttsPlaybackIsRunning();
+    var visibilityChanged = active !== state.ttsPlayerVisible;
+    state.ttsPlayerVisible = active;
+    ttsPlayer.hidden = !active;
+    ttsPlayer.setAttribute("aria-hidden", String(!active));
+    document.body.classList.toggle("reflow-tts-session-active", active);
+
+    var playLabel = playing ? "Pausar" : "Reproducir";
+    setAttributeIfChanged(ttsPlayerToggleButton, "aria-label", playLabel);
+    setAttributeIfChanged(ttsPlayerToggleButton, "aria-pressed", playing);
+    var playIcon = ttsPlayerToggleButton.querySelector(".reflow-tts-player-icon");
+    var playText = ttsPlayerToggleButton.querySelector(".reflow-tts-player-label");
+    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (playText) playText.textContent = playLabel;
+
+    var api = window.__adtReflowAudio;
+    var canStep = Boolean(active && api && api.items && api.items.length && api.playAtIndex);
+    ttsPlayerPreviousButton.disabled = !canStep;
+    ttsPlayerNextButton.disabled = !canStep;
+    ttsPlayerToggleButton.disabled = !active;
+    ttsPlayerStopButton.disabled = !active;
+    syncToolbarReserve();
+
+    if (
+      visibilityChanged && active &&
+      typeof window.__adtReflowGetDockMenu === "function" &&
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      window.__adtReflowGetDockMenu() === "settings"
+    ) {
+      window.__adtReflowSetDockMenu("");
+      window.setTimeout(function () {
+        if (!ttsPlayer.hidden) ttsPlayerToggleButton.focus({ preventScroll: true });
+      }, 0);
+    }
+  }
+
   function syncPrimaryToolbar() {
-    if (!indexButton || !readButton || !toolsButton) return;
+    if (!indexButton || !toolsButton) return;
     var indexTrigger = runtimeDockButton(["Menú principal", "Main Menu"]);
     var toolsTrigger = runtimeDockButton(["Configuración", "Settings"]);
     var glossaryTrigger = runtimeDockButton(["Glosario", "Glossary"]);
@@ -2272,19 +2418,12 @@
       "aria-expanded",
       currentMenu === "settings" || currentMenu === "glossary"
     );
-    setAttributeIfChanged(readButton, "aria-label", playing ? "Pausar" : "Leer");
-    setAttributeIfChanged(readButton, "aria-pressed", playing);
-    var icon = readButton.querySelector(".reflow-toolbar-icon");
-    var label = readButton.querySelector(".reflow-toolbar-label");
-    var iconText = playing ? "❚❚" : "▶";
-    var labelText = playing ? "Pausar" : "Leer";
-    if (icon.textContent !== iconText) icon.textContent = iconText;
-    if (label.textContent !== labelText) label.textContent = labelText;
     primaryToolbar.classList.toggle(
       "reflow-primary-toolbar-hidden",
       upstreamWantsHidden && !toolbarHasFocus
     );
     document.body.classList.toggle("reflow-tts-playing", playing);
+    syncFloatingTtsPlayer();
     markUpstreamDock();
     /* Closing the index can happen through its button, Escape, an outside
        click or after choosing a result. Only return focus when the panel was
@@ -2363,7 +2502,7 @@
     toggleRuntimePanel(labels);
   }
 
-  function togglePrimaryReadAloud() {
+  function toggleFloatingReadAloud() {
     var api = window.__adtReflowAudio;
     if (ttsPlaybackIsRunning()) {
       state.ttsManuallyPaused = true;
@@ -2377,6 +2516,39 @@
     }
     requestAnimationFrame(syncPrimaryToolbar);
     window.setTimeout(syncPrimaryToolbar, 160);
+  }
+
+  function stepFloatingReadAloud(direction) {
+    var api = window.__adtReflowAudio;
+    if (!api || !api.items || !api.items.length || !api.playAtIndex) return;
+    state.ttsStepShouldRemainPaused = state.ttsManuallyPaused || !ttsPlaybackIsRunning();
+    if (state.ttsStepShouldRemainPaused) state.ttsManuallyPaused = true;
+    syncReadAloudSetting(true);
+    var destination = resolveTtsStepIndex(
+      api.items,
+      Number.isFinite(Number(api.currentIndex)) ? Number(api.currentIndex) : state.ttsCurrentItemIndex,
+      direction
+    );
+    api.playAtIndex(destination);
+    if (window.__adtReflowAfterTtsStep) window.__adtReflowAfterTtsStep(destination);
+    if (announcer) {
+      announcer.textContent = direction < 0 ? "Audio anterior" : "Audio siguiente";
+    }
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 180);
+  }
+
+  function stopFloatingReadAloud() {
+    state.ttsPlayerStopPendingUntil = Date.now() + 600;
+    syncReadAloudSetting(false);
+    stopTtsFromSettings();
+    syncFloatingTtsPlayer();
+    focusVisibleReadingContent();
+    window.setTimeout(syncPrimaryToolbar, 180);
+    window.setTimeout(function () {
+      state.ttsPlayerStopPendingUntil = 0;
+      syncPrimaryToolbar();
+    }, 650);
   }
 
   function createPagination() {
@@ -2404,14 +2576,38 @@
         '<span class="reflow-toolbar-icon" aria-hidden="true">→</span>' +
         '<span class="reflow-toolbar-label">Siguiente</span>' +
       '</button>' +
-      '<button id="reflow-read" class="reflow-toolbar-action" type="button" aria-label="Leer" aria-pressed="false">' +
-        '<span class="reflow-toolbar-icon" aria-hidden="true">▶</span>' +
-        '<span class="reflow-toolbar-label">Leer</span>' +
-      '</button>' +
       '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">⚙</span>' +
         '<span class="reflow-toolbar-label">Herramientas</span>' +
+      '</button>';
+
+    ttsPlayer = document.createElement("section");
+    ttsPlayer.id = "reflow-tts-player";
+    ttsPlayer.setAttribute("role", "region");
+    ttsPlayer.setAttribute("aria-label", "Controles de lectura en voz alta");
+    ttsPlayer.setAttribute("aria-hidden", "true");
+    ttsPlayer.hidden = true;
+    ttsPlayer.innerHTML =
+      '<button id="reflow-tts-previous" type="button" aria-label="Audio anterior">' +
+        '<span class="reflow-tts-player-icon" aria-hidden="true">⏮</span>' +
+        '<span class="reflow-tts-player-label">Anterior</span>' +
+      '</button>' +
+      '<button id="reflow-tts-toggle" type="button" aria-label="Reproducir" aria-pressed="false">' +
+        '<span class="reflow-tts-player-icon" aria-hidden="true">▶</span>' +
+        '<span class="reflow-tts-player-label">Reproducir</span>' +
+      '</button>' +
+      '<button id="reflow-tts-next" type="button" aria-label="Audio siguiente">' +
+        '<span class="reflow-tts-player-icon" aria-hidden="true">⏭</span>' +
+        '<span class="reflow-tts-player-label">Siguiente</span>' +
+      '</button>' +
+      '<button id="reflow-tts-settings" type="button" aria-label="Voz y velocidad">' +
+        '<span class="reflow-tts-player-icon" aria-hidden="true">⚙</span>' +
+        '<span class="reflow-tts-player-label">Voz y velocidad</span>' +
+      '</button>' +
+      '<button id="reflow-tts-stop" type="button" aria-label="Detener">' +
+        '<span class="reflow-tts-player-icon" aria-hidden="true">■</span>' +
+        '<span class="reflow-tts-player-label">Detener</span>' +
       '</button>';
 
     announcer = document.createElement("div");
@@ -2420,20 +2616,14 @@
     announcer.setAttribute("aria-atomic", "true");
 
     document.body.appendChild(pagination);
+    document.body.appendChild(ttsPlayer);
     document.body.appendChild(announcer);
 
-    function syncToolbarReserve() {
-      var height = Math.ceil(pagination.getBoundingClientRect().height);
-      if (height > 0) {
-        document.documentElement.style.setProperty(
-          "--reflow-toolbar-reserve",
-          height + "px"
-        );
-      }
-    }
     syncToolbarReserve();
     if (typeof ResizeObserver === "function") {
-      new ResizeObserver(syncToolbarReserve).observe(pagination);
+      var toolbarResizeObserver = new ResizeObserver(syncToolbarReserve);
+      toolbarResizeObserver.observe(pagination);
+      toolbarResizeObserver.observe(ttsPlayer);
     }
     window.addEventListener("resize", syncToolbarReserve);
     if (window.visualViewport) {
@@ -2445,8 +2635,12 @@
     currentOutput = document.getElementById("reflow-current-page");
     totalOutput = document.getElementById("reflow-total-pages");
     indexButton = document.getElementById("reflow-index");
-    readButton = document.getElementById("reflow-read");
     toolsButton = document.getElementById("reflow-tools");
+    ttsPlayerPreviousButton = document.getElementById("reflow-tts-previous");
+    ttsPlayerToggleButton = document.getElementById("reflow-tts-toggle");
+    ttsPlayerNextButton = document.getElementById("reflow-tts-next");
+    ttsPlayerSettingsButton = document.getElementById("reflow-tts-settings");
+    ttsPlayerStopButton = document.getElementById("reflow-tts-stop");
 
     indexButton.addEventListener("click", function () {
       switchRuntimePanel(
@@ -2454,12 +2648,28 @@
         ["Configuración", "Settings", "Glosario", "Glossary"]
       );
     });
-    readButton.addEventListener("click", togglePrimaryReadAloud);
     toolsButton.addEventListener("click", function () {
       switchRuntimePanel(
         ["Configuración", "Settings"],
         ["Menú principal", "Main Menu"]
       );
+    });
+    ttsPlayerPreviousButton.addEventListener("click", function () {
+      stepFloatingReadAloud(-1);
+    });
+    ttsPlayerToggleButton.addEventListener("click", toggleFloatingReadAloud);
+    ttsPlayerNextButton.addEventListener("click", function () {
+      stepFloatingReadAloud(1);
+    });
+    ttsPlayerSettingsButton.addEventListener("click", function () {
+      switchRuntimePanel(
+        ["Configuración", "Settings"],
+        ["Menú principal", "Main Menu"]
+      );
+    });
+    ttsPlayerStopButton.addEventListener("click", function (event) {
+      event.stopPropagation();
+      stopFloatingReadAloud();
     });
 
     document.addEventListener("keydown", function (event) {
@@ -2999,9 +3209,7 @@
         clearQuizInteractionHeights();
         clearExplicitPageLock();
         var active = activeTtsElement();
-        var ttsEnabled = Boolean(
-          document.querySelector('button[aria-label="Desactivar texto a voz"]')
-        );
+        var ttsEnabled = readAloudSettingIsEnabled();
         var settingsAnchorId = active && active.dataset.id && ttsEnabled
           ? active.dataset.id
           : visibleSemanticAnchorId();
@@ -3827,7 +4035,7 @@
       var dockTrigger = target.closest(
         '#reflow-index, #reflow-tools, #reflow-open-glossary, ' +
         'button[aria-label="Menú principal"], button[aria-label="Glosario"], ' +
-        'button[aria-label="Activar texto a voz"], button[aria-label="Desactivar texto a voz"], ' +
+        readAloudDisabledSelector + "," + readAloudEnabledSelector + "," +
         'button[aria-label="Idioma"], button[aria-label="Configuración"]'
       );
       if (dockTrigger) return dockTrigger;
@@ -3944,9 +4152,10 @@
         /controles de lectura en voz alta/i.test(dialogText) ||
         dialog.querySelector('button[aria-label="Audio anterior"], button[aria-label="Previous audio"]')
       ) {
-        triggerLabel = document.querySelector('button[aria-label="Desactivar texto a voz"]')
-          ? "Desactivar texto a voz"
-          : "Activar texto a voz";
+        var readAloudTrigger = document.querySelector(
+          readAloudEnabledSelector + "," + readAloudDisabledSelector
+        );
+        triggerLabel = readAloudTrigger && readAloudTrigger.getAttribute("aria-label");
       }
       if (!triggerLabel) return false;
 
@@ -3958,7 +4167,10 @@
 
     function preserveTtsPanel(event) {
       var target = event.target;
-      if (!target || !target.closest || !target.closest("#reflow-pagination")) return;
+      if (
+        !target || !target.closest ||
+        !target.closest("#reflow-pagination, #reflow-tts-player")
+      ) return;
       /* The upstream fixed-layout shell also listens to pointer gestures and
          interprets them as its own page navigation. On the reconstructed chat
          that source-level movement races the reflow column change and restores
@@ -3974,7 +4186,7 @@
 
     function movePrimaryToolbarFocus(event) {
       var toolbar = event.target && event.target.closest
-        ? event.target.closest("#reflow-pagination")
+        ? event.target.closest("#reflow-pagination, #reflow-tts-player")
         : null;
       if (!toolbar || !/^Arrow(?:Left|Right|Up|Down)$/.test(event.key)) return false;
       var controls = Array.prototype.slice.call(
@@ -4093,14 +4305,14 @@
         syncReadAloudSetting(true);
       }
 
-      var activateTts = target.closest('button[aria-label="Activar texto a voz"]');
+      var activateTts = target.closest(readAloudDisabledSelector);
       if (activateTts) {
         /* The speaker icon is a menu trigger. Playback starts only from the
            Play button inside the audio panel. */
         return;
       }
 
-      var deactivateTts = target.closest('button[aria-label="Desactivar texto a voz"]');
+      var deactivateTts = target.closest(readAloudEnabledSelector);
       if (deactivateTts) {
         /* When TTS is enabled this is still the same menu trigger; opening it
            must not clear a manual pause or change playback state. */
@@ -4993,9 +5205,7 @@
       instant: true,
       announce: false,
       preserveHash: true,
-      fromTts: Boolean(
-        document.querySelector('button[aria-label="Desactivar texto a voz"]')
-      )
+      fromTts: readAloudSettingIsEnabled()
     });
   }
 
@@ -8551,6 +8761,7 @@
     window.__adtReflowSyncSceneSeparators = reconcileSceneSeparatorTts;
     window.__adtReflowStartFromSettings = startTtsFromSettings;
     window.__adtReflowStartFromUserGesture = startTtsFromUserGesture;
+    window.__adtReflowActivateFromSettings = activateTtsFromSettings;
     window.__adtReflowStopFromSettings = stopTtsFromSettings;
     window.__adtReflowShouldPauseAfterItem = function (item) {
       if (!item || !item.el || !item.el.closest) return false;
@@ -8561,7 +8772,7 @@
     };
     window.__adtReflowReadQuizFeedback = function (audioId, feedbackElement) {
       if (!audioId || !feedbackElement) return;
-      if (!document.querySelector('button[aria-label="Desactivar texto a voz"]')) return;
+      if (!readAloudSettingIsEnabled()) return;
       var api = window.__adtReflowAudio;
       if (api && api.pause) api.pause();
       stopQuizFeedbackAudio();
@@ -8755,7 +8966,7 @@
 
   function followTtsHighlight() {
     if (state.ttsAligning) return;
-    if (!document.querySelector('button[aria-label="Desactivar texto a voz"]')) return;
+    if (!readAloudSettingIsEnabled()) return;
     var active = activeTtsElement();
     if (!active) return;
     var activePage = livePageForTtsElement(active);
@@ -8772,7 +8983,7 @@
      one audio item spans a page boundary. */
   function followTtsVisualTarget(target) {
     if (!target || state.ttsAligning) return;
-    if (!document.querySelector('button[aria-label="Desactivar texto a voz"]')) return;
+    if (!readAloudSettingIsEnabled()) return;
     var targetPages = pagesForElement(target);
     if (!targetPages.length) return;
     var targetPage = targetPages[0];
@@ -8870,7 +9081,7 @@
     var remaining = typeof attempts === "number" ? attempts : 80;
     var api = window.__adtReflowAudio;
     if (!api || !api.items || !api.playAtIndex) {
-      if (remaining > 0 && document.querySelector('button[aria-label="Desactivar texto a voz"]')) {
+      if (remaining > 0 && readAloudSettingIsEnabled()) {
         state.ttsTimer = window.setTimeout(function () {
           alignTtsToPage(targetPage, remaining - 1);
         }, 50);
@@ -8939,7 +9150,7 @@
     var speakerOpenReplacement = 'd=()=>{a(!0),c("audio")};';
     var settingsStartMarker = 'onChange:O("ReadAloud",f)';
     var settingsStartReplacement = 'onChange:w=>{O("ReadAloud",f)(w),' +
-      'w?window.__adtReflowStartFromUserGesture&&window.__adtReflowStartFromUserGesture():' +
+      'w?window.__adtReflowActivateFromSettings&&window.__adtReflowActivateFromSettings():' +
       'window.__adtReflowStopFromSettings&&window.__adtReflowStopFromSettings()}';
     var settingsVisibilityMarker = 'I=o.readAloud||!!o.easyRead,N=p;return';
     var settingsVisibilityReplacement = 'I=o.readAloud||!!o.easyRead,N=!0;return';
@@ -9636,7 +9847,7 @@
           var preserveActiveTts = Boolean(
             !state.initialHashSectionId &&
             (pendingAnchorId || active) &&
-            document.querySelector('button[aria-label="Desactivar texto a voz"]')
+            readAloudSettingIsEnabled()
           );
           var guardedAnchorId = state.quizRepaginationAnchorId;
           recalculate({

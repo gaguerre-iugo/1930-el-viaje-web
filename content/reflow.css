@@ -2,7 +2,8 @@
 :root {
   --reflow-font-scale: 1;
   --reflow-controls-height: 0rem;
-  --reflow-toolbar-reserve: 4rem;
+  --reflow-tts-player-lane: 4rem;
+  --reflow-toolbar-reserve: calc(4rem + var(--reflow-tts-player-lane));
   --reflow-text-measure: 72ch;
   --reflow-panel-reserve: 18.75rem;
   --reflow-gutter: 1.25rem;
@@ -17,22 +18,22 @@
   /* EVA Ceibal interface tokens, extracted from the supplied design-system
      references. They intentionally apply to reader chrome and activities,
      never to the book artwork or editorial content. */
-  --ceibal-institutional-100: #d2ebea;
-  --ceibal-institutional-200: #a7d7d5;
-  --ceibal-institutional-300: #7ec4bf;
-  --ceibal-institutional-400: #479e96;
-  --ceibal-institutional-500: #377e78;
-  --ceibal-institutional-600: #29615d;
-  --ceibal-institutional-700: #204f4b;
-  --ceibal-institutional-800: #183f3c;
-  --ceibal-institutional-900: #102f2d;
-  --ceibal-quiz-page: #16b8ac;
+  --ceibal-institutional-100: #ccecea;
+  --ceibal-institutional-200: #99d9d5;
+  --ceibal-institutional-300: #66c6c0;
+  --ceibal-institutional-400: #00a096;
+  --ceibal-institutional-500: #008078;
+  --ceibal-institutional-600: #00635d;
+  --ceibal-institutional-700: #00504b;
+  --ceibal-institutional-800: #00403c;
+  --ceibal-institutional-900: #00302d;
+  --ceibal-quiz-page: var(--ceibal-institutional-400);
   --ceibal-gray-50: #f8f9fa;
   --ceibal-gray-100: #f1f2f4;
   --ceibal-gray-200: #e5e7eb;
-  --ceibal-gray-300: #d2d5da;
+  --ceibal-gray-300: #d1d5db;
   --ceibal-gray-400: #a9afbb;
-  --ceibal-gray-600: #6c727f;
+  --ceibal-gray-600: #6b7280;
   --ceibal-gray-700: #4d5562;
   --ceibal-gray-800: #212936;
   --ceibal-gray-900: #121826;
@@ -44,14 +45,22 @@
   --ceibal-space-2: .5rem;
   --ceibal-space-3: .75rem;
   --ceibal-space-4: 1rem;
+  --ceibal-space-5: 1.25rem;
   --ceibal-space-6: 1.5rem;
   --ceibal-space-8: 2rem;
+  --ceibal-space-16: 4rem;
+  --ceibal-space-24: 6rem;
+  --ceibal-space-40: 10rem;
   --ceibal-radius-sm: .5rem;
   --ceibal-radius-md: .75rem;
   --ceibal-radius-lg: 1rem;
   --ceibal-shadow-card: 0 .25rem .75rem rgb(18 24 38 / 8%);
-  --ceibal-focus-on-light: var(--ceibal-institutional-500);
-  --ceibal-focus-on-dark: var(--ceibal-institutional-200);
+  --ceibal-shadow-button: 1px 1px 4px rgb(0 0 0 / 10%);
+  --ceibal-shadow-focus: 0 2px 4px var(--ceibal-institutional-500);
+  --ceibal-border-default: 1px;
+  --ceibal-border-focus: 3px;
+  --ceibal-focus-on-light: var(--ceibal-institutional-600);
+  --ceibal-focus-on-dark: var(--ceibal-institutional-400);
 }
 
 /* From laptop width upward, the book owns one stable central viewport and
@@ -1084,7 +1093,6 @@ body.reflow-book .tts-image-highlight-overlay {
     minmax(6.5rem, 1fr)
     5.25rem
     minmax(6.5rem, 1fr)
-    minmax(6rem, 1fr)
     minmax(8.5rem, 1.2fr);
   align-items: center;
   gap: .25rem;
@@ -1112,12 +1120,12 @@ body.reflow-book .tts-image-highlight-overlay {
   display: inline-flex;
   width: 100%;
   min-width: 0;
-  min-height: 3.25rem;
+  min-height: 2.875rem;
   align-items: center;
   justify-content: center;
-  gap: .5rem;
-  padding: .5rem .65rem;
-  border: 1px solid transparent;
+  gap: .625rem;
+  padding: .75rem 1.25rem;
+  border: var(--ceibal-border-default) solid transparent;
   border-radius: var(--ceibal-radius-md);
   color: #f8fafc;
   background: rgb(255 255 255 / 8%);
@@ -1126,6 +1134,9 @@ body.reflow-book .tts-image-highlight-overlay {
   line-height: 1.15;
   white-space: nowrap;
   cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
+  transition: background-color 120ms ease, border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 #reflow-pagination .reflow-toolbar-icon {
@@ -1168,11 +1179,22 @@ body.reflow-book .tts-image-highlight-overlay {
 #reflow-pagination button[aria-pressed="true"] {
   background: var(--ceibal-institutional-500);
 }
-#reflow-pagination button:focus-visible {
-  outline: 3px solid var(--ceibal-focus-on-dark);
-  outline-offset: 2px;
+#reflow-pagination button:active:not(:disabled) {
+  background: var(--ceibal-institutional-600);
 }
-#reflow-pagination button:disabled { opacity: .55; cursor: not-allowed; }
+#reflow-pagination button:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+#reflow-pagination button:disabled {
+  border-color: var(--ceibal-gray-600);
+  color: var(--ceibal-gray-300);
+  background: var(--ceibal-gray-800);
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+}
 
 /* Disabled navigation remains legible and differs through surface, border and
    icon color; opacity is deliberately not its only state indicator. */
@@ -1192,6 +1214,100 @@ body.reflow-book .tts-image-highlight-overlay {
   font-size: 1rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* Read-aloud is a persistent session rather than a primary navigation action.
+   Its compact player stays immediately above the permanent book toolbar and
+   reserves its own height so it cannot cover text or keyboard focus. */
+#reflow-tts-player {
+  position: fixed;
+  z-index: 65;
+  left: 50%;
+  bottom: calc(var(--reflow-primary-toolbar-height, 4rem) + .5rem);
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns:
+    minmax(6rem, auto)
+    minmax(8.5rem, 1fr)
+    minmax(6rem, auto)
+    minmax(8.5rem, auto)
+    minmax(6rem, auto);
+  align-items: center;
+  gap: var(--ceibal-space-1);
+  width: min(calc(100vw - 1rem), 44rem);
+  min-height: 3.5rem;
+  padding: var(--ceibal-space-1);
+  border: var(--ceibal-border-default) solid var(--ceibal-gray-700);
+  border-radius: var(--ceibal-radius-lg);
+  color: #f8fafc;
+  background: rgb(24 24 24 / 98%);
+  box-shadow: 0 -.25rem 1rem rgb(0 0 0 / 18%);
+}
+
+#reflow-tts-player[hidden] {
+  display: none;
+}
+
+#reflow-tts-player button {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.875rem;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ceibal-space-2);
+  padding: var(--ceibal-space-3) var(--ceibal-space-4);
+  border: var(--ceibal-border-default) solid transparent;
+  border-radius: var(--ceibal-radius-md);
+  color: #f8fafc;
+  background: rgb(255 255 255 / 8%);
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
+}
+
+#reflow-tts-player button:hover:not(:disabled) {
+  background: rgb(255 255 255 / 16%);
+}
+
+#reflow-tts-player button[aria-pressed="true"] {
+  background: var(--ceibal-institutional-500);
+}
+
+#reflow-tts-player button:active:not(:disabled) {
+  background: var(--ceibal-institutional-600);
+}
+
+#reflow-tts-player button:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+
+#reflow-tts-player button:disabled {
+  border-color: var(--ceibal-gray-700);
+  color: var(--ceibal-gray-400);
+  background: #20242a;
+  box-shadow: none;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+#reflow-tts-player .reflow-tts-player-icon {
+  flex: 0 0 auto;
+  min-width: 1.35rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+}
+
+#reflow-tts-player .reflow-tts-player-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Keep the component-base dock mounted as a state and panel bridge. Its
@@ -1216,7 +1332,7 @@ body.reflow-book .reflow-upstream-dock {
 
 @media (max-width: 47.999rem) {
   #reflow-pagination {
-    grid-template-columns: 2.75rem 2.75rem minmax(3.75rem, 1fr) 2.75rem 2.75rem 2.75rem;
+    grid-template-columns: 2.75rem 2.75rem minmax(3.75rem, 1fr) 2.75rem 2.75rem;
     gap: .125rem;
     width: 100vw;
     padding: .375rem;
@@ -1248,6 +1364,31 @@ body.reflow-book .reflow-upstream-dock {
 
   #reflow-page-status {
     min-width: 3.75rem;
+  }
+
+  #reflow-tts-player {
+    grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
+    gap: .125rem;
+    width: calc(100vw - .75rem);
+    min-height: 3.375rem;
+    padding: .25rem;
+  }
+
+  #reflow-tts-player button {
+    min-height: 2.75rem;
+    padding: .25rem;
+  }
+
+  #reflow-tts-player .reflow-tts-player-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 }
 
@@ -1712,7 +1853,7 @@ body.reflow-book #content > .reflow-quiz-repagination-overlay {
   overflow: hidden;
   visibility: visible !important;
   pointer-events: none;
-  background: var(--ceibal-institutional-400, #16b8ac);
+  background: var(--ceibal-institutional-400, #00a096);
   column-width: auto !important;
   column-count: auto !important;
   column-gap: 0 !important;
@@ -1853,7 +1994,7 @@ body.reflow-book #content .quiz-option {
   gap: var(--ceibal-space-3);
   padding: var(--reflow-quiz-option-pad-block)
     var(--reflow-quiz-option-pad-inline);
-  border: 2px solid var(--ceibal-gray-400);
+  border: var(--ceibal-border-default) solid var(--ceibal-gray-400);
   border-radius: var(--ceibal-radius-md);
   background: #fff;
   cursor: pointer;
@@ -1871,9 +2012,10 @@ body.reflow-book #content .quiz-option:hover {
 }
 
 body.reflow-book #content .quiz-option:focus-within {
-  border-color: var(--ceibal-institutional-400);
-  outline: 0;
-  box-shadow: none;
+  border-color: var(--ceibal-focus-on-light);
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-light);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
 }
 
 body.reflow-book #content .quiz-option.is-selected {
@@ -1943,27 +2085,40 @@ body.reflow-book #content .quiz-actions {
 }
 
 body.reflow-book #content .quiz-submit {
-  min-height: 2.75rem;
-  padding: var(--ceibal-space-2) var(--ceibal-space-6);
-  border: 0;
+  min-height: 2.875rem;
+  padding: var(--ceibal-space-3) var(--ceibal-space-5);
+  border: var(--ceibal-border-default) solid var(--ceibal-institutional-500);
   border-radius: var(--ceibal-radius-md);
   color: #fff;
   background: var(--ceibal-institutional-500);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
+  transition: background-color 120ms ease, border-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 body.reflow-book #content .quiz-submit:hover:not(:disabled) {
   background: var(--ceibal-institutional-600);
 }
 
+body.reflow-book #content .quiz-submit:active:not(:disabled) {
+  border-color: var(--ceibal-institutional-700);
+  background: var(--ceibal-institutional-700);
+}
+
 body.reflow-book #content .quiz-submit:focus-visible {
-  outline: 3px solid var(--ceibal-focus-on-light);
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-light);
   outline-offset: 3px;
+  box-shadow: var(--ceibal-shadow-focus);
 }
 
 body.reflow-book #content .quiz-submit:disabled {
-  opacity: .45;
+  border-color: var(--ceibal-gray-300);
+  color: var(--ceibal-gray-600);
+  background: var(--ceibal-gray-200);
+  box-shadow: none;
+  opacity: 1;
   cursor: default;
 }
 
@@ -2104,10 +2259,10 @@ body.reflow-book #content .quiz-explanation-bank {
 #reflow-open-glossary {
   display: flex;
   width: 100%;
-  min-height: 2.75rem;
+  min-height: 2.875rem;
   align-items: center;
-  gap: var(--ceibal-space-2);
-  padding: var(--ceibal-space-2) var(--ceibal-space-3);
+  gap: .625rem;
+  padding: var(--ceibal-space-3) var(--ceibal-space-5);
   border: 1px solid var(--ceibal-gray-600);
   border-radius: var(--ceibal-radius-md);
   color: var(--ceibal-gray-50);
@@ -2115,16 +2270,18 @@ body.reflow-book #content .quiz-explanation-bank {
   font-size: 1.125rem;
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
 }
 
 #reflow-open-glossary:hover {
   border-color: var(--ceibal-institutional-300);
-  background: rgb(126 196 191 / 16%);
+  background: rgb(102 198 192 / 16%);
 }
 
 #reflow-open-glossary:focus-visible {
-  outline: 3px solid var(--ceibal-focus-on-dark);
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
   outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
 }
 
 .reflow-font-settings-card {
@@ -2153,7 +2310,7 @@ body.reflow-book #content .quiz-explanation-bank {
 }
 
 .reflow-font-settings-options button {
-  min-height: 2.75rem;
+  min-height: 2.875rem;
   padding: var(--ceibal-space-2) var(--ceibal-space-1);
   border: 1px solid transparent;
   border-radius: var(--ceibal-radius-sm);
@@ -2168,12 +2325,13 @@ body.reflow-book #content .quiz-explanation-bank {
   border-color: rgb(255 255 255 / 20%);
   color: #fff;
   background: var(--ceibal-institutional-500);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
+  box-shadow: var(--ceibal-shadow-button);
 }
 
 .reflow-font-settings-options button:focus-visible {
-  outline: 3px solid var(--ceibal-focus-on-dark);
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
   outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
 }
 
 /* Navigation and accessibility menus overlay the page, following the CLE 3
@@ -2210,6 +2368,19 @@ body.reflow-book .reflow-reader-panel {
   max-width: min(18.75rem, 100vw) !important;
 }
 
+/* EVA exposes one three-pixel focus treatment. Reader panels use the
+   accessible dark-surface token while retaining each control's own radius. */
+body.reflow-book .reflow-reader-panel :is(
+  button,
+  input,
+  [role="tab"],
+  [role="radio"]
+):focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px !important;
+  box-shadow: var(--ceibal-shadow-focus) !important;
+}
+
 body.reflow-book .reflow-reader-panel.reflow-navigation-panel {
   width: min(18rem, 100vw) !important;
   max-width: min(18rem, 100vw) !important;
@@ -2243,9 +2414,10 @@ body.reflow-book .reflow-navigation-panel input[placeholder="Buscar"] {
 }
 
 body.reflow-book .reflow-navigation-panel input[placeholder="Buscar"]:focus {
-  border-color: var(--ceibal-institutional-300) !important;
-  outline: 2px solid var(--ceibal-institutional-300) !important;
-  outline-offset: 1px !important;
+  border-color: var(--ceibal-focus-on-dark) !important;
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px !important;
+  box-shadow: var(--ceibal-shadow-focus) !important;
 }
 
 body.reflow-book .reflow-reader-panel.reflow-accessibility-panel {
@@ -2359,7 +2531,7 @@ body.reflow-book .reflow-navigation-panel [role="tab"][aria-selected="true"] {
   border-color: var(--ceibal-institutional-500) !important;
   color: #fff !important;
   background: var(--ceibal-quiz-page) !important;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 22%) !important;
+  box-shadow: var(--ceibal-shadow-button) !important;
 }
 
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] ul {
@@ -2385,7 +2557,7 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:hover,
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:focus-visible {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: rgb(126 196 191 / 16%) !important;
+  background: rgb(102 198 192 / 16%) !important;
 }
 
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-current] {
@@ -2573,9 +2745,9 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-question {
 
 body.reflow-book #content .reflow-glossary-target {
   border-radius: .25rem;
-  outline: .2rem solid rgb(22 184 172 / .75);
+  outline: .2rem solid rgb(0 160 150 / .75);
   outline-offset: .12rem;
-  background: rgb(22 184 172 / .2) !important;
+  background: rgb(0 160 150 / .2) !important;
 }
 
 body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options {
@@ -2737,7 +2909,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
 
 .reflow-tts-voice-options button {
   min-width: 0 !important;
-  min-height: 2.75rem;
+  min-height: 2.875rem;
   padding: .5rem .35rem !important;
   border: 1px solid transparent !important;
   border-radius: .6rem !important;
@@ -2751,7 +2923,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
   background: var(--ceibal-institutional-500) !important;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 22%);
+  box-shadow: var(--ceibal-shadow-button);
 }
 
 .reflow-tts-voice-options:has(> button[hidden]) {
@@ -2792,7 +2964,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
 
 .reflow-tts-speed-options button {
   min-width: 0 !important;
-  min-height: 2.75rem;
+  min-height: 2.875rem;
   padding: .5rem .35rem !important;
   border: 1px solid transparent !important;
   border-radius: .6rem !important;
@@ -2806,12 +2978,13 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
   background: var(--ceibal-institutional-500) !important;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 22%);
+  box-shadow: var(--ceibal-shadow-button);
 }
 
 .reflow-tts-speed-options button:focus-visible {
-  outline: 3px solid var(--ceibal-focus-on-dark) !important;
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
   outline-offset: 2px !important;
+  box-shadow: var(--ceibal-shadow-focus) !important;
 }
 
 /* Glossary: same surface, controls and active-state hierarchy as Index and
@@ -2859,9 +3032,10 @@ body.reflow-book .reflow-glossary-panel input:is([type="search"], [placeholder="
 }
 
 body.reflow-book .reflow-glossary-panel input:is([type="search"], [placeholder="Buscar"]):focus {
-  border-color: var(--ceibal-institutional-300) !important;
-  outline: 2px solid var(--ceibal-institutional-300) !important;
-  outline-offset: 1px;
+  border-color: var(--ceibal-focus-on-dark) !important;
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus) !important;
 }
 
 body.reflow-book .reflow-glossary-panel [role="tablist"] {
@@ -2900,7 +3074,7 @@ body.reflow-book .reflow-glossary-panel [role="tab"][aria-selected="true"] {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
   background: var(--ceibal-quiz-page) !important;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 22%) !important;
+  box-shadow: var(--ceibal-shadow-button) !important;
 }
 
 body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button {
@@ -2919,7 +3093,7 @@ body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button {
 body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:hover,
 body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:focus-visible {
   border-color: var(--ceibal-institutional-300) !important;
-  background: rgb(126 196 191 / 16%) !important;
+  background: rgb(102 198 192 / 16%) !important;
 }
 
 /* The four dock options use one state convention. This selector deliberately
@@ -2935,7 +3109,7 @@ body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"])) but
 body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"]))
   button:hover {
   color: #fff !important;
-  background: rgb(126 196 191 / 14%) !important;
+  background: rgb(102 198 192 / 14%) !important;
 }
 
 body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"]))

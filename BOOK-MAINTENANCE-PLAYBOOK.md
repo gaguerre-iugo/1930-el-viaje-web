@@ -959,6 +959,140 @@ Eliminar conjuntamente la gestión del origen, la activación con teclado, `aria
 
 ---
 
+## Acción 13: aplicar los tokens verificables del sistema EVA
+
+### Objetivo
+
+Unificar color institucional, espaciado, bordes, sombras y estados interactivos con la referencia EVA sin inventar valores que Figma no expone.
+
+### Procedimiento
+
+1. Sustituir cualquier escala institucional aproximada por los valores EVA: `100 #CCECEA`, `200 #99D9D5`, `300 #66C6C0`, `400 #00A096`, `500 #008078`, `600 #00635D`, `700 #00504B`, `800 #00403C` y `900 #00302D`.
+2. Usar la escala espacial `4, 8, 12, 16, 20, 24, 32, 64, 96 y 160 px`. El valor de 20 px corresponde al token semántico `500` utilizado por los botones.
+3. Mantener los controles importantes entre 44 y 48 px. El botón normal EVA mide 46 px; Anterior y Siguiente conservan 48 px.
+4. Aplicar borde normal de 1 px y foco exterior de 3 px.
+5. En fondos claros, usar `#00635D` para el foco. En fondos oscuros, usar `#00A096`.
+6. Aplicar la sombra normal `1px 1px 4px rgb(0 0 0 / 10%)` y la sombra de foco `0 2px 4px #008078`.
+7. Representar de forma diferenciada los estados normal, hover, active, focus y disabled; el estado deshabilitado no debe depender únicamente de opacidad.
+8. Versionar la URL de `reflow.css` después de modificar estos tokens.
+
+### Validación
+
+- Comprobar foco visible sobre paneles claros y oscuros.
+- Recorrer con teclado la barra, Herramientas, Índice, Glosario y actividades.
+- Confirmar que botones y campos no cambian de tamaño al recibir foco.
+- Verificar contraste, estado activo y estado deshabilitado sin depender solo del color o la opacidad.
+
+### Riesgos y excepciones
+
+- La página de primitivos «Bordes» de la referencia EVA está vacía y el modo de lectura de Figma no expone el valor numérico de `eva-border-radio-button` ni `eva-border-radio-normal`.
+- Hasta contar con ese dato, conservar los `border-radius` existentes. No deducirlos a partir de una captura ni sustituirlos por valores aproximados.
+- Los colores editoriales del libro y de sus ilustraciones no forman parte de la interfaz EVA y no deben modificarse.
+
+### Reversión
+
+Restaurar los tokens anteriores y la versión previa de `reflow.css`; los radios de borde no requieren reversión porque permanecen sin cambios.
+
+---
+
+## Acción 14: separar el reproductor TTS de la barra principal
+
+### Objetivo
+
+Mantener la barra inferior dedicada a navegación y presentar controles de audio persistentes únicamente durante una sesión de lectura en voz alta.
+
+### Procedimiento
+
+1. Retirar «Leer/Pausar» de la barra principal y conservar solamente Índice, Anterior, contador, Siguiente y Herramientas.
+2. Crear un reproductor flotante con Audio anterior, Reproducir/Pausar, Audio siguiente, acceso a Voz y velocidad y Detener.
+3. Mostrar el reproductor mientras la preferencia de lectura en voz alta esté activa, incluso si la reproducción está pausada; ocultarlo únicamente al detener o desactivar la sesión.
+4. Conectar los controles al mismo puente de audio del componente base para conservar voz, velocidad, resaltado y seguimiento de página.
+5. Mantener el estado pausado al usar Anterior o Siguiente; esos controles seleccionan otro fragmento, pero no reanudan por sí solos una sesión pausada.
+6. Reservar desde la carga inicial una franja estable para el reproductor. Mostrarlo u ocultarlo no debe cambiar la altura del libro, repaginar ni tapar texto, navegación o foco.
+7. Al activar TTS desde Herramientas, cerrar el panel y llevar el foco a Reproducir/Pausar. Al detener, devolver el foco al contenido visible.
+8. Permitir recorrer los controles del reproductor con flechas cuando el foco ya está dentro de él.
+9. En móvil conservar cinco áreas táctiles de al menos 44 px y ocultar solo las etiquetas visuales; los nombres accesibles permanecen completos.
+10. Versionar conjuntamente `reflow-book.js` y `reflow.css`.
+
+### Validación
+
+- Confirmar que la barra principal no contiene «Leer» ni «Pausar».
+- Activar lectura en voz alta desde Herramientas y comprobar que aparece el reproductor, se cierra el panel y queda preparado en estado «Reproducir», sin iniciar audio.
+- Pausar y verificar que el reproductor permanece visible.
+- Usar Audio anterior y Audio siguiente tanto en reproducción como en pausa.
+- Abrir Voz y velocidad y confirmar que lleva a Herramientas sin finalizar la sesión.
+- Pulsar Detener y comprobar que el audio, el resaltado y el reproductor desaparecen, y que el foco vuelve al libro.
+- Verificar escritorio y móvil sin superposición sobre texto ni barra.
+- Revisar consola, ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Resultado obtenido
+
+- La barra principal quedó reducida a cinco elementos: Índice, Anterior, contador, Siguiente y Herramientas.
+- El reproductor permanece visible al pausar y desaparece solamente al detener la sesión.
+- La reserva estable evita repaginaciones al mostrar u ocultar el reproductor y no cubre contenido ni foco.
+- Las pruebas en escritorio y móvil confirmaron el flujo completo, la devolución del foco y áreas táctiles mínimas de 44 px.
+- Una recarga con TTS activo pero pausado no generó nuevos intentos de reproducción automática ni errores de consola.
+
+### Riesgos y excepciones
+
+- No crear un segundo elemento `Audio`: el reproductor es una interfaz para la sesión existente.
+- No confundir Pausar con Detener. Pausar conserva la sesión y el reproductor; Detener desactiva ambos.
+- Chrome exige que el primer `play()` audible se origine en el gesto de la persona. No iniciar audio durante la carga del documento.
+- No recalcular la altura disponible al mostrar u ocultar el reproductor: en libros extensos una segunda paginación puede bloquear la interfaz durante varios segundos.
+- Al leer una medida CSS desde JavaScript, convertir correctamente unidades como `rem` a píxeles. `parseFloat("4rem")` devuelve `4`, no los `64 px` esperados, y una reserva subestimada puede dejar texto detrás del reproductor.
+
+### Reversión
+
+Restaurar la columna y el botón Leer de la barra, eliminar `#reflow-tts-player`, retirar su reserva de altura y volver a las versiones anteriores de JavaScript y CSS.
+
+---
+
+## Acción 15: diferenciar activación de reproducción TTS
+
+### Objetivo
+
+Separar la disponibilidad de la lectura en voz alta del transporte de audio: «Activar lectura en voz alta» prepara la sesión y «Reproducir» inicia el sonido.
+
+### Procedimiento
+
+1. Al encender «Lectura en voz alta», conservar el audio pausado y mostrar el reproductor.
+2. Cerrar Herramientas y llevar el foco a «Reproducir», para que la siguiente acción sea explícita y predecible.
+3. Anunciar «Lectura en voz alta activada. Pulse Reproducir para comenzar» mediante la región viva.
+4. Ejecutar la primera llamada real a `play()` únicamente desde el botón «Reproducir».
+5. Mantener «Pausar» como estado temporal de la reproducción y «Detener» como cierre completo de la sesión.
+6. Conservar la preferencia activa durante una recarga, pero iniciar siempre en pausa hasta recibir un nuevo gesto.
+7. Registrar en memoria si la sesión recibió un «Reproducir» explícito y no permitir que una repaginación tardía aplique reproducción automática antes de ese gesto.
+
+### Validación
+
+- Activar la preferencia y comprobar que el reproductor muestra «Reproducir», con `aria-pressed="false"`.
+- Confirmar que no comienza audio y que no aparecen advertencias `NotAllowedError`.
+- Pulsar «Reproducir» y comprobar que cambia a «Pausar», con `aria-pressed="true"`.
+- Pausar y verificar que la preferencia continúa activa y el reproductor permanece visible.
+- Desactivar la preferencia o pulsar «Detener» y comprobar que el reproductor desaparece.
+- Recargar con la preferencia activa y confirmar que la sesión reaparece pausada.
+
+### Resultado obtenido
+
+- Activar la preferencia muestra el reproductor en «Reproducir», con `aria-pressed="false"`, sin iniciar sonido.
+- El panel Herramientas se cierra y el foco queda sobre «Reproducir».
+- Un clic posterior en «Reproducir» cambia el control a «Pausar», con `aria-pressed="true"`.
+- La preferencia activa sobrevive a una recarga, pero el audio permanece pausado.
+- Una espera prolongada después de la recarga confirmó que la repaginación tardía no intenta reproducir audio ni genera `NotAllowedError`.
+- Desactivar la preferencia detiene la sesión y oculta el reproductor.
+
+### Riesgos y excepciones
+
+- No volver a enlazar el interruptor directamente con `play()`: eso fusionaría otra vez configuración y transporte.
+- «Reproducción automática» gobierna la continuidad entre fragmentos una vez iniciada la lectura; no autoriza reproducir al activar la preferencia ni durante la carga.
+- En libros extensos, observadores de diseño pueden repaginar varios segundos después de la carga. Esa ruta también debe comprobar el inicio explícito antes de alinear y reproducir audio.
+
+### Reversión
+
+Volver a invocar `startTtsFromUserGesture()` desde el cambio del interruptor y retirar el estado preparado; esta reversión no se recomienda porque restaura la ambigüedad original.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
