@@ -852,6 +852,113 @@ Restaurar conjuntamente los datos del índice, su decorador JavaScript y los est
 
 ---
 
+## Acción 10: limitar el resaltado del glosario a la página visible
+
+### Objetivo
+
+Evitar que «Resaltar palabras» bloquee el hilo principal al procesar un libro completo, manteniendo términos interactivos y actualizados al cambiar de página.
+
+### Procedimiento
+
+1. No ejecutar el resaltador global del componente base sobre todo `#content`: combina miles de nodos de texto con todas las palabras y variaciones del glosario.
+2. Obtener únicamente los nodos de texto cuya geometría pertenece a la página visual actual.
+3. Filtrar el catálogo contra el texto de esa página, ordenar las formas por longitud y compilar una sola expresión regular Unicode para sus coincidencias.
+4. Insertar `.glossary-term` solamente en esos nodos y conservar tanto las clases visuales originales (`bg-emerald-100/80`, `text-emerald-800`, `rounded`, `cursor-pointer`) como `role="button"`, `tabindex="0"` y `data-glossary-key` para el popup y el teclado.
+5. Al navegar o apagar la opción, desenvolver exclusivamente los resaltados existentes y normalizar solo sus padres directos.
+6. Ignorar temporalmente esas mutaciones en el observador global de contenido, pues son decorativas y no justifican repaginar el libro completo.
+7. Al construir «En esta página», incluir el texto dentro de los `.glossary-term` existentes; excluirlos únicamente al crear nuevos resaltados para impedir envoltorios anidados.
+8. Incrementar la versión de `reflow-book.js` para impedir que el navegador reutilice la implementación anterior.
+
+### Validación
+
+- Activar «Resaltar palabras» y confirmar que la interfaz sigue respondiendo después de varios segundos.
+- Comprobar que solo existen términos resaltados en la página visible y que cada uno abre su definición.
+- Comparar los términos resaltados con «En esta página»: el listado debe incluir también las palabras que ya están envueltas por el resaltador.
+- Navegar con Anterior y Siguiente: los resaltados anteriores deben desaparecer y los de la nueva página deben aparecer.
+- Desactivar la opción y confirmar que no queda ningún `.glossary-term[data-glossary-key]`.
+- Revisar la consola y ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Riesgos y excepciones
+
+- Una expresión que atraviese dos nodos de texto separados no se resalta; es preferible conservar la estructura semántica a fusionar nodos editoriales.
+- Los encabezados, actividades, cuestionarios, contenido oculto y el propio popup se excluyen deliberadamente.
+- Si cambia el efecto interno del componente base, actualizar el marcador de integración antes de publicar el libro.
+
+### Reversión
+
+Restaurar conjuntamente el puente del glosario, la exclusión del observador y la versión de `reflow-book.js`; no reactivar el recorrido global sin medirlo con un catálogo completo.
+
+---
+
+## Acción 11: añadir un atajo directo al glosario
+
+### Objetivo
+
+Permitir abrir el Glosario con la tecla `G` y comunicar el atajo dentro de Herramientas.
+
+### Procedimiento
+
+1. Capturar `G` sin distinguir mayúsculas y minúsculas, siempre que no se utilicen Ctrl, Alt o Meta.
+2. No capturar escritura dentro de campos, elementos editables, formularios o actividades.
+3. Abrir el estado real del panel Glosario; si ya está abierto, mantenerlo abierto en vez de alternarlo.
+4. Añadir «Abrir glosario — G» a la sección «Atajos de teclado» y exponer `aria-keyshortcuts="G"` en su acceso visible.
+5. Mantener la página actual y sincronizar el estado de la barra después de abrir el panel.
+
+### Validación
+
+- Con foco en el libro, pulsar `G` y confirmar que se abre el Glosario.
+- Pulsar `G` nuevamente y comprobar que el panel permanece abierto.
+- Escribir `g` en Buscar y en campos de actividades: la letra debe introducirse y no abrir otro panel.
+- Confirmar que Herramientas muestra «Abrir glosario» junto a la tecla `G`.
+
+### Riesgos y excepciones
+
+- No reutilizar `toggleRuntimePanel` para este atajo: una acción denominada «Abrir» no debe cerrar el panel cuando se repite.
+- Si se asigna `G` a otra función global, resolver el conflicto en un único controlador antes de conservar ambos atajos.
+
+### Reversión
+
+Eliminar conjuntamente el controlador de `G`, la fila de ayuda y `aria-keyshortcuts`.
+
+---
+
+## Acción 12: devolver el foco al término que abrió una definición
+
+### Objetivo
+
+Mantener la continuidad de teclado al abrir y cerrar una definición emergente del glosario.
+
+### Procedimiento
+
+1. Hacer activables los `.glossary-term` mediante `Enter` y `Espacio`, además del clic.
+2. Antes de abrir, recordar el elemento exacto, su clave, texto, página y posición entre términos repetidos.
+3. Detectar el cierre real del diálogo de definición y restaurar el foco después de que termine el desmontaje del componente.
+4. Usar `focus({ preventScroll: true })` para no desplazar ni repaginar el contenido.
+5. Si el envoltorio original fue reconstruido, buscar la misma clave y aparición en la página; si ya no existe, usar Herramientas como destino estable.
+6. No devolver el foco al origen al elegir «Ver en glosario» ni al cerrar mediante otro control interactivo: en esos casos prevalece el nuevo destino elegido.
+7. Mostrar un contorno perceptible sobre la palabra enfocada y declarar `aria-haspopup="dialog"`.
+8. No iniciar el resaltado durante el estado transitorio `1 / 1`: esperar a que termine la paginación y no reconstruir los términos si la página y la revisión de diseño no cambiaron.
+
+### Validación
+
+- Enfocar una palabra, abrirla con `Enter`, cerrar con `Esc` y confirmar que `document.activeElement` es el mismo `.glossary-term`.
+- Repetir con `Espacio` y con clic.
+- Confirmar que la página y el desplazamiento no cambian.
+- Seleccionar «Ver en glosario» y comprobar que el foco no regresa a la palabra.
+- Desactivar el resaltado mientras la definición está abierta y comprobar el destino alternativo sin errores.
+
+### Riesgos y excepciones
+
+- El diálogo pertenece al componente base y se monta en un portal; la restauración debe ejecutarse después de su desmontaje para no ser sobrescrita por el gestor de foco interno.
+- Reconstruir continuamente los resaltados desconecta la palabra enfocada, puede bloquear la interfaz y vuelve inestable cualquier prueba; el resaltado debe ser idempotente por página.
+- No forzar el foco hacia atrás cuando el usuario haya pulsado otro control durante el cierre.
+
+### Reversión
+
+Eliminar conjuntamente la gestión del origen, la activación con teclado, `aria-haspopup` y el estilo de foco visible.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

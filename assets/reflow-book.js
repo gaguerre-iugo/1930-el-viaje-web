@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  document.documentElement.dataset.reflowBuild = "47-full-book-66";
+  document.documentElement.dataset.reflowBuild = "47-full-book-83";
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -307,6 +307,28 @@
     ttsManualHandoffTimer: 0,
     sentencePaginationKey: "",
     runtimeMenu: null,
+    glossaryHighlightEnabled: false,
+    glossaryEntries: null,
+    glossaryHighlightFrame: 0,
+    glossaryHighlightGeneration: 0,
+    glossaryMarkupIgnoreUntil: 0,
+    glossaryPaginationWaitTimer: 0,
+    glossaryHighlightedPage: -1,
+    glossaryHighlightedLayoutRevision: -1,
+    glossaryHighlightedCount: 0,
+    glossaryFocusOrigin: null,
+    glossaryFocusKey: "",
+    glossaryFocusText: "",
+    glossaryFocusPage: null,
+    glossaryFocusOrdinal: 0,
+    glossaryDefinitionDialog: null,
+    glossaryFocusSuppressUntil: 0,
+    glossaryFocusRestoreTimer: 0,
+    glossaryHighlightFocusKey: "",
+    glossaryHighlightFocusText: "",
+    glossaryHighlightFocusOrdinal: 0,
+    glossaryHighlightFocusPage: null,
+    glossaryHighlightFocusUntil: 0,
     fontSize: "normal",
     ttsVoice: "valentina"
   };
@@ -623,9 +645,12 @@
     });
   }
 
-  function glossaryExcludedElement(element) {
-    return Boolean(element && element.closest(
-      ".quiz-panel, .quiz-explanation-bank, .glossary-popup, " +
+  function glossaryExcludedElement(element, includeGlossaryTerms) {
+    if (!element) return false;
+    if (!includeGlossaryTerms && element.closest(".glossary-term")) return true;
+    return Boolean(element.closest(
+      "h1, h2, h3, h4, h5, h6, .glossary-popup, " +
+      ".activity-text, [data-activity-item], .quiz-panel, .quiz-explanation-bank, " +
       "script, style, [aria-hidden=\"true\"]"
     ));
   }
@@ -643,29 +668,239 @@
     });
   }
 
-  function textForVisualPage(pageIndex) {
-    if (!content) return "";
-    var pieces = [];
+  function textNodesForVisualPage(pageIndex, includeGlossaryTerms) {
+    if (!content) return [];
+    var nodes = [];
+    var pageCache = new WeakMap();
     var walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
       acceptNode: function (node) {
         var parent = node.parentElement;
-        if (!parent || glossaryExcludedElement(parent) || !node.textContent.trim()) {
+        if (
+          !parent ||
+          glossaryExcludedElement(parent, includeGlossaryTerms) ||
+          !node.textContent.trim()
+        ) {
           return NodeFilter.FILTER_REJECT;
         }
-        return pagesForElement(parent).indexOf(pageIndex) >= 0
+        var pages = pageCache.get(parent);
+        if (!pages) {
+          pages = pagesForElement(parent);
+          pageCache.set(parent, pages);
+        }
+        return pages.indexOf(pageIndex) >= 0
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_REJECT;
       }
     });
     var node = walker.nextNode();
     while (node) {
-      pieces.push(node.textContent);
+      nodes.push(node);
       node = walker.nextNode();
     }
-    return pieces.join(" ");
+    return nodes;
+  }
+
+  function textForVisualPage(pageIndex) {
+    /* The page glossary must also read text already wrapped by the visual
+       highlighter. Highlight creation itself keeps those nodes excluded to
+       prevent nested glossary spans. */
+    return textNodesForVisualPage(pageIndex, true).map(function (node) {
+      return node.textContent;
+    }).join(" ");
+  }
+
+  function escapeGlossaryPattern(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function clearReflowGlossaryHighlights() {
+    window.cancelAnimationFrame(state.glossaryHighlightFrame);
+    state.glossaryHighlightFrame = 0;
+    if (!content) return;
+    var parents = new Set();
+    var highlights = content.querySelectorAll(".glossary-term[data-glossary-key]");
+    state.glossaryHighlightedPage = -1;
+    state.glossaryHighlightedLayoutRevision = -1;
+    state.glossaryHighlightedCount = 0;
+    if (!highlights.length) return;
+    var focusedHighlight = document.activeElement && document.activeElement.closest &&
+      document.activeElement.closest(".glossary-term[data-glossary-key]");
+    if (focusedHighlight && content.contains(focusedHighlight)) {
+      var focusedKey = focusedHighlight.getAttribute("data-glossary-key") || "";
+      var focusedMatches = Array.prototype.slice.call(highlights).filter(function (term) {
+        return term.getAttribute("data-glossary-key") === focusedKey;
+      });
+      state.glossaryHighlightFocusKey = focusedKey;
+      state.glossaryHighlightFocusText = String(focusedHighlight.textContent || "");
+      state.glossaryHighlightFocusOrdinal = Math.max(0, focusedMatches.indexOf(focusedHighlight));
+      state.glossaryHighlightFocusPage = visiblePageIndex();
+      state.glossaryHighlightFocusUntil = Date.now() + 1600;
+    }
+    state.glossaryMarkupIgnoreUntil = Date.now() + 600;
+    Array.prototype.slice.call(highlights).forEach(function (highlight) {
+      var parent = highlight.parentNode;
+      if (!parent) return;
+      parent.replaceChild(document.createTextNode(highlight.textContent || ""), highlight);
+      parents.add(parent);
+    });
+    parents.forEach(function (parent) { parent.normalize(); });
+  }
+
+  function highlightGlossaryOnVisualPage() {
+    if (!state.glossaryHighlightEnabled || !state.glossaryEntries || !content) {
+      clearReflowGlossaryHighlights();
+      return;
+    }
+    var pageIndex = visiblePageIndex();
+    var existingHighlightCount = content.querySelectorAll(
+      ".glossary-term[data-glossary-key]"
+    ).length;
+    if (
+      state.glossaryHighlightedPage === pageIndex &&
+      state.glossaryHighlightedLayoutRevision === state.ttsLayoutRevision &&
+      state.glossaryHighlightedCount === existingHighlightCount
+    ) return;
+
+    clearReflowGlossaryHighlights();
+    if (state.total <= 1 && sections.length > 1) {
+      /* The glossary runtime can mount before column pagination is ready.
+         Highlighting in that transient 1 / 1 state would wrap terms from the
+         entire book, block the UI and later destroy the focused term. */
+      window.clearTimeout(state.glossaryPaginationWaitTimer);
+      state.glossaryPaginationWaitTimer = window.setTimeout(function () {
+        state.glossaryPaginationWaitTimer = 0;
+        if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
+      }, 240);
+      return;
+    }
+
+    var textNodes = textNodesForVisualPage(pageIndex);
+    var pageText = textNodes.map(function (node) { return node.textContent; }).join(" ");
+    var formOwners = new Map();
+
+    Object.keys(state.glossaryEntries).forEach(function (termKey) {
+      var entry = state.glossaryEntries[termKey] || {};
+      var searchableEntry = { word: termKey, variations: entry.variations || [] };
+      if (!glossaryEntryMatchesText(searchableEntry, pageText)) return;
+      glossaryForms(searchableEntry).forEach(function (form) {
+        var normalized = form.trim();
+        if (normalized && !formOwners.has(normalized)) formOwners.set(normalized, termKey);
+      });
+    });
+
+    var forms = Array.from(formOwners.keys()).sort(function (left, right) {
+      return right.length - left.length;
+    });
+    if (!forms.length) {
+      state.glossaryHighlightedPage = pageIndex;
+      state.glossaryHighlightedLayoutRevision = state.ttsLayoutRevision;
+      state.glossaryHighlightedCount = 0;
+      return;
+    }
+
+    var matcher = new RegExp(
+      "(?<![\\p{L}\\p{N}\\p{M}_])(?:" +
+        forms.map(escapeGlossaryPattern).join("|") +
+        ")(?![\\p{L}\\p{N}\\p{M}_])",
+      "giu"
+    );
+    state.glossaryMarkupIgnoreUntil = Date.now() + 600;
+
+    textNodes.forEach(function (textNode) {
+      if (!textNode.parentNode) return;
+      var source = textNode.textContent || "";
+      var fragment = document.createDocumentFragment();
+      var cursor = 0;
+      var matched = false;
+      matcher.lastIndex = 0;
+      var match = matcher.exec(source);
+      while (match) {
+        matched = true;
+        if (match.index > cursor) fragment.appendChild(
+          document.createTextNode(source.slice(cursor, match.index))
+        );
+        var highlight = document.createElement("span");
+        /* Match the stock glossary presentation while keeping the page-scoped
+           implementation that avoids the full-book highlighting freeze. */
+        highlight.className =
+          "glossary-term bg-emerald-100/80 text-emerald-800 rounded cursor-pointer";
+        highlight.setAttribute("role", "button");
+        highlight.setAttribute("tabindex", "0");
+        highlight.setAttribute("aria-haspopup", "dialog");
+        highlight.dataset.glossaryKey = formOwners.get(
+          match[0].toLocaleLowerCase("es")
+        );
+        highlight.textContent = match[0];
+        fragment.appendChild(highlight);
+        cursor = match.index + match[0].length;
+        match = matcher.exec(source);
+      }
+      if (!matched) return;
+      if (cursor < source.length) fragment.appendChild(document.createTextNode(source.slice(cursor)));
+      textNode.parentNode.replaceChild(fragment, textNode);
+    });
+
+    if (
+      state.glossaryHighlightFocusKey &&
+      state.glossaryHighlightFocusPage === visiblePageIndex() &&
+      Date.now() <= state.glossaryHighlightFocusUntil
+    ) {
+      var focusCandidates = Array.prototype.slice.call(content.querySelectorAll(
+        '.glossary-term[data-glossary-key="' +
+          CSS.escape(state.glossaryHighlightFocusKey) + '"]'
+      ));
+      var exactFocusCandidates = focusCandidates.filter(function (term) {
+        return String(term.textContent || "") === state.glossaryHighlightFocusText;
+      });
+      var focusMatches = exactFocusCandidates.length ? exactFocusCandidates : focusCandidates;
+      var replacementFocus = focusMatches[
+        Math.min(state.glossaryHighlightFocusOrdinal, Math.max(0, focusMatches.length - 1))
+      ];
+      if (replacementFocus) {
+        try {
+          replacementFocus.focus({ preventScroll: true });
+        } catch (_error) {
+          replacementFocus.focus();
+        }
+      }
+    }
+    state.glossaryHighlightFocusKey = "";
+    state.glossaryHighlightFocusText = "";
+    state.glossaryHighlightFocusOrdinal = 0;
+    state.glossaryHighlightFocusPage = null;
+    state.glossaryHighlightFocusUntil = 0;
+    state.glossaryHighlightedPage = pageIndex;
+    state.glossaryHighlightedLayoutRevision = state.ttsLayoutRevision;
+    state.glossaryHighlightedCount = content.querySelectorAll(
+      ".glossary-term[data-glossary-key]"
+    ).length;
+  }
+
+  function scheduleGlossaryPageHighlight() {
+    window.cancelAnimationFrame(state.glossaryHighlightFrame);
+    state.glossaryHighlightFrame = window.requestAnimationFrame(function () {
+      state.glossaryHighlightFrame = window.requestAnimationFrame(function () {
+        state.glossaryHighlightFrame = 0;
+        highlightGlossaryOnVisualPage();
+      });
+    });
   }
 
   function installReflowGlossaryBridge() {
+    window.__adtReflowSetGlossaryHighlight = function (enabled, entries) {
+      var generation = ++state.glossaryHighlightGeneration;
+      state.glossaryHighlightEnabled = Boolean(enabled);
+      state.glossaryEntries = entries || null;
+      if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
+      else clearReflowGlossaryHighlights();
+      return function () {
+        if (generation !== state.glossaryHighlightGeneration) return;
+        state.glossaryHighlightEnabled = false;
+        state.glossaryEntries = null;
+        clearReflowGlossaryHighlights();
+      };
+    };
+
     window.__adtReflowGlossaryEntriesForCurrentPage = function (entries, filter) {
       var pageText = textForVisualPage(visiblePageIndex());
       var query = String(filter || "").trim().toLocaleLowerCase("es");
@@ -682,9 +917,10 @@
       if (!entry || !content) return false;
       var forms = glossaryForms(entry);
       var candidates = Array.prototype.slice.call(content.querySelectorAll(
-        ".glossary-term[data-glossary-key]"
+      ".glossary-term[data-glossary-key]"
       )).filter(function (element) {
-        return !glossaryExcludedElement(element) && glossaryEntryMatchesText(entry, element.textContent);
+        return !glossaryExcludedElement(element, true) &&
+          glossaryEntryMatchesText(entry, element.textContent);
       });
 
       if (!candidates.length) {
@@ -731,6 +967,242 @@
       }, 2800);
       return true;
     };
+  }
+
+  function installGlossaryDefinitionFocusManagement() {
+    if (document.documentElement.dataset.reflowGlossaryFocus === "true") return;
+    document.documentElement.dataset.reflowGlossaryFocus = "true";
+
+    function isDefinitionDialog(dialog) {
+      if (!dialog || !dialog.matches || !dialog.matches('[role="dialog"]')) return false;
+      if (/^definition for\b/i.test(dialog.getAttribute("aria-label") || "")) return true;
+      return Array.prototype.slice.call(dialog.querySelectorAll("button")).some(function (button) {
+        return /^ver en glosario$/i.test(String(button.textContent || "").trim());
+      });
+    }
+
+    function definitionDialogWithin(node) {
+      if (!node || node.nodeType !== 1) return null;
+      if (isDefinitionDialog(node)) return node;
+      return Array.prototype.slice.call(node.querySelectorAll('[role="dialog"]')).find(
+        isDefinitionDialog
+      ) || null;
+    }
+
+    function glossaryTermsForKey(key) {
+      return Array.prototype.slice.call(
+        content.querySelectorAll(".glossary-term[data-glossary-key]")
+      ).filter(function (term) {
+        return term.getAttribute("data-glossary-key") === key;
+      });
+    }
+
+    function rememberGlossaryOrigin(term) {
+      window.clearTimeout(state.glossaryFocusRestoreTimer);
+      var key = term.getAttribute("data-glossary-key") || "";
+      var sameKey = glossaryTermsForKey(key);
+      state.glossaryFocusOrigin = term;
+      state.glossaryFocusKey = key;
+      state.glossaryFocusText = String(term.textContent || "");
+      state.glossaryFocusPage = visiblePageIndex();
+      state.glossaryFocusOrdinal = Math.max(0, sameKey.indexOf(term));
+      state.glossaryFocusSuppressUntil = 0;
+      document.documentElement.dataset.reflowGlossaryFocusOrigin = key;
+    }
+
+    function clearGlossaryOrigin() {
+      state.glossaryFocusOrigin = null;
+      state.glossaryFocusKey = "";
+      state.glossaryFocusText = "";
+      state.glossaryFocusPage = null;
+      state.glossaryFocusOrdinal = 0;
+    }
+
+    function glossaryFocusTarget() {
+      var samePage = state.glossaryFocusPage === visiblePageIndex();
+      if (
+        samePage && state.glossaryFocusOrigin && state.glossaryFocusOrigin.isConnected &&
+        state.glossaryFocusOrigin.getClientRects().length
+      ) return state.glossaryFocusOrigin;
+
+      if (samePage && state.glossaryFocusKey) {
+        /* Closing a definition can make the page highlighter rebuild every
+           glossary span. At that point its column geometry may still be
+           settling, so identify the replacement by its stable key/text and
+           ordinal instead of rejecting it because of a transient page value. */
+        var candidates = glossaryTermsForKey(state.glossaryFocusKey);
+        var exactText = candidates.filter(function (term) {
+          return String(term.textContent || "") === state.glossaryFocusText;
+        });
+        var matching = exactText.length ? exactText : candidates;
+        if (matching.length) {
+          return matching[Math.min(state.glossaryFocusOrdinal, matching.length - 1)];
+        }
+      }
+      return document.getElementById("reflow-tools");
+    }
+
+    function scheduleGlossaryOriginRestore() {
+      window.clearTimeout(state.glossaryFocusRestoreTimer);
+      document.documentElement.dataset.reflowGlossaryFocusRestore = "scheduled";
+      state.glossaryFocusRestoreTimer = window.setTimeout(function () {
+        state.glossaryFocusRestoreTimer = 0;
+        if (
+          state.glossaryDefinitionDialog &&
+          isDefinitionDialog(state.glossaryDefinitionDialog) &&
+          state.glossaryDefinitionDialog.getClientRects().length
+        ) return;
+        if (Date.now() <= state.glossaryFocusSuppressUntil) {
+          document.documentElement.dataset.reflowGlossaryFocusRestore = "suppressed";
+          clearGlossaryOrigin();
+          return;
+        }
+        var restoreKey = state.glossaryFocusKey;
+        function restoreAttempt(finalAttempt) {
+          if (!restoreKey || state.glossaryFocusKey !== restoreKey) return;
+          if (visibleDefinitionDialog()) return;
+          if (Date.now() <= state.glossaryFocusSuppressUntil) {
+            clearGlossaryOrigin();
+            return;
+          }
+          var target = glossaryFocusTarget();
+          if (target && target.isConnected) {
+            try {
+              target.focus({ preventScroll: true });
+            } catch (_error) {
+              target.focus();
+            }
+            document.documentElement.dataset.reflowGlossaryFocusRestore =
+              target.getAttribute("data-glossary-key") || target.id || "fallback";
+          }
+          if (finalAttempt) clearGlossaryOrigin();
+        }
+        /* The dialog library performs its own focus cleanup after closing.
+           Repeat the restoration after those deferred effects, retaining the
+           exact term identity until the final attempt. */
+        restoreAttempt(false);
+        window.setTimeout(function () { restoreAttempt(false); }, 120);
+        window.setTimeout(function () { restoreAttempt(false); }, 600);
+        window.setTimeout(function () { restoreAttempt(false); }, 1200);
+        window.setTimeout(function () { restoreAttempt(true); }, 1800);
+      }, 240);
+    }
+
+    function visibleDefinitionDialog() {
+      return Array.prototype.slice.call(document.querySelectorAll('[role="dialog"]')).find(
+        function (dialog) {
+          return isDefinitionDialog(dialog) && dialog.getClientRects().length;
+        }
+      ) || null;
+    }
+
+    function verifyGlossaryDefinitionClosed() {
+      window.setTimeout(function () {
+        var liveDialog = visibleDefinitionDialog();
+        state.glossaryDefinitionDialog = liveDialog;
+        if (!liveDialog) scheduleGlossaryOriginRestore();
+      }, 160);
+    }
+    window.__adtReflowGlossaryDefinitionClosed = function () {
+      document.documentElement.dataset.reflowGlossaryCloseSignal = "received";
+      verifyGlossaryDefinitionClosed();
+    };
+
+    document.addEventListener("click", function (event) {
+      var target = event.target;
+      if (!target || !target.closest) return;
+      var term = target.closest(".glossary-term[data-glossary-key]");
+      if (term && content.contains(term)) {
+        rememberGlossaryOrigin(term);
+        return;
+      }
+
+      var dialog = state.glossaryDefinitionDialog;
+      if (!dialog || !dialog.isConnected) return;
+      var viewInGlossary = target.closest("button");
+      if (
+        viewInGlossary && dialog.contains(viewInGlossary) &&
+        /^ver en glosario$/i.test(String(viewInGlossary.textContent || "").trim())
+      ) {
+        state.glossaryFocusSuppressUntil = Date.now() + 1600;
+        return;
+      }
+      if (!dialog.contains(target) && target.closest(
+        "a[href], button, input, select, textarea, [contenteditable='true'], " +
+        "[role='button'], [role='link'], [role='tab']"
+      )) {
+        state.glossaryFocusSuppressUntil = Date.now() + 800;
+      }
+      if (!dialog.contains(target)) verifyGlossaryDefinitionClosed();
+    }, true);
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") {
+        var activeDialog = event.target && event.target.closest &&
+          event.target.closest('[role="dialog"]');
+        if (isDefinitionDialog(activeDialog)) {
+          state.glossaryDefinitionDialog = activeDialog;
+          verifyGlossaryDefinitionClosed();
+        }
+      }
+      var term = event.target && event.target.closest &&
+        event.target.closest(".glossary-term[data-glossary-key]");
+      if (!term || !content.contains(term)) return;
+      if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      term.click();
+    }, true);
+
+    document.addEventListener("focusin", function (event) {
+      var dialog = event.target && event.target.closest && event.target.closest('[role="dialog"]');
+      if (isDefinitionDialog(dialog)) {
+        state.glossaryDefinitionDialog = dialog;
+        document.documentElement.dataset.reflowGlossaryDialogTracked = "true";
+      }
+    }, true);
+
+    var observer = new MutationObserver(function (mutations) {
+      var removedActiveDialog = false;
+      var addedDialog = null;
+      mutations.forEach(function (mutation) {
+        if (mutation.type === "attributes") {
+          if (
+            mutation.target === state.glossaryDefinitionDialog &&
+            !isDefinitionDialog(mutation.target)
+          ) removedActiveDialog = true;
+          var attributedDialog = definitionDialogWithin(mutation.target);
+          if (attributedDialog) addedDialog = attributedDialog;
+          return;
+        }
+        Array.prototype.slice.call(mutation.removedNodes).forEach(function (node) {
+          if (
+            state.glossaryDefinitionDialog &&
+            (node === state.glossaryDefinitionDialog ||
+              (node.contains && node.contains(state.glossaryDefinitionDialog)))
+          ) removedActiveDialog = true;
+        });
+        Array.prototype.slice.call(mutation.addedNodes).some(function (node) {
+          addedDialog = definitionDialogWithin(node);
+          return Boolean(addedDialog);
+        });
+      });
+
+      if (addedDialog) state.glossaryDefinitionDialog = addedDialog;
+      if (removedActiveDialog && !addedDialog) {
+        var replacement = Array.prototype.slice.call(
+          document.querySelectorAll('[role="dialog"]')
+        ).find(isDefinitionDialog);
+        state.glossaryDefinitionDialog = replacement || null;
+        if (!replacement) scheduleGlossaryOriginRestore();
+      }
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["role", "aria-label"]
+    });
   }
 
   function elementOccupiesPage(element, page) {
@@ -906,6 +1378,7 @@
     updateQuizPageBackground();
     updateBackMatterPageBackground();
     if (state.runtimeMenuRefresh) state.runtimeMenuRefresh();
+    if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
 
     if (announce) {
       announcer.textContent = "Página " + (state.current + 1) + " de " + state.total;
@@ -1846,6 +2319,33 @@
     return true;
   }
 
+  function openRuntimePanel(labels) {
+    var wanted = Array.isArray(labels) ? labels : [labels];
+    var joined = wanted.join(" ").toLowerCase();
+    var menuValue = /menú principal|main menu/.test(joined) ? "toc" :
+      /configuración|settings/.test(joined) ? "settings" :
+      /glosario|glossary/.test(joined) ? "glossary" :
+      /idioma|language/.test(joined) ? "language" : "";
+    if (
+      menuValue &&
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      typeof window.__adtReflowGetDockMenu === "function"
+    ) {
+      if (window.__adtReflowGetDockMenu() !== menuValue) {
+        window.__adtReflowSetDockMenu(menuValue);
+      }
+      requestAnimationFrame(syncPrimaryToolbar);
+      window.setTimeout(syncPrimaryToolbar, 120);
+      return true;
+    }
+    var trigger = runtimeDockButton(wanted);
+    if (!trigger) return false;
+    if (trigger.getAttribute("aria-pressed") !== "true") trigger.click();
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 120);
+    return true;
+  }
+
   function switchRuntimePanel(labels, competingLabels) {
     if (
       typeof window.__adtReflowSetDockMenu === "function" &&
@@ -2594,7 +3094,7 @@
         referenceSection.innerHTML =
           '<header><h3>Consulta</h3></header>' +
           '<div class="reflow-reference-tools-card">' +
-            '<button id="reflow-open-glossary" type="button">' +
+            '<button id="reflow-open-glossary" type="button" aria-keyshortcuts="G">' +
               '<span aria-hidden="true">⌕</span><span>Glosario</span>' +
             '</button>' +
           '</div>';
@@ -2606,6 +3106,28 @@
         var shortcutRow = label.parentElement;
         if (shortcutRow) shortcutRow.remove();
       });
+      var shortcutHeading = Array.prototype.slice.call(settingsTab.querySelectorAll("h3")).find(
+        function (heading) {
+          return /^(atajos de teclado|keyboard shortcuts)$/i.test(heading.textContent.trim());
+        }
+      );
+      var shortcutCard = shortcutHeading && shortcutHeading.closest("section") &&
+        shortcutHeading.closest("section").querySelector(":scope > div");
+      if (shortcutCard && !document.getElementById("reflow-glossary-shortcut")) {
+        var closeShortcutRow = Array.prototype.slice.call(shortcutCard.children).find(
+          function (row) { return /^(cerrar panel|close panel)/i.test(row.textContent.trim()); }
+        );
+        var templateShortcutRow = closeShortcutRow || shortcutCard.firstElementChild;
+        if (templateShortcutRow) {
+          var glossaryShortcutRow = templateShortcutRow.cloneNode(true);
+          glossaryShortcutRow.id = "reflow-glossary-shortcut";
+          var glossaryShortcutLabel = glossaryShortcutRow.querySelector("span");
+          var glossaryShortcutKey = glossaryShortcutRow.querySelector('kbd[data-slot="kbd"]');
+          if (glossaryShortcutLabel) glossaryShortcutLabel.textContent = "Abrir glosario";
+          if (glossaryShortcutKey) glossaryShortcutKey.textContent = "G";
+          shortcutCard.insertBefore(glossaryShortcutRow, closeShortcutRow || null);
+        }
+      }
       updateFontControls();
       updateTtsVoiceControls();
       updateTtsSpeedControls();
@@ -3476,6 +3998,19 @@
 
     document.addEventListener("keydown", function (event) {
       if (movePrimaryToolbarFocus(event)) return;
+      var typingContext = event.target && event.target.closest && event.target.closest(
+        "input, textarea, select, [contenteditable='true'], [data-activity-item]"
+      );
+      if (
+        !event.defaultPrevented && !event.repeat &&
+        !event.altKey && !event.ctrlKey && !event.metaKey &&
+        !typingContext && String(event.key || "").toLocaleLowerCase("es") === "g"
+      ) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        openRuntimePanel(["Glosario", "Glossary"]);
+        return;
+      }
       var focusedInPrimaryToolbar = Boolean(
         event.target && event.target.closest && event.target.closest("#reflow-pagination")
       );
@@ -8484,16 +9019,20 @@
     var quizPauseReplacement = 'j.onended=()=>{I();if(window.__adtReflowShouldPauseAfterItem&&' +
       'window.__adtReflowShouldPauseAfterItem(F)){r(!1);return}let G=w+1;' +
       'G<O.length?A(G):(r(!1),s(0))}';
-    /* The upstream glossary used one Set for the whole book, so it wrapped
-       only the first occurrence of each term. Reset the dedupe set for every
-       text node: one occurrence per paragraph remains readable, while later
-       pages can expose the same vocabulary again. */
-    var glossaryRepeatMarker =
-      'let n=new Set,a=D6(t),r=!1;for(let i of a){let s=i.textContent??"";';
-    var glossaryRepeatReplacement =
-      'let n=new Set,a=D6(t),r=!1,gx=null;for(let i of a){' +
-      'let gy=i.parentElement?.closest("[data-section-id]")?.getAttribute("data-section-id")??"";' +
-      'gy!==gx&&(n.clear(),gx=gy);let s=i.textContent??"";';
+    var glossaryHighlightEffectMarker =
+      '(0,MN.useEffect)(()=>{if(!t){If();return}if(Object.keys(e).length!==0' +
+      ')return If(),Oy(e),()=>{If()}},[t,e])';
+    var glossaryHighlightEffectReplacement =
+      '(0,MN.useEffect)(()=>window.__adtReflowSetGlossaryHighlight?' +
+      'window.__adtReflowSetGlossaryHighlight(t,e):' +
+      '(()=>{if(!t){If();return}if(Object.keys(e).length!==0' +
+      ')return If(),Oy(e),()=>{If()}})(),[t,e])';
+    var glossaryCloseFocusMarker =
+      'p=(0,ja.useCallback)(()=>{i(null),s.current=null},[])';
+    var glossaryCloseFocusReplacement =
+      'p=(0,ja.useCallback)(()=>{i(null),s.current=null,' +
+      'setTimeout(()=>window.__adtReflowGlossaryDefinitionClosed&&' +
+      'window.__adtReflowGlossaryDefinitionClosed(),900)},[])';
     var glossarySkipMarker =
       'A6="h1, h2, h3, h4, h5, h6, script, style, .glossary-term, .glossary-popup, ' +
       '.activity-text, [data-activity-item]"';
@@ -8543,7 +9082,8 @@
       !source.includes(sentenceHighlightMarker) ||
       !source.includes(sentenceMetadataMarker) ||
       !source.includes(quizPauseMarker) ||
-      !source.includes(glossaryRepeatMarker) ||
+      !source.includes(glossaryHighlightEffectMarker) ||
+      !source.includes(glossaryCloseFocusMarker) ||
       !source.includes(glossarySkipMarker) ||
       !source.includes(glossaryBoundaryMarker) ||
       !source.includes(glossaryDedupeReadMarker) ||
@@ -8572,7 +9112,8 @@
       .replace(sentenceHighlightMarker, sentenceHighlightReplacement)
       .replace(sentenceMetadataMarker, sentenceMetadataReplacement)
       .replace(quizPauseMarker, quizPauseReplacement)
-      .replace(glossaryRepeatMarker, glossaryRepeatReplacement)
+      .replace(glossaryHighlightEffectMarker, glossaryHighlightEffectReplacement)
+      .replace(glossaryCloseFocusMarker, glossaryCloseFocusReplacement)
       .replace(glossarySkipMarker, glossarySkipReplacement)
       .replace(glossaryBoundaryMarker, glossaryBoundaryReplacement)
       .replace(glossaryDedupeReadMarker, glossaryDedupeReadReplacement)
@@ -8992,6 +9533,7 @@
       await voiceCatalogPromise;
       await indexMetadataPromise;
       await loadRuntime();
+      installGlossaryDefinitionFocusManagement();
       normalizeLaterBookStructure();
       createPagination();
       createFontControls();
@@ -9054,6 +9596,7 @@
 
       var contentObserver = new MutationObserver(function (mutations) {
         if (state.ttsMarkupRestoring) return;
+        if (Date.now() <= state.glossaryMarkupIgnoreUntil) return;
         if (state.settingsRepaginationActive) {
           scheduleSettingsRepaginationFinalize(280);
           return;

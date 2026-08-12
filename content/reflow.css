@@ -988,6 +988,11 @@ body.reflow-book #content .glossary-term.tts-glossary-covered {
   background: #fde047 !important;
 }
 
+body.reflow-book #content .glossary-term:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-light) !important;
+  outline-offset: 2px;
+}
+
 body.reflow-book #content [data-sentence-index] {
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
