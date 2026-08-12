@@ -2,11 +2,17 @@
 :root {
   --reflow-font-scale: 1;
   --reflow-controls-height: 0rem;
+  --reflow-toolbar-reserve: 4rem;
   --reflow-text-measure: 72ch;
   --reflow-panel-reserve: 18.75rem;
   --reflow-gutter: 1.25rem;
   --reflow-block-padding: clamp(1.5rem, 4vh, 3rem);
-  --reflow-page-height: calc(100dvh - var(--nav-height, 80px) - var(--reflow-controls-height));
+  --reflow-page-height: calc(
+    100dvh - max(
+      var(--nav-height, 80px),
+      calc(var(--reflow-toolbar-reserve) + .5rem)
+    ) - var(--reflow-controls-height)
+  );
 
   /* EVA Ceibal interface tokens, extracted from the supplied design-system
      references. They intentionally apply to reader chrome and activities,
@@ -1078,8 +1084,8 @@ body.reflow-book .tts-image-highlight-overlay {
   align-items: center;
   gap: .25rem;
   width: min(100vw, 62rem);
-  min-height: 4rem;
-  padding: .375rem .5rem;
+  min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
+  padding: .375rem .5rem calc(.375rem + env(safe-area-inset-bottom, 0px));
   border: 1px solid var(--ceibal-gray-700);
   border-bottom: 0;
   border-radius: var(--ceibal-radius-lg) var(--ceibal-radius-lg) 0 0;
@@ -1106,7 +1112,7 @@ body.reflow-book .tts-image-highlight-overlay {
   justify-content: center;
   gap: .5rem;
   padding: .5rem .65rem;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: var(--ceibal-radius-md);
   color: #f8fafc;
   background: rgb(255 255 255 / 8%);
@@ -1131,6 +1137,28 @@ body.reflow-book .tts-image-highlight-overlay {
 }
 
 #reflow-pagination button:hover:not(:disabled) { background: rgb(255 255 255 / 16%); }
+
+/* Previous and Next are the primary navigation actions. Their 48 px target,
+   border and stronger surface distinguish them from the toolbar container. */
+#reflow-previous,
+#reflow-next {
+  min-height: 3rem;
+  border-color: var(--ceibal-gray-600);
+  background: #3b4652;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+}
+
+#reflow-previous:hover:not(:disabled),
+#reflow-next:hover:not(:disabled) {
+  border-color: var(--ceibal-gray-400);
+  background: #4b5968;
+}
+
+#reflow-previous .reflow-toolbar-icon,
+#reflow-next .reflow-toolbar-icon {
+  font-size: 1.5rem;
+}
+
 #reflow-pagination button[aria-expanded="true"],
 #reflow-pagination button[aria-pressed="true"] {
   background: var(--ceibal-institutional-500);
@@ -1139,7 +1167,19 @@ body.reflow-book .tts-image-highlight-overlay {
   outline: 3px solid var(--ceibal-focus-on-dark);
   outline-offset: 2px;
 }
-#reflow-pagination button:disabled { opacity: .35; cursor: default; }
+#reflow-pagination button:disabled { opacity: .55; cursor: not-allowed; }
+
+/* Disabled navigation remains legible and differs through surface, border and
+   icon color; opacity is deliberately not its only state indicator. */
+#reflow-previous:disabled,
+#reflow-next:disabled {
+  opacity: 1;
+  border-color: var(--ceibal-gray-700);
+  border-style: dashed;
+  color: var(--ceibal-gray-400);
+  background: #20242a;
+  box-shadow: none;
+}
 
 #reflow-page-status {
   min-width: 5.25rem;
@@ -1182,6 +1222,11 @@ body.reflow-book .reflow-upstream-dock {
   #reflow-pagination button {
     min-height: 2.75rem;
     padding: .25rem;
+  }
+
+  #reflow-previous,
+  #reflow-next {
+    min-height: 2.75rem;
   }
 
   #reflow-pagination .reflow-toolbar-label {

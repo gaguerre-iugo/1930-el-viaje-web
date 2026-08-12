@@ -1830,14 +1830,16 @@
         '<span class="reflow-toolbar-icon" aria-hidden="true">☰</span>' +
         '<span class="reflow-toolbar-label">Índice</span>' +
       '</button>' +
-      '<button id="reflow-previous" class="reflow-toolbar-action" type="button" aria-label="Página anterior">' +
+      '<button id="reflow-previous" class="reflow-toolbar-action" type="button" ' +
+        'aria-label="Página anterior" aria-keyshortcuts="ArrowLeft PageUp">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">←</span>' +
         '<span class="reflow-toolbar-label">Anterior</span>' +
       '</button>' +
       '<output id="reflow-page-status" aria-live="off" aria-label="Página 1 de 1">' +
         '<span id="reflow-current-page">1</span> / <span id="reflow-total-pages">1</span>' +
       '</output>' +
-      '<button id="reflow-next" class="reflow-toolbar-action" type="button" aria-label="Página siguiente">' +
+      '<button id="reflow-next" class="reflow-toolbar-action" type="button" ' +
+        'aria-label="Página siguiente" aria-keyshortcuts="ArrowRight PageDown">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">→</span>' +
         '<span class="reflow-toolbar-label">Siguiente</span>' +
       '</button>' +
@@ -1858,6 +1860,24 @@
 
     document.body.appendChild(pagination);
     document.body.appendChild(announcer);
+
+    function syncToolbarReserve() {
+      var height = Math.ceil(pagination.getBoundingClientRect().height);
+      if (height > 0) {
+        document.documentElement.style.setProperty(
+          "--reflow-toolbar-reserve",
+          height + "px"
+        );
+      }
+    }
+    syncToolbarReserve();
+    if (typeof ResizeObserver === "function") {
+      new ResizeObserver(syncToolbarReserve).observe(pagination);
+    }
+    window.addEventListener("resize", syncToolbarReserve);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", syncToolbarReserve);
+    }
 
     previousButton = document.getElementById("reflow-previous");
     nextButton = document.getElementById("reflow-next");

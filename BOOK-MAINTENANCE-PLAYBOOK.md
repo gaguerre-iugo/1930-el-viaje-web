@@ -781,6 +781,41 @@ Revertir conjuntamente JavaScript, CSS y documentación. La paginación anterior
 
 ---
 
+## Acción 8: reforzar la jerarquía de navegación
+
+### Objetivo
+
+Dar prioridad perceptiva y operativa a Anterior y Siguiente, conservar sus equivalentes de teclado y garantizar que la barra inferior no cubra contenido ni foco al aplicar zoom.
+
+### Procedimiento
+
+1. Mantener Anterior y Siguiente en 48 px en escritorio y 44 px en móvil.
+2. Usar una superficie y un borde con mayor contraste que el fondo general de la barra.
+3. Diferenciar el estado deshabilitado mediante color, fondo y borde discontinuo; no depender únicamente de opacidad.
+4. Mantener el contador visual abreviado, con números tabulares, y actualizar su nombre accesible como «Página actual de total».
+5. Exponer los atajos mediante `aria-keyshortcuts` y conservar flechas, Page Up, Page Down, Inicio y Fin, sin capturarlos dentro de controles interactivos.
+6. Medir la altura real de la barra con `ResizeObserver` y `visualViewport`, publicarla en `--reflow-toolbar-reserve` y usarla para calcular el alto disponible del libro.
+7. Incluir `env(safe-area-inset-bottom)` en la barra para dispositivos con área segura inferior.
+
+### Validación
+
+- Confirmar objetivos de 48 px y 44 px en los dos puntos de quiebre.
+- Revisar el primer y último estado del libro: uno de los botones debe seguir siendo claramente reconocible como deshabilitado.
+- Comprobar que el contador conserva `font-variant-numeric: tabular-nums` y que la auditoría Atkinson incluye el elemento `output`.
+- Probar teclado con foco en el libro y confirmar que no interfiere con formularios, actividades ni paneles.
+- Probar zoom de 200 % y 400 %, foco visible y `safe-area` sin superposición del contenido.
+
+### Riesgos y excepciones
+
+- No fijar la reserva inferior con un valor independiente de la barra: los textos traducidos, el zoom o un área segura pueden modificar su altura.
+- Evitar que el observador de tamaño escriba propiedades que cambien la propia altura de la barra, porque produciría un ciclo de redimensionamiento.
+
+### Reversión
+
+Restaurar conjuntamente los estilos de navegación, los metadatos de teclado y el cálculo anterior de `--reflow-page-height`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
