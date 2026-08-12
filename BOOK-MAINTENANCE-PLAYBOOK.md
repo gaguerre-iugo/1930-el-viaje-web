@@ -1093,6 +1093,112 @@ Volver a invocar `startTtsFromUserGesture()` desde el cambio del interruptor y r
 
 ---
 
+## Acción 16: cerrar, regresar y controlar el foco de los paneles
+
+### Objetivo
+
+Permitir cerrar Índice, Herramientas y Glosario de forma explícita, regresar desde Glosario a Herramientas y mantener un recorrido de foco predecible sin cambiar la página de lectura.
+
+### Procedimiento
+
+1. Añadir un encabezado propio a cada panel con título y botón «Cerrar»; en Glosario, incluir además «Volver a Herramientas».
+2. Al abrir Índice o Herramientas, guardar el elemento que tenía el foco y llevarlo al botón «Cerrar».
+3. Al abrir Glosario, conservar como origen el control que abrió Herramientas y llevar el foco a «Volver a Herramientas».
+4. Al regresar desde Glosario, abrir Herramientas y enfocar su acceso «Glosario» para conservar el contexto.
+5. Al cerrar con el botón o con `Escape`, devolver el foco al control que abrió el panel.
+6. Confinar `Tab` y `Shift+Tab` dentro del diálogo mientras permanezca abierto.
+7. Mantener Índice y Herramientas mutuamente excluyentes y usar Glosario como reemplazo temporal de Herramientas, no como un tercer panel superpuesto.
+8. No animar la aparición de estos paneles ni modificar la página actual o la distribución horizontal.
+
+### Validación
+
+- Abrir cada panel y comprobar que el foco inicial llega a su primer control de navegación.
+- Recorrer los extremos con `Tab` y `Shift+Tab` y confirmar que el foco no sale del diálogo.
+- Cerrar mediante el botón y mediante `Escape`; verificar que el foco vuelve al control de origen.
+- Abrir Glosario desde Herramientas, pulsar «Volver a Herramientas» y comprobar que el foco queda en el acceso «Glosario».
+- Abrir Glosario con el atajo `G`, cerrarlo y comprobar que el foco vuelve al elemento desde el que se accionó el atajo.
+- Alternar Índice y Herramientas y confirmar que existe un solo diálogo.
+- Medir «Volver» y «Cerrar»: sus áreas táctiles deben ser de al menos `44 × 44 px`.
+- Confirmar que el contador de página no cambia y que el panel no tiene desbordamiento horizontal.
+
+### Resultado obtenido
+
+- Índice y Herramientas muestran un botón «Cerrar»; Glosario muestra «Volver a Herramientas» y «Cerrar».
+- `Escape` y el cierre explícito devuelven correctamente el foco al origen.
+- Volver desde Glosario restaura Herramientas con foco en su acceso «Glosario».
+- El foco queda confinado dentro del panel y los controles nuevos cumplen el mínimo de `44 × 44 px`.
+- Índice y Herramientas continúan siendo excluyentes y Glosario los reemplaza sin crear paneles superpuestos.
+- La página de prueba permaneció en `7 / 413` durante todas las aperturas y cierres; no hubo desbordamiento horizontal ni errores nuevos de consola.
+
+### Riesgos y excepciones
+
+- No interceptar `Escape` dentro del diálogo de definición de una palabra: ese diálogo debe conservar su propia devolución del foco a la palabra de origen.
+- No restaurar automáticamente el foco del panel cuando una acción tiene un destino más específico, como activar TTS y continuar en «Reproducir».
+- Los componentes base pueden añadir elementos auxiliares con `tabindex`; el confinamiento debe trabajar con los controles realmente visibles y habilitados.
+- Conservar nombres accesibles completos aunque en móvil se oculte parte de una etiqueta visual.
+
+### Reversión
+
+Retirar los encabezados de control, el confinamiento de foco y el registro del elemento de origen; restaurar después las versiones anteriores de JavaScript y CSS indicadas en `index.html`.
+
+---
+
+## Acción 17: reorganizar el panel Herramientas
+
+### Objetivo
+
+Reducir la carga visual del panel Herramientas mediante secciones previsibles, controles alineados y dependencias accesibles, conservando un único estado funcional para cada preferencia.
+
+### Procedimiento
+
+1. Organizar el contenido visible en «Apoyos para la lectura», «Preferencias», «Atajos de teclado» y «Herramientas».
+2. Dentro de los apoyos, ordenar «Activar lectura en voz alta», «Resaltado», «Descripción de imágenes» y «Lectura fácil»; separar «Audio y voz» para voz, velocidad y reproducción automática.
+3. Diferenciar la activación TTS de la reproducción mediante la descripción «Habilita el modo. Use Reproducir para comenzar».
+4. Mantener «Descripción de imágenes» visible e independiente del estado TTS.
+5. Deshabilitar «Resaltado» cuando TTS esté inactivo, exponer el grupo como foco accesible y asociar la explicación correspondiente.
+6. Mantener la restricción adicional de resaltado por palabra cuando la velocidad sea superior a Normal.
+7. Añadir «Reducir movimiento» como interruptor persistente que minimiza animaciones, transiciones y desplazamiento suave.
+8. Presentar Glosario como botón de acción, no como interruptor, y conservar el atajo `G`.
+9. Ocultar Idioma mientras `es-UY` sea la única opción disponible.
+10. Eliminar superficies de tarjeta repetidas y usar separadores entre filas; conservar controles segmentados cuando necesitan espacio horizontal.
+11. Calcular la altura del panel respecto de la barra y del reproductor TTS para que el desplazamiento interno nunca quede cubierto.
+
+### Validación
+
+- Confirmar que los encabezados visibles estén en sentence case y que `text-transform` sea `none`.
+- Comprobar que «Descripción de imágenes» permanezca visible con TTS encendido y apagado.
+- Apagar TTS y verificar que el grupo Resaltado tenga `aria-disabled="true"`, sea enfocable y anuncie su explicación; reactivar TTS y comprobar que vuelve a estar disponible.
+- Activar y desactivar «Reducir movimiento»; verificar `aria-checked`, el atributo de estado del documento y una duración de transición mínima.
+- Confirmar que Glosario sea un elemento `button` con al menos 44 px de alto.
+- Verificar que Idioma y «Español (Uruguay)» no estén visibles.
+- Recorrer el panel hasta el final con teclado y comprobar que el desplazamiento interno muestra Glosario.
+- Medir el panel con TTS activo: debe terminar antes del reproductor y no tener desbordamiento horizontal.
+- Confirmar que abrir el panel no modifique la página actual.
+
+### Resultado obtenido
+
+- El panel muestra cuatro encabezados principales y el subgrupo «Audio y voz», todos en sentence case.
+- Las tarjetas repetidas fueron sustituidas por filas y separadores; las superficies de sección son transparentes y sin bordes.
+- Resaltado cambia correctamente entre disponible e inactivo con explicación accesible.
+- «Reducir movimiento» funciona, persiste y conserva un área táctil de `44 × 44 px`.
+- Glosario continúa funcionando como botón de `51 px` de alto; Idioma permanece oculto.
+- En la prueba móvil, el panel tuvo desplazamiento interno, cero desbordamiento horizontal y terminó `9 px` antes del reproductor TTS.
+- La página permaneció en `6 / 413` durante la validación.
+
+### Riesgos y excepciones
+
+- No clonar controles del runtime: se perderían sus eventos y estados administrados. Reordenar mediante clases y CSS conserva los nodos originales.
+- Al actualizar el runtime, revisar los textos usados para identificar filas y la clase de la columna de ajustes.
+- No permitir que la restricción por velocidad vuelva a habilitar Resaltado mientras TTS siga apagado.
+- Mantener visible la explicación solo durante el estado que la requiere para no sobrecargar el panel.
+- Si se añade un segundo idioma, retirar la ocultación y volver a validar el flujo completo de selección.
+
+### Reversión
+
+Retirar la organización y clases del panel, el control personalizado de movimiento reducido y el cálculo de altura; restaurar las versiones anteriores de JavaScript y CSS indicadas en `index.html`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

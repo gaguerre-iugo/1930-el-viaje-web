@@ -223,6 +223,7 @@
     "adt-reflow-default-reader-state:47-full-book-45";
   var retiredTextCaseStorageKey = "adt-reflow-text-case:1930-libro-completo-v47";
   var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
+  var reducedMotionStorageKey = "adt-reflow-reduced-motion:1930-libro-completo-v47";
   var editorialTocTitles = {
     pg221_sec001: "Ana Solari",
     pg223_sec001: "Misterio de Cabo Frío"
@@ -309,8 +310,14 @@
     ttsPlayerVisible: false,
     ttsPlayerReserve: 0,
     ttsPlayerStopPendingUntil: 0,
+    reducedMotion: false,
     sentencePaginationKey: "",
     runtimeMenu: null,
+    panelFocusOrigin: null,
+    panelFocusMenu: "",
+    panelFocusRestoreTimer: 0,
+    panelFocusRestoreSuppressedUntil: 0,
+    panelPendingFocusSelector: "",
     glossaryHighlightEnabled: false,
     glossaryEntries: null,
     glossaryHighlightFrame: 0,
@@ -2294,6 +2301,68 @@
     });
   }
 
+  function focusWithoutScroll(element) {
+    if (!element || !element.focus) return;
+    try {
+      element.focus({ preventScroll: true });
+    } catch (_error) {
+      element.focus();
+    }
+  }
+
+  function rememberRuntimePanelFocus(menuValue) {
+    var active = document.activeElement;
+    var fallback = menuValue === "toc" ? indexButton : toolsButton;
+    var outsidePanel = active && active !== document.body &&
+      active !== document.documentElement && active.isConnected &&
+      !(active.closest && active.closest(".reflow-reader-panel, .reflow-upstream-dock"));
+    if (!state.panelFocusOrigin || outsidePanel) {
+      state.panelFocusOrigin = outsidePanel ? active : fallback;
+      state.panelFocusMenu = menuValue;
+    }
+  }
+
+  function restoreRuntimePanelFocus(menuValue) {
+    window.clearTimeout(state.panelFocusRestoreTimer);
+    if (Date.now() < state.panelFocusRestoreSuppressedUntil) return;
+    var target = state.panelFocusOrigin;
+    if (!target || !target.isConnected || !target.getClientRects().length) {
+      target = menuValue === "toc" ? indexButton : toolsButton;
+    }
+    state.panelFocusOrigin = null;
+    state.panelFocusMenu = "";
+    state.panelPendingFocusSelector = "";
+    state.panelFocusRestoreTimer = window.setTimeout(function () {
+      var active = document.activeElement;
+      var focusWasLost = !active || active === document.body ||
+        active === document.documentElement || !active.isConnected || Boolean(
+          active.closest && active.closest(
+            ".reflow-reader-panel, .reflow-upstream-dock"
+          )
+        );
+      if (active !== target && !focusWasLost) return;
+      focusWithoutScroll(target);
+    }, 0);
+  }
+
+  function closeRuntimePanel() {
+    if (
+      typeof window.__adtReflowSetDockMenu !== "function" ||
+      typeof window.__adtReflowGetDockMenu !== "function"
+    ) return;
+    window.__adtReflowSetDockMenu("");
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 120);
+  }
+
+  function returnFromGlossaryToTools() {
+    if (typeof window.__adtReflowSetDockMenu !== "function") return;
+    state.panelPendingFocusSelector = "#reflow-open-glossary";
+    window.__adtReflowSetDockMenu("settings");
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 120);
+  }
+
   function ttsSessionIsActive() {
     if (Date.now() < state.ttsPlayerStopPendingUntil) return false;
     return readAloudSettingIsEnabled();
@@ -2382,6 +2451,7 @@
       typeof window.__adtReflowSetDockMenu === "function" &&
       window.__adtReflowGetDockMenu() === "settings"
     ) {
+      state.panelFocusRestoreSuppressedUntil = Date.now() + 500;
       window.__adtReflowSetDockMenu("");
       window.setTimeout(function () {
         if (!ttsPlayer.hidden) ttsPlayerToggleButton.focus({ preventScroll: true });
@@ -2429,7 +2499,9 @@
        click or after choosing a result. Only return focus when the panel was
        actually dismissed; switching directly to Tools must keep focus on the
        newly requested control instead. */
-    if (previousMenu === "toc" && currentMenu === "") restoreIndexFocus();
+    if (previousMenu && currentMenu === "") {
+      restoreRuntimePanelFocus(previousMenu);
+    }
   }
 
   function toggleRuntimePanel(labels) {
@@ -2445,6 +2517,7 @@
       typeof window.__adtReflowGetDockMenu === "function"
     ) {
       var currentMenu = window.__adtReflowGetDockMenu();
+      if (currentMenu !== menuValue) rememberRuntimePanelFocus(menuValue);
       window.__adtReflowSetDockMenu(currentMenu === menuValue ? "" : menuValue);
       requestAnimationFrame(syncPrimaryToolbar);
       window.setTimeout(syncPrimaryToolbar, 120);
@@ -2471,6 +2544,7 @@
       typeof window.__adtReflowGetDockMenu === "function"
     ) {
       if (window.__adtReflowGetDockMenu() !== menuValue) {
+        rememberRuntimePanelFocus(menuValue);
         window.__adtReflowSetDockMenu(menuValue);
       }
       requestAnimationFrame(syncPrimaryToolbar);
@@ -2745,6 +2819,25 @@
     }
     document.body.dataset.reflowTtsVoice = state.ttsVoice;
     window.__adtReflowTtsVoice = state.ttsVoice;
+  }
+
+  function applyReducedMotion(enabled, persist) {
+    state.reducedMotion = Boolean(enabled);
+    document.body.dataset.reflowReduceMotion = String(state.reducedMotion);
+    var control = document.getElementById("reflow-reduce-motion");
+    if (control) setAttributeIfChanged(control, "aria-checked", state.reducedMotion);
+    if (persist) {
+      try {
+        localStorage.setItem(reducedMotionStorageKey, String(state.reducedMotion));
+      } catch (_error) {}
+    }
+  }
+
+  function loadReducedMotionPreference() {
+    var enabled = false;
+    try { enabled = localStorage.getItem(reducedMotionStorageKey) === "true"; }
+    catch (_error) {}
+    applyReducedMotion(enabled, false);
   }
 
   async function loadTtsVoiceCatalogs() {
@@ -3199,6 +3292,167 @@
   function createFontControls() {
     var interfaceContainer = document.getElementById("interface-container");
 
+    function normalizedSettingText(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function directSettingRow(card, pattern) {
+      return Array.prototype.slice.call(card ? card.children : []).find(
+        function (row) {
+          var label = row.querySelector("label span, :scope > span");
+          return label && pattern.test(normalizedSettingText(label.textContent));
+        }
+      );
+    }
+
+    function syncHighlightAvailability(readingCard) {
+      var highlightRow = directSettingRow(readingCard, /^Resaltado$/i);
+      if (!highlightRow) return;
+      var group = highlightRow.matches('[role="group"]')
+        ? highlightRow
+        : highlightRow.querySelector('[role="group"]');
+      if (!group) return;
+      var description = highlightRow.querySelector("#reflow-highlight-requirement");
+      if (!description) {
+        description = document.createElement("span");
+        description.id = "reflow-highlight-requirement";
+        description.className = "reflow-setting-description";
+        description.textContent =
+          "Active Lectura en voz alta para utilizar el resaltado.";
+        highlightRow.appendChild(description);
+      }
+      var enabled = readAloudSettingIsEnabled();
+      var radios = group.querySelectorAll('[role="radio"]');
+      setAttributeIfChanged(group, "aria-disabled", !enabled);
+      if (enabled) {
+        group.removeAttribute("tabindex");
+        group.removeAttribute("aria-describedby");
+        description.hidden = true;
+      } else {
+        group.tabIndex = 0;
+        group.setAttribute("aria-describedby", description.id);
+        description.hidden = false;
+      }
+      radios.forEach(function (radio) {
+        if (!enabled && !radio.disabled) {
+          radio.dataset.reflowTtsRequiredDisabled = "true";
+          radio.disabled = true;
+          setAttributeIfChanged(radio, "aria-disabled", true);
+        } else if (enabled && radio.dataset.reflowTtsRequiredDisabled === "true") {
+          delete radio.dataset.reflowTtsRequiredDisabled;
+          radio.disabled = false;
+          if (!radio.classList.contains("reflow-speed-disabled")) {
+            setAttributeIfChanged(radio, "aria-disabled", false);
+          }
+        }
+      });
+      highlightRow.classList.toggle("reflow-setting-disabled", !enabled);
+    }
+
+    window.__adtReflowSyncHighlightAvailability = function () {
+      syncHighlightAvailability(
+        document.querySelector(
+          ".reflow-accessibility-panel .reflow-settings-section-reading " +
+          ".reflow-settings-list"
+        )
+      );
+    };
+
+    function organizeSettingsPanel(settingsTab, readingSection, readingCard) {
+      settingsTab.classList.add("reflow-settings-organized");
+      if (readingSection) {
+        readingSection.classList.add("reflow-settings-section-reading");
+        var readingHeading = readingSection.querySelector("h3");
+        if (readingHeading) readingHeading.textContent = "Apoyos para la lectura";
+      }
+      if (readingCard) {
+        readingCard.classList.add("reflow-settings-list");
+        [
+          [/^Lectura fácil$/i, "reflow-setting-easy-read"],
+          [/^(Lectura en voz alta|Activar lectura en voz alta)$/i, "reflow-setting-read-aloud"],
+          [/^Reproducción automática$/i, "reflow-setting-autoplay"],
+          [/^Descripción de imágenes$/i, "reflow-setting-describe-images"],
+          [/^Resaltado$/i, "reflow-setting-highlight"]
+        ].forEach(function (definition) {
+          var row = directSettingRow(readingCard, definition[0]);
+          if (row) row.classList.add("reflow-setting-row", definition[1]);
+        });
+        var readAloudRow = directSettingRow(
+          readingCard,
+          /^(Lectura en voz alta|Activar lectura en voz alta)$/i
+        );
+        if (readAloudRow) {
+          var label = readAloudRow.querySelector("label span");
+          if (label) {
+            label.id = "reflow-read-aloud-label";
+            label.textContent = "Activar lectura en voz alta";
+          }
+          var description = readAloudRow.querySelector("#reflow-read-aloud-description");
+          if (!description) {
+            description = document.createElement("span");
+            description.id = "reflow-read-aloud-description";
+            description.className = "reflow-setting-description";
+            description.textContent =
+              "Habilita el modo. Use Reproducir para comenzar.";
+            var labelContainer = readAloudRow.querySelector("label");
+            if (labelContainer) labelContainer.appendChild(description);
+          }
+          var readAloudSwitch = readAloudRow.querySelector('[role="switch"]');
+          if (readAloudSwitch) {
+            readAloudSwitch.setAttribute("aria-labelledby", "reflow-read-aloud-label");
+            readAloudSwitch.setAttribute(
+              "aria-describedby",
+              "reflow-read-aloud-description"
+            );
+          }
+        }
+        var audioHeading = document.getElementById("reflow-audio-settings-heading");
+        if (!audioHeading) {
+          audioHeading = document.createElement("h4");
+          audioHeading.id = "reflow-audio-settings-heading";
+          audioHeading.textContent = "Audio y voz";
+          readingCard.appendChild(audioHeading);
+        }
+        var voiceRow = document.getElementById("reflow-tts-voice-setting");
+        var speedRow = document.getElementById("reflow-tts-speed-setting");
+        if (voiceRow) voiceRow.classList.add("reflow-setting-row");
+        if (speedRow) speedRow.classList.add("reflow-setting-row");
+        syncHighlightAvailability(readingCard);
+      }
+
+      var fontSection = document.getElementById("reflow-font-settings");
+      if (fontSection) fontSection.classList.add("reflow-settings-section-preferences");
+      Array.prototype.slice.call(settingsTab.querySelectorAll(":scope > section")).forEach(
+        function (section) {
+          var heading = section.querySelector("h3");
+          var text = normalizedSettingText(heading && heading.textContent);
+          var card = section.querySelector(":scope > div");
+          if (card && !section.id) {
+            Array.prototype.slice.call(card.children).forEach(function (row) {
+              if (row.id !== "reflow-audio-settings-heading") {
+                row.classList.add("reflow-setting-row");
+              }
+            });
+          }
+          if (/^(Accesibilidad|Comportamiento)$/i.test(text)) {
+            section.classList.add("reflow-settings-preferences-continuation");
+          }
+          if (/^Atajos de teclado$/i.test(text)) {
+            section.classList.add("reflow-settings-section-shortcuts");
+            Array.prototype.slice.call(section.querySelectorAll("span")).forEach(
+              function (label) {
+                if (/^Abrir ajustes$/i.test(normalizedSettingText(label.textContent))) {
+                  label.textContent = "Abrir Herramientas";
+                }
+              }
+            );
+          }
+        }
+      );
+      var referenceSection = document.getElementById("reflow-reference-tools");
+      if (referenceSection) referenceSection.classList.add("reflow-settings-section-tools");
+    }
+
     document.addEventListener("click", function (event) {
       var control = event.target.closest("[data-reflow-font-size]");
       /* Role-based widgets also exist inside quizzes. Only accessibility
@@ -3234,7 +3488,7 @@
         section = document.createElement("section");
         section.id = "reflow-font-settings";
         section.innerHTML =
-          '<header><h3>Accesibilidad</h3></header>' +
+          '<header><h3>Preferencias</h3></header>' +
           '<div class="reflow-font-settings-card">' +
             '<span id="reflow-font-settings-label">Tamaño de letra</span>' +
             '<div class="reflow-font-settings-options" role="radiogroup" ' +
@@ -3242,6 +3496,20 @@
               '<button type="button" role="radio" data-reflow-font-size="normal" aria-pressed="false">Normal</button>' +
               '<button type="button" role="radio" data-reflow-font-size="large" aria-pressed="false">Grande</button>' +
               '<button type="button" role="radio" data-reflow-font-size="xlarge" aria-pressed="false">Extra grande</button>' +
+            '</div>' +
+            '<div class="reflow-reduce-motion-setting">' +
+              '<label for="reflow-reduce-motion">' +
+                '<span id="reflow-reduce-motion-label">Reducir movimiento</span>' +
+                '<span id="reflow-reduce-motion-description" class="reflow-setting-description">' +
+                  'Desactiva animaciones y transiciones del lector.' +
+                '</span>' +
+              '</label>' +
+              '<button id="reflow-reduce-motion" class="reflow-custom-switch" type="button" ' +
+                'role="switch" aria-checked="false" ' +
+                'aria-labelledby="reflow-reduce-motion-label" ' +
+                'aria-describedby="reflow-reduce-motion-description">' +
+                '<span class="reflow-custom-switch-thumb" aria-hidden="true"></span>' +
+              '</button>' +
             '</div>' +
           '</div>';
         var firstSection = settingsTab.querySelector(":scope > section");
@@ -3256,7 +3524,9 @@
         settingsTab.querySelectorAll(":scope > section")
       ).find(function (candidate) {
         var heading = candidate.querySelector("h3");
-        return heading && /^lectura$/i.test(heading.textContent.trim());
+        return heading && /^(lectura|apoyos para la lectura)$/i.test(
+          heading.textContent.trim()
+        );
       });
       var readingCard = readingSection && readingSection.querySelector(":scope > div");
       if (readingCard && !document.getElementById("reflow-tts-voice-setting")) {
@@ -3300,7 +3570,7 @@
         var referenceSection = document.createElement("section");
         referenceSection.id = "reflow-reference-tools";
         referenceSection.innerHTML =
-          '<header><h3>Consulta</h3></header>' +
+          '<header><h3>Herramientas</h3></header>' +
           '<div class="reflow-reference-tools-card">' +
             '<button id="reflow-open-glossary" type="button" aria-keyshortcuts="G">' +
               '<span aria-hidden="true">⌕</span><span>Glosario</span>' +
@@ -3336,9 +3606,11 @@
           shortcutCard.insertBefore(glossaryShortcutRow, closeShortcutRow || null);
         }
       }
+      organizeSettingsPanel(settingsTab, readingSection, readingCard);
       updateFontControls();
       updateTtsVoiceControls();
       updateTtsSpeedControls();
+      applyReducedMotion(state.reducedMotion, false);
       syncEasyReadSwitchVisual();
     }
 
@@ -3362,8 +3634,26 @@
     });
 
     document.addEventListener("click", function (event) {
+      var control = event.target.closest("#reflow-reduce-motion");
+      if (!control) return;
+      applyReducedMotion(control.getAttribute("aria-checked") !== "true", true);
+    });
+
+    document.addEventListener("click", function (event) {
       if (!event.target.closest("#reflow-open-glossary")) return;
       toggleRuntimePanel(["Glosario", "Glossary"]);
+    });
+
+    document.addEventListener("click", function (event) {
+      var control = event.target.closest('[role="switch"]');
+      if (!control) return;
+      var label = control.getAttribute("aria-labelledby");
+      var labelElement = label && document.getElementById(label);
+      if (!labelElement || !/lectura en voz alta/i.test(labelElement.textContent)) return;
+      window.setTimeout(mountInSettingsPanel, 0);
+      window.setTimeout(mountInSettingsPanel, 160);
+      window.setTimeout(mountInSettingsPanel, 400);
+      window.setTimeout(mountInSettingsPanel, 800);
     });
 
     mountInSettingsPanel();
@@ -3438,11 +3728,12 @@
     function sync() {
       scheduled = false;
       var restricted = currentSpeed() > 1;
+      var ttsEnabled = readAloudSettingIsEnabled();
       document.body.dataset.reflowWordHighlightRestricted = String(restricted);
 
       wordHighlightButtons().forEach(function (button) {
-        button.disabled = restricted;
-        button.setAttribute("aria-disabled", String(restricted));
+        button.disabled = restricted || !ttsEnabled;
+        button.setAttribute("aria-disabled", String(restricted || !ttsEnabled));
         button.classList.toggle("reflow-speed-disabled", restricted);
         if (restricted) {
           button.title = "Disponible sólo con velocidad Lenta o Normal";
@@ -3450,6 +3741,9 @@
           button.removeAttribute("title");
         }
       });
+      if (window.__adtReflowSyncHighlightAvailability) {
+        window.__adtReflowSyncHighlightAvailability();
+      }
 
       if (restricted && lastRestricted !== true && window.__adtReflowSetWordHighlight) {
         var wasWordHighlight = wordHighlightActive();
@@ -3499,6 +3793,99 @@
 
     function normalized(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function focusablePanelControls(panel) {
+      return Array.prototype.slice.call(panel.querySelectorAll(
+        'button:not([disabled]), a[href], input:not([disabled]):not([type="hidden"]), ' +
+        'select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(function (control) {
+        return control.getClientRects().length &&
+          control.getAttribute("aria-hidden") !== "true" &&
+          !control.closest('[aria-hidden="true"]');
+      });
+    }
+
+    function focusPanelEntry(panel, fallback) {
+      var pendingSelector = state.panelPendingFocusSelector;
+      var delays = pendingSelector ? [0, 80, 240, 500] : [0];
+      delays.forEach(function (delay, index) {
+        window.setTimeout(function () {
+          if (!panel.isConnected || !panel.getClientRects().length) return;
+          var target = pendingSelector && panel.querySelector(pendingSelector);
+          if (target) {
+            state.panelPendingFocusSelector = "";
+            focusWithoutScroll(target);
+            return;
+          }
+          if (pendingSelector && index < delays.length - 1) return;
+          focusWithoutScroll(fallback);
+        }, delay);
+      });
+    }
+
+    function enhancePanelControls(panel) {
+      var isNavigation = panel.classList.contains("reflow-navigation-panel");
+      var isTools = panel.classList.contains("reflow-accessibility-panel");
+      var isGlossary = panel.classList.contains("reflow-glossary-panel");
+      if (!isNavigation && !isTools && !isGlossary) return;
+      var shell = panel.firstElementChild;
+      if (!shell) return;
+
+      var label = isNavigation ? "Índice" : isGlossary ? "Glosario" : "Herramientas";
+      var nativeTitle = Array.prototype.slice.call(
+        shell.querySelectorAll("h1, h2, h3, h4, h5, h6")
+      ).find(function (heading) {
+        return !heading.classList.contains("reflow-panel-control-title") &&
+          normalized(heading.textContent).toLowerCase() === label.toLowerCase();
+      });
+      if (nativeTitle) {
+        nativeTitle.classList.add("reflow-panel-native-title");
+        nativeTitle.setAttribute("aria-hidden", "true");
+        if (isGlossary && nativeTitle.parentElement) {
+          nativeTitle.parentElement.classList.add("reflow-panel-native-header");
+        }
+      }
+
+      var header = shell.querySelector(":scope > .reflow-panel-control-header");
+      var firstEnhancement = panel.dataset.reflowPanelControls !== "true";
+      if (!header) {
+        header = document.createElement("div");
+        header.className = "reflow-panel-control-header" +
+          (isGlossary ? " reflow-panel-control-header-glossary" : "");
+        header.innerHTML =
+          (isGlossary
+            ? '<button type="button" class="reflow-panel-back" aria-label="Volver a Herramientas">' +
+                '<span aria-hidden="true">←</span><span>Herramientas</span></button>'
+            : "") +
+          '<h2 class="reflow-panel-control-title"></h2>' +
+          '<button type="button" class="reflow-panel-close" aria-keyshortcuts="Escape">' +
+            '<span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>';
+        var title = header.querySelector(".reflow-panel-control-title");
+        title.id = "reflow-panel-title-" + (isNavigation ? "index" : isGlossary ? "glossary" : "tools");
+        title.textContent = label;
+        var closeButton = header.querySelector(".reflow-panel-close");
+        closeButton.setAttribute("aria-label", "Cerrar " + label);
+        closeButton.addEventListener("click", closeRuntimePanel);
+        var backButton = header.querySelector(".reflow-panel-back");
+        if (backButton) backButton.addEventListener("click", returnFromGlossaryToTools);
+        shell.insertBefore(header, shell.firstChild);
+      }
+      panel.setAttribute(
+        "aria-labelledby",
+        header.querySelector(".reflow-panel-control-title").id
+      );
+      var controlTitle = header.querySelector(".reflow-panel-control-title");
+      controlTitle.classList.remove("reflow-panel-native-title");
+      controlTitle.removeAttribute("aria-hidden");
+      panel.dataset.reflowPanelControls = "true";
+      if (firstEnhancement) {
+        focusPanelEntry(
+          panel,
+          header.querySelector(".reflow-panel-back") ||
+            header.querySelector(".reflow-panel-close")
+        );
+      }
     }
 
     function classifyPanel(panel) {
@@ -3579,9 +3966,28 @@
           );
         }
       }
-      anchor.style.setProperty(
-        "--reflow-panel-top",
-        Math.max(0, Math.round(intendedTop)) + "px"
+      var panelTop = panel.classList.contains("reflow-reader-panel-tall")
+        ? 8
+        : Math.max(0, Math.round(intendedTop));
+      var lowerBoundary = window.innerHeight;
+      var primaryToolbar = document.getElementById("reflow-pagination");
+      var ttsControls = document.getElementById("reflow-tts-player");
+      if (primaryToolbar && primaryToolbar.getClientRects().length) {
+        lowerBoundary = Math.min(
+          lowerBoundary,
+          primaryToolbar.getBoundingClientRect().top
+        );
+      }
+      if (ttsControls && !ttsControls.hidden && ttsControls.getClientRects().length) {
+        lowerBoundary = Math.min(
+          lowerBoundary,
+          ttsControls.getBoundingClientRect().top
+        );
+      }
+      anchor.style.setProperty("--reflow-panel-top", panelTop + "px");
+      panel.style.setProperty(
+        "--reflow-panel-max-height",
+        Math.max(180, Math.floor(lowerBoundary - panelTop - 8)) + "px"
       );
       anchor.classList.add("reflow-panel-anchor");
       anchor.classList.toggle(
@@ -3683,6 +4089,7 @@
           panel.classList.add("reflow-reader-panel");
           if (rect.height >= 300) panel.classList.add("reflow-reader-panel-tall");
         }
+        enhancePanelControls(panel);
         dockPanelToViewport(panel);
       });
       requestAnimationFrame(syncReadingShift);
@@ -3711,6 +4118,33 @@
       subtree: true
     });
     window.addEventListener("resize", scheduleUpdate);
+    document.addEventListener("keydown", function (event) {
+      var panel = event.target && event.target.closest &&
+        event.target.closest(".reflow-reader-panel");
+      if (!panel || !panel.querySelector(".reflow-panel-control-header")) return;
+      if (panel.getAttribute("aria-label") === "glossary-term-details") return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeRuntimePanel();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      var controls = focusablePanelControls(panel);
+      if (!controls.length) return;
+      var first = controls[0];
+      var last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        focusWithoutScroll(last);
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        focusWithoutScroll(first);
+      } else if (!panel.contains(document.activeElement)) {
+        event.preventDefault();
+        focusWithoutScroll(first);
+      }
+    }, true);
     primePanels();
   }
 
@@ -9703,6 +10137,7 @@
     loadFontPreference();
     retireTextCasePreference();
     loadTtsVoicePreference();
+    loadReducedMotionPreference();
     installReflowDataAdapter();
     var voiceCatalogPromise = loadTtsVoiceCatalogs();
     var indexMetadataPromise = loadIndexMetadata();
