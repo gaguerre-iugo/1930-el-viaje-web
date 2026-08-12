@@ -614,6 +614,173 @@ Revertir el commit correspondiente y restaurar conjuntamente los identificadores
 
 ---
 
+## Acción 7: simplificar la arquitectura de la barra inferior
+
+### Objetivo
+
+Reducir la carga cognitiva y mantener una navegación predecible. El primer nivel debe conservar siempre este orden: Índice, Página anterior, Página actual/total, Página siguiente, Leer/Pausar y Herramientas.
+
+### Áreas que deben revisarse
+
+- Barra generada por el componente base y paginación añadida por el modo reflujo.
+- Paneles de Índice, Configuración, Glosario, Idioma y lectura en voz alta.
+- Configuración de idiomas disponibles.
+- Etiquetas visibles, nombres accesibles, orden de foco y tamaños táctiles.
+- Apertura de paneles en escritorio y móvil.
+
+### Procedimiento
+
+1. Crear una sola barra primaria con seis posiciones invariables.
+2. Mantener el componente base montado únicamente como puente de estado para sus paneles, ocultándolo de la presentación, el puntero y el orden de foco.
+3. Ocultar Idioma cuando exista una única lengua y anular su atajo de teclado.
+4. Mover tamaño de letra, lectura fácil, descripción de imágenes, resaltado, velocidad, reproducción automática, voz y Glosario a Herramientas.
+5. Hacer que Leer/Pausar controle directamente el estado real del audio, sin exigir la apertura de un panel secundario.
+6. Mostrar icono y etiqueta cuando haya espacio; ocultar solo la etiqueta visual en móvil, conservando `aria-label`.
+7. Mantener los paneles superpuestos a la caja del libro y conservar la página visual al abrirlos o cerrarlos.
+8. Distinguir la apertura de un panel de un cambio tipográfico: modificar el tamaño de letra puede repaginar, pero debe preservar el ancla semántica.
+
+### Archivos modificados
+
+- `assets/reflow-book.js`.
+- `content/reflow.css`.
+- `index.html` y `assets/offline-preloader.js` para versionado y ejecución local.
+- `tools/sync_offline_preloader.js`.
+- `BOOK-MAINTENANCE-PLAYBOOK.md`.
+
+### Validación estática
+
+- Confirmar que `#reflow-pagination` contiene exactamente los cinco botones y el contador esperados.
+- Confirmar que cada botón tiene nombre accesible y una altura mínima de 44 px.
+- Verificar que el componente base recibe `aria-hidden="true"` y que sus controles salen del orden de foco.
+- Verificar que el panel de Idioma no puede mostrarse y que `Alt + Shift + L` queda anulado.
+- Comprobar sintaxis JavaScript y ejecutar `git diff --check`.
+
+### Validación en navegador
+
+1. Recorrer la barra con teclado en escritorio y móvil.
+2. Confirmar el orden Índice → Anterior → contador → Siguiente → Leer/Pausar → Herramientas.
+3. Abrir y cerrar Índice, Herramientas y Glosario sin que cambie la página actual.
+4. Iniciar, pausar y reanudar la lectura desde la barra, comprobando etiqueta, icono y `aria-pressed`.
+5. Confirmar que Idioma no aparece y que todas las preferencias siguen disponibles en Herramientas.
+6. Cambiar el tamaño de letra y verificar que se conserva el fragmento semántico leído.
+
+### Resultado obtenido en este proyecto
+
+- El primer nivel se limita a las seis posiciones definidas.
+- Idioma queda oculto porque solo existe `es-UY`.
+- Glosario y las preferencias de lectura se agrupan bajo Herramientas.
+- Los paneles se superponen sin desplazar ni ocultar el libro.
+- La barra mantiene iconos y etiquetas en escritorio, y nombres accesibles completos en móvil.
+- La preferencia «Ocultar menús automáticamente» controla también la barra simplificada; el foco de teclado la mantiene visible.
+- El esqueleto y la barra base se ocultan desde su primer fotograma para evitar que aparezcan detrás de la barra simplificada durante la carga.
+- La barra simplificada espera a que el runtime esté listo y abre sus paneles mediante el estado compartido, sin simular clics sobre controles ocultos.
+
+### Incidencias encontradas y medidas preventivas
+
+#### 1. Abrir el libro con `file://` produce falsos fallos de aplicación
+
+**Síntomas observados:** Atkinson Hyperlegible no carga, aparecen errores CORS con origen `null`, las navegaciones internas entre documentos se bloquean y algunos controles no responden.
+
+**Causa:** Chromium trata cada URL `file://` como un origen opaco. Las fuentes externas, los `fetch()` y las navegaciones entre marcos no tienen las mismas garantías que bajo HTTP o SCORM.
+
+**Prevención:**
+
+- Probar el desarrollo local mediante `http://127.0.0.1:<puerto>/`, nunca usando el archivo directamente como validación principal.
+- Validar por separado los tres destinos reales: servidor local HTTP, paquete SCORM y servidor final.
+- Si un entregable debe funcionar obligatoriamente con doble clic, incrustar fuentes y documentos requeridos y eliminar toda navegación entre archivos. No asumir que un paquete HTTP funcionará sin cambios bajo `file://`.
+
+#### 2. El preloader portable bloqueaba también la versión HTTP
+
+**Síntomas observados:** pantalla en «Preparando…», controles congelados, carga muy lenta o caída del proceso sin error JavaScript.
+
+**Causa:** `assets/offline-preloader.js` contiene una copia incrustada del libro y pesa aproximadamente 17 MB. Aunque su función terminaba inmediatamente bajo HTTP, el navegador debía descargarlo y analizarlo antes de continuar.
+
+**Prevención:**
+
+- Cargar `offline-preloader.js` de forma síncrona únicamente cuando `location.protocol === "file:"`.
+- No incluir el preloader portable como `<script src>` incondicional en páginas servidas por HTTP o SCORM.
+- Después de modificar `index.html`, actualizar su copia incrustada con la herramienta de sincronización y verificar que HTTP no solicita el preloader.
+
+#### 3. Esperas ilimitadas impedían terminar la inicialización
+
+**Síntomas observados:** el mensaje de carga permanecía indefinidamente sin excepción en consola.
+
+**Causa:** `document.fonts.ready` y `HTMLImageElement.decode()` podían quedar pendientes cuando un recurso fallaba o el navegador no completaba su decodificación.
+
+**Prevención:**
+
+- Acotar la espera de fuentes e imágenes mediante `Promise.race()` y un tiempo máximo razonable.
+- Permitir que los observadores de diseño procesen recursos que terminen después del primer render utilizable.
+- Un recurso decorativo o una fuente fallida nunca debe impedir que aparezcan navegación y controles.
+
+#### 4. Un `MutationObserver` global provocó saturación y crash
+
+**Síntomas observados:** los botones dejaban de responder y la aplicación caía unos segundos después, sin error en consola.
+
+**Causa:** la barra nueva observaba todo `document.body` y, en cada sincronización, volvía a escribir `class`, `aria-hidden` y `tabindex` sobre el componente base. Esas escrituras activaban otros observadores de diseño y creaban realimentación continua.
+
+**Prevención:**
+
+- Observar solamente el contenedor mínimo necesario; para la barra, `#nav-container`.
+- Usar filtros de atributos específicos y no observar `style`, `class` o todo el subárbol sin una necesidad demostrada.
+- Antes de llamar a `setAttribute()` o modificar una clase, comprobar que el valor realmente cambió.
+- No realizar cálculos de paginación completos desde un observador de alta frecuencia; agruparlos mediante una única actualización programada.
+- Mantener la aplicación abierta al menos 30 segundos durante la prueba y accionar repetidamente Índice, Herramientas, Leer/Pausar y navegación.
+
+#### 5. El menú base aparecía brevemente detrás de la barra nueva
+
+**Síntoma observado:** el esqueleto y la barra anterior se veían durante el primer fotograma y luego desaparecían.
+
+**Causa:** ocultarlos sólo desde JavaScript dejaba una ventana entre el render inicial de React y la clasificación del componente.
+
+**Prevención:** ocultar desde CSS tanto el esqueleto (`data-testid="dock-skeleton"`) como el grupo con los disparadores conocidos. Mantenerlos montados como puente de estado, pero fuera de presentación, puntero y foco.
+
+#### 6. Preferencias ocultas por el estado de lectura en voz alta
+
+**Síntomas observados:** Descripción de imágenes, Resaltado y Reproducción automática aparecían únicamente después de activar Lectura en voz alta; Velocidad no aparecía en Herramientas porque pertenecía al panel de audio.
+
+**Causa:** el componente base condicionaba conjuntamente esas preferencias al estado activo de TTS y ubicaba la velocidad en otro popover.
+
+**Prevención:**
+
+- Mantener siempre visibles en Herramientas las preferencias configurables, aunque la reproducción esté apagada.
+- Conectar controles trasladados al mismo estado compartido del runtime; no mantener dos valores independientes.
+- Verificar los dos estados de aceptación: Lectura en voz alta apagada y encendida.
+- Confirmar que Herramientas contiene Lectura fácil, Lectura en voz alta, Reproducción automática, Descripción de imágenes, Resaltado, voz, Velocidad, Tamaño de letra, comportamiento y accesos de consulta aplicables.
+
+#### 7. Chrome bloqueaba el audio por falta de gesto del usuario
+
+**Síntoma observado:** `NotAllowedError: play() failed because the user didn't interact with the document first`.
+
+**Causas:** la primera llamada a `audio.play()` se retrasaba mediante un temporizador y el estado persistido intentaba reproducir automáticamente durante la carga del documento.
+
+**Prevención:**
+
+- Ejecutar la primera llamada real a `play()` sincrónicamente dentro del clic en Leer o del interruptor activado por el usuario.
+- No reproducir audio audible durante la carga, aunque las preferencias persistidas indiquen Lectura en voz alta y Reproducción automática.
+- Interpretar Reproducción automática como continuidad entre fragmentos después del primer clic, no como reproducción al abrir el libro.
+- Probar con una consola limpia en Chrome: recargar, confirmar que no aparece `NotAllowedError`, pulsar Leer, pausar y reanudar.
+
+#### 8. Caché y verificación de cada corrección
+
+- Incrementar el identificador `?v=` de cada JavaScript o CSS modificado.
+- Confirmar que el servidor entrega el identificador nuevo antes de evaluar el resultado.
+- Recargar con `Ctrl + F5` durante desarrollo.
+- Ejecutar `node --check assets/reflow-book.js`, comparar llaves CSS y ejecutar `git diff --check`.
+- Revisar consola, carga de Atkinson, estabilidad prolongada, apertura de paneles, audio en Chrome y ausencia de la barra anterior.
+
+### Riesgos y excepciones
+
+- El componente base sigue siendo la fuente de estado de los paneles; una recompilación puede cambiar sus etiquetas o estructura interna.
+- No eliminar físicamente el puente del componente base sin reemplazar antes sus estados y paneles.
+- Si se incorpora otro idioma, restaurar el selector dentro de Herramientas y su atajo accesible.
+
+### Reversión
+
+Revertir conjuntamente JavaScript, CSS y documentación. La paginación anterior y el componente base deben restaurarse en el mismo cambio para evitar dos barras visibles.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

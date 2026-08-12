@@ -311,6 +311,9 @@
   var nextButton;
   var currentOutput;
   var totalOutput;
+  var indexButton;
+  var readButton;
+  var toolsButton;
   var announcer;
   var ttsWordTickerRefs = new WeakMap();
   var ttsWordTickerRuns = new WeakMap();
@@ -831,6 +834,21 @@
     }
   }
 
+  function startTtsFromUserGesture() {
+    var api = window.__adtReflowAudio;
+    if (!api || !api.items || !api.playAtIndex) {
+      startTtsFromSettings();
+      return;
+    }
+    state.ttsManuallyPaused = false;
+    state.ttsResumeAfterSeek = true;
+    lockTtsToExplicitNavigation(state.current);
+    /* Chrome grants unmuted playback only while the activating click is still
+       on the stack. Start the selected item now; alignment cleanup may remain
+       asynchronous after play() has already received that authorization. */
+    scheduleTtsAlignment(state.current, true, true);
+  }
+
   function stopTtsFromSettings() {
     window.clearTimeout(state.ttsActivationTimer);
     clearTtsAlignmentState();
@@ -859,6 +877,11 @@
     nextButton.disabled = state.current >= state.total - 1;
     currentOutput.textContent = String(state.current + 1);
     totalOutput.textContent = String(state.total);
+    currentOutput.parentElement.setAttribute(
+      "aria-label",
+      "Página " + (state.current + 1) + " de " + state.total
+    );
+    syncPrimaryToolbar();
     updateQuizPageBackground();
     updateBackMatterPageBackground();
     if (state.runtimeMenuRefresh) state.runtimeMenuRefresh();
@@ -1644,16 +1667,189 @@
     }
   }
 
+  function runtimeDockButton(labels) {
+    var wanted = Array.isArray(labels) ? labels : [labels];
+    return Array.prototype.slice.call(document.querySelectorAll("button[aria-label]")).find(
+      function (button) {
+        if (button.closest("#reflow-pagination")) return false;
+        return wanted.indexOf(button.getAttribute("aria-label")) >= 0;
+      }
+    ) || null;
+  }
+
+  function pressedRuntimeDockButton(labels) {
+    var wanted = Array.isArray(labels) ? labels : [labels];
+    return Array.prototype.slice.call(document.querySelectorAll('button[aria-pressed="true"][aria-label]')).find(
+      function (button) {
+        if (button.closest("#reflow-pagination")) return false;
+        return wanted.indexOf(button.getAttribute("aria-label")) >= 0;
+      }
+    ) || null;
+  }
+
+  function markUpstreamDock() {
+    var trigger = runtimeDockButton(["Menú principal", "Main Menu"]);
+    var dock = trigger && trigger.closest('[role="group"]');
+    if (!dock) return;
+    if (!dock.classList.contains("reflow-upstream-dock")) {
+      dock.classList.add("reflow-upstream-dock");
+    }
+    if (dock.getAttribute("aria-hidden") !== "true") {
+      dock.setAttribute("aria-hidden", "true");
+    }
+    dock.querySelectorAll("button, a, input, select, textarea, [tabindex]").forEach(function (control) {
+      if (control.getAttribute("tabindex") !== "-1") {
+        control.setAttribute("tabindex", "-1");
+      }
+    });
+    if (dock.dataset.reflowAutoHideObserved !== "true") {
+      dock.dataset.reflowAutoHideObserved = "true";
+      new MutationObserver(syncPrimaryToolbar).observe(dock, {
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+    }
+  }
+
+  function setAttributeIfChanged(element, name, value) {
+    var normalized = String(value);
+    if (element.getAttribute(name) !== normalized) element.setAttribute(name, normalized);
+  }
+
+  function syncPrimaryToolbar() {
+    if (!indexButton || !readButton || !toolsButton) return;
+    var indexTrigger = runtimeDockButton(["Menú principal", "Main Menu"]);
+    var toolsTrigger = runtimeDockButton(["Configuración", "Settings"]);
+    var glossaryTrigger = runtimeDockButton(["Glosario", "Glossary"]);
+    var upstreamDock = indexTrigger && indexTrigger.closest('[role="group"]');
+    var primaryToolbar = indexButton.closest("#reflow-pagination");
+    var playing = ttsPlaybackIsRunning();
+    var runtimeMenuReady = Boolean(
+      indexTrigger && toolsTrigger &&
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      typeof window.__adtReflowGetDockMenu === "function"
+    );
+    var currentMenu = runtimeMenuReady ? window.__adtReflowGetDockMenu() : "";
+    var toolbarHasFocus = Boolean(primaryToolbar && primaryToolbar.matches(":focus-within"));
+    var upstreamWantsHidden = Boolean(
+      upstreamDock && upstreamDock.classList.contains("opacity-0")
+    );
+
+    primaryToolbar.classList.toggle("reflow-primary-toolbar-pending", !runtimeMenuReady);
+    setAttributeIfChanged(primaryToolbar, "aria-busy", !runtimeMenuReady);
+    setAttributeIfChanged(indexButton, "aria-expanded", currentMenu === "toc");
+    setAttributeIfChanged(
+      toolsButton,
+      "aria-expanded",
+      currentMenu === "settings" || currentMenu === "glossary"
+    );
+    setAttributeIfChanged(readButton, "aria-label", playing ? "Pausar" : "Leer");
+    setAttributeIfChanged(readButton, "aria-pressed", playing);
+    var icon = readButton.querySelector(".reflow-toolbar-icon");
+    var label = readButton.querySelector(".reflow-toolbar-label");
+    var iconText = playing ? "❚❚" : "▶";
+    var labelText = playing ? "Pausar" : "Leer";
+    if (icon.textContent !== iconText) icon.textContent = iconText;
+    if (label.textContent !== labelText) label.textContent = labelText;
+    primaryToolbar.classList.toggle(
+      "reflow-primary-toolbar-hidden",
+      upstreamWantsHidden && !toolbarHasFocus
+    );
+    document.body.classList.toggle("reflow-tts-playing", playing);
+    markUpstreamDock();
+  }
+
+  function toggleRuntimePanel(labels) {
+    var wanted = Array.isArray(labels) ? labels : [labels];
+    var joined = wanted.join(" ").toLowerCase();
+    var menuValue = /menú principal|main menu/.test(joined) ? "toc" :
+      /configuración|settings/.test(joined) ? "settings" :
+      /glosario|glossary/.test(joined) ? "glossary" :
+      /idioma|language/.test(joined) ? "language" : "";
+    if (
+      menuValue &&
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      typeof window.__adtReflowGetDockMenu === "function"
+    ) {
+      var currentMenu = window.__adtReflowGetDockMenu();
+      window.__adtReflowSetDockMenu(currentMenu === menuValue ? "" : menuValue);
+      requestAnimationFrame(syncPrimaryToolbar);
+      window.setTimeout(syncPrimaryToolbar, 120);
+      return true;
+    }
+    var trigger = runtimeDockButton(labels);
+    if (!trigger) return false;
+    trigger.click();
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 120);
+    return true;
+  }
+
+  function switchRuntimePanel(labels, competingLabels) {
+    if (
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      typeof window.__adtReflowGetDockMenu === "function"
+    ) {
+      toggleRuntimePanel(labels);
+      return;
+    }
+    var competing = pressedRuntimeDockButton(competingLabels);
+    if (competing) {
+      competing.click();
+      window.setTimeout(function () { toggleRuntimePanel(labels); }, 80);
+      return;
+    }
+    toggleRuntimePanel(labels);
+  }
+
+  function togglePrimaryReadAloud() {
+    var api = window.__adtReflowAudio;
+    if (ttsPlaybackIsRunning()) {
+      state.ttsManuallyPaused = true;
+      state.ttsResumeAfterSeek = false;
+      if (api && api.pause) api.pause();
+      else if (state.ttsAudio) state.ttsAudio.pause();
+    } else {
+      state.ttsManuallyPaused = false;
+      syncReadAloudSetting(true);
+      startTtsFromUserGesture();
+    }
+    requestAnimationFrame(syncPrimaryToolbar);
+    window.setTimeout(syncPrimaryToolbar, 160);
+  }
+
   function createPagination() {
     var pagination = document.createElement("nav");
     pagination.id = "reflow-pagination";
-    pagination.setAttribute("aria-label", "Páginas del libro");
+    pagination.className = "reflow-primary-toolbar reflow-primary-toolbar-pending";
+    pagination.setAttribute("aria-label", "Controles principales del libro");
+    pagination.setAttribute("aria-busy", "true");
     pagination.innerHTML =
-      '<button id="reflow-previous" type="button" aria-label="Página anterior">&#8592;</button>' +
-      '<output id="reflow-page-status" aria-live="off">' +
+      '<button id="reflow-index" class="reflow-toolbar-action" type="button" ' +
+        'aria-label="Índice" aria-haspopup="dialog" aria-expanded="false">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">☰</span>' +
+        '<span class="reflow-toolbar-label">Índice</span>' +
+      '</button>' +
+      '<button id="reflow-previous" class="reflow-toolbar-action" type="button" aria-label="Página anterior">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">←</span>' +
+        '<span class="reflow-toolbar-label">Anterior</span>' +
+      '</button>' +
+      '<output id="reflow-page-status" aria-live="off" aria-label="Página 1 de 1">' +
         '<span id="reflow-current-page">1</span> / <span id="reflow-total-pages">1</span>' +
       '</output>' +
-      '<button id="reflow-next" type="button" aria-label="Página siguiente">&#8594;</button>';
+      '<button id="reflow-next" class="reflow-toolbar-action" type="button" aria-label="Página siguiente">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">→</span>' +
+        '<span class="reflow-toolbar-label">Siguiente</span>' +
+      '</button>' +
+      '<button id="reflow-read" class="reflow-toolbar-action" type="button" aria-label="Leer" aria-pressed="false">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">▶</span>' +
+        '<span class="reflow-toolbar-label">Leer</span>' +
+      '</button>' +
+      '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
+        'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">⚙</span>' +
+        '<span class="reflow-toolbar-label">Herramientas</span>' +
+      '</button>';
 
     announcer = document.createElement("div");
     announcer.className = "sr-only";
@@ -1667,6 +1863,47 @@
     nextButton = document.getElementById("reflow-next");
     currentOutput = document.getElementById("reflow-current-page");
     totalOutput = document.getElementById("reflow-total-pages");
+    indexButton = document.getElementById("reflow-index");
+    readButton = document.getElementById("reflow-read");
+    toolsButton = document.getElementById("reflow-tools");
+
+    indexButton.addEventListener("click", function () {
+      switchRuntimePanel(
+        ["Menú principal", "Main Menu"],
+        ["Configuración", "Settings", "Glosario", "Glossary"]
+      );
+    });
+    readButton.addEventListener("click", togglePrimaryReadAloud);
+    toolsButton.addEventListener("click", function () {
+      switchRuntimePanel(
+        ["Configuración", "Settings"],
+        ["Menú principal", "Main Menu"]
+      );
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!event.altKey || !event.shiftKey || String(event.key).toLowerCase() !== "l") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+
+    document.addEventListener("play", syncPrimaryToolbar, true);
+    document.addEventListener("pause", syncPrimaryToolbar, true);
+    document.addEventListener("ended", syncPrimaryToolbar, true);
+    pagination.addEventListener("focusin", syncPrimaryToolbar);
+    pagination.addEventListener("focusout", function () {
+      requestAnimationFrame(syncPrimaryToolbar);
+    });
+    var runtimeNavigation = document.getElementById("nav-container");
+    if (runtimeNavigation) {
+      new MutationObserver(syncPrimaryToolbar).observe(runtimeNavigation, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["aria-label", "aria-pressed"]
+      });
+    }
+    syncPrimaryToolbar();
 
     /* Page clicks are routed once by the document-level adapter installed
        below. Registering a second handler here made one physical click move
@@ -2256,8 +2493,41 @@
           readingCard.appendChild(voiceRow);
         }
       }
+      if (readingCard && !document.getElementById("reflow-tts-speed-setting")) {
+        var speedRow = document.createElement("div");
+        speedRow.id = "reflow-tts-speed-setting";
+        speedRow.innerHTML =
+          '<span id="reflow-tts-speed-label">Velocidad</span>' +
+          '<div class="reflow-tts-speed-options" role="radiogroup" ' +
+            'aria-labelledby="reflow-tts-speed-label">' +
+            '<button type="button" role="radio" data-reflow-tts-speed="0.5" aria-checked="false">Lenta</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="1" aria-checked="false">Normal</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="1.5" aria-checked="false">Rápida</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="2" aria-checked="false">Muy rápida</button>' +
+          '</div>';
+        readingCard.appendChild(speedRow);
+      }
+      if (!document.getElementById("reflow-reference-tools")) {
+        var referenceSection = document.createElement("section");
+        referenceSection.id = "reflow-reference-tools";
+        referenceSection.innerHTML =
+          '<header><h3>Consulta</h3></header>' +
+          '<div class="reflow-reference-tools-card">' +
+            '<button id="reflow-open-glossary" type="button">' +
+              '<span aria-hidden="true">⌕</span><span>Glosario</span>' +
+            '</button>' +
+          '</div>';
+        settingsTab.appendChild(referenceSection);
+      }
+
+      Array.prototype.slice.call(settingsTab.querySelectorAll("span")).forEach(function (label) {
+        if (!/^(abrir idioma|open language)$/i.test(label.textContent.trim())) return;
+        var shortcutRow = label.parentElement;
+        if (shortcutRow) shortcutRow.remove();
+      });
       updateFontControls();
       updateTtsVoiceControls();
+      updateTtsSpeedControls();
       syncEasyReadSwitchVisual();
     }
 
@@ -2273,6 +2543,18 @@
       applyTtsVoice(button.dataset.reflowTtsVoice);
     });
 
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-reflow-tts-speed]");
+      if (!button || typeof window.__adtReflowSetAudioSpeed !== "function") return;
+      window.__adtReflowSetAudioSpeed(Number(button.dataset.reflowTtsSpeed));
+      updateTtsSpeedControls();
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest("#reflow-open-glossary")) return;
+      toggleRuntimePanel(["Glosario", "Glossary"]);
+    });
+
     mountInSettingsPanel();
     if (interfaceContainer) {
       new MutationObserver(mountInSettingsPanel).observe(interfaceContainer, {
@@ -2280,6 +2562,18 @@
         subtree: true
       });
     }
+  }
+
+  function updateTtsSpeedControls() {
+    var speed = typeof window.__adtReflowGetAudioSpeed === "function"
+      ? Number(window.__adtReflowGetAudioSpeed())
+      : 1;
+    if (!Number.isFinite(speed)) speed = 1;
+    document.querySelectorAll("[data-reflow-tts-speed]").forEach(function (button) {
+      var selected = Number(button.dataset.reflowTtsSpeed) === speed;
+      setAttributeIfChanged(button, "aria-checked", selected);
+      setAttributeIfChanged(button, "aria-pressed", selected);
+    });
   }
 
   /* Word-by-word tracking becomes visually unreliable once narration is
@@ -2437,6 +2731,8 @@
       var text = normalized(panel.textContent);
       if (/configuración|lectura fácil|texto a voz|tamaño de letra/i.test(text)) {
         panel.classList.add("reflow-accessibility-panel");
+        if (heading && /^configuración$/i.test(headingText)) heading.textContent = "Herramientas";
+        panel.setAttribute("aria-label", "Herramientas");
         return;
       }
 
@@ -2901,6 +3197,7 @@
     function pageStablePanelInteraction(target) {
       if (!target || !target.closest) return null;
       var dockTrigger = target.closest(
+        '#reflow-index, #reflow-tools, #reflow-open-glossary, ' +
         'button[aria-label="Menú principal"], button[aria-label="Glosario"], ' +
         'button[aria-label="Activar texto a voz"], button[aria-label="Desactivar texto a voz"], ' +
         'button[aria-label="Idioma"], button[aria-label="Configuración"]'
@@ -7576,6 +7873,7 @@
     window.__adtReflowSyncChatContinuation = syncChapterOneChatContinuation;
     window.__adtReflowSyncSceneSeparators = reconcileSceneSeparatorTts;
     window.__adtReflowStartFromSettings = startTtsFromSettings;
+    window.__adtReflowStartFromUserGesture = startTtsFromUserGesture;
     window.__adtReflowStopFromSettings = stopTtsFromSettings;
     window.__adtReflowShouldPauseAfterItem = function (item) {
       if (!item || !item.el || !item.el.closest) return false;
@@ -7916,7 +8214,7 @@
     }, 90);
   }
 
-  function scheduleTtsAlignment(targetPage, forceResume) {
+  function scheduleTtsAlignment(targetPage, forceResume, immediate) {
     window.clearTimeout(state.ttsTimer);
     state.ttsAligning = true;
     state.ttsDesiredPage = targetPage;
@@ -7930,9 +8228,13 @@
     stopQuizFeedbackAudio();
     if (api && api.pause) api.pause();
     if (state.ttsAudio) state.ttsAudio.muted = true;
-    state.ttsTimer = window.setTimeout(function () {
+    if (immediate) {
       alignTtsToPage(targetPage);
-    }, 40);
+    } else {
+      state.ttsTimer = window.setTimeout(function () {
+        alignTtsToPage(targetPage);
+      }, 40);
+    }
   }
 
   async function loadRuntime() {
@@ -7947,8 +8249,10 @@
       'window.__adtReflowCaptureTtsPages&&window.__adtReflowCaptureTtsPages(O);' +
       'return(0,pt.useEffect)';
     var autoStartMarker = 'o.current||O.length!==0&&g&&P.current&&(o.current=!0,A(0))';
-    var autoStartReplacement = 'o.current||O.length!==0&&g&&P.current&&(o.current=!0,' +
-      'A(window.__adtReflowTargetIndex?window.__adtReflowTargetIndex(O):0))';
+    /* Chrome forbids audible playback during initial document load. Preserve
+       the enabled preference, but wait for the explicit Leer action before
+       starting; autoplay continues to govern transitions after that click. */
+    var autoStartReplacement = 'o.current||O.length!==0&&g&&P.current&&(o.current=!0)';
     var manualStartMarker = 'A(i||0)},[O.length,i,A,u,r,b])';
     var manualStartReplacement = 'A(window.__adtReflowResumeIndex?' +
       'window.__adtReflowResumeIndex(O,i):' +
@@ -7958,13 +8262,18 @@
     var speakerOpenReplacement = 'd=()=>{a(!0),c("audio")};';
     var settingsStartMarker = 'onChange:O("ReadAloud",f)';
     var settingsStartReplacement = 'onChange:w=>{O("ReadAloud",f)(w),' +
-      'w?window.__adtReflowStartFromSettings&&window.__adtReflowStartFromSettings():' +
+      'w?window.__adtReflowStartFromUserGesture&&window.__adtReflowStartFromUserGesture():' +
       'window.__adtReflowStopFromSettings&&window.__adtReflowStopFromSettings()}';
+    var settingsVisibilityMarker = 'I=o.readAloud||!!o.easyRead,N=p;return';
+    var settingsVisibilityReplacement = 'I=o.readAloud||!!o.easyRead,N=!0;return';
     var sharedReadAloudMarker = 'var Bu=L(Y(),1),qF=De();';
     var sharedReadAloudReplacement = sharedReadAloudMarker +
+      'window.__adtReflowSetDockMenu=v=>qF.set(No,v);' +
+      'window.__adtReflowGetDockMenu=()=>qF.get(No);' +
       'window.__adtReflowSetReadAloud=w=>{on("ReadAloud",w),qF.set(Bi,w)};' +
       'window.__adtReflowSetWordHighlight=w=>{on("WordHighlight",w),qF.set(Iy,w)};' +
       'window.__adtReflowGetWordHighlight=()=>qF.get(Iy);' +
+      'window.__adtReflowSetAudioSpeed=w=>qF.set(Ay,w);' +
       'window.__adtReflowGetAudioSpeed=()=>qF.get(Ay);' +
       'window.__adtReflowGetAutoplay=()=>qF.get(Ey);';
     var wordTimingMarker = 'function hL(e,t,o,n){return n&&n.length>0?n:' +
@@ -8078,6 +8387,7 @@
       !source.includes(manualStartMarker) ||
       !source.includes(speakerOpenMarker) ||
       !source.includes(settingsStartMarker) ||
+      !source.includes(settingsVisibilityMarker) ||
       !source.includes(sharedReadAloudMarker) ||
       !source.includes(wordTimingMarker) ||
       !source.includes(easyReadTimingGateMarker) ||
@@ -8106,6 +8416,7 @@
       .replace(manualStartMarker, manualStartReplacement)
       .replace(speakerOpenMarker, speakerOpenReplacement)
       .replace(settingsStartMarker, settingsStartReplacement)
+      .replace(settingsVisibilityMarker, settingsVisibilityReplacement)
       .replace(sharedReadAloudMarker, sharedReadAloudReplacement)
       .replace(wordTimingMarker, wordTimingReplacement)
       .replace(easyReadTimingGateMarker, easyReadTimingGateReplacement)
@@ -8132,11 +8443,23 @@
   }
 
   async function waitForLayout() {
+    function settleWithin(promise, timeout) {
+      return Promise.race([
+        Promise.resolve(promise).catch(function () {}),
+        new Promise(function (resolve) {
+          window.setTimeout(resolve, timeout);
+        })
+      ]);
+    }
+
     if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
+      /* A failed local font request can leave Chromium's font set pending for
+         an unbounded period. Fonts improve the final measurement, but must
+         never prevent the reader controls from becoming available. */
+      await settleWithin(document.fonts.ready, 2500);
     }
     var images = Array.prototype.slice.call(content.querySelectorAll("img"));
-    await Promise.all(images.map(function (image) {
+    var imageSettlements = Promise.all(images.map(function (image) {
       if (image.complete) return Promise.resolve();
       if (image.decode) return image.decode().catch(function () {});
       return new Promise(function (resolve) {
@@ -8144,6 +8467,10 @@
         image.addEventListener("error", resolve, { once: true });
       });
     }));
+    /* The book contains images for every page. A single stalled decode must
+       not hold the complete interface hostage; late assets are handled by
+       the existing layout observers after the first usable render. */
+    await settleWithin(imageSettlements, 4000);
     await new Promise(function (resolve) {
       requestAnimationFrame(function () { requestAnimationFrame(resolve); });
     });

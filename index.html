@@ -9,7 +9,7 @@
     <meta name="page-section-id" content="1" />
     <link href="./content/tailwind_output.css?v=2-sentence-case" rel="stylesheet">
     <link href="./content/viewport-layout.css" rel="stylesheet">
-    <link href="./content/reflow.css?v=50-sentence-case" rel="stylesheet">
+    <link href="./content/reflow.css?v=55-tools-speed-control" rel="stylesheet">
     <link href="./assets/libs/fontawesome/css/all.min.css" rel="stylesheet">
     <link rel="preload" href="./assets/fonts/AtkinsonHyperlegible-400-latin.woff2?v=2-atkinson-runtime" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="./assets/fonts/AtkinsonHyperlegible-700-latin.woff2?v=2-atkinson-runtime" as="font" type="font/woff2" crossorigin>
@@ -39,9 +39,13 @@
 
     <div class="relative z-50" id="interface-container"></div>
     <div class="relative z-50" id="nav-container"></div>
-    <script src="./assets/offline-preloader.js?v=48-sentence-case"></script>
+    <script>
+      if (window.location.protocol === "file:") {
+        document.write('<script src="./assets/offline-preloader.js?v=53-protocol-gated"><\/script>');
+      }
+    </script>
     <script src="./assets/scorm.js"></script>
-  <script src="./assets/reflow-book.js?v=47-full-book-146-quiz-control-reverted"></script>
+  <script src="./assets/reflow-book.js?v=56-no-load-autoplay"></script>
     <script src="./assets/quiz-sequence.js?v=6-force-enviar"></script>
 </body>
 

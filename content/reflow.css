@@ -58,14 +58,8 @@
   }
 }
 
-/* Below that physical width a 300 px panel and a useful two-column book
-   cannot coexist without overlap. Treat the panel as a modal surface and
-   temporarily hide the book rather than covering readable content. */
-@media (max-width: 71.999rem) {
-  body.reflow-book:has(.reflow-reader-panel) main {
-    visibility: hidden;
-  }
-}
+/* At narrower widths panels overlay the stable reader viewport. Opening a
+   panel never changes the book geometry or temporarily removes its content. */
 
 html,
 body.reflow-book {
@@ -1071,36 +1065,76 @@ body.reflow-book .tts-image-highlight-overlay {
   position: fixed;
   z-index: 64;
   left: 50%;
-  bottom: .5rem;
+  bottom: 0;
   transform: translateX(-50%);
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(7rem, 1.15fr)
+    minmax(6.5rem, 1fr)
+    5.25rem
+    minmax(6.5rem, 1fr)
+    minmax(6rem, 1fr)
+    minmax(8.5rem, 1.2fr);
   align-items: center;
-  justify-content: center;
-  gap: .45rem;
-  min-height: 2.75rem;
-  padding: 0 .35rem;
-  border: 0;
-  border-radius: .7rem;
+  gap: .25rem;
+  width: min(100vw, 62rem);
+  min-height: 4rem;
+  padding: .375rem .5rem;
+  border: 1px solid var(--ceibal-gray-700);
+  border-bottom: 0;
+  border-radius: var(--ceibal-radius-lg) var(--ceibal-radius-lg) 0 0;
   color: #f8fafc;
-  background: transparent;
-  box-shadow: none;
+  background: rgb(24 24 24 / 96%);
+  box-shadow: 0 -.25rem 1rem rgb(0 0 0 / 18%);
+  backdrop-filter: blur(.75rem);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+#reflow-pagination.reflow-primary-toolbar-pending,
+#reflow-pagination.reflow-primary-toolbar-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 150%);
 }
 
 #reflow-pagination button {
   display: inline-flex;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 3.25rem;
   align-items: center;
   justify-content: center;
+  gap: .5rem;
+  padding: .5rem .65rem;
   border: 0;
   border-radius: var(--ceibal-radius-md);
   color: #f8fafc;
   background: rgb(255 255 255 / 8%);
-  font-size: 1.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
   cursor: pointer;
 }
 
+#reflow-pagination .reflow-toolbar-icon {
+  flex: 0 0 auto;
+  min-width: 1.35rem;
+  font-size: 1.35rem;
+  line-height: 1;
+  text-align: center;
+}
+
+#reflow-pagination .reflow-toolbar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #reflow-pagination button:hover:not(:disabled) { background: rgb(255 255 255 / 16%); }
+#reflow-pagination button[aria-expanded="true"],
+#reflow-pagination button[aria-pressed="true"] {
+  background: var(--ceibal-institutional-500);
+}
 #reflow-pagination button:focus-visible {
   outline: 3px solid var(--ceibal-focus-on-dark);
   outline-offset: 2px;
@@ -1108,10 +1142,67 @@ body.reflow-book .tts-image-highlight-overlay {
 #reflow-pagination button:disabled { opacity: .35; cursor: default; }
 
 #reflow-page-status {
-  min-width: 4.8rem;
+  min-width: 5.25rem;
   text-align: center;
   font-size: 1rem;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+/* Keep the component-base dock mounted as a state and panel bridge. Its
+   controls remain programmatically operable, but only the simplified primary
+   toolbar is presented visually and to pointer users. */
+#nav-container [role="group"]:has([data-testid="dock-skeleton"]),
+#nav-container [role="group"]:has(button[aria-label="Menú principal"]),
+#nav-container [role="group"]:has(button[aria-label="Main Menu"]),
+body.reflow-book .reflow-upstream-dock {
+  position: fixed !important;
+  inset: auto 0 0 auto !important;
+  width: 1px !important;
+  min-width: 0 !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+@media (max-width: 47.999rem) {
+  #reflow-pagination {
+    grid-template-columns: 2.75rem 2.75rem minmax(3.75rem, 1fr) 2.75rem 2.75rem 2.75rem;
+    gap: .125rem;
+    width: 100vw;
+    padding: .375rem;
+    border-inline: 0;
+    border-radius: 0;
+  }
+
+  #reflow-pagination button {
+    min-height: 2.75rem;
+    padding: .25rem;
+  }
+
+  #reflow-pagination .reflow-toolbar-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #reflow-page-status {
+    min-width: 3.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #reflow-pagination { transition: none; }
 }
 
 /* The activity submit dock must not float over ordinary reading pages. */
@@ -1934,6 +2025,58 @@ body.reflow-book #content .quiz-explanation-bank {
   letter-spacing: .06em;
 }
 
+#reflow-reference-tools {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding: 1rem 0;
+}
+
+#reflow-reference-tools > header {
+  padding: 0 0 .5rem;
+}
+
+#reflow-reference-tools h3 {
+  margin: 0;
+  color: rgb(255 255 255 / 58%);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.reflow-reference-tools-card {
+  padding: var(--ceibal-space-3);
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: var(--ceibal-radius-lg);
+  background: rgb(0 0 0 / 44%);
+}
+
+#reflow-open-glossary {
+  display: flex;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: var(--ceibal-space-2);
+  padding: var(--ceibal-space-2) var(--ceibal-space-3);
+  border: 1px solid var(--ceibal-gray-600);
+  border-radius: var(--ceibal-radius-md);
+  color: var(--ceibal-gray-50);
+  background: rgb(255 255 255 / 7%);
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#reflow-open-glossary:hover {
+  border-color: var(--ceibal-institutional-300);
+  background: rgb(126 196 191 / 16%);
+}
+
+#reflow-open-glossary:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+}
+
 .reflow-font-settings-card {
   display: flex;
   flex-direction: column;
@@ -2062,9 +2205,7 @@ body.reflow-book .reflow-reader-panel.reflow-accessibility-panel {
 }
 
 body.reflow-book .reflow-reader-panel.reflow-language-panel {
-  width: min(18rem, 100vw) !important;
-  max-width: min(18rem, 100vw) !important;
-  border-radius: var(--ceibal-radius-md) 0 0 var(--ceibal-radius-md) !important;
+  display: none !important;
 }
 
 body.reflow-book .reflow-panel-pending {
@@ -2521,6 +2662,58 @@ body.reflow-book #content .book-cover-final .book-cover-site {
 
 .reflow-tts-voice-options > button[hidden] {
   display: none !important;
+}
+
+/* Playback speed belongs to the consolidated Tools panel. A two-column
+   segmented control keeps all four choices readable at the compact width. */
+#reflow-tts-speed-setting {
+  box-sizing: border-box;
+  display: grid !important;
+  gap: .5rem !important;
+  width: 100% !important;
+  padding: .75rem .5rem !important;
+  border-top: 1px solid var(--ceibal-gray-800) !important;
+}
+
+#reflow-tts-speed-label {
+  color: var(--ceibal-gray-100) !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+
+.reflow-tts-speed-options {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .25rem;
+  width: 100% !important;
+  padding: .25rem;
+  border-radius: var(--ceibal-radius-md);
+  background: #252525;
+}
+
+.reflow-tts-speed-options button {
+  min-width: 0 !important;
+  min-height: 2.75rem;
+  padding: .5rem .35rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .6rem !important;
+  color: var(--ceibal-gray-300) !important;
+  background: transparent !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+
+.reflow-tts-speed-options button[aria-checked="true"] {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-500) !important;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 22%);
+}
+
+.reflow-tts-speed-options button:focus-visible {
+  outline: 3px solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px !important;
 }
 
 /* Glossary: same surface, controls and active-state hierarchy as Index and
