@@ -2641,7 +2641,8 @@ body.reflow-book [role="dialog"][role="dialog"] * {
 body.reflow-book .reflow-reader-panel {
   width: min(18.75rem, 100vw) !important;
   max-width: min(18.75rem, 100vw) !important;
-  animation: none !important;
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
   transition: none !important;
 }
 
@@ -2782,6 +2783,16 @@ body.reflow-book .reflow-panel-pending {
   visibility: hidden !important;
 }
 
+/* Stock switches and segmented buttons restore their saved state with
+   150 ms transitions. Suppress those transitions only while Tools performs
+   its first hidden paint, then release them two frames after the complete
+   state is visible so later user interactions remain animated. */
+body.reflow-book .reflow-accessibility-panel.reflow-panel-pending *,
+body.reflow-book .reflow-accessibility-panel.reflow-settings-first-paint * {
+  animation: none !important;
+  transition: none !important;
+}
+
 body.reflow-book .reflow-reader-panel.reflow-glossary-panel {
   width: min(18.75rem, 100vw) !important;
   max-width: min(18.75rem, 100vw) !important;
@@ -2855,6 +2866,32 @@ body.reflow-book .reflow-accessibility-panel
 body.reflow-book .reflow-accessibility-panel
   [role="group"]:has(> span + div > [role="radio"]) > div > [role="radio"] {
   padding-inline: .45rem !important;
+}
+
+/* The availability hint is a third child of the Resaltado group. Keep it on
+   its own line so it cannot squeeze or overlap the segmented control in the
+   narrow Tools panel. */
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center !important;
+  column-gap: .5rem !important;
+  row-gap: .25rem !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] > div {
+  grid-column: 2;
+  justify-self: end;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"]
+  > #reflow-highlight-requirement {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-top: 0;
 }
 
 /* The second navigation tab needs slightly more room than the first one.

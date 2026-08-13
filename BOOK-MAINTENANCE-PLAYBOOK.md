@@ -1255,6 +1255,474 @@ Retirar los cortes progresivos y el límite móvil de los paneles, eliminar `dat
 
 ---
 
+## Acción 19: limitar el resaltado del glosario a la página visible
+
+### Objetivo
+
+Evitar que «Resaltar palabras» bloquee la navegación o provoque que el navegador marque la página como no disponible en libros extensos.
+
+### Procedimiento
+
+1. No recorrer todos los nodos de texto del libro en cada cambio de página.
+2. Tratar cada hijo directo de `#content` como una raíz de contenido importado.
+3. Calcular el intervalo visual de cada raíz mediante su primer y último anclaje semántico renderizado (`data-id` o `data-reflow-anchor-id`).
+4. Recorrer y medir únicamente las raíces cuyo intervalo contiene la página visible.
+5. Mantener el filtrado final por geometría para excluir fragmentos que pertenecen a otra columna de una raíz multipágina.
+6. Permitir el recorrido completo solo en vistas breves de una o dos páginas que todavía no expongan anclajes; no usarlo como respaldo para el libro completo.
+7. Versionar `reflow-book.js` en `index.html` para invalidar la copia anterior.
+
+### Validación
+
+- Activar «Resaltar palabras» y recorrer varias páginas consecutivas con términos y sin ellos.
+- Confirmar que los resaltados pertenecen exclusivamente a la página visible.
+- Probar la primera y la última página para detectar errores de límites.
+- Abrir el glosario y confirmar que «En esta página» continúa usando el mismo conjunto de texto visible.
+- Ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Resultado obtenido
+
+- Antes del cambio, una navegación con resaltado activo demoró aproximadamente `9,7 s`; con el resaltado apagado demoró `1,2 s`.
+- Después del cambio, cinco páginas consecutivas con resaltado activo respondieron entre `0,36 s` y `0,39 s`.
+- La página 6 conservó nueve términos resaltados y respondió sin congelarse.
+- Inicio y final respondieron en aproximadamente `0,25 s` y `0,22 s`, respectivamente.
+- La adaptación móvil no era la causa: el bloqueo provenía del recorrido geométrico completo del glosario.
+
+### Riesgos y excepciones
+
+- El contenido textual que deba participar del glosario necesita al menos un anclaje semántico renderizado dentro de su raíz importada.
+- Una raíz puede abarcar varias columnas; por eso no basta con comprobar solamente el primer anclaje y se conserva el filtrado final de cada nodo candidato.
+- No volver a introducir un respaldo de libro completo cuando no se encuentren raíces en una página ya paginada: es preferible omitir un resaltado transitorio a bloquear toda la interfaz.
+- Repetir esta prueba con el glosario activado después de modificar la estructura de importación o la paginación.
+
+### Reversión
+
+Restaurar el recorrido completo de `#content`, retirar `glossaryRootsForVisualPage` y volver a la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 20: evitar ciclos al montar el panel Herramientas
+
+### Objetivo
+
+Impedir que la apertura de «Herramientas» congele o cierre la página por un ciclo de mutaciones de la interfaz.
+
+### Procedimiento
+
+1. Revisar los `MutationObserver` instalados sobre el contenedor de la interfaz cuando un panel deja de responder sin registrar una excepción de JavaScript.
+2. No reescribir `textContent`, atributos ni clases cuando el valor final ya es el correcto.
+3. Agrupar las ráfagas de mutaciones del componente base en una sola ejecución mediante `requestAnimationFrame`.
+4. Mantener las inserciones personalizadas protegidas por identificadores únicos para no duplicar controles.
+5. Versionar `reflow-book.js` en `index.html` para invalidar la copia anterior.
+
+### Validación
+
+- Abrir y cerrar «Herramientas» al menos cinco veces consecutivas.
+- Confirmar que el cierre devuelve el foco al botón «Herramientas».
+- Comprobar que existe un solo panel y una sola copia de cada grupo personalizado.
+- Navegar de página después de cerrar el panel y volver a abrirlo.
+- Revisar la consola y ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Resultado obtenido
+
+- El observador ya no reacciona indefinidamente a los cambios de texto que él mismo produce.
+- Cinco aperturas consecutivas completaron correctamente; las reaperturas demoraron aproximadamente `1,0–1,2 s` dentro del navegador de prueba.
+- El foco volvió al botón «Herramientas» después de cada cierre.
+- Permaneció una sola instancia del panel y de los grupos de tamaño de fuente, audio y atajos.
+
+### Riesgos y excepciones
+
+- Toda personalización futura dentro de `#interface-container` debe ser idempotente porque ese árbol continúa observado.
+- No ejecutar trabajo pesado directamente por cada registro del observador; conservar la agrupación por cuadro.
+- Si el componente base cambia su estructura, revisar selectores y recuentos sin retirar la protección contra ciclos.
+
+### Reversión
+
+Retirar `scheduleSettingsPanelMount` y `setTextContentIfChanged`, restaurar el observador anterior y volver a la versión previa de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 21: reducir la carga inicial de voces y el trabajo por navegación
+
+### Objetivo
+
+Evitar descargar catálogos TTS que todavía no se usan y eliminar mediciones y actualizaciones duplicadas en cada cambio de página.
+
+### Procedimiento
+
+1. Cargar al inicio únicamente `audios.json` y `timecodes.json` de la voz guardada.
+2. Mantener la otra voz visible y cargar su catálogo al seleccionarla por primera vez.
+3. Reutilizar la misma promesa si una voz se solicita mientras su descarga continúa.
+4. Si la voz inicial falla, intentar la alternativa antes de iniciar el runtime.
+5. Calcular una sola vez por repaginación qué columnas contienen actividades y páginas finales.
+6. Consultar ese mapa en cada navegación, en lugar de medir nuevamente todos los paneles con `getClientRects()`.
+7. Ignorar el evento `scroll` generado por `goToPage` cuando la página calculada ya coincide con el estado confirmado.
+8. Actualizar el índice dinámico desde `updateControls` solamente mientras el índice está abierto.
+9. Versionar `reflow-book.js` en `index.html`.
+
+### Validación
+
+- Recargar con Valentina seleccionada y confirmar que Mateo permanece disponible.
+- Seleccionar Mateo, esperar su carga bajo demanda y regresar a Valentina.
+- Reproducir y pausar audio, comprobando archivo, voz y marcas temporales.
+- Recorrer al menos diez páginas con el glosario y la lectura en voz alta habilitados.
+- Confirmar que una repaginación reconstruye los mapas de actividades y páginas finales.
+- Ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Resultado obtenido
+
+- El arranque deja de descargar y analizar aproximadamente `8,4 MB` correspondientes a la voz no seleccionada.
+- Mateo se cargó correctamente bajo demanda y Valentina volvió a seleccionarse sin recargar la página.
+- La reproducción con Valentina resolvió el archivo esperado y `33` marcas temporales; Pausar respondió correctamente.
+- Diez cambios de página consecutivos completaron sin bloqueos ni errores de consola.
+- Las 24 actividades se miden al reconstruir la paginación, no en cada pulsación de Anterior o Siguiente.
+- El único mensaje de consola restante fue el aviso conocido del runtime al forzar la presentación del contenido después de su espera de seguridad.
+
+### Riesgos y excepciones
+
+- La primera selección de una voz que todavía no se usó depende de que sus dos catálogos puedan descargarse y analizarse.
+- No desactivar ni ocultar una voz con estado `idle`: debe seguir disponible para iniciar su carga bajo demanda.
+- Reconstruir los mapas de páginas después de cualquier cambio que modifique la geometría del libro.
+- Conservar el respaldo secuencial cuando la voz guardada no esté disponible.
+
+### Reversión
+
+Restaurar la carga simultánea de ambos catálogos, retirar `rebuildPageKindCache` y volver a la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 22: evitar demora y destello al abrir Herramientas
+
+### Objetivo
+
+Mostrar Herramientas únicamente cuando su estructura y valores actuales estén preparados, y evitar trabajo de navegación innecesario durante su apertura.
+
+### Procedimiento
+
+1. Mantener la protección temporal de página para cambios tardíos reales del componente base.
+2. Antes de restaurar una página protegida, comparar tanto `state.current` como el `scrollLeft` objetivo.
+3. Retornar inmediatamente cuando la columna no se haya movido; no recalcular anclas, controles ni resaltados.
+4. Considerar listo el panel de accesibilidad solamente cuando tenga `.reflow-settings-organized`.
+5. Exigir también los grupos personalizados de tamaño, voz y velocidad y una opción seleccionada en cada uno.
+6. Conservar `reflow-panel-pending` hasta cumplir esas condiciones, aprovechando `visibility: hidden` para impedir el primer pintado incompleto.
+7. Versionar `reflow-book.js` en `index.html`.
+
+### Validación
+
+- Abrir y cerrar Herramientas cinco veces consecutivas.
+- Confirmar que la página visual no cambia y que el cierre devuelve el foco a Herramientas.
+- Verificar en cada apertura que el panel esté organizado y ya no tenga el estado pendiente.
+- Probar una velocidad no predeterminada, cerrar, reabrir y confirmar que se muestre seleccionada desde el estado listo.
+- Navegar a la página siguiente y regresar después de las pruebas.
+- Revisar consola y ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Resultado obtenido
+
+- Cinco aperturas consecutivas conservaron la página 7 y devolvieron el foco al botón Herramientas.
+- La medición del navegador bajó de aproximadamente `1,9–2,3 s` a `1,8 s` en las reaperturas; la primera apertura quedó en `2,0 s`.
+- El panel apareció organizado y con Normal, Valentina y velocidad Normal ya seleccionados.
+- La velocidad Rápida persistió al cerrar y reabrir; después se restauró Normal.
+- La navegación 7 → 8 → 7 continuó funcionando y no se registraron errores de consola.
+
+### Riesgos y excepciones
+
+- Si el componente base deja de renderizar alguno de los tres grupos requeridos, el panel permanecerá pendiente hasta agotar el respaldo de seguridad existente.
+- No retirar los controles de readiness sin reemplazarlos: revelar el panel al detectar solamente un `section` o `switch` reintroduce el destello.
+- Conservar los puntos de comprobación tardíos de página; el retorno rápido debe omitir solo el caso en el que no hubo desplazamiento.
+
+### Reversión
+
+Restaurar la comprobación básica de contenido del panel, retirar el retorno rápido de `restorePanelTogglePage` y volver a la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 23: sincronizar los estados nativos antes de mostrar Herramientas
+
+### Objetivo
+
+Evitar que «Activar lectura en voz alta» y «Resaltado: Palabra» aparezcan desmarcados y se activen después de que Herramientas ya sea visible.
+
+### Procedimiento
+
+1. Capturar el estado efectivo de lectura en voz alta y el modo de resaltado justo antes de abrir Herramientas.
+2. No usar como referencia el estado transitorio del panel recién montado, porque el componente base lo inicializa con valores predeterminados.
+3. Mantener `reflow-panel-pending` mientras el interruptor de lectura no coincida con la sesión capturada.
+4. Mantener también el panel pendiente mientras Palabra/Oración no coincida con `__adtReflowGetWordHighlight()`.
+5. Marcar la instancia como `data-reflow-initial-settings-ready="true"` cuando ambas comprobaciones se cumplan.
+6. Después del primer pintado listo, permitir cambios del usuario sin volver a ocultar el panel.
+7. Versionar `reflow-book.js` en `index.html`.
+
+### Validación
+
+- Abrir Herramientas varias veces con lectura en voz alta y Palabra activadas.
+- Confirmar que el panel visible ya tenga ambos estados marcados y no conserve `reflow-panel-pending`.
+- Desactivar lectura en voz alta, reabrir y comprobar el estado OFF desde la primera vista lista.
+- Volver a activar, reabrir y comprobar el estado ON.
+- Restaurar las preferencias originales, revisar página y consola.
+
+### Resultado obtenido
+
+- Tres reaperturas consecutivas mostraron `Lectura en voz alta = true` y `Palabra = true` desde el estado visible listo.
+- El caso OFF también apareció correctamente antes de retirar la ocultación preventiva.
+- Al reactivar, la siguiente apertura volvió a mostrar ON correctamente.
+- La página 7 se conservó y no se registraron errores de consola.
+
+### Riesgos y excepciones
+
+- Capturar el estado antes de solicitar el panel; hacerlo después permite que el valor predeterminado de React contamine la referencia.
+- Aplicar la condición estricta solamente al primer pintado de cada instancia. Si se mantiene durante toda la vida del panel, una modificación voluntaria podría ocultarlo.
+- Si el runtime deja de exponer `__adtReflowGetWordHighlight`, omitir únicamente esa comparación y conservar la de lectura en voz alta.
+
+### Reversión
+
+Retirar los estados esperados y `data-reflow-initial-settings-ready`, volver al criterio estructural de la Acción 22 y restaurar la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 24: eliminar la transición visual inicial de los controles
+
+### Objetivo
+
+Evitar que un estado semánticamente correcto termine de animarse después de que Herramientas ya sea visible.
+
+### Procedimiento
+
+1. No limitar la comprobación a `aria-checked`: el interruptor base pinta su estado mediante `data-checked` o `data-unchecked` tanto en el control como en su thumb.
+2. Confirmar que Palabra/Oración tenga también las clases visuales activa e inactiva esperadas.
+3. Añadir `reflow-settings-first-paint` cuando todos los estados semánticos y visuales coincidan.
+4. Desactivar `animation` y `transition` en el panel pendiente y durante ese primer pintado.
+5. Retirar la clase después de dos cuadros para que las interacciones posteriores conserven sus animaciones normales.
+6. Versionar tanto `reflow.css` como `reflow-book.js`.
+
+### Validación
+
+- Abrir Herramientas con Lectura en voz alta y Palabra activadas.
+- Confirmar `aria-checked`, `data-checked`, el thumb y las clases activas antes de considerar el panel listo.
+- Repetir con Lectura en voz alta desactivada y comprobar `data-unchecked` en control y thumb.
+- Reactivar, reabrir y confirmar el estado visual ON.
+- Revisar consola y ejecutar las comprobaciones estáticas.
+
+### Resultado obtenido
+
+- El estado ON apareció con interruptor, thumb y Palabra ya pintados como activos.
+- El estado OFF apareció con `data-unchecked` en interruptor y thumb antes de retirar la ocultación.
+- Tras reactivar, la apertura volvió a mostrar ON y Palabra con sus clases visuales finales.
+- No se registraron errores de consola.
+
+### Riesgos y excepciones
+
+- Las comprobaciones de clases dependen del componente base actual (`bg-background`, `shadow-sm` y `text-muted-foreground`). Revisarlas si cambia el sistema de estilos upstream.
+- No mantener las transiciones desactivadas durante toda la vida del panel; la supresión pertenece únicamente al primer pintado.
+- Conservar la comprobación semántica además de la visual para no depender solamente de clases CSS.
+
+### Reversión
+
+Retirar `reflow-settings-first-paint`, las comprobaciones visuales y sus reglas CSS, y restaurar las versiones anteriores de `reflow.css` y `reflow-book.js` indicadas en `index.html`.
+
+---
+
+## Acción 25: evitar superposiciones en la opción Resaltado
+
+### Objetivo
+
+Mantener legibles la etiqueta, el selector Palabra/Oración y la explicación de disponibilidad dentro del panel estrecho de Herramientas.
+
+### Procedimiento
+
+1. Tratar la fila Resaltado como una cuadrícula de dos columnas.
+2. Mantener la etiqueta y el selector segmentado en la primera línea.
+3. Colocar `#reflow-highlight-requirement` en una segunda línea que abarque todo el ancho.
+4. Conservar `hidden` como fuente de verdad cuando la lectura en voz alta está activa.
+5. Versionar `reflow.css` para evitar que la caché conserve la distribución anterior.
+
+### Validación
+
+- Probar con lectura en voz alta desactivada y medir etiqueta, selector y explicación.
+- Confirmar que ninguna intersección tenga superficie mayor que cero.
+- Activar lectura en voz alta, reabrir Herramientas y comprobar que la explicación se oculta.
+- Verificar que el selector completo permanezca dentro de los límites de la fila.
+
+### Resultado obtenido
+
+- En una fila de `236 px`, el selector recuperó `140,5 px` de ancho y quedó completamente visible.
+- La explicación ocupó una segunda línea de `228 px` sin solaparse con la etiqueta ni con el selector.
+- Las tres mediciones de superposición dieron `0 px²`.
+- En estado activo, la explicación quedó oculta y la fila volvió a una altura compacta de `69 px`.
+
+### Riesgos y excepciones
+
+- La regla depende de las clases `reflow-setting-highlight` y del identificador `reflow-highlight-requirement`; deben conservarse si cambia el componente base.
+- No aplicar la cuadrícula a todos los grupos segmentados: otras filas no incluyen una explicación como tercer hijo.
+
+### Reversión
+
+Retirar las reglas específicas de `.reflow-setting-highlight[role="group"]` y restaurar la versión anterior de `reflow.css` indicada en `index.html`.
+
+---
+
+## Acción 26: estabilizar el clic al reaparecer la barra autooculta
+
+### Objetivo
+
+Permitir que los botones de la barra principal, especialmente Herramientas, respondan al primer clic después de reaparecer por proximidad del puntero.
+
+### Procedimiento
+
+1. Mantener la protección que detiene los gestos del lector base sobre la barra personalizada.
+2. Antes de detener `pointerdown` o `mousedown`, identificar el botón pulsado en la barra principal o el reproductor.
+3. Dar foco programáticamente al botón sin desplazar el documento.
+4. Sincronizar inmediatamente la barra para que `:focus-within` la mantenga inmóvil durante toda la secuencia del clic.
+5. Versionar `reflow-book.js` para evitar que Chrome conserve el controlador anterior.
+
+### Validación
+
+- Activar Ocultar menús automáticamente.
+- Alejar el puntero y confirmar que la barra sale del área visible.
+- Acercar el puntero al borde inferior y comprobar que la barra reaparece.
+- Pulsar Herramientas una sola vez y verificar que el panel se abre y permanece visible.
+- Repetir por teclado para confirmar que no se altera su comportamiento.
+- Revisar la consola de Chrome.
+
+### Resultado obtenido
+
+- Antes del cambio, el clic ocultaba la barra y Herramientas permanecía cerrado.
+- Después del cambio, la misma secuencia abrió un panel visible de `288 × 418 px` que permaneció abierto tras la espera.
+- La activación mediante `Enter` continuó abriendo Herramientas correctamente.
+- No se registraron errores de JavaScript.
+
+### Riesgos y excepciones
+
+- El foco programático debe ejecutarse antes de `stopImmediatePropagation`; hacerlo después no evita que el botón se desplace antes de recibir `click`.
+- La corrección se limita a botones de `#reflow-pagination` y `#reflow-tts-player` para no modificar el foco de otros controles.
+
+### Reversión
+
+Retirar el bloque `pressedControl` de `preserveTtsPanel` y restaurar la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 27: activar caché selectiva en el servidor local
+
+### Objetivo
+
+Evitar que cada recarga vuelva a transferir todos los recursos pesados sin permitir que `index.html` o archivos en desarrollo queden desactualizados.
+
+### Procedimiento
+
+1. Servir `index.html` con `Cache-Control: no-cache`.
+2. Servir recursos con parámetro `v` mediante `public, max-age=31536000, immutable`.
+3. Aplicar una caché corta de una hora a imágenes, medios y fuentes sin versión.
+4. Mantener `no-cache` para los demás archivos no versionados.
+5. Reiniciar el servidor local después de modificar su política.
+
+### Validación
+
+- Consultar las cabeceras de `index.html`, un JavaScript versionado y una imagen sin versión.
+- Confirmar respectivamente `no-cache`, caché inmutable anual y caché de una hora.
+- Verificar la sintaxis de `tools/serve-local.js`.
+
+### Resultado obtenido
+
+- `index.html` responde con `Cache-Control: no-cache`.
+- `reflow-book.js?v=100-pointer-release-panel-toggle` responde con `public, max-age=31536000, immutable`.
+- Las imágenes sin versión responden con `public, max-age=3600`.
+
+### Riesgos y excepciones
+
+- Todo recurso con caché inmutable debe cambiar su parámetro `v` al modificarse.
+- Una imagen reemplazada sin cambiar de nombre puede tardar hasta una hora en actualizarse durante desarrollo.
+- Esta mejora reduce transferencias repetidas; no elimina el costo de reconstruir y paginar el DOM completo.
+
+### Reversión
+
+Restaurar `Cache-Control: no-store` en `tools/serve-local.js` y reiniciar el servidor.
+
+---
+
+## Acción 28: cerrar Índice y Herramientas con el mismo botón
+
+### Objetivo
+
+Garantizar el ciclo abrir/cerrar mediante el mismo control incluso cuando Chrome no completa `click` después de una secuencia de autoocultado.
+
+### Procedimiento
+
+1. Derivar el menú visible de los paneles realmente renderizados y usarlo para sincronizar `aria-expanded`.
+2. En `pointerdown` o `mousedown`, registrar el botón pulsado y mantener estable la barra.
+3. En `pointerup` o `mouseup`, abrir, cambiar o cerrar según el botón registrado y el panel visible.
+4. Si el navegador genera después el evento `click`, consumirlo para impedir una segunda acción.
+5. Mantener el flujo normal de `click` para la activación mediante teclado.
+6. Versionar `reflow-book.js`.
+
+### Validación
+
+- Ejecutar con mouse el ciclo Herramientas cerrado → abierto → cerrado.
+- Ejecutar con mouse el ciclo Índice cerrado → abierto → cerrado.
+- Confirmar `aria-expanded="true"` al abrir y `false` al cerrar.
+- Comprobar que no quede ningún diálogo visible y revisar la consola de Chrome.
+
+### Resultado obtenido
+
+- Herramientas completó el ciclo con `open/expanded = true/true` y luego `false/false`.
+- Índice completó el mismo ciclo con `true/true` y luego `false/false`.
+- El navegador integrado repitió ambos ciclos con pulsaciones físicas; Índice llevó el foco a Cerrar y lo devolvió al control de origen.
+- El foco regresó al botón que cerró cada panel.
+- Chrome no registró errores de consola.
+
+### Riesgos y excepciones
+
+- La supresión dura solamente `700 ms` y se limita al identificador del botón cuya acción de puntero ya fue atendida.
+- Deduplicar las parejas pointer/mouse: los navegadores normales emiten ambas, mientras que algunas automatizaciones del navegador integrado solo entregan los eventos de mouse.
+- Ejecutar el cambio al soltar, no al presionar; el runtime puede sobrescribir una escritura realizada durante su propia fase de captura.
+- No extender este cierre anticipado a Anterior o Siguiente: esos controles no representan paneles alternables.
+
+### Reversión
+
+Retirar `visibleRuntimeMenu`, `consumePrimaryPointerAction` y la alternancia anticipada de `preserveTtsPanel`; restaurar la versión anterior de `reflow-book.js` indicada en `index.html`.
+
+---
+
+## Acción 29: completar el ciclo de los paneles en Chrome sin depender del puente del runtime
+
+### Objetivo
+
+Garantizar que Índice y Herramientas abran, cierren y vuelvan a abrir aunque el componente base no exponga `__adtReflowSetDockMenu` y aunque la barra se encuentre autooculta.
+
+### Procedimiento
+
+1. Mantener visible la barra principal mientras exista un menú abierto, aunque el foco haya pasado al botón Cerrar del panel.
+2. Tratar el puente `__adtReflowSetDockMenu` como una optimización opcional. Si no existe, cerrar pulsando el control original que conserve `aria-pressed="true"`.
+3. Capturar en el inicio de la pulsación si la intención era abrir o cerrar, antes de mover el foco.
+4. Usar la ruta de liberación solamente cuando el control no estaba enfocado o la barra estaba fuera del área visible; en los demás casos conservar un único flujo de `click`.
+5. Mantener ininterrumpida la animación de `1ms` del contenedor para que Base UI complete tanto la entrada oculta como la salida. Durante el primer pintado, desactivar solamente animaciones y transiciones de los controles descendientes; quitar la animación del propio panel reinicia `enter` al revelar y puede bloquear el desmontaje.
+6. Incrementar por separado las versiones de `reflow-book.js` y `reflow.css`; los recursos versionados se sirven con caché inmutable.
+
+### Validación
+
+- Recargar Chrome y confirmar la compilación `47-full-book-104`, `document.readyState = complete`, `aria-busy = false` y `document.fonts.status = loaded`.
+- Ejecutar Índice cerrado → abierto → cerrado → abierto y comprobar panel visible, `aria-expanded` y desmontaje final.
+- Ejecutar Herramientas cerrado → abierto → cerrado y comprobar que ya no conserve `reflow-panel-pending` al mostrarse.
+- Confirmar que ambos paneles dejan de estar montados después del cierre y que el foco vuelve al botón de origen.
+- Revisar la consola y las cabeceras del servidor.
+
+### Resultado obtenido
+
+- Índice cerró con `expanded/open/mounted = false/false/false` y volvió a abrir con `true/true/true`.
+- Herramientas abrió listo con `expanded/open/pending = true/true/false` y cerró con `false/false/false`.
+- La prueba se realizó con el puente del runtime ausente, validando expresamente la ruta de respaldo.
+- Chrome no registró errores de consola; Atkinson Hyperlegible terminó cargada.
+
+### Riesgos y excepciones
+
+- `animation: none` sobre el propio panel puede reiniciar `enter` al revelar o dejarlo en `data-closed` y `data-ending-style`; aplicarla únicamente a los descendientes durante el primer pintado.
+- Cambiar un recurso servido como `immutable` sin cambiar su parámetro `v` mantiene la copia anterior en Chrome.
+- Las comprobaciones automáticas deben esperar el montaje del componente base antes de interpretar una apertura como fallida.
+
+### Reversión
+
+Retirar el cierre alternativo por `aria-pressed`, la captura de intención de puntero y la duración de salida de `1ms`; restaurar simultáneamente las versiones anteriores de CSS y JavaScript en `index.html`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

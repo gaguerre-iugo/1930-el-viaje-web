@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  document.documentElement.dataset.reflowBuild = "47-full-book-83";
+  document.documentElement.dataset.reflowBuild = "47-full-book-104";
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -231,8 +231,14 @@
   var fontScales = { normal: 1, large: 1.2, xlarge: 1.4 };
   var ttsVoices = { valentina: "Valentina", mateo: "Mateo" };
   var ttsVoiceCatalogs = {
-    valentina: { audios: Object.create(null), timecodes: Object.create(null), available: false },
-    mateo: { audios: Object.create(null), timecodes: Object.create(null), available: false }
+    valentina: {
+      audios: Object.create(null), timecodes: Object.create(null),
+      available: false, status: "idle", promise: null
+    },
+    mateo: {
+      audios: Object.create(null), timecodes: Object.create(null),
+      available: false, status: "idle", promise: null
+    }
   };
 
   var state = {
@@ -245,6 +251,9 @@
     layoutObserverTimer: 0,
     layoutObserver: null,
     layoutObserverSignature: "",
+    quizPages: Object.create(null),
+    backMatterPages: Object.create(null),
+    pageKindCacheReady: false,
     mutationTimer: 0,
     lastContentReflowAt: 0,
     settingsRepaginationActive: false,
@@ -318,6 +327,14 @@
     panelFocusRestoreTimer: 0,
     panelFocusRestoreSuppressedUntil: 0,
     panelPendingFocusSelector: "",
+    primaryPointerPendingId: "",
+    primaryPointerPendingShouldClose: false,
+    primaryPointerPendingUntil: 0,
+    primaryPointerPendingReleaseAction: false,
+    primaryPointerReleaseHandledId: "",
+    primaryPointerReleaseHandledUntil: 0,
+    settingsExpectedReadAloud: null,
+    settingsExpectedWordHighlight: null,
     glossaryHighlightEnabled: false,
     glossaryEntries: null,
     glossaryHighlightFrame: 0,
@@ -684,35 +701,82 @@
     });
   }
 
+  /* Each imported source page is a direct child of #content, while CSS
+     columns place its descendants across one or more visual pages. Locate the
+     few source roots whose first/last semantic anchors cover the current
+     column before walking text. The former full-book TreeWalker measured
+     every text parent on every page change and could block the UI for several
+     seconds when glossary highlighting was enabled. */
+  function glossaryRootsForVisualPage(pageIndex) {
+    if (!content || content.children.length <= 1) return content ? [content] : [];
+    var roots = [];
+    Array.prototype.slice.call(content.children).forEach(function (root) {
+      var anchors = Array.prototype.slice.call(root.querySelectorAll(
+        "[data-id], [data-reflow-anchor-id]"
+      ));
+      if (root.matches("[data-id], [data-reflow-anchor-id]")) anchors.unshift(root);
+      var firstAnchor = null;
+      var lastAnchor = null;
+      for (var firstIndex = 0; firstIndex < anchors.length; firstIndex += 1) {
+        if (anchors[firstIndex].getClientRects().length) {
+          firstAnchor = anchors[firstIndex];
+          break;
+        }
+      }
+      for (var lastIndex = anchors.length - 1; lastIndex >= 0; lastIndex -= 1) {
+        if (anchors[lastIndex].getClientRects().length) {
+          lastAnchor = anchors[lastIndex];
+          break;
+        }
+      }
+      if (!firstAnchor && !lastAnchor) return;
+      var boundaryPages = pagesForElement(firstAnchor || lastAnchor).concat(
+        lastAnchor && lastAnchor !== firstAnchor ? pagesForElement(lastAnchor) : []
+      );
+      if (!boundaryPages.length) return;
+      var firstPage = Math.min.apply(Math, boundaryPages);
+      var lastPage = Math.max.apply(Math, boundaryPages);
+      if (firstPage <= pageIndex && pageIndex <= lastPage) roots.push(root);
+    });
+    /* A short, non-paginated preview may not expose semantic anchors yet. It
+       is safe to retain the complete scan there; never fall back to it for the
+       413-page book because responsiveness is more important than painting a
+       transient highlight before pagination is ready. */
+    if (!roots.length && state.total <= 2) return [content];
+    return roots;
+  }
+
   function textNodesForVisualPage(pageIndex, includeGlossaryTerms) {
     if (!content) return [];
     var nodes = [];
     var pageCache = new WeakMap();
-    var walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
-      acceptNode: function (node) {
-        var parent = node.parentElement;
-        if (
-          !parent ||
-          glossaryExcludedElement(parent, includeGlossaryTerms) ||
-          !node.textContent.trim()
-        ) {
-          return NodeFilter.FILTER_REJECT;
+    glossaryRootsForVisualPage(pageIndex).forEach(function (root) {
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (node) {
+          var parent = node.parentElement;
+          if (
+            !parent ||
+            glossaryExcludedElement(parent, includeGlossaryTerms) ||
+            !node.textContent.trim()
+          ) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          var pages = pageCache.get(parent);
+          if (!pages) {
+            pages = pagesForElement(parent);
+            pageCache.set(parent, pages);
+          }
+          return pages.indexOf(pageIndex) >= 0
+            ? NodeFilter.FILTER_ACCEPT
+            : NodeFilter.FILTER_REJECT;
         }
-        var pages = pageCache.get(parent);
-        if (!pages) {
-          pages = pagesForElement(parent);
-          pageCache.set(parent, pages);
-        }
-        return pages.indexOf(pageIndex) >= 0
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT;
+      });
+      var node = walker.nextNode();
+      while (node) {
+        nodes.push(node);
+        node = walker.nextNode();
       }
     });
-    var node = walker.nextNode();
-    while (node) {
-      nodes.push(node);
-      node = walker.nextNode();
-    }
     return nodes;
   }
 
@@ -1225,6 +1289,26 @@
     return pagesForElement(element).indexOf(page) >= 0;
   }
 
+  function rebuildPageKindCache() {
+    state.quizPages = Object.create(null);
+    state.backMatterPages = Object.create(null);
+    Array.prototype.slice.call(content.querySelectorAll(".quiz-panel")).forEach(
+      function (panel) {
+        pagesForElement(panel).forEach(function (page) {
+          state.quizPages[page] = true;
+        });
+      }
+    );
+    Array.prototype.slice.call(content.querySelectorAll(
+      ".reflow-back-cover-page, .reflow-collaborators-page"
+    )).forEach(function (element) {
+      pagesForElement(element).forEach(function (page) {
+        state.backMatterPages[page] = true;
+      });
+    });
+    state.pageKindCacheReady = true;
+  }
+
   function updateQuizPageBackground() {
     /* Intermediate columns can briefly point at a different quiz while a
        settings reflow settles. Never let that transient state repaint the
@@ -1233,20 +1317,20 @@
       document.body.classList.remove("reflow-quiz-page");
       return;
     }
-    var active = Array.prototype.slice.call(
-      content.querySelectorAll(".quiz-panel")
-    ).some(function (panel) {
-      return elementOccupiesPage(panel, state.current);
-    });
+    var active = state.pageKindCacheReady
+      ? Boolean(state.quizPages[state.current])
+      : Array.prototype.slice.call(content.querySelectorAll(".quiz-panel")).some(
+        function (panel) { return elementOccupiesPage(panel, state.current); }
+      );
     document.body.classList.toggle("reflow-quiz-page", active);
   }
 
   function updateBackMatterPageBackground() {
-    var active = Array.prototype.slice.call(content.querySelectorAll(
-      ".reflow-back-cover-page, .reflow-collaborators-page"
-    )).some(function (page) {
-      return elementOccupiesPage(page, state.current);
-    });
+    var active = state.pageKindCacheReady
+      ? Boolean(state.backMatterPages[state.current])
+      : Array.prototype.slice.call(content.querySelectorAll(
+        ".reflow-back-cover-page, .reflow-collaborators-page"
+      )).some(function (page) { return elementOccupiesPage(page, state.current); });
     document.body.classList.toggle("reflow-back-matter-page", active);
   }
 
@@ -1438,7 +1522,9 @@
     syncPrimaryToolbar();
     updateQuizPageBackground();
     updateBackMatterPageBackground();
-    if (state.runtimeMenuRefresh) state.runtimeMenuRefresh();
+    if (state.runtimeMenuRefresh && state.runtimeMenu === "toc") {
+      state.runtimeMenuRefresh();
+    }
     if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
 
     if (announce) {
@@ -1875,6 +1961,7 @@
     fitChapterFiveChat();
     stabilizeSentencePagination();
     state.total = Math.max(1, Math.ceil((content.scrollWidth - 1) / pageWidth()));
+    rebuildPageKindCache();
     state.ttsLayoutRevision += 1;
     state.ttsPageMapRevision = -1;
     var audioApi = window.__adtReflowAudio;
@@ -2347,12 +2434,67 @@
 
   function closeRuntimePanel() {
     if (
-      typeof window.__adtReflowSetDockMenu !== "function" ||
-      typeof window.__adtReflowGetDockMenu !== "function"
-    ) return;
-    window.__adtReflowSetDockMenu("");
+      typeof window.__adtReflowSetDockMenu === "function" &&
+      typeof window.__adtReflowGetDockMenu === "function"
+    ) {
+      window.__adtReflowSetDockMenu("");
+    } else {
+      /* The runtime bridge is an optimization, not a requirement. Some
+         cached/server combinations can finish mounting without exposing it;
+         in that case, activate the currently pressed upstream control just as
+         the original dock does when the user closes its popover. */
+      var activeTrigger = pressedRuntimeDockButton([
+        "Menú principal", "Main Menu",
+        "Configuración", "Settings",
+        "Glosario", "Glossary",
+        "Idioma", "Language"
+      ]);
+      if (!activeTrigger) return;
+      activeTrigger.click();
+    }
     requestAnimationFrame(syncPrimaryToolbar);
     window.setTimeout(syncPrimaryToolbar, 120);
+  }
+
+  function visibleRuntimeMenu() {
+    var definitions = [
+      [".reflow-navigation-panel", "toc"],
+      [".reflow-glossary-panel", "glossary"],
+      [".reflow-accessibility-panel", "settings"],
+      [".reflow-language-panel", "language"]
+    ];
+    for (var index = 0; index < definitions.length; index += 1) {
+      var panel = document.querySelector(definitions[index][0]);
+      if (!panel || !panel.getClientRects().length) continue;
+      var style = window.getComputedStyle(panel);
+      if (style.display !== "none" && style.visibility !== "hidden") {
+        return definitions[index][1];
+      }
+    }
+    return "";
+  }
+
+  function takePrimaryPointerIntent(button) {
+    if (
+      !button || state.primaryPointerPendingId !== button.id ||
+      Date.now() > state.primaryPointerPendingUntil
+    ) return null;
+    var intent = { shouldClose: state.primaryPointerPendingShouldClose };
+    state.primaryPointerPendingId = "";
+    state.primaryPointerPendingShouldClose = false;
+    state.primaryPointerPendingUntil = 0;
+    state.primaryPointerPendingReleaseAction = false;
+    return intent;
+  }
+
+  function consumePrimaryPointerReleaseAction(button) {
+    if (
+      !button || state.primaryPointerReleaseHandledId !== button.id ||
+      Date.now() > state.primaryPointerReleaseHandledUntil
+    ) return false;
+    state.primaryPointerReleaseHandledId = "";
+    state.primaryPointerReleaseHandledUntil = 0;
+    return true;
   }
 
   function returnFromGlossaryToTools() {
@@ -2473,6 +2615,10 @@
       typeof window.__adtReflowGetDockMenu === "function"
     );
     var currentMenu = runtimeMenuReady ? window.__adtReflowGetDockMenu() : "";
+    /* The runtime atom may commit before or after its popover DOM. Prefer a
+       panel that is already visibly mounted so aria-expanded and a repeated
+       click never lag behind what the reader can actually see. */
+    currentMenu = visibleRuntimeMenu() || currentMenu;
     var previousMenu = state.runtimeMenu;
     state.runtimeMenu = currentMenu;
     var toolbarHasFocus = Boolean(primaryToolbar && primaryToolbar.matches(":focus-within"));
@@ -2490,7 +2636,7 @@
     );
     primaryToolbar.classList.toggle(
       "reflow-primary-toolbar-hidden",
-      upstreamWantsHidden && !toolbarHasFocus
+      upstreamWantsHidden && !toolbarHasFocus && !currentMenu
     );
     document.body.classList.toggle("reflow-tts-playing", playing);
     syncFloatingTtsPlayer();
@@ -2517,6 +2663,13 @@
       typeof window.__adtReflowGetDockMenu === "function"
     ) {
       var currentMenu = window.__adtReflowGetDockMenu();
+      if (menuValue === "settings" && currentMenu !== menuValue) {
+        state.settingsExpectedReadAloud = Boolean(state.ttsPlayerVisible);
+        state.settingsExpectedWordHighlight =
+          typeof window.__adtReflowGetWordHighlight === "function"
+            ? Boolean(window.__adtReflowGetWordHighlight())
+            : null;
+      }
       if (currentMenu !== menuValue) rememberRuntimePanelFocus(menuValue);
       window.__adtReflowSetDockMenu(currentMenu === menuValue ? "" : menuValue);
       requestAnimationFrame(syncPrimaryToolbar);
@@ -2544,6 +2697,13 @@
       typeof window.__adtReflowGetDockMenu === "function"
     ) {
       if (window.__adtReflowGetDockMenu() !== menuValue) {
+        if (menuValue === "settings") {
+          state.settingsExpectedReadAloud = Boolean(state.ttsPlayerVisible);
+          state.settingsExpectedWordHighlight =
+            typeof window.__adtReflowGetWordHighlight === "function"
+              ? Boolean(window.__adtReflowGetWordHighlight())
+              : null;
+        }
         rememberRuntimePanelFocus(menuValue);
         window.__adtReflowSetDockMenu(menuValue);
       }
@@ -2717,12 +2877,41 @@
     ttsPlayerStopButton = document.getElementById("reflow-tts-stop");
 
     indexButton.addEventListener("click", function () {
+      if (consumePrimaryPointerReleaseAction(indexButton)) return;
+      var pointerIntent = takePrimaryPointerIntent(indexButton);
+      if (pointerIntent) {
+        if (pointerIntent.shouldClose) closeRuntimePanel();
+        else openRuntimePanel(["Menú principal", "Main Menu"]);
+        return;
+      }
+      if (
+        indexButton.getAttribute("aria-expanded") === "true" ||
+        visibleRuntimeMenu() === "toc"
+      ) {
+        closeRuntimePanel();
+        return;
+      }
       switchRuntimePanel(
         ["Menú principal", "Main Menu"],
         ["Configuración", "Settings", "Glosario", "Glossary"]
       );
     });
     toolsButton.addEventListener("click", function () {
+      if (consumePrimaryPointerReleaseAction(toolsButton)) return;
+      var pointerIntent = takePrimaryPointerIntent(toolsButton);
+      if (pointerIntent) {
+        if (pointerIntent.shouldClose) closeRuntimePanel();
+        else openRuntimePanel(["Configuración", "Settings"]);
+        return;
+      }
+      var visibleMenu = visibleRuntimeMenu();
+      if (
+        toolsButton.getAttribute("aria-expanded") === "true" ||
+        visibleMenu === "settings" || visibleMenu === "glossary"
+      ) {
+        closeRuntimePanel();
+        return;
+      }
       switchRuntimePanel(
         ["Configuración", "Settings"],
         ["Menú principal", "Main Menu"]
@@ -2840,56 +3029,70 @@
     applyReducedMotion(enabled, false);
   }
 
-  async function loadTtsVoiceCatalogs() {
-    await Promise.all(Object.keys(ttsVoices).map(async function (voiceKey) {
-      var root = "./content/i18n/es-UY/voices/" + voiceKey + "/";
-      try {
-        var responses = await Promise.all([
-          fetch(root + "audios.json?v=47-full-book-132-uatsap-no-e"),
-          fetch(root + "timecodes.json?v=47-full-book-132-uatsap-no-e")
-        ]);
-        if (!responses[0].ok || !responses[1].ok) throw new Error("missing catalogue");
-        ttsVoiceCatalogs[voiceKey].audios = await responses[0].json();
-        ttsVoiceCatalogs[voiceKey].timecodes = await responses[1].json();
-        var easyReadNormalAudioAliases = {
-          pg070_n0026_easy_read: "pg070_n0026",
-          pg071_n0002_easy_read: "pg071_n0002",
-          pg136_n0048_easy_read: "pg136_n0048",
-          pg137_n0002_easy_read: "pg137_n0002",
-          pg152_n0002_easy_read: "pg152_n0002",
-          pg155_n0021_easy_read: "pg155_n0021",
-          pg156_n0002_easy_read: "pg156_n0002",
-          pg174_n0035_easy_read: "pg174_n0035",
-          pg175_n0002_easy_read: "pg175_n0002",
-          pg184_n0032_easy_read: "pg184_n0032",
-          pg185_n0002_easy_read: "pg185_n0002"
-        };
-        Object.keys(easyReadNormalAudioAliases).forEach(function (easyId) {
-          var normalId = easyReadNormalAudioAliases[easyId];
-          if (ttsVoiceCatalogs[voiceKey].audios[normalId]) {
-            ttsVoiceCatalogs[voiceKey].audios[easyId] = ttsVoiceCatalogs[voiceKey].audios[normalId];
-          }
-          if (ttsVoiceCatalogs[voiceKey].timecodes[normalId]) {
-            ttsVoiceCatalogs[voiceKey].timecodes[easyId] = ttsVoiceCatalogs[voiceKey].timecodes[normalId];
-          }
-        });
-        ttsVoiceCatalogs[voiceKey].available = true;
-      } catch (_error) {
-        ttsVoiceCatalogs[voiceKey].available = false;
-      }
-    }));
-    var availableVoice = Object.keys(ttsVoices).find(function (voiceKey) {
-      return ttsVoiceCatalogs[voiceKey].available;
+  var easyReadNormalAudioAliases = {
+    pg070_n0026_easy_read: "pg070_n0026",
+    pg071_n0002_easy_read: "pg071_n0002",
+    pg136_n0048_easy_read: "pg136_n0048",
+    pg137_n0002_easy_read: "pg137_n0002",
+    pg152_n0002_easy_read: "pg152_n0002",
+    pg155_n0021_easy_read: "pg155_n0021",
+    pg156_n0002_easy_read: "pg156_n0002",
+    pg174_n0035_easy_read: "pg174_n0035",
+    pg175_n0002_easy_read: "pg175_n0002",
+    pg184_n0032_easy_read: "pg184_n0032",
+    pg185_n0002_easy_read: "pg185_n0002"
+  };
+
+  function loadTtsVoiceCatalog(voiceKey) {
+    var catalogue = ttsVoiceCatalogs[voiceKey];
+    if (!catalogue) return Promise.resolve(false);
+    if (catalogue.status === "ready") return Promise.resolve(true);
+    if (catalogue.promise) return catalogue.promise;
+
+    var root = "./content/i18n/es-UY/voices/" + voiceKey + "/";
+    catalogue.status = "loading";
+    updateTtsVoiceControls();
+    catalogue.promise = Promise.all([
+      fetch(root + "audios.json?v=47-full-book-132-uatsap-no-e"),
+      fetch(root + "timecodes.json?v=47-full-book-132-uatsap-no-e")
+    ]).then(function (responses) {
+      if (!responses[0].ok || !responses[1].ok) throw new Error("missing catalogue");
+      return Promise.all([responses[0].json(), responses[1].json()]);
+    }).then(function (catalogues) {
+      catalogue.audios = catalogues[0];
+      catalogue.timecodes = catalogues[1];
+      Object.keys(easyReadNormalAudioAliases).forEach(function (easyId) {
+        var normalId = easyReadNormalAudioAliases[easyId];
+        if (catalogue.audios[normalId]) catalogue.audios[easyId] = catalogue.audios[normalId];
+        if (catalogue.timecodes[normalId]) {
+          catalogue.timecodes[easyId] = catalogue.timecodes[normalId];
+        }
+      });
+      catalogue.available = true;
+      catalogue.status = "ready";
+      return true;
+    }).catch(function () {
+      catalogue.available = false;
+      catalogue.status = "error";
+      return false;
+    }).then(function (loaded) {
+      catalogue.promise = null;
+      updateTtsVoiceControls();
+      return loaded;
     });
-    if (
-      availableVoice &&
-      (!ttsVoiceCatalogs[state.ttsVoice] || !ttsVoiceCatalogs[state.ttsVoice].available)
-    ) {
-      state.ttsVoice = availableVoice;
-      document.body.dataset.reflowTtsVoice = availableVoice;
-      window.__adtReflowTtsVoice = availableVoice;
-      try { localStorage.setItem(ttsVoiceStorageKey, availableVoice); } catch (_error) {}
-    }
+    return catalogue.promise;
+  }
+
+  async function loadInitialTtsVoiceCatalog() {
+    if (await loadTtsVoiceCatalog(state.ttsVoice)) return;
+    var fallbackVoice = Object.keys(ttsVoices).find(function (voiceKey) {
+      return voiceKey !== state.ttsVoice;
+    });
+    if (!fallbackVoice || !(await loadTtsVoiceCatalog(fallbackVoice))) return;
+    state.ttsVoice = fallbackVoice;
+    document.body.dataset.reflowTtsVoice = fallbackVoice;
+    window.__adtReflowTtsVoice = fallbackVoice;
+    try { localStorage.setItem(ttsVoiceStorageKey, fallbackVoice); } catch (_error) {}
   }
 
   var modernWhatsAppWindowAudioIds = [
@@ -3001,28 +3204,34 @@
 
   function updateTtsVoiceControls() {
     var selector = document.getElementById("reflow-tts-voice-setting");
-    var cataloguesReady = Object.keys(ttsVoices).some(function (voiceKey) {
-      return ttsVoiceCatalogs[voiceKey].available;
-    });
-    if (selector) selector.hidden = !cataloguesReady;
+    if (selector) selector.hidden = false;
     Array.prototype.slice.call(document.querySelectorAll("[data-reflow-tts-voice]")).forEach(
       function (button) {
         var selected = button.dataset.reflowTtsVoice === state.ttsVoice;
         var catalogue = ttsVoiceCatalogs[button.dataset.reflowTtsVoice];
-        button.hidden = !catalogue || !catalogue.available;
+        var loading = Boolean(catalogue && catalogue.status === "loading");
+        var failed = Boolean(catalogue && catalogue.status === "error");
+        button.hidden = !catalogue;
         button.setAttribute("aria-checked", String(selected));
         button.setAttribute("aria-pressed", String(selected));
-        button.disabled = !catalogue || !catalogue.available;
+        button.setAttribute("aria-busy", String(loading));
+        button.disabled = !catalogue || loading || failed;
+        button.title = failed ? "Esta voz no está disponible" :
+          loading ? "Preparando voz" : "";
       }
     );
   }
 
-  function applyTtsVoice(voiceKey) {
+  async function applyTtsVoice(voiceKey) {
     if (
       !Object.prototype.hasOwnProperty.call(ttsVoices, voiceKey) ||
-      !ttsVoiceCatalogs[voiceKey].available ||
       voiceKey === state.ttsVoice
     ) {
+      updateTtsVoiceControls();
+      return;
+    }
+    if (!(await loadTtsVoiceCatalog(voiceKey))) {
+      if (announcer) announcer.textContent = "La voz seleccionada no está disponible.";
       updateTtsVoiceControls();
       return;
     }
@@ -3291,9 +3500,14 @@
 
   function createFontControls() {
     var interfaceContainer = document.getElementById("interface-container");
+    var settingsMountScheduled = false;
 
     function normalizedSettingText(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function setTextContentIfChanged(element, value) {
+      if (element && element.textContent !== value) element.textContent = value;
     }
 
     function directSettingRow(card, pattern) {
@@ -3363,7 +3577,7 @@
       if (readingSection) {
         readingSection.classList.add("reflow-settings-section-reading");
         var readingHeading = readingSection.querySelector("h3");
-        if (readingHeading) readingHeading.textContent = "Apoyos para la lectura";
+        setTextContentIfChanged(readingHeading, "Apoyos para la lectura");
       }
       if (readingCard) {
         readingCard.classList.add("reflow-settings-list");
@@ -3385,7 +3599,7 @@
           var label = readAloudRow.querySelector("label span");
           if (label) {
             label.id = "reflow-read-aloud-label";
-            label.textContent = "Activar lectura en voz alta";
+            setTextContentIfChanged(label, "Activar lectura en voz alta");
           }
           var description = readAloudRow.querySelector("#reflow-read-aloud-description");
           if (!description) {
@@ -3442,7 +3656,7 @@
             Array.prototype.slice.call(section.querySelectorAll("span")).forEach(
               function (label) {
                 if (/^Abrir ajustes$/i.test(normalizedSettingText(label.textContent))) {
-                  label.textContent = "Abrir Herramientas";
+                  setTextContentIfChanged(label, "Abrir Herramientas");
                 }
               }
             );
@@ -3614,6 +3828,15 @@
       syncEasyReadSwitchVisual();
     }
 
+    function scheduleSettingsPanelMount() {
+      if (settingsMountScheduled) return;
+      settingsMountScheduled = true;
+      requestAnimationFrame(function () {
+        settingsMountScheduled = false;
+        mountInSettingsPanel();
+      });
+    }
+
     document.addEventListener("click", function (event) {
       var button = event.target.closest("[data-reflow-font-size]");
       if (!button) return;
@@ -3658,7 +3881,7 @@
 
     mountInSettingsPanel();
     if (interfaceContainer) {
-      new MutationObserver(mountInSettingsPanel).observe(interfaceContainer, {
+      new MutationObserver(scheduleSettingsPanelMount).observe(interfaceContainer, {
         childList: true,
         subtree: true
       });
@@ -4026,7 +4249,75 @@
         return glossaryListReady || glossaryDetailReady;
       }
       if (panel.classList.contains("reflow-accessibility-panel")) {
-        return Boolean(panel.querySelector("section, [role=\"switch\"]"));
+        var organizedSettings = panel.querySelector(".reflow-settings-organized");
+        var customControlsReady = Boolean(
+          organizedSettings &&
+          organizedSettings.querySelector("#reflow-font-settings") &&
+          organizedSettings.querySelector("#reflow-tts-voice-setting") &&
+          organizedSettings.querySelector("#reflow-tts-speed-setting") &&
+          organizedSettings.querySelector(
+            "#reflow-font-settings [role=\"radio\"][aria-checked=\"true\"]"
+          ) &&
+          organizedSettings.querySelector(
+            "#reflow-tts-voice-setting [role=\"radio\"][aria-checked=\"true\"]"
+          ) &&
+          organizedSettings.querySelector(
+            "#reflow-tts-speed-setting [role=\"radio\"][aria-checked=\"true\"]"
+          )
+        );
+        if (!customControlsReady) return false;
+        if (panel.dataset.reflowInitialSettingsReady === "true") return true;
+
+        /* React first mounts these stock controls with defaults and restores
+           the persisted reader state immediately afterwards. Do not reveal
+           that intermediate paint: the switch must agree with the already
+           active TTS session and the segmented highlight control must agree
+           with the runtime mode. */
+        var readAloudSwitch = organizedSettings.querySelector(
+          ".reflow-setting-read-aloud [role=\"switch\"]"
+        );
+        var expectedReadAloud = state.settingsExpectedReadAloud === null
+          ? Boolean(state.ttsPlayerVisible)
+          : state.settingsExpectedReadAloud;
+        if (
+          !readAloudSwitch ||
+          readAloudSwitch.getAttribute("aria-checked") !==
+            String(Boolean(expectedReadAloud))
+        ) return false;
+        var readAloudMarker = expectedReadAloud ? "data-checked" : "data-unchecked";
+        var readAloudThumb = readAloudSwitch.querySelector('[data-slot="switch-thumb"]');
+        if (
+          !readAloudSwitch.hasAttribute(readAloudMarker) ||
+          !readAloudThumb || !readAloudThumb.hasAttribute(readAloudMarker)
+        ) return false;
+
+        if (typeof window.__adtReflowGetWordHighlight === "function") {
+          var highlightRadios = Array.prototype.slice.call(
+            organizedSettings.querySelectorAll(
+              ".reflow-setting-highlight [role=\"radio\"]"
+            )
+          );
+          var wordRadio = highlightRadios.find(function (radio) {
+            return /^(palabra|word)$/i.test(normalized(radio.textContent));
+          });
+          var sentenceRadio = highlightRadios.find(function (radio) {
+            return /^(oraci[oó]n|sentence)$/i.test(normalized(radio.textContent));
+          });
+          var wordHighlight = state.settingsExpectedWordHighlight === null
+            ? Boolean(window.__adtReflowGetWordHighlight())
+            : state.settingsExpectedWordHighlight;
+          if (
+            !wordRadio || !sentenceRadio ||
+            wordRadio.getAttribute("aria-checked") !== String(wordHighlight) ||
+            sentenceRadio.getAttribute("aria-checked") !== String(!wordHighlight) ||
+            !(wordHighlight ? wordRadio : sentenceRadio).classList.contains("bg-background") ||
+            !(wordHighlight ? wordRadio : sentenceRadio).classList.contains("shadow-sm") ||
+            !(wordHighlight ? sentenceRadio : wordRadio).classList.contains("text-muted-foreground")
+          ) return false;
+        }
+        panel.classList.add("reflow-settings-first-paint");
+        panel.dataset.reflowInitialSettingsReady = "true";
+        return true;
       }
       if (panel.classList.contains("reflow-language-panel")) {
         var languageOption = Array.prototype.slice.call(panel.querySelectorAll("button, [role=\"option\"]")).some(
@@ -4082,6 +4373,19 @@
           return;
         }
         panel.classList.remove("reflow-panel-pending");
+        if (
+          panel.classList.contains("reflow-settings-first-paint") &&
+          panel.dataset.reflowFirstPaintReleaseScheduled !== "true"
+        ) {
+          panel.dataset.reflowFirstPaintReleaseScheduled = "true";
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              if (!panel.isConnected) return;
+              panel.classList.remove("reflow-settings-first-paint");
+              delete panel.dataset.reflowFirstPaintReleaseScheduled;
+            });
+          });
+        }
         panel.removeAttribute("data-reflow-readiness-attempts");
         if (!panel.classList.contains("reflow-reader-panel")) {
           var rect = panel.getBoundingClientRect();
@@ -4499,8 +4803,18 @@
     function restorePanelTogglePage() {
       if (state.panelToggleLockPage === null || Date.now() > state.panelToggleLockUntil) return;
       var page = Math.max(0, Math.min(state.total - 1, state.panelToggleLockPage));
+      var targetLeft = page * pageWidth();
+      /* Opening an overlay normally leaves the book column untouched. The
+         former guard still recalculated controls, anchors and glossary
+         highlights at every scheduled checkpoint for 3.4 seconds. Retain
+         those checkpoints for genuine late layout drift, but make the usual
+         no-movement case a constant-time return. */
+      if (
+        state.current === page &&
+        Math.abs(content.scrollLeft - targetLeft) < 1
+      ) return;
       content.style.scrollBehavior = "auto";
-      content.scrollLeft = page * pageWidth();
+      content.scrollLeft = targetLeft;
       state.current = page;
       state.currentAnchorId = paintedSemanticAnchorId() || state.currentAnchorId;
       updateControls(false);
@@ -4599,16 +4913,51 @@
       return true;
     }
 
-    function preserveTtsPanel(event) {
-      var target = event.target;
-      if (
-        !target || !target.closest ||
-        !target.closest("#reflow-pagination, #reflow-tts-player")
-      ) return;
-      /* The upstream fixed-layout shell also listens to pointer gestures and
-         interprets them as its own page navigation. On the reconstructed chat
-         that source-level movement races the reflow column change and restores
-         the page being left. The custom paginator owns its complete pointer
+  function preserveTtsPanel(event) {
+    var target = event.target;
+    if (
+      !target || !target.closest ||
+      !target.closest("#reflow-pagination, #reflow-tts-player")
+    ) return;
+    /* When auto-hide is enabled, the toolbar is visible only while the
+       upstream hover strip remains active. Stopping its pointerdown at the
+       capture phase can prevent the browser from focusing the pressed button;
+       the strip then hides and moves the target before click is dispatched.
+       Focus the intended control first so syncPrimaryToolbar keeps the custom
+       toolbar stationary for the complete pointer sequence. */
+    var pressedControl = target.closest(
+      "#reflow-pagination button, #reflow-tts-player button"
+    );
+    var primaryPointerActivation = event.type === "pointerdown" ||
+      event.type === "mousedown" ||
+      (event.type === "touchstart" && typeof window.PointerEvent !== "function");
+    if (
+      pressedControl && primaryPointerActivation &&
+      (pressedControl === indexButton || pressedControl === toolsButton)
+    ) {
+      var visibleMenuAtPress = visibleRuntimeMenu();
+      var pressedToolbar = pressedControl.closest("#reflow-pagination");
+      var controlAlreadyActive = document.activeElement === pressedControl;
+      state.primaryPointerPendingId = pressedControl.id;
+      state.primaryPointerPendingShouldClose =
+        pressedControl.getAttribute("aria-expanded") === "true" ||
+        (pressedControl === indexButton && visibleMenuAtPress === "toc") ||
+        (pressedControl === toolsButton &&
+          (visibleMenuAtPress === "settings" || visibleMenuAtPress === "glossary"));
+      state.primaryPointerPendingUntil = Date.now() + 1200;
+      state.primaryPointerPendingReleaseAction = Boolean(
+        !controlAlreadyActive ||
+        (pressedToolbar && pressedToolbar.classList.contains("reflow-primary-toolbar-hidden"))
+      );
+    }
+    if (pressedControl && document.activeElement !== pressedControl) {
+      focusWithoutScroll(pressedControl);
+      syncPrimaryToolbar();
+    }
+    /* The upstream fixed-layout shell also listens to pointer gestures and
+       interprets them as its own page navigation. On the reconstructed chat
+       that source-level movement races the reflow column change and restores
+       the page being left. The custom paginator owns its complete pointer
          sequence whether TTS is active or not; the later click handler performs
          the single intended reflow movement. */
       event.stopImmediatePropagation();
@@ -4617,6 +4966,44 @@
     document.addEventListener("pointerdown", preserveTtsPanel, true);
     document.addEventListener("mousedown", preserveTtsPanel, true);
     document.addEventListener("touchstart", preserveTtsPanel, true);
+
+    function completeHiddenToolbarPointerAction(event) {
+      var primaryPointerRelease = event.type === "pointerup" ||
+        event.type === "mouseup" ||
+        (event.type === "touchend" && typeof window.PointerEvent !== "function");
+      if (
+        !primaryPointerRelease || !state.primaryPointerPendingId ||
+        !state.primaryPointerPendingReleaseAction
+      ) return;
+      var pressedControl = document.getElementById(state.primaryPointerPendingId);
+      var shouldClose = state.primaryPointerPendingShouldClose;
+      state.primaryPointerPendingId = "";
+      state.primaryPointerPendingShouldClose = false;
+      state.primaryPointerPendingUntil = 0;
+      state.primaryPointerPendingReleaseAction = false;
+      if (!pressedControl || !pressedControl.isConnected) return;
+      if (shouldClose) closeRuntimePanel();
+      else if (pressedControl === indexButton) {
+        openRuntimePanel(["Menú principal", "Main Menu"]);
+      } else if (pressedControl === toolsButton) {
+        openRuntimePanel(["Configuración", "Settings"]);
+      } else return;
+      state.primaryPointerReleaseHandledId = pressedControl.id;
+      state.primaryPointerReleaseHandledUntil = Date.now() + 1000;
+      event.stopImmediatePropagation();
+    }
+
+    function cancelPrimaryPointerAction() {
+      state.primaryPointerPendingId = "";
+      state.primaryPointerPendingShouldClose = false;
+      state.primaryPointerPendingUntil = 0;
+      state.primaryPointerPendingReleaseAction = false;
+    }
+    document.addEventListener("pointerup", completeHiddenToolbarPointerAction, true);
+    document.addEventListener("mouseup", completeHiddenToolbarPointerAction, true);
+    document.addEventListener("touchend", completeHiddenToolbarPointerAction, true);
+    document.addEventListener("pointercancel", cancelPrimaryPointerAction, true);
+    document.addEventListener("touchcancel", cancelPrimaryPointerAction, true);
 
     function movePrimaryToolbarFocus(event) {
       var toolbar = event.target && event.target.closest
@@ -4866,10 +5253,16 @@
           restorePanelTogglePage();
           return;
         }
-        state.current = Math.max(
+        var scrolledPage = Math.max(
           0,
           Math.min(state.total - 1, Math.round(content.scrollLeft / pageWidth()))
         );
+        /* goToPage already committed controls, focus state and progress before
+           assigning scrollLeft. The resulting scroll event must not repeat
+           the same full update 80 ms later. Native scrolling still reaches
+           this path as soon as it enters a different visual column. */
+        if (scrolledPage === state.current) return;
+        state.current = scrolledPage;
         state.currentAnchorId = paintedSemanticAnchorId() || state.currentAnchorId;
         updateControls(false);
         saveProgress();
@@ -10139,7 +10532,7 @@
     loadTtsVoicePreference();
     loadReducedMotionPreference();
     installReflowDataAdapter();
-    var voiceCatalogPromise = loadTtsVoiceCatalogs();
+    var voiceCatalogPromise = loadInitialTtsVoiceCatalog();
     var indexMetadataPromise = loadIndexMetadata();
 
     var loading = document.createElement("div");

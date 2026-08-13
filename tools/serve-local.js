@@ -16,9 +16,29 @@ const mimeTypes = {
   ".woff2": "font/woff2",
 };
 
+function cacheControlFor(requestUrl, target) {
+  const extension = path.extname(target).toLowerCase();
+  const versioned = requestUrl.searchParams.has("v");
+
+  // The entry document must always check for a newer build. Versioned book
+  // resources are immutable until their URL changes, so Chrome can safely
+  // reuse them without transferring them again.
+  if (path.basename(target).toLowerCase() === "index.html") return "no-cache";
+  if (versioned) return "public, max-age=31536000, immutable";
+
+  // Images and media do not all carry a query version in the exported HTML.
+  // A short development cache still avoids repeating their largest transfer
+  // while limiting the lifetime of a replaced, unversioned file.
+  if ([".jpg", ".jpeg", ".png", ".svg", ".webp", ".mp3", ".woff2"].includes(extension)) {
+    return "public, max-age=3600";
+  }
+  return "no-cache";
+}
+
 http
   .createServer((request, response) => {
-    const pathname = decodeURIComponent(new URL(request.url, `http://${host}`).pathname);
+    const requestUrl = new URL(request.url, `http://${host}`);
+    const pathname = decodeURIComponent(requestUrl.pathname);
     const relativePath = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
     const filePath = path.resolve(root, relativePath);
 
@@ -35,7 +55,7 @@ http
           return;
         }
         response.writeHead(200, {
-          "Cache-Control": "no-store",
+          "Cache-Control": cacheControlFor(requestUrl, target),
           "Content-Type": mimeTypes[path.extname(target).toLowerCase()] || "application/octet-stream",
         });
         response.end(data);
