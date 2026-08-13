@@ -24,6 +24,8 @@ Se completaron los puntos 1, 2, 3, 4 y 5 del análisis de la barra inferior perm
 - Se normalizaron los estados normal, `hover`, foco, pulsado, seleccionado, deshabilitado, carga, error y éxito en la interfaz del lector.
 - Las voces publican carga, error y éxito mediante estado semántico y mensaje visible; las palabras del glosario publican la definición abierta mediante `aria-expanded`.
 - Las opciones deshabilitadas y el feedback enfocado de actividades incorporan señales de borde y forma que no dependen solamente del color.
+- La auditoría de contraste sustituyó `#00A096` por `#008078` únicamente bajo texto blanco normal, reforzó Anterior/Siguiente y elevó bordes seleccionados y deshabilitados sin perder la identidad institucional.
+- El resaltado TTS ya no depende solo del amarillo: Palabra usa subrayado sólido, Oración subrayado doble, el fallback una barra interior y las imágenes un doble contorno.
 - En móvil, las etiquetas se mantienen completas cuando caben, «Herramientas» pasa visualmente a «Herram.» en el corte intermedio y solo se oculta el texto en anchos extremos.
 - Los nombres accesibles completos, el orden fijo, las áreas táctiles de 44 px y el contador de 16 px se conservan en todos los cortes.
 - Índice, Herramientas y Glosario dejan un borde visible en pantallas estrechas y mantienen desplazamiento interno.
@@ -68,6 +70,10 @@ El tratamiento de movimiento se actualizó después: la compilación es `47-full
 
 La normalización de estados de interacción eleva la compilación a `47-full-book-106` y las versiones vigentes pasan a `reflow.css?v=75-normalized-interaction-states` y `reflow-book.js?v=110-normalized-interaction-states`; la secuencia de actividades permanece en `quiz-sequence.js?v=7-effective-reduced-motion`.
 
+La auditoría de contraste mantiene la compilación y JavaScript anteriores y actualiza únicamente la hoja a `reflow.css?v=78-audited-color-contrast`.
+
+La señal no cromática de lectura mantiene JavaScript y compilación, y actualiza la hoja a `reflow.css?v=79-non-color-tts-highlight`.
+
 ## Validación realizada
 
 - La barra principal presenta únicamente Índice, Anterior, contador, Siguiente y Herramientas.
@@ -104,6 +110,8 @@ La normalización de estados de interacción eleva la compilación a `47-full-bo
 - Con reducción activa, la paginación conserva desplazamiento instantáneo, el confeti se omite y la narración no se inicia automáticamente al cambiar de página.
 - La revisión estática de los estados confirma señales no cromáticas para deshabilitado, carga, error y éxito, además de foco reforzado para el feedback de actividades.
 - En navegador se verificaron `hover` y foco de pestaña, apariencia deshabilitada de Resaltado, confirmación de voz, expansión y devolución de foco del glosario y foco visible del feedback correcto.
+- La auditoría renderizada de contraste confirma mínimos en navegación, selecciones, deshabilitados, foco y actividades; la menor relación de texto normal aceptada es `4.80:1` y la menor relación esencial no textual es `3.20:1`.
+- La lectura real confirmó que Palabra usa amarillo más subrayado sólido, Oración amarillo más subrayado doble y las imágenes un contorno oscuro más un anillo amarillo; la paginación se mantuvo en `234` páginas y no surgieron errores nuevos.
 - Las cabeceras verificadas son `no-cache` para `index.html`, caché inmutable anual para recursos versionados y una hora para imágenes sin versión.
 - Se ejecutaron las comprobaciones:
 

@@ -1873,6 +1873,151 @@ Retirar el bloque de estados normalizados, los atributos y mensajes de voz y glo
 
 ---
 
+## Acción 32: auditar y corregir contraste de color
+
+### Objetivo
+
+Medir las combinaciones realmente renderizadas y garantizar al menos `4.5:1` para texto normal, `3:1` para texto grande y `3:1` para límites, iconos y estados esenciales, conservando `#00A096` como identidad Ceibal.
+
+### Áreas que deben revisarse
+
+- Texto normal y grande sobre fondos claros y oscuros.
+- Foco de teclado en contenido, paneles y barra inferior.
+- Verde institucional como texto, superficie, borde e indicador de estado.
+- Controles seleccionados, activos y deshabilitados.
+- Respuestas correctas e incorrectas y sus iconos.
+- Superficie y límites de Anterior/Siguiente respecto de la barra.
+
+### Procedimiento
+
+1. Medir luminancia relativa y contraste WCAG a partir de colores calculados, incluyendo la composición de fondos con transparencia.
+2. Mantener `#00A096` para identidad, iconos, bordes o superficies con texto oscuro; no usarlo detrás de texto blanco normal porque produce `3.25:1`.
+3. Usar `#008078` para superficies seleccionadas con texto blanco: produce `4.82:1` y contrasta `3.22:1` contra el panel oscuro.
+4. Reforzar Anterior/Siguiente con `#66707E`: produce `5.02:1` con blanco y `3.21:1` contra la barra; usar `#6B7280` en `hover`.
+5. Cambiar el borde seleccionado de actividades de `#66C6C0` (`2.02:1` sobre blanco) a `#008078` (`4.82:1`).
+6. Reponer el contorno de foco de la opción seleccionada, que no debe perderse por una regla `outline: 0`.
+7. Elevar los estados deshabilitados: borde `#A9AFBB` en panel oscuro y, en actividades claras, texto `#4D5562` con borde `#6B7280`.
+8. Versionar el CSS para impedir que la caché reutilice la combinación anterior.
+
+### Archivos modificados
+
+- `content/reflow.css`
+- `index.html`
+- `BOOK-MAINTENANCE-PLAYBOOK.md`
+- `PROJECT-CONTINUITY.md`
+
+### Validación estática
+
+- Ejecutar `git diff --check`.
+- Confirmar que `#00A096` permanece definido como `--ceibal-institutional-400`.
+- Confirmar que los controles con texto blanco usan `--ceibal-institutional-500`.
+- Verificar matemáticamente las relaciones indicadas en el procedimiento.
+
+### Validación en navegador
+
+- Medir estilos calculados de pestañas y opciones seleccionadas en Índice y Herramientas.
+- Medir texto, superficie y borde de Anterior/Siguiente contra la barra inferior.
+- Medir borde y texto de opciones deshabilitadas.
+- Seleccionar una respuesta sin enviarla y verificar borde y foco.
+- Enviar respuestas correcta e incorrecta y confirmar texto, icono y borde.
+- Comprobar los focos sobre blanco, superficies de resultado, panel oscuro y barra.
+
+### Resultado obtenido
+
+- Antes de corregir, blanco sobre `#00A096` medía `3.25:1`; Anterior/Siguiente contra la barra medía `1.27:1`; el borde seleccionado de actividades medía `2.02:1`.
+- Los focos ya cumplían: `7.14:1` sobre blanco, `4.78:1` sobre panel oscuro y `4.95:1` sobre la barra.
+- Correcto e incorrecto ya cumplían en texto e iconos, con valores entre `5.02:1` y `10.93:1`.
+- Las selecciones de pestaña, voz y tamaño alcanzaron `4.82:1` en texto blanco; sus superficies midieron entre `3.22:1` y `3.58:1` contra el panel.
+- Siguiente alcanzó `4.80:1` en texto, `3.20:1` en superficie y `7.29:1` en límite contra la barra; Anterior deshabilitado conservó `9.93:1` en texto.
+- El control deshabilitado de Resaltado alcanzó `5.77:1` tanto en texto como en borde.
+- En actividades, el botón deshabilitado alcanzó `6.08:1` en texto y `3.90:1` en borde; la opción seleccionada alcanzó `4.82:1` en borde y su foco `7.14:1`.
+- El feedback correcto conservó `7.08:1` en texto, `5.02:1` en icono y `6.56:1` en foco. El estado incorrecto permanece en `10.93:1` y `5.65:1`.
+- La validación renderizada final utiliza `reflow.css?v=78-audited-color-contrast`.
+
+### Riesgos y excepciones
+
+- Los controles inactivos están exentos de ciertos requisitos WCAG, pero este proyecto adopta igualmente el objetivo interno de `3:1` para sus límites.
+- No oscurecer globalmente `#00A096`: hacerlo eliminaría la referencia institucional. La variante se elige según función y fondo.
+- El borde no necesita contrastar simultáneamente con la superficie interna si el componente ya ofrece un límite de `3:1` contra el fondo adyacente.
+- Los cambios de estado no deben depender solo del color; se conservan grosor, patrón de borde, texto, iconos y semántica.
+
+### Reversión
+
+Restaurar los colores anteriores de navegación, selección y deshabilitado, retirar la reposición de foco y volver conjuntamente a la versión CSS previa en `index.html`.
+
+---
+
+## Acción 33: comunicar el resaltado TTS sin depender del color
+
+### Objetivo
+
+Conservar el fondo amarillo de lectura como señal reconocible y añadir forma, patrón y contorno para que palabra, oración e imagen sigan siendo identificables sin percepción del color.
+
+### Áreas que deben revisarse
+
+- Rango nativo `::highlight(adt-tts-active)`.
+- Fallback con `.bg-yellow-300` y `.tts-active-block`.
+- Palabras del glosario cubiertas por el rango TTS.
+- Contorno flotante de imágenes descritas.
+- Movimiento reducido y estabilidad de paginación.
+
+### Procedimiento
+
+1. Reutilizar `data-reflow-highlight-mode="word|sentence"`; no duplicar estado en JavaScript.
+2. En modo Palabra, combinar amarillo con subrayado oscuro sólido de `3px`.
+3. En modo Oración, combinar amarillo con subrayado oscuro doble de `2px`.
+4. Aplicar las mismas señales al fallback con spans y a términos de glosario cubiertos por TTS.
+5. Cuando el runtime solo pueda señalar el bloque completo, añadir una barra interior izquierda de `.25rem` sin padding ni cambio geométrico.
+6. Sustituir el borde únicamente amarillo de las imágenes por un borde interior oscuro de `3px` y un anillo exterior amarillo de `3px`.
+7. Mantener transiciones y animaciones desactivadas en estos marcadores.
+8. Versionar el CSS para impedir que la caché conserve el resaltado anterior.
+
+### Archivos modificados
+
+- `content/reflow.css`
+- `index.html`
+- `BOOK-MAINTENANCE-PLAYBOOK.md`
+- `PROJECT-CONTINUITY.md`
+
+### Validación estática
+
+- Ejecutar `git diff --check`.
+- Confirmar que Palabra y Oración usan patrones distintos.
+- Confirmar que ninguna señal añade padding, margen, peso tipográfico o transformación.
+- Confirmar que la imagen conserva `pointer-events: none` en su overlay.
+
+### Validación en navegador
+
+- Iniciar lectura en modo Palabra y comprobar fondo más subrayado sólido.
+- Cambiar a Oración y comprobar fondo más subrayado doble.
+- Verificar una palabra del glosario mientras cruza el rango leído.
+- Alcanzar una imagen con descripción y comprobar el doble contorno.
+- Confirmar que página total, saltos de línea y posición no cambian al avanzar el audio.
+- Activar movimiento reducido y comprobar que los marcadores permanecen instantáneos.
+
+### Resultado obtenido
+
+- Palabra y Oración conservan el amarillo, pero ya cuentan con patrones de subrayado diferentes.
+- El fallback de bloque incorpora una barra interior que no modifica sus dimensiones.
+- Las imágenes combinan contorno oscuro y anillo amarillo sobre arte claro u oscuro.
+- La versión vigente pasa a `reflow.css?v=79-non-color-tts-highlight`.
+- La comprobación renderizada confirmó el subrayado sólido en Palabra y el subrayado doble en Oración durante reproducción real.
+- La descripción de una imagen confirmó el contorno oscuro interior más el anillo amarillo exterior sobre una ilustración de página completa.
+- Las pruebas conservaron los saltos de línea, la posición del contenido y el total de `234` páginas; no aparecieron errores nuevos en consola.
+
+### Riesgos y excepciones
+
+- No usar negrita para señalar el rango: puede cambiar ancho, saltos de línea y paginación.
+- No anunciar cada palabra mediante `aria-live`; el reproductor comunica el estado general de lectura sin saturar tecnologías de asistencia.
+- CSS Highlights admite un conjunto limitado de propiedades, por lo que el patrón exacto se expresa mediante `text-decoration`, no mediante borde o `box-shadow`.
+- La barra interior se reserva al fallback de bloque; en rangos nativos la señal debe seguir exactamente el texto pronunciado.
+
+### Reversión
+
+Retirar las reglas dependientes de `data-reflow-highlight-mode`, restaurar el `box-shadow: none` del bloque y el borde amarillo simple del overlay, y volver conjuntamente a la versión CSS anterior.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
