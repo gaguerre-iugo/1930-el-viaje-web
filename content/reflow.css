@@ -1392,6 +1392,77 @@ body.reflow-book .reflow-upstream-dock {
   }
 }
 
+/* Mobile labels degrade progressively instead of disappearing at the tablet
+   breakpoint. Index and Tools keep text whenever the five fixed controls fit;
+   Tools uses a visual abbreviation before both actions become icon-only. The
+   buttons retain their complete aria-labels at every width. */
+@media (min-width: 22rem) and (max-width: 47.999rem) {
+  #reflow-pagination {
+    grid-template-columns:
+      minmax(5.25rem, 1fr)
+      2.75rem
+      minmax(3.75rem, .75fr)
+      2.75rem
+      minmax(5.75rem, 1.05fr);
+  }
+
+  #reflow-index,
+  #reflow-tools {
+    gap: .35rem;
+  }
+
+  #reflow-index .reflow-toolbar-label,
+  #reflow-tools .reflow-toolbar-label {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    clip: auto;
+    white-space: nowrap;
+    border: 0;
+    text-overflow: ellipsis;
+  }
+
+  #reflow-tools .reflow-toolbar-label {
+    font-size: 0;
+  }
+
+  #reflow-tools .reflow-toolbar-label::after {
+    content: attr(data-compact-label);
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 30rem) and (max-width: 47.999rem) {
+  #reflow-pagination {
+    grid-template-columns:
+      minmax(6.75rem, 1fr)
+      2.75rem
+      minmax(4rem, .75fr)
+      2.75rem
+      minmax(8.25rem, 1.1fr);
+  }
+
+  #reflow-tools .reflow-toolbar-label {
+    font-size: 1rem;
+  }
+
+  #reflow-tools .reflow-toolbar-label::after {
+    content: none;
+  }
+}
+
+@media (max-width: 30rem) {
+  body.reflow-book .reflow-reader-panel.reflow-navigation-panel,
+  body.reflow-book .reflow-reader-panel.reflow-accessibility-panel,
+  body.reflow-book .reflow-reader-panel.reflow-glossary-panel {
+    width: min(18rem, calc(100vw - .75rem)) !important;
+    max-width: calc(100vw - .75rem) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #reflow-pagination { transition: none; }
 }

@@ -2653,7 +2653,7 @@
       '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">⚙</span>' +
-        '<span class="reflow-toolbar-label">Herramientas</span>' +
+        '<span class="reflow-toolbar-label" data-compact-label="Herram.">Herramientas</span>' +
       '</button>';
 
     ttsPlayer = document.createElement("section");

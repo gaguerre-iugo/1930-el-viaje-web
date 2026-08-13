@@ -1199,6 +1199,62 @@ Retirar la organización y clases del panel, el control personalizado de movimie
 
 ---
 
+## Acción 18: adaptar la barra y los paneles a móvil
+
+### Objetivo
+
+Conservar la jerarquía, el orden y la accesibilidad de la barra inferior en anchos reducidos, abreviando las etiquetas de forma progresiva sin reducir las áreas táctiles.
+
+### Procedimiento
+
+1. Mantener el orden fijo Índice, Anterior, página actual/total, Siguiente y Herramientas.
+2. Conservar áreas táctiles mínimas de `44 × 44 px` y un contador de al menos `16 px` con números tabulares.
+3. Entre `30rem` y el corte de escritorio, mostrar completas las etiquetas «Índice» y «Herramientas».
+4. Entre `22rem` y `30rem`, mantener «Índice» y abreviar visualmente «Herramientas» como «Herram.».
+5. Por debajo de `22rem`, ocultar visualmente esas dos etiquetas como último recurso y conservar los iconos.
+6. Mantener siempre los nombres accesibles completos mediante `aria-label`; la abreviatura es únicamente visual.
+7. Limitar el ancho de Índice, Herramientas y Glosario en pantallas estrechas para dejar un borde visible y conservar su desplazamiento interno.
+8. Conservar la reserva inferior y el área segura del dispositivo para que la barra y el reproductor TTS no cubran contenido ni foco.
+9. Versionar CSS y JavaScript en `index.html` para evitar que la caché mantenga la disposición anterior.
+
+### Validación estática
+
+- Confirmar que el DOM mantiene el mismo orden de controles en todos los cortes.
+- Comprobar que «Índice» y «Herramientas» conservan sus `aria-label` completos.
+- Revisar que ninguna regla móvil reduzca `min-width` o `min-height` por debajo de `2.75rem`.
+- Verificar que el contador mantiene `font-size: 1rem` y `font-variant-numeric: tabular-nums`.
+- Ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Validación en navegador
+
+- Probar al menos `320`, `375`, `480` y `566 px` de ancho.
+- En `320 px`, verificar la variante solo con iconos; en `375 px`, «Índice» y «Herram.»; desde `480 px`, las dos etiquetas completas.
+- Confirmar que no existe desplazamiento horizontal y que los cinco controles permanecen en una única fila.
+- Medir todos los botones y confirmar un mínimo de `44 × 44 px`.
+- Abrir Índice, Herramientas y Glosario; comprobar que dejan un borde visible, tienen desplazamiento interno y no repaginan el libro.
+- Con zoom de navegador, recorrer la barra y los paneles con teclado y comprobar que ningún foco queda oculto.
+
+### Resultado obtenido
+
+- Se añadieron dos cortes progresivos: etiqueta abreviada desde `22rem` y etiquetas completas desde `30rem`.
+- La variante extrema conserva iconos, orden fijo y nombres accesibles completos.
+- Los tamaños táctiles y el contador no fueron reducidos.
+- Los paneles laterales dejan al menos `.75rem` de borde visible en anchos de hasta `30rem`.
+- Se actualizaron las versiones de `reflow.css` y `reflow-book.js` para invalidar la caché.
+
+### Riesgos y excepciones
+
+- El zoom modifica el ancho CSS efectivo; validar también los cortes con zoom alto, no solo mediante emulación de dispositivo.
+- Si se traducen las etiquetas o cambia «Herramientas», revisar la abreviatura visual sin modificar el nombre accesible completo.
+- No reducir el área táctil para recuperar espacio: ocultar texto es el último ajuste permitido.
+- No cambiar el orden de la cuadrícula según el ancho; la memoria espacial de la barra debe permanecer estable.
+
+### Reversión
+
+Retirar los cortes progresivos y el límite móvil de los paneles, eliminar `data-compact-label` y restaurar las versiones anteriores de JavaScript y CSS indicadas en `index.html`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

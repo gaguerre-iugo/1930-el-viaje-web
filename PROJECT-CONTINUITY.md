@@ -1,10 +1,10 @@
 # Estado para retomar el trabajo
 
-Última actualización: 12 de agosto de 2026.
+Última actualización: 13 de agosto de 2026.
 
 ## Última operación completada
 
-Se completaron los puntos 1, 2, 3 y 4 del análisis de la barra inferior permanente: crear un reproductor TTS flotante, diferenciar «Activar lectura en voz alta» de «Reproducir», añadir cierre y control completo del foco, y reorganizar Herramientas.
+Se completaron los puntos 1, 2, 3, 4 y 5 del análisis de la barra inferior permanente: crear un reproductor TTS flotante, diferenciar «Activar lectura en voz alta» de «Reproducir», añadir cierre y control completo del foco, reorganizar Herramientas y adaptar progresivamente la interfaz a móvil.
 
 ## Implementación realizada
 
@@ -19,7 +19,10 @@ Se completaron los puntos 1, 2, 3 y 4 del análisis de la barra inferior permane
 - Herramientas se organiza en Apoyos para la lectura, Preferencias, Atajos de teclado y Herramientas, con Audio y voz como subgrupo.
 - Resaltado queda deshabilitado y explicado cuando TTS está apagado; Descripción de imágenes permanece independiente.
 - Se añadió una preferencia funcional para reducir movimiento y se evitó que el panel quede detrás del reproductor TTS.
-- La receta general y los errores encontrados están documentados en las acciones 14, 15, 16 y 17 de `BOOK-MAINTENANCE-PLAYBOOK.md`.
+- En móvil, las etiquetas se mantienen completas cuando caben, «Herramientas» pasa visualmente a «Herram.» en el corte intermedio y solo se oculta el texto en anchos extremos.
+- Los nombres accesibles completos, el orden fijo, las áreas táctiles de 44 px y el contador de 16 px se conservan en todos los cortes.
+- Índice, Herramientas y Glosario dejan un borde visible en pantallas estrechas y mantienen desplazamiento interno.
+- La receta general y los errores encontrados están documentados en las acciones 14, 15, 16, 17 y 18 de `BOOK-MAINTENANCE-PLAYBOOK.md`.
 
 ## Último cambio aplicado
 
@@ -28,6 +31,8 @@ La reserva inferior se estaba calculando incorrectamente porque JavaScript inter
 Este último ajuste quedó aplicado y validado en navegador.
 
 Al retomar se añadió `tools/serve-local.js`, un servidor estático local con caché desactivada para repetir las pruebas de forma consistente. Se inicia con `node tools/serve-local.js`.
+
+El punto 5 añadió cortes móviles a `22rem` y `30rem`, una abreviatura únicamente visual para Herramientas y un ancho seguro para los paneles laterales. Las versiones quedaron en `reflow.css?v=66-progressive-mobile-toolbar` y `reflow-book.js?v=87-progressive-mobile-toolbar`.
 
 ## Validación realizada
 
@@ -50,6 +55,7 @@ Al retomar se añadió `tools/serve-local.js`, un servidor estático local con c
 - Los encabezados de Herramientas usan sentence case y no aplican transformación CSS.
 - Glosario sigue siendo un botón de `51 px`; Idioma permanece oculto mientras solo existe `es-UY`.
 - En móvil, Herramientas tiene desplazamiento interno, cero desbordamiento horizontal y termina antes del reproductor TTS.
+- La revisión estática del punto 5 confirma el orden fijo, nombres accesibles completos y mínimos de 44 px; queda pendiente repetir su comprobación visual en `320`, `375`, `480` y `566 px` cuando la pestaña del navegador integrado recargue el servidor local.
 - Se ejecutaron las comprobaciones:
 
    ```powershell
@@ -61,16 +67,14 @@ Las comprobaciones estáticas de `assets/reflow-book.js` y `tools/serve-local.js
 
 ## Estado de Git
 
-Los cambios no se han comiteado ni subido. Antes de confirmar, revisar conjuntamente las modificaciones previas de EVA y las de este reproductor en:
+Los puntos 1 a 4 están comiteados y subidos en `136ae7f2`. El punto 5 se preparó como un cambio independiente que afecta a:
 
 - `assets/reflow-book.js`
-- `assets/config.json`
 - `content/reflow.css`
 - `index.html`
 - `BOOK-MAINTENANCE-PLAYBOOK.md`
 - `PROJECT-CONTINUITY.md`
-- `tools/serve-local.js`
 
 ## Trabajo posterior acordado
 
-Continuar con el siguiente bloque del documento de requisitos: revisar la adaptación móvil completa. Los radios EVA continúan pendientes.
+Completar la comprobación visual del punto 5 en el navegador integrado y continuar con el siguiente punto del documento. Los radios EVA continúan pendientes.
