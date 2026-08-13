@@ -1723,6 +1723,79 @@ Retirar el cierre alternativo por `aria-pressed`, la captura de intención de pu
 
 ---
 
+## Acción 30: respetar movimiento reducido del sistema y de la configuración
+
+### Objetivo
+
+Mantener instantáneos los cambios de página, respetar automáticamente `prefers-reduced-motion` y permitir que cada lector establezca o restablezca una preferencia manual desde Herramientas.
+
+### Áreas que deben revisarse
+
+- Estado inicial y persistencia de la preferencia de movimiento.
+- Cambios en vivo de `prefers-reduced-motion`.
+- Animaciones, transiciones, desplazamientos y celebraciones decorativas.
+- Reproducción automática al cambiar de página.
+- Sincronización con el componente base y versionado de los recursos.
+
+### Procedimiento
+
+1. Interpretar la ausencia de una preferencia guardada como «usar configuración del sistema», no como `false`.
+2. Escuchar los cambios de `prefers-reduced-motion` y aplicarlos mientras no exista una elección manual.
+3. Permitir activar o desactivar manualmente la reducción y ofrecer «Usar configuración del sistema» para volver al modo automático.
+4. Publicar el estado efectivo en `data-reflow-reduce-motion` y sincronizarlo, cuando exista, con el átomo `reduceMotion` del runtime base.
+5. Mantener `scroll-behavior: auto` en la paginación y neutralizar las animaciones no esenciales cuando el estado efectivo sea reducido.
+6. Consultar la preferencia efectiva antes de lanzar confeti y retirar cualquier confeti ya visible al activarla.
+7. Impedir que la reproducción automática inicie narración en un cambio de página con movimiento reducido; no reactivarla automáticamente al abandonar ese modo.
+8. Preferir una transición corta de opacidad para el feedback del cuestionario, sin desplazamiento, escala ni rebote.
+9. Incrementar las versiones de CSS, runtime y secuencia de actividades porque el servidor trata esos recursos como inmutables.
+
+### Archivos modificados
+
+- `assets/reflow-book.js`
+- `assets/quiz-sequence.js`
+- `content/reflow.css`
+- `index.html`
+
+### Validación estática
+
+- Ejecutar `node --check assets/reflow-book.js`.
+- Ejecutar `node --check assets/quiz-sequence.js`.
+- Ejecutar `git diff --check`.
+- Confirmar que `goToPage` conserva `scrollBehavior = "auto"`.
+- Confirmar que confeti y autoplay consultan el estado efectivo.
+
+### Validación en navegador
+
+- Sin preferencia manual, comprobar que Herramientas identifica la fuente como «configuración del sistema».
+- Cambiar manualmente el interruptor y confirmar `data-reflow-motion-preference="manual"`.
+- Pulsar «Usar configuración del sistema» y confirmar el regreso a `data-reflow-motion-preference="system"`.
+- Navegar entre páginas y comprobar que el cambio sigue siendo instantáneo.
+- Con reducción activa, validar ausencia de confeti, rebotes, desplazamientos decorativos y arranque automático de narración.
+- Abrir y cerrar Índice y Herramientas para comprobar que las transiciones técnicas de montaje siguen completando el ciclo.
+
+### Resultado obtenido
+
+- La compilación `47-full-book-105` cargó completa, con `aria-busy="false"` y `scroll-behavior: auto`.
+- El modo automático pasó de movimiento normal a reducido en vivo al cambiar la preferencia emulada del sistema, sin recargar la página.
+- El interruptor creó una preferencia manual y «Usar configuración del sistema» eliminó esa excepción y ocultó correctamente el botón.
+- La navegación avanzó de «Página 6 de 234» a «Página 7 de 234» de forma instantánea y no inició ningún audio.
+- Índice y Herramientas completaron los ciclos abrir/cerrar con reducción activa y terminaron invisibles con `aria-expanded="false"`.
+- Una respuesta correcta mostró feedback sin animación espacial y produjo cero capas de confeti.
+- La emulación se retiró al finalizar y el libro quedó en modo automático, siguiendo la configuración real del sistema.
+
+### Riesgos y excepciones
+
+- No aplicar `animation: none` al contenedor base de los paneles: necesita una salida técnica de `1ms` para desmontarse correctamente.
+- Una elección manual `false` es válida y debe prevalecer sobre el sistema hasta que se pulse «Usar configuración del sistema».
+- Desactivar autoplay al solicitar reducción de movimiento no debe reactivarlo después sin una acción explícita de la persona.
+- El feedback mediante color u opacidad breve permanece permitido porque no produce movimiento espacial.
+
+### Reversión
+
+Restaurar la lectura booleana anterior de `reducedMotion`, retirar el botón para volver al sistema y recuperar conjuntamente las versiones previas de los tres recursos en `index.html`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

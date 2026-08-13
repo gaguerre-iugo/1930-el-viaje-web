@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  document.documentElement.dataset.reflowBuild = "47-full-book-104";
+  document.documentElement.dataset.reflowBuild = "47-full-book-105";
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -320,6 +320,9 @@
     ttsPlayerReserve: 0,
     ttsPlayerStopPendingUntil: 0,
     reducedMotion: false,
+    reducedMotionOverride: null,
+    systemReducedMotion: false,
+    reducedMotionMediaQuery: null,
     sentencePaginationKey: "",
     runtimeMenu: null,
     panelFocusOrigin: null,
@@ -1650,6 +1653,7 @@
         scheduleTtsAlignment(nextPage, false);
       } else if (
         state.ttsExplicitlyStarted &&
+        !state.reducedMotion &&
         window.__adtReflowGetAutoplay &&
         window.__adtReflowGetAutoplay()
       ) {
@@ -3010,23 +3014,96 @@
     window.__adtReflowTtsVoice = state.ttsVoice;
   }
 
-  function applyReducedMotion(enabled, persist) {
-    state.reducedMotion = Boolean(enabled);
-    document.body.dataset.reflowReduceMotion = String(state.reducedMotion);
+  function updateReducedMotionControls() {
     var control = document.getElementById("reflow-reduce-motion");
     if (control) setAttributeIfChanged(control, "aria-checked", state.reducedMotion);
-    if (persist) {
-      try {
-        localStorage.setItem(reducedMotionStorageKey, String(state.reducedMotion));
-      } catch (_error) {}
+    var description = document.getElementById("reflow-reduce-motion-description");
+    if (description) {
+      var sourceText = state.reducedMotionOverride === null
+        ? "Sigue la configuración del sistema"
+        : "Preferencia manual";
+      var valueText = state.reducedMotion ? "movimiento reducido activado" : "movimiento reducido desactivado";
+      description.textContent = sourceText + ": " + valueText + ".";
+    }
+    var reset = document.getElementById("reflow-reduce-motion-system");
+    if (reset) reset.hidden = state.reducedMotionOverride === null;
+  }
+
+  function syncReducedMotionRuntime() {
+    window.__adtReflowEffectiveReducedMotion = state.reducedMotion;
+    window.__adtReflowShouldReduceMotion = function () {
+      return state.reducedMotion;
+    };
+    if (typeof window.__adtReflowSetReduceMotion === "function") {
+      window.__adtReflowSetReduceMotion(state.reducedMotion);
+    }
+    if (!state.reducedMotion) return;
+    document.querySelectorAll(".quiz-confetti").forEach(function (layer) {
+      layer.remove();
+    });
+    if (window.__adtReflowConfetti && typeof window.__adtReflowConfetti.reset === "function") {
+      window.__adtReflowConfetti.reset();
+    }
+    if (typeof window.__adtReflowSetAutoplay === "function") {
+      window.__adtReflowSetAutoplay(false);
     }
   }
 
+  function applyReducedMotion(enabled, persist) {
+    if (persist) {
+      state.reducedMotionOverride = Boolean(enabled);
+      try {
+        localStorage.setItem(reducedMotionStorageKey, String(state.reducedMotionOverride));
+      } catch (_error) {}
+    }
+    state.reducedMotion = Boolean(enabled);
+    document.body.dataset.reflowReduceMotion = String(state.reducedMotion);
+    document.body.dataset.reflowMotionPreference =
+      state.reducedMotionOverride === null ? "system" : "manual";
+    updateReducedMotionControls();
+    syncReducedMotionRuntime();
+  }
+
+  function applySystemReducedMotionPreference() {
+    state.reducedMotionOverride = null;
+    try { localStorage.removeItem(reducedMotionStorageKey); } catch (_error) {}
+    applyReducedMotion(state.systemReducedMotion, false);
+  }
+
   function loadReducedMotionPreference() {
-    var enabled = false;
-    try { enabled = localStorage.getItem(reducedMotionStorageKey) === "true"; }
-    catch (_error) {}
-    applyReducedMotion(enabled, false);
+    var mediaQuery = window.matchMedia
+      ? window.matchMedia("(prefers-reduced-motion: reduce)")
+      : null;
+    state.reducedMotionMediaQuery = mediaQuery;
+    state.systemReducedMotion = Boolean(mediaQuery && mediaQuery.matches);
+    try {
+      var stored = localStorage.getItem(reducedMotionStorageKey);
+      state.reducedMotionOverride = stored === "true"
+        ? true
+        : stored === "false" ? false : null;
+    } catch (_error) {
+      state.reducedMotionOverride = null;
+    }
+    applyReducedMotion(
+      state.reducedMotionOverride === null
+        ? state.systemReducedMotion
+        : state.reducedMotionOverride,
+      false
+    );
+    if (!mediaQuery) return;
+    var handleSystemMotionChange = function (event) {
+      state.systemReducedMotion = Boolean(event.matches);
+      if (state.reducedMotionOverride === null) {
+        applyReducedMotion(state.systemReducedMotion, false);
+      } else {
+        updateReducedMotionControls();
+      }
+    };
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", handleSystemMotionChange);
+    } else if (typeof mediaQuery.addListener === "function") {
+      mediaQuery.addListener(handleSystemMotionChange);
+    }
   }
 
   var easyReadNormalAudioAliases = {
@@ -3715,7 +3792,7 @@
               '<label for="reflow-reduce-motion">' +
                 '<span id="reflow-reduce-motion-label">Reducir movimiento</span>' +
                 '<span id="reflow-reduce-motion-description" class="reflow-setting-description">' +
-                  'Desactiva animaciones y transiciones del lector.' +
+                  'Sigue la configuración de movimiento del sistema.' +
                 '</span>' +
               '</label>' +
               '<button id="reflow-reduce-motion" class="reflow-custom-switch" type="button" ' +
@@ -3725,6 +3802,9 @@
                 '<span class="reflow-custom-switch-thumb" aria-hidden="true"></span>' +
               '</button>' +
             '</div>' +
+            '<button id="reflow-reduce-motion-system" type="button" hidden>' +
+              'Usar configuración del sistema' +
+            '</button>' +
           '</div>';
         var firstSection = settingsTab.querySelector(":scope > section");
         if (firstSection && firstSection.nextSibling) {
@@ -3860,6 +3940,11 @@
       var control = event.target.closest("#reflow-reduce-motion");
       if (!control) return;
       applyReducedMotion(control.getAttribute("aria-checked") !== "true", true);
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!event.target.closest("#reflow-reduce-motion-system")) return;
+      applySystemReducedMotionPreference();
     });
 
     document.addEventListener("click", function (event) {
@@ -9507,7 +9592,10 @@
         current: state.current + 1,
         total: state.total,
         fontScale: document.body.getAttribute("data-reflow-font-scale") || "normal",
-        easyRead: document.body.classList.contains("reflow-easy-read")
+        easyRead: document.body.classList.contains("reflow-easy-read"),
+        reducedMotion: state.reducedMotion,
+        reducedMotionSource: state.reducedMotionOverride === null ? "system" : "manual",
+        systemReducedMotion: state.systemReducedMotion
       };
     };
     var mediaPrototype = window.HTMLMediaElement && window.HTMLMediaElement.prototype;
@@ -9990,7 +10078,10 @@
       'window.__adtReflowGetWordHighlight=()=>qF.get(Iy);' +
       'window.__adtReflowSetAudioSpeed=w=>qF.set(Ay,w);' +
       'window.__adtReflowGetAudioSpeed=()=>qF.get(Ay);' +
-      'window.__adtReflowGetAutoplay=()=>qF.get(Ey);';
+      'window.__adtReflowGetAutoplay=()=>qF.get(Ey);' +
+      'window.__adtReflowSetAutoplay=w=>qF.set(Ey,!!w);' +
+      'window.__adtReflowSetReduceMotion=w=>qF.set(Lr,!!w);' +
+      'window.__adtReflowGetReduceMotion=()=>qF.get(Lr);';
     var wordTimingMarker = 'function hL(e,t,o,n){return n&&n.length>0?n:' +
       '!Number.isFinite(o)||o<=0?dL(t,NaN):dL(t,o)}';
     var wordTimingReplacement = 'function hL(e,t,o,n){let a=R2(u8(t)).length,' +
@@ -10523,7 +10614,10 @@
         current: state.current + 1,
         total: state.total,
         fontScale: document.body.getAttribute("data-reflow-font-scale") || "normal",
-        easyRead: document.body.classList.contains("reflow-easy-read")
+        easyRead: document.body.classList.contains("reflow-easy-read"),
+        reducedMotion: state.reducedMotion,
+        reducedMotionSource: state.reducedMotionOverride === null ? "system" : "manual",
+        systemReducedMotion: state.systemReducedMotion
       };
     };
     migrateDefaultReaderState();
@@ -10572,6 +10666,7 @@
       await voiceCatalogPromise;
       await indexMetadataPromise;
       await loadRuntime();
+      syncReducedMotionRuntime();
       installGlossaryDefinitionFocusManagement();
       normalizeLaterBookStructure();
       createPagination();

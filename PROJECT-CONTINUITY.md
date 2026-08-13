@@ -19,6 +19,8 @@ Se completaron los puntos 1, 2, 3, 4 y 5 del análisis de la barra inferior perm
 - Herramientas se organiza en Apoyos para la lectura, Preferencias, Atajos de teclado y Herramientas, con Audio y voz como subgrupo.
 - Resaltado queda deshabilitado y explicado cuando TTS está apagado; Descripción de imágenes permanece independiente.
 - Se añadió una preferencia funcional para reducir movimiento y se evitó que el panel quede detrás del reproductor TTS.
+- Reducir movimiento ahora hereda automáticamente `prefers-reduced-motion`, sigue sus cambios en vivo y admite una elección manual reversible mediante «Usar configuración del sistema».
+- El estado efectivo desactiva confeti, movimiento decorativo y autoplay entre páginas, mientras los cambios de página permanecen instantáneos.
 - En móvil, las etiquetas se mantienen completas cuando caben, «Herramientas» pasa visualmente a «Herram.» en el corte intermedio y solo se oculta el texto en anchos extremos.
 - Los nombres accesibles completos, el orden fijo, las áreas táctiles de 44 px y el contador de 16 px se conservan en todos los cortes.
 - Índice, Herramientas y Glosario dejan un borde visible en pantallas estrechas y mantienen desplazamiento interno.
@@ -59,6 +61,8 @@ Con Ocultar menús automáticamente, la protección de gestos detenía `pointerd
 
 Chrome y el navegador integrado podían completar una parte de la secuencia del puntero pero omitir `click` cuando la barra cambiaba de estado. La solución vigente captura la intención al iniciar la pulsación, usa una liberación de respaldo solo cuando el control estaba desenfocado o autooculto y conserva el flujo normal de clic para controles estables. El cierre ya no depende del puente del runtime: puede activar el control original con `aria-pressed="true"`. La animación de `1ms` del contenedor permanece ininterrumpida para el ciclo de Base UI; la protección del primer pintado desactiva únicamente las transiciones de los controles internos, evitando el parpadeo al revelar Herramientas. Las versiones vigentes son `reflow.css?v=72-stable-tools-first-paint` y `reflow-book.js?v=108-first-press-release-fallback`.
 
+El tratamiento de movimiento se actualizó después: la compilación es `47-full-book-105` y las versiones vigentes pasan a `reflow.css?v=73-effective-reduced-motion`, `reflow-book.js?v=109-effective-reduced-motion` y `quiz-sequence.js?v=7-effective-reduced-motion`.
+
 ## Validación realizada
 
 - La barra principal presenta únicamente Índice, Anterior, contador, Siguiente y Herramientas.
@@ -91,6 +95,8 @@ Chrome y el navegador integrado podían completar una parte de la secuencia del 
 - En Chrome, Herramientas abre al primer clic después de reaparecer la barra autooculta y el panel permanece visible; la activación por teclado sigue funcionando.
 - En Chrome, Índice y Herramientas completan con mouse los ciclos `false → true → false` tanto en visibilidad como en `aria-expanded`, sin errores de consola.
 - En el navegador integrado, Índice y Herramientas completan también los ciclos `false → true → false` con pulsaciones físicas; el foco de Índice se restaura correctamente.
+- La preferencia de movimiento distingue fuente automática y manual, ofrece regreso al sistema y publica el estado efectivo para las actividades y el runtime base.
+- Con reducción activa, la paginación conserva desplazamiento instantáneo, el confeti se omite y la narración no se inicia automáticamente al cambiar de página.
 - Las cabeceras verificadas son `no-cache` para `index.html`, caché inmutable anual para recursos versionados y una hora para imágenes sin versión.
 - Se ejecutaron las comprobaciones:
 

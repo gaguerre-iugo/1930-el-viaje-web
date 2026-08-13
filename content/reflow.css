@@ -2230,12 +2230,12 @@ body.reflow-book #content .quiz-feedback.is-incorrect .quiz-feedback-icon {
 }
 
 body.reflow-book #content .quiz-feedback:not(:empty) {
-  animation: quiz-feedback-in 160ms ease-out;
+  animation: quiz-feedback-in 120ms ease-out;
 }
 
 @keyframes quiz-feedback-in {
-  from { opacity: 0; transform: translateY(.25rem); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 body.reflow-book #content .quiz-feedback.is-correct {
@@ -2568,6 +2568,34 @@ body.reflow-book .reflow-settings-organized
   font-weight: 700;
 }
 
+body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system {
+  min-height: 2.75rem;
+  margin: 0 .25rem .5rem;
+  padding: .5rem .75rem;
+  border: 1px solid var(--ceibal-gray-600);
+  border-radius: var(--ceibal-radius-md);
+  color: var(--ceibal-gray-100);
+  background: transparent;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system[hidden] {
+  display: none !important;
+}
+
+body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system:hover {
+  border-color: var(--ceibal-institutional-300);
+  background: rgb(102 198 192 / 16%);
+}
+
+body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+
 body.reflow-book .reflow-custom-switch {
   flex: 0 0 auto;
   border: 1px solid transparent;
@@ -2607,6 +2635,14 @@ body.reflow-book[data-reflow-reduce-motion="true"] *::after {
   animation-duration: .01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: .01ms !important;
+}
+
+body.reflow-book[data-reflow-reduce-motion="true"] #content .quiz-feedback:not(:empty) {
+  animation: none !important;
+}
+
+body.reflow-book[data-reflow-reduce-motion="true"] #content .quiz-confetti {
+  display: none !important;
 }
 
 /* Navigation and accessibility menus overlay the page, following the CLE 3

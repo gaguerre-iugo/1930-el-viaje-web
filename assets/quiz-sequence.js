@@ -90,7 +90,14 @@
   }
 
   function launchConfetti(panel) {
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var bookRequestsReducedMotion =
+      typeof window.__adtReflowShouldReduceMotion === "function" &&
+      window.__adtReflowShouldReduceMotion();
+    var systemRequestsReducedMotion =
+      window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (bookRequestsReducedMotion || systemRequestsReducedMotion) {
+      clearConfetti(panel);
       return;
     }
     /* Reuse the book runtime's original canvas-confetti engine and its exact
