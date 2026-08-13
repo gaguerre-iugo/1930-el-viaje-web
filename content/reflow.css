@@ -5360,3 +5360,215 @@ body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
   #content [data-id="pg215_n0023"] {
   margin-top: .5em !important;
 }
+
+/* Normalized interaction states. Every control family keeps its established
+   shape, while hover, pressed, disabled, loading and result states use the
+   same surface/border language and never rely on opacity alone. */
+body.reflow-book .reflow-reader-panel [role="tab"] {
+  cursor: pointer !important;
+  transition: color 120ms ease, background-color 120ms ease,
+    border-color 120ms ease, box-shadow 120ms ease;
+}
+
+body.reflow-book .reflow-reader-panel [role="tab"]:hover:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]) {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: rgb(102 198 192 / 16%) !important;
+}
+
+body.reflow-book .reflow-reader-panel [role="tab"]:active:not(:disabled):not([aria-disabled="true"]),
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:active:not(:disabled),
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:active:not(:disabled),
+body.reflow-book .reflow-panel-control-header button:active:not(:disabled),
+body.reflow-book #reflow-open-glossary:active:not(:disabled),
+body.reflow-book #reflow-reduce-motion-system:active:not(:disabled) {
+  border-color: var(--ceibal-institutional-200) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-600) !important;
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 20%) !important;
+}
+
+body.reflow-book .reflow-accessibility-panel [role="radio"] {
+  cursor: pointer !important;
+  transition: color 120ms ease, background-color 120ms ease,
+    border-color 120ms ease, box-shadow 120ms ease;
+}
+
+body.reflow-book .reflow-accessibility-panel [role="radio"]:hover:not(:disabled):not([aria-disabled="true"]):not([aria-checked="true"]):not([aria-pressed="true"]) {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: rgb(102 198 192 / 16%) !important;
+}
+
+body.reflow-book .reflow-accessibility-panel [role="radio"]:active:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--ceibal-institutional-200) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-600) !important;
+  box-shadow: inset 0 0 0 2px rgb(255 255 255 / 20%) !important;
+}
+
+body.reflow-book .reflow-reader-panel [role="switch"]:hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--ceibal-institutional-300) !important;
+  box-shadow: 0 0 0 2px rgb(102 198 192 / 24%) !important;
+}
+
+body.reflow-book .reflow-reader-panel [role="switch"]:active:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--ceibal-institutional-200) !important;
+  box-shadow: inset 0 0 0 2px var(--ceibal-institutional-200) !important;
+}
+
+body.reflow-book .reflow-reader-panel :is(
+  button,
+  [role="tab"],
+  [role="radio"],
+  [role="switch"]
+):is(:disabled, [aria-disabled="true"]) {
+  border-color: var(--ceibal-gray-600) !important;
+  border-style: dashed !important;
+  color: var(--ceibal-gray-400) !important;
+  background: #2d333d !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+}
+
+/* Reusable state contract for controls that acquire asynchronous validation
+   in this or later books. Dotted, dashed and double borders preserve meaning
+   without requiring the status color to be perceived. */
+body.reflow-book :is(.reflow-reader-panel, #content) :is(
+  button,
+  [role="tab"],
+  [role="radio"],
+  [role="switch"],
+  .glossary-term
+):is([aria-busy="true"], [data-interaction-state="loading"]) {
+  border-color: var(--ceibal-institutional-300) !important;
+  border-style: dotted !important;
+  box-shadow: inset 3px 0 0 var(--ceibal-institutional-200) !important;
+  cursor: progress !important;
+}
+
+body.reflow-book :is(.reflow-reader-panel, #content) :is(
+  button,
+  [role="tab"],
+  [role="radio"],
+  [role="switch"],
+  .glossary-term
+):is([aria-invalid="true"], [data-interaction-state="error"]) {
+  border-color: #f28b82 !important;
+  border-style: dashed !important;
+  box-shadow: inset 3px 0 0 #f28b82 !important;
+}
+
+body.reflow-book :is(.reflow-reader-panel, #content) :is(
+  button,
+  [role="tab"],
+  [role="radio"],
+  [role="switch"],
+  .glossary-term
+)[data-interaction-state="success"] {
+  border-color: #79c98c !important;
+  border-style: double !important;
+  box-shadow: inset 3px 0 0 #79c98c !important;
+}
+
+body.reflow-book .reflow-reader-panel [data-reflow-tts-voice][aria-busy="true"] {
+  border-color: var(--ceibal-institutional-300) !important;
+  border-style: dashed !important;
+  color: #fff !important;
+  background: #293d3c !important;
+  cursor: progress !important;
+}
+
+body.reflow-book .reflow-reader-panel [data-reflow-tts-voice][aria-busy="true"]::after {
+  content: "…";
+  margin-left: .3rem;
+  font-weight: 700;
+}
+
+body.reflow-book .reflow-reader-panel [data-reflow-tts-voice][data-interaction-state="error"] {
+  border-color: #f28b82 !important;
+  border-style: dashed !important;
+  color: #ffd7d4 !important;
+  background: #4a2525 !important;
+}
+
+body.reflow-book .reflow-control-status {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem .65rem;
+  border: 1px solid var(--ceibal-gray-600);
+  border-radius: var(--ceibal-radius-md);
+  color: var(--ceibal-gray-100);
+  background: #242424;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+body.reflow-book .reflow-control-status[hidden] {
+  display: none !important;
+}
+
+body.reflow-book .reflow-control-status::before {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+body.reflow-book .reflow-control-status[data-state="loading"] {
+  border-style: dashed;
+  border-color: var(--ceibal-institutional-300);
+}
+
+body.reflow-book .reflow-control-status[data-state="loading"]::before {
+  content: "…";
+}
+
+body.reflow-book .reflow-control-status[data-state="error"] {
+  border-color: #f28b82;
+  color: #ffd7d4;
+  background: #4a2525;
+}
+
+body.reflow-book .reflow-control-status[data-state="error"]::before {
+  content: "×";
+}
+
+body.reflow-book .reflow-control-status[data-state="success"] {
+  border-color: #79c98c;
+  color: #d9f7e0;
+  background: #21402a;
+}
+
+body.reflow-book .reflow-control-status[data-state="success"]::before {
+  content: "✓";
+}
+
+body.reflow-book #content .glossary-term {
+  transition: color 120ms ease, background-color 120ms ease,
+    box-shadow 120ms ease;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+body.reflow-book #content .glossary-term:hover {
+  color: var(--ceibal-institutional-700) !important;
+  background: #c7eeeb !important;
+  box-shadow: inset 0 -3px 0 var(--ceibal-institutional-500) !important;
+}
+
+body.reflow-book #content .glossary-term:is(:active, [aria-expanded="true"]) {
+  color: #fff !important;
+  background: var(--ceibal-institutional-600) !important;
+  box-shadow: inset 0 0 0 2px var(--ceibal-institutional-200) !important;
+}
+
+body.reflow-book #content .quiz-feedback:focus {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-light) !important;
+  outline-offset: 3px !important;
+  box-shadow: var(--ceibal-shadow-focus) !important;
+  scroll-margin-block: 1rem;
+}

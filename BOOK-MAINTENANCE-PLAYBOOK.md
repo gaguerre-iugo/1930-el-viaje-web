@@ -1796,6 +1796,83 @@ Restaurar la lectura booleana anterior de `reducedMotion`, retirar el botón par
 
 ---
 
+## Acción 31: normalizar los estados de interacción y el foco
+
+### Objetivo
+
+Ofrecer estados consistentes, visibles y comprensibles en botones, pestañas, opciones, términos del glosario y actividades, sin depender exclusivamente del color y sin ocultar el foco.
+
+### Áreas que deben revisarse
+
+- Estado normal, `hover`, foco de teclado, presionado o seleccionado y deshabilitado.
+- Estados transitorios de carga, error y éxito.
+- Semántica accesible (`aria-selected`, `aria-checked`, `aria-expanded`, `aria-busy` y mensajes vivos).
+- Contraste, grosor y separación del indicador de foco.
+- Visibilidad del foco junto a la barra inferior y dentro de paneles.
+
+### Procedimiento
+
+1. Añadir una capa CSS común al final de `content/reflow.css`, con selectores suficientemente específicos para prevalecer sobre el componente base.
+2. Diferenciar `hover`, foco y pulsación mediante superficie, borde, subrayado o relieve, sin introducir desplazamientos ni escalados.
+3. Representar los controles deshabilitados con borde discontinuo, texto y superficie neutros, opacidad completa y cursor de indisponibilidad; no conservar la apariencia verde de una opción seleccionada cuando está deshabilitada.
+4. Publicar en los botones de voz el estado `normal`, `selected`, `loading` o `error`, conservar `aria-busy` y mostrar un mensaje textual vivo de preparación, éxito o fallo.
+5. Marcar el término del glosario que abre una definición con `aria-expanded="true"` y restablecerlo al cerrar, además de devolverle el foco.
+6. Reforzar el foco programático del mensaje de actividad con un contorno de tres píxeles, separación y margen de desplazamiento.
+7. Mantener los indicadores mediante texto, símbolos (`…`, `×`, `✓`) y patrones de borde además del color; dejar `data-interaction-state="loading|error|success"` como contrato reutilizable para cualquier familia de control.
+8. Versionar CSS y runtime en `index.html` para evitar que la caché mezcle la capa nueva con recursos anteriores.
+
+### Archivos modificados
+
+- `assets/reflow-book.js`
+- `content/reflow.css`
+- `index.html`
+- `BOOK-MAINTENANCE-PLAYBOOK.md`
+- `PROJECT-CONTINUITY.md`
+
+### Validación estática
+
+- Ejecutar `node --check assets/reflow-book.js`.
+- Ejecutar `git diff --check`.
+- Confirmar que no se introduce `outline: 0` ni `outline: none` sin sustitución equivalente.
+- Confirmar que carga, error y éxito conservan texto o símbolo independiente del color.
+
+### Validación en navegador
+
+- Recorrer botones y pestañas con puntero, `Tab`, `Enter` y `Espacio`, comparando los estados normal, `hover`, foco y presionado.
+- Abrir Herramientas y comprobar que una opción de Resaltado deshabilitada tiene borde discontinuo y apariencia neutra.
+- Elegir una voz no preparada y comprobar el mensaje de carga y la confirmación de éxito; provocar un fallo controlado solo en un entorno de prueba.
+- Abrir una palabra del glosario, confirmar `aria-expanded="true"`, cerrar la definición y verificar `aria-expanded="false"` y la devolución del foco.
+- Resolver una actividad y confirmar que el feedback de éxito o error recibe un foco visible que no queda oculto.
+- Verificar que la barra y los paneles no cubren el elemento enfocado con zoom y desplazamiento interno.
+
+### Resultado obtenido
+
+- Se incorporó una capa unificada de interacción sin animaciones espaciales.
+- Las opciones deshabilitadas ya no aparentan estar activas; se distinguen también por borde discontinuo y cursor.
+- La preparación de voces expone `aria-busy`, estado visual y mensajes vivos de carga, éxito o error.
+- Los términos del glosario comunican semánticamente la definición abierta y recuperan su estado al cerrarla.
+- El feedback de actividades presenta un foco de tres píxeles separado de la superficie.
+- En navegador, la pestaña no seleccionada cambió superficie, borde y texto al recibir `hover`; con teclado mostró un contorno de tres píxeles y `outline-offset: 2px`.
+- «Palabra» deshabilitada conservó opacidad completa y mostró superficie neutra, borde discontinuo y cursor de indisponibilidad.
+- El cambio temporal a Valentina mostró «Voz Valentina preparada.» y el regreso a Mateo conservó la preferencia original.
+- Una palabra de glosario pasó de `aria-expanded="false"` a `true`; al cerrar la definición volvió a `false` y recuperó el foco.
+- Una respuesta correcta presentó símbolo, texto y superficie de éxito; su mensaje recibió un contorno de tres píxeles con separación de tres píxeles.
+- La recarga final terminó en `7 / 234`, con la barra en `aria-busy="false"`, ningún diálogo abierto y sin errores nuevos de ejecución.
+- La compilación pasó a `47-full-book-106`; las versiones vigentes son `reflow.css?v=75-normalized-interaction-states` y `reflow-book.js?v=110-normalized-interaction-states`.
+
+### Riesgos y excepciones
+
+- No usar únicamente opacidad para deshabilitar: reduce legibilidad y puede confundirse con un control activo tenue.
+- No sustituir `aria-selected`, `aria-checked` o `aria-expanded` por clases visuales; ambas capas deben mantenerse sincronizadas.
+- Los mensajes de éxito de voz son transitorios para no producir ruido persistente en lectores de pantalla; los errores permanecen hasta una nueva acción válida.
+- El estado de carga puede ser muy breve con recursos locales en caché, pero debe seguir publicado semántica y visualmente.
+
+### Reversión
+
+Retirar el bloque de estados normalizados, los atributos y mensajes de voz y glosario, y restaurar conjuntamente las versiones anteriores de CSS y JavaScript en `index.html`.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  document.documentElement.dataset.reflowBuild = "47-full-book-105";
+  document.documentElement.dataset.reflowBuild = "47-full-book-106";
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -361,7 +361,8 @@
     glossaryHighlightFocusPage: null,
     glossaryHighlightFocusUntil: 0,
     fontSize: "normal",
-    ttsVoice: "valentina"
+    ttsVoice: "valentina",
+    ttsVoiceStatusTimer: 0
   };
 
   var content;
@@ -910,6 +911,7 @@
         highlight.setAttribute("role", "button");
         highlight.setAttribute("tabindex", "0");
         highlight.setAttribute("aria-haspopup", "dialog");
+        highlight.setAttribute("aria-expanded", "false");
         highlight.dataset.glossaryKey = formOwners.get(
           match[0].toLocaleLowerCase("es")
         );
@@ -1082,6 +1084,11 @@
 
     function rememberGlossaryOrigin(term) {
       window.clearTimeout(state.glossaryFocusRestoreTimer);
+      if (state.glossaryFocusKey) {
+        glossaryTermsForKey(state.glossaryFocusKey).forEach(function (candidate) {
+          candidate.setAttribute("aria-expanded", "false");
+        });
+      }
       var key = term.getAttribute("data-glossary-key") || "";
       var sameKey = glossaryTermsForKey(key);
       state.glossaryFocusOrigin = term;
@@ -1090,10 +1097,19 @@
       state.glossaryFocusPage = visiblePageIndex();
       state.glossaryFocusOrdinal = Math.max(0, sameKey.indexOf(term));
       state.glossaryFocusSuppressUntil = 0;
+      term.setAttribute("aria-expanded", "true");
       document.documentElement.dataset.reflowGlossaryFocusOrigin = key;
     }
 
     function clearGlossaryOrigin() {
+      if (state.glossaryFocusKey) {
+        glossaryTermsForKey(state.glossaryFocusKey).forEach(function (term) {
+          term.setAttribute("aria-expanded", "false");
+        });
+      }
+      if (state.glossaryFocusOrigin && state.glossaryFocusOrigin.isConnected) {
+        state.glossaryFocusOrigin.setAttribute("aria-expanded", "false");
+      }
       state.glossaryFocusOrigin = null;
       state.glossaryFocusKey = "";
       state.glossaryFocusText = "";
@@ -3279,9 +3295,34 @@
     audio.load();
   }
 
+  function setTtsVoiceStatus(message, statusType, autoHide) {
+    var status = document.getElementById("reflow-tts-voice-status");
+    if (!status) return;
+    window.clearTimeout(state.ttsVoiceStatusTimer);
+    state.ttsVoiceStatusTimer = 0;
+    if (!message) {
+      status.hidden = true;
+      status.textContent = "";
+      delete status.dataset.state;
+      status.setAttribute("role", "status");
+      return;
+    }
+    status.hidden = false;
+    status.textContent = message;
+    status.dataset.state = statusType || "loading";
+    status.setAttribute("role", statusType === "error" ? "alert" : "status");
+    if (autoHide) {
+      state.ttsVoiceStatusTimer = window.setTimeout(function () {
+        setTtsVoiceStatus("", "", false);
+      }, 2600);
+    }
+  }
+
   function updateTtsVoiceControls() {
     var selector = document.getElementById("reflow-tts-voice-setting");
     if (selector) selector.hidden = false;
+    var loadingVoice = "";
+    var failedVoice = "";
     Array.prototype.slice.call(document.querySelectorAll("[data-reflow-tts-voice]")).forEach(
       function (button) {
         var selected = button.dataset.reflowTtsVoice === state.ttsVoice;
@@ -3292,11 +3333,23 @@
         button.setAttribute("aria-checked", String(selected));
         button.setAttribute("aria-pressed", String(selected));
         button.setAttribute("aria-busy", String(loading));
+        button.dataset.interactionState = loading ? "loading" :
+          failed ? "error" : selected ? "selected" : "normal";
         button.disabled = !catalogue || loading || failed;
         button.title = failed ? "Esta voz no está disponible" :
           loading ? "Preparando voz" : "";
+        if (loading) loadingVoice = ttsVoices[button.dataset.reflowTtsVoice] || "seleccionada";
+        if (failed) failedVoice = ttsVoices[button.dataset.reflowTtsVoice] || "seleccionada";
       }
     );
+    var liveStatus = document.getElementById("reflow-tts-voice-status");
+    if (loadingVoice) {
+      setTtsVoiceStatus("Preparando la voz " + loadingVoice + "…", "loading", false);
+    } else if (failedVoice) {
+      setTtsVoiceStatus("No se pudo cargar la voz " + failedVoice + ".", "error", false);
+    } else if (!liveStatus || liveStatus.dataset.state !== "success") {
+      setTtsVoiceStatus("", "", false);
+    }
   }
 
   async function applyTtsVoice(voiceKey) {
@@ -3327,6 +3380,7 @@
     window.__adtReflowTtsVoice = voiceKey;
     try { localStorage.setItem(ttsVoiceStorageKey, voiceKey); } catch (_error) {}
     updateTtsVoiceControls();
+    setTtsVoiceStatus("Voz " + ttsVoices[voiceKey] + " preparada.", "success", true);
     if (item && audio) {
       bindTtsAudioForItem(item.id, audio);
       if (wasPlaying && !state.ttsManuallyPaused) {
@@ -3834,7 +3888,9 @@
               'aria-checked="false" aria-pressed="false">Valentina</button>' +
             '<button type="button" role="radio" data-reflow-tts-voice="mateo" ' +
               'aria-checked="false" aria-pressed="false">Mateo</button>' +
-          '</div>';
+          '</div>' +
+          '<span id="reflow-tts-voice-status" class="reflow-control-status" ' +
+            'role="status" aria-live="polite" hidden></span>';
         var readAloudRow = Array.prototype.slice.call(readingCard.children).find(
           function (candidate) {
             return /^texto a voz\b/i.test(candidate.textContent.trim());

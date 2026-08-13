@@ -21,6 +21,9 @@ Se completaron los puntos 1, 2, 3, 4 y 5 del análisis de la barra inferior perm
 - Se añadió una preferencia funcional para reducir movimiento y se evitó que el panel quede detrás del reproductor TTS.
 - Reducir movimiento ahora hereda automáticamente `prefers-reduced-motion`, sigue sus cambios en vivo y admite una elección manual reversible mediante «Usar configuración del sistema».
 - El estado efectivo desactiva confeti, movimiento decorativo y autoplay entre páginas, mientras los cambios de página permanecen instantáneos.
+- Se normalizaron los estados normal, `hover`, foco, pulsado, seleccionado, deshabilitado, carga, error y éxito en la interfaz del lector.
+- Las voces publican carga, error y éxito mediante estado semántico y mensaje visible; las palabras del glosario publican la definición abierta mediante `aria-expanded`.
+- Las opciones deshabilitadas y el feedback enfocado de actividades incorporan señales de borde y forma que no dependen solamente del color.
 - En móvil, las etiquetas se mantienen completas cuando caben, «Herramientas» pasa visualmente a «Herram.» en el corte intermedio y solo se oculta el texto en anchos extremos.
 - Los nombres accesibles completos, el orden fijo, las áreas táctiles de 44 px y el contador de 16 px se conservan en todos los cortes.
 - Índice, Herramientas y Glosario dejan un borde visible en pantallas estrechas y mantienen desplazamiento interno.
@@ -63,6 +66,8 @@ Chrome y el navegador integrado podían completar una parte de la secuencia del 
 
 El tratamiento de movimiento se actualizó después: la compilación es `47-full-book-105` y las versiones vigentes pasan a `reflow.css?v=73-effective-reduced-motion`, `reflow-book.js?v=109-effective-reduced-motion` y `quiz-sequence.js?v=7-effective-reduced-motion`.
 
+La normalización de estados de interacción eleva la compilación a `47-full-book-106` y las versiones vigentes pasan a `reflow.css?v=75-normalized-interaction-states` y `reflow-book.js?v=110-normalized-interaction-states`; la secuencia de actividades permanece en `quiz-sequence.js?v=7-effective-reduced-motion`.
+
 ## Validación realizada
 
 - La barra principal presenta únicamente Índice, Anterior, contador, Siguiente y Herramientas.
@@ -97,6 +102,8 @@ El tratamiento de movimiento se actualizó después: la compilación es `47-full
 - En el navegador integrado, Índice y Herramientas completan también los ciclos `false → true → false` con pulsaciones físicas; el foco de Índice se restaura correctamente.
 - La preferencia de movimiento distingue fuente automática y manual, ofrece regreso al sistema y publica el estado efectivo para las actividades y el runtime base.
 - Con reducción activa, la paginación conserva desplazamiento instantáneo, el confeti se omite y la narración no se inicia automáticamente al cambiar de página.
+- La revisión estática de los estados confirma señales no cromáticas para deshabilitado, carga, error y éxito, además de foco reforzado para el feedback de actividades.
+- En navegador se verificaron `hover` y foco de pestaña, apariencia deshabilitada de Resaltado, confirmación de voz, expansión y devolución de foco del glosario y foco visible del feedback correcto.
 - Las cabeceras verificadas son `no-cache` para `index.html`, caché inmutable anual para recursos versionados y una hora para imágenes sin versión.
 - Se ejecutaron las comprobaciones:
 
