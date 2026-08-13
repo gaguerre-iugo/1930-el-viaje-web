@@ -2635,10 +2635,11 @@
       typeof window.__adtReflowGetDockMenu === "function"
     );
     var currentMenu = runtimeMenuReady ? window.__adtReflowGetDockMenu() : "";
+    var visibleMenu = visibleRuntimeMenu();
     /* The runtime atom may commit before or after its popover DOM. Prefer a
        panel that is already visibly mounted so aria-expanded and a repeated
        click never lag behind what the reader can actually see. */
-    currentMenu = visibleRuntimeMenu() || currentMenu;
+    currentMenu = visibleMenu || currentMenu;
     var previousMenu = state.runtimeMenu;
     state.runtimeMenu = currentMenu;
     var toolbarHasFocus = Boolean(primaryToolbar && primaryToolbar.matches(":focus-within"));
@@ -2653,6 +2654,11 @@
       toolsButton,
       "aria-expanded",
       currentMenu === "settings" || currentMenu === "glossary"
+    );
+    setAttributeIfChanged(
+      ttsPlayerSettingsButton,
+      "aria-expanded",
+      visibleMenu === "settings"
     );
     primaryToolbar.classList.toggle(
       "reflow-primary-toolbar-hidden",
@@ -2855,7 +2861,8 @@
         '<span class="reflow-tts-player-icon" aria-hidden="true">⏭</span>' +
         '<span class="reflow-tts-player-label">Siguiente</span>' +
       '</button>' +
-      '<button id="reflow-tts-settings" type="button" aria-label="Voz y velocidad">' +
+      '<button id="reflow-tts-settings" type="button" aria-label="Voz y velocidad" ' +
+        'aria-haspopup="dialog" aria-expanded="false">' +
         '<span class="reflow-tts-player-icon" aria-hidden="true">⚙</span>' +
         '<span class="reflow-tts-player-label">Voz y velocidad</span>' +
       '</button>' +
@@ -3909,10 +3916,14 @@
           '<span id="reflow-tts-speed-label">Velocidad</span>' +
           '<div class="reflow-tts-speed-options" role="radiogroup" ' +
             'aria-labelledby="reflow-tts-speed-label">' +
-            '<button type="button" role="radio" data-reflow-tts-speed="0.5" aria-checked="false">Lenta</button>' +
-            '<button type="button" role="radio" data-reflow-tts-speed="1" aria-checked="false">Normal</button>' +
-            '<button type="button" role="radio" data-reflow-tts-speed="1.5" aria-checked="false">Rápida</button>' +
-            '<button type="button" role="radio" data-reflow-tts-speed="2" aria-checked="false">Muy rápida</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="0.5" ' +
+              'aria-label="Lenta, 0,5 veces" aria-checked="false">Lenta</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="1" ' +
+              'aria-label="Normal, 1 vez" aria-checked="false">Normal</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="1.5" ' +
+              'aria-label="Rápida, 1,5 veces" aria-checked="false">Rápida</button>' +
+            '<button type="button" role="radio" data-reflow-tts-speed="2" ' +
+              'aria-label="Muy rápida, 2 veces" aria-checked="false">Muy rápida</button>' +
           '</div>';
         readingCard.appendChild(speedRow);
       }
@@ -4538,6 +4549,7 @@
         dockPanelToViewport(panel);
       });
       requestAnimationFrame(syncReadingShift);
+      requestAnimationFrame(syncPrimaryToolbar);
     }
 
     function scheduleUpdate() {

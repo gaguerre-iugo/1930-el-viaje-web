@@ -7,7 +7,17 @@ const root = path.resolve(__dirname, "..");
 const preloaderPath = path.join(root, "assets", "offline-preloader.js");
 const marker = "  var INLINE = ";
 const afterInlineMarker = ";\n  var BASE_DIR";
-const syncPaths = ["./index.html"];
+const syncPaths = [
+  "./index.html",
+  "./quiz_final.html",
+  "./qz007.html",
+  "./qz010.html",
+  "./qz013.html",
+  "./qz016.html",
+  "./qz019.html",
+  "./qz022.html",
+  "./qz025.html"
+];
 
 const source = fs.readFileSync(preloaderPath, "utf8");
 const start = source.indexOf(marker) + marker.length;

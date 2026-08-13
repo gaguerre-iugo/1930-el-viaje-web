@@ -2018,6 +2018,68 @@ Retirar las reglas dependientes de `data-reflow-highlight-mode`, restaurar el `b
 
 ---
 
+## Acción 34: completar las etiquetas accesibles de audio
+
+### Objetivo
+
+Hacer que voz, velocidad y navegación de audio comuniquen nombre, función, valor seleccionado y apertura del diálogo sin depender del texto visual o de la posición del control.
+
+### Procedimiento
+
+1. Mantener «Voz del narrador» y «Velocidad» como nombres de sus respectivos `radiogroup` mediante `aria-labelledby`.
+2. Conservar las voces como opciones `radio` y publicar la selección con `aria-checked`.
+3. Incluir el multiplicador en el nombre accesible de cada velocidad: `0,5`, `1`, `1,5` y `2` veces.
+4. Mantener «Audio anterior» y «Audio siguiente» para diferenciarlos de la navegación de páginas.
+5. Declarar `aria-haspopup="dialog"` en «Voz y velocidad» y sincronizar `aria-expanded` con la presencia visible de Herramientas, no solamente con el estado interno del runtime.
+6. Recalcular el estado al montar o desmontar un panel para evitar valores expandidos obsoletos.
+7. Versionar `reflow-book.js` para evitar reutilizar el script anterior desde caché.
+
+### Validación
+
+- `node --check assets/reflow-book.js` y `git diff --check` pasan.
+- El grupo Velocidad expone exactamente «Lenta, 0,5 veces», «Normal, 1 vez», «Rápida, 1,5 veces» y «Muy rápida, 2 veces».
+- «Voz y velocidad» conserva `aria-haspopup="dialog"` y completa el ciclo `aria-expanded="false" → "true" → "false"` al abrir y cerrar Herramientas.
+- «Audio anterior» y «Audio siguiente» siguen siendo nombres únicos dentro de «Controles de lectura en voz alta».
+- La versión vigente pasa a `reflow-book.js?v=111-accessible-audio-labels`.
+
+### Reversión
+
+Retirar los multiplicadores de `aria-label`, los atributos del botón «Voz y velocidad» y su sincronización con el panel, y volver conjuntamente a la versión JavaScript anterior en `index.html`.
+
+---
+
+## Acción 35: mantener Enviar visible y declarar la política de reintento
+
+### Objetivo
+
+Mantener la acción «Enviar» dentro del flujo de la tarjeta después de evaluar, sin superponer contenido, y permitir que cada actividad declare explícitamente si admite corregir la respuesta.
+
+### Procedimiento
+
+1. Añadir `data-allow-retry="true|false"` a cada `.quiz-panel`.
+2. Mantener `true` en las 24 actividades actuales para conservar su propuesta de corrección formativa.
+3. Tras evaluar, conservar «Enviar» visible y deshabilitarlo hasta que cambie la respuesta.
+4. Con `true`, un cambio elimina el resultado anterior, habilita «Enviar» y permite evaluar nuevamente.
+5. Con `false`, bloquear los radios después del primer envío y publicar `aria-disabled` en sus etiquetas.
+6. Mantener el foco en `.quiz-feedback` y conservar `role="status"` y `aria-live="polite"`.
+7. Completar con `true` únicamente exportaciones compiladas antiguas que todavía no contienen el atributo; nunca sobrescribir un `false` editorial.
+8. Sincronizar `quiz_final.html` y `qz007`–`qz025` dentro de `offline-preloader.js` para que servidor, archivo local y SCORM compartan la política.
+
+### Validación
+
+- Las 24 actividades renderizadas exponen `data-allow-retry="true"`.
+- Después de una respuesta correcta o incorrecta, «Enviar» permanece visible, deshabilitado y dentro de la tarjeta.
+- Al elegir otra opción, el feedback se limpia, `data-quiz-evaluated` desaparece y «Enviar» vuelve a habilitarse.
+- El nuevo resultado recibe el foco y conserva texto, icono y borde además del color.
+- `node --check`, `git diff --check` y la sincronización offline pasan.
+- Las versiones vigentes son `reflow.css?v=80-normalized-activities` y `quiz-sequence.js?v=9-retry-policy-fallback`.
+
+### Reversión
+
+Retirar la política y el bloqueo condicional, volver a ocultar `.quiz-actions` después del feedback, eliminar los atributos de las fuentes y regenerar `offline-preloader.js` antes de restaurar las versiones anteriores.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

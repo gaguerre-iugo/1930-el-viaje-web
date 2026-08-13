@@ -3632,7 +3632,14 @@ body.reflow-book #content .quiz-feedback-icon {
 }
 
 body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
-  display: none !important;
+  display: flex !important;
+  margin-top: .75rem !important;
+}
+
+body.reflow-book #content
+  .quiz-panel[data-quiz-evaluated="true"][data-allow-retry="false"]
+  .quiz-option[aria-disabled="true"] {
+  cursor: default;
 }
 
 body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {

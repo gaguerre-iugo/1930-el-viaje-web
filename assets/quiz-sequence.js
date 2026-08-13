@@ -20,6 +20,16 @@
     });
   }
 
+  function normalizeQuizRetryPolicies() {
+    document.querySelectorAll(".quiz-panel:not([data-allow-retry])").forEach(
+      function (panel) {
+        /* Compiled exports created before the policy existed remain retryable.
+           An explicit editorial false value is never overwritten. */
+        panel.dataset.allowRetry = "true";
+      }
+    );
+  }
+
   var submitLabelUpdateScheduled = false;
   function scheduleSubmitLabelUpdate() {
     if (submitLabelUpdateScheduled) return;
@@ -27,10 +37,12 @@
     requestAnimationFrame(function () {
       submitLabelUpdateScheduled = false;
       normalizeQuizSubmitLabels();
+      normalizeQuizRetryPolicies();
     });
   }
 
   normalizeQuizSubmitLabels();
+  normalizeQuizRetryPolicies();
   new MutationObserver(scheduleSubmitLabelUpdate).observe(document.body, {
     childList: true,
     characterData: true,
@@ -39,6 +51,10 @@
 
   function panelFor(target) {
     return target && target.closest ? target.closest(".quiz-panel") : null;
+  }
+
+  function panelAllowsRetry(panel) {
+    return Boolean(panel && panel.dataset.allowRetry === "true");
   }
 
   function stopResultAudio() {
@@ -163,6 +179,8 @@
     if (!input.matches || !input.matches('.quiz-panel input[type="radio"]')) return;
     var panel = panelFor(input);
     if (!panel) return;
+    if (panel.dataset.quizEvaluated === "true" && !panelAllowsRetry(panel)) return;
+    panel.removeAttribute("data-quiz-evaluated");
     panel.querySelectorAll(".quiz-option").forEach(function (option) {
       option.classList.toggle("is-selected", option.contains(input));
     });
@@ -212,6 +230,15 @@
     feedback.classList.toggle("is-correct", Boolean(isCorrect));
     feedback.classList.toggle("is-incorrect", !isCorrect);
     feedback.setAttribute("aria-hidden", "false");
+    panel.dataset.quizEvaluated = "true";
+    button.disabled = true;
+    if (!panelAllowsRetry(panel)) {
+      panel.querySelectorAll('input[type="radio"]').forEach(function (input) {
+        input.disabled = true;
+        var label = input.closest(".quiz-option");
+        if (label) label.setAttribute("aria-disabled", "true");
+      });
+    }
     feedback.focus({ preventScroll: true });
 
     if (isCorrect) launchConfetti(panel);

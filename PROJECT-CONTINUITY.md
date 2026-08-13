@@ -112,6 +112,8 @@ La señal no cromática de lectura mantiene JavaScript y compilación, y actuali
 - En navegador se verificaron `hover` y foco de pestaña, apariencia deshabilitada de Resaltado, confirmación de voz, expansión y devolución de foco del glosario y foco visible del feedback correcto.
 - La auditoría renderizada de contraste confirma mínimos en navegación, selecciones, deshabilitados, foco y actividades; la menor relación de texto normal aceptada es `4.80:1` y la menor relación esencial no textual es `3.20:1`.
 - La lectura real confirmó que Palabra usa amarillo más subrayado sólido, Oración amarillo más subrayado doble y las imágenes un contorno oscuro más un anillo amarillo; la paginación se mantuvo en `234` páginas y no surgieron errores nuevos.
+- Voz y velocidad conservan grupos y selección semánticos; cada velocidad anuncia su multiplicador y el acceso «Voz y velocidad» publica apertura y cierre del diálogo mediante `aria-expanded`.
+- Las 24 actividades mantienen «Enviar» visible tras evaluar y declaran `data-allow-retry="true"`; al cambiar la opción se limpia el feedback y se habilita un nuevo envío, mientras un futuro valor `false` bloquea los radios.
 - Las cabeceras verificadas son `no-cache` para `index.html`, caché inmutable anual para recursos versionados y una hora para imágenes sin versión.
 - Se ejecutaron las comprobaciones:
 
