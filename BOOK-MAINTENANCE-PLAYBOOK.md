@@ -9,10 +9,11 @@ Este archivo describe el **resultado vigente**, no una secuencia de parches que 
 1. Crear un commit base y registrar la versión del exportador.
 2. Auditar qué funciones ya ofrece el runtime del nuevo libro y conservarlo como única fuente de estado.
 3. Aplicar primero tipografía, tamaños táctiles y sentence case (Acciones 1–6).
-4. Aplicar la arquitectura canónica de barra, Índice, Herramientas y reproductor TTS definida únicamente en la Acción 7.
-5. Añadir después las mejoras funcionales que correspondan: Glosario, actividades, movimiento, estados, contraste y audio.
-6. Aplicar el bloque de rendimiento de forma incremental y medir después de cada cambio.
-7. Validar por HTTP, SCORM y servidor final; usar `file://` solamente si el entregable exige explícitamente apertura directa.
+4. Establecer el viewport paginado y evitar el scroll de página mediante la Acción 37.
+5. Aplicar la arquitectura canónica de barra, Índice, Herramientas y reproductor TTS definida únicamente en la Acción 7.
+6. Añadir después las mejoras funcionales que correspondan: Glosario, actividades, movimiento, estados, contraste y audio.
+7. Aplicar el bloque de rendimiento de forma incremental y medir después de cada cambio.
+8. Validar por HTTP, SCORM y servidor final; usar `file://` solamente si el entregable exige explícitamente apertura directa.
 
 Los números de versión y las mediciones incluidas en «Resultado obtenido» documentan este libro y sirven como referencia. En otro proyecto deben asignarse identificadores de caché nuevos y volver a medirse; no se copian como valores universales.
 
@@ -804,6 +805,21 @@ Reducir la carga cognitiva y mantener una navegación predecible mediante una ba
 - Recargar con `Ctrl + F5` durante desarrollo.
 - Ejecutar `node --check assets/reflow-book.js`, comparar llaves CSS y ejecutar `git diff --check`.
 - Revisar consola, carga de Atkinson, estabilidad prolongada, apertura de paneles, audio en Chrome y ausencia de la barra anterior.
+
+#### 9. La búsqueda por página cerraba el Índice pero no navegaba en Chrome
+
+**Síntoma observado:** al buscar «120» en la vista Páginas y pulsar «Página 120», el panel se cerraba y el foco regresaba a Índice, pero el contador permanecía en la página anterior. El navegador integrado sí parecía navegar.
+
+**Causa:** Chrome emite la secuencia física `pointerdown` → `mousedown` → `click`. La protección que conserva la página durante interacciones ordinarias del panel clasificaba el resultado como un botón estable, guardaba la página de origen y la restauraba después de que el resultado ya había llamado al paginador.
+
+**Prevención:**
+
+- Excluir `button[data-reflow-page-index]`, `.reflow-index-page-button` y `.reflow-toc-entry` de la protección de página estable de los paneles.
+- Tratar la selección de un resultado numérico como navegación explícita mediante `goToPage(pageIndex, { announce: true, explicit: true })`.
+- Hacer que la navegación explícita cancele cualquier restauración pendiente iniciada al enfocar o escribir en Buscar.
+- Probar con un clic físico en Chrome, no únicamente con una activación programática o en el navegador integrado.
+- Esperar más que la ventana completa de restauración antes de aceptar el resultado; en este proyecto se validó después de `4,2 s`.
+- Confirmar cierre del panel, retorno del foco a `#reflow-index`, contador correcto y ausencia de errores de consola.
 
 ### Riesgos y excepciones
 
@@ -2139,6 +2155,150 @@ Reducir la latencia de los paneles sin modificar el ciclo de montaje de React, l
 ### Reversión
 
 Restaurar los observadores globales y la comprobación por frame junto con la versión anterior de `reflow-book.js` en `index.html`.
+
+---
+
+## Acción 37: sustituir el scroll de página por paginación discreta
+
+### Objetivo
+
+Evitar el desplazamiento vertical del documento y los movimientos continuos o inerciales entre páginas. El libro debe ocupar un viewport estable y navegar por columnas completas, sin perder el desplazamiento interno necesario para paneles, listas y otros controles que realmente lo requieren.
+
+Esta solución ya estaba presente en la primera instantánea versionada de este proyecto. No corresponde a un commit posterior aislado: debe reconstruirse a partir del contrato CSS y JavaScript descrito aquí.
+
+### Modelo vigente
+
+No se elimina todo mecanismo de scroll. Se separan tres capas:
+
+1. **Documento y página visible:** no se desplazan; `html`, `body` y `main` quedan fijados al viewport.
+2. **Paginador interno:** `#content` conserva un `scrollLeft` horizontal oculto que funciona como coordenada de página. JavaScript lo mueve en múltiplos exactos del ancho visible.
+3. **Paneles y listas:** Índice, Herramientas y Glosario pueden tener scroll vertical interno cuando su contenido supera el alto disponible. Ese desplazamiento nunca debe propagarse al libro.
+
+### Implementación CSS
+
+1. Fijar el documento y el contenedor principal al viewport:
+
+```css
+html,
+body.reflow-book {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.reflow-book main {
+  width: 100vw;
+  height: var(--reflow-page-height);
+  overflow: hidden;
+}
+```
+
+2. Calcular `--reflow-page-height` con `100dvh`, descontando navegación, barra inferior, reproductor TTS y área segura. No usar una altura fija independiente de los controles reales.
+3. Convertir el contenido en columnas del ancho del viewport y bloquear únicamente el eje vertical:
+
+```css
+body.reflow-book #content {
+  box-sizing: border-box;
+  width: 100vw;
+  height: var(--reflow-page-height);
+  overflow-x: auto;
+  overflow-y: hidden;
+  column-width: calc(100vw - (2 * var(--reflow-gutter)));
+  column-gap: calc(2 * var(--reflow-gutter));
+  column-fill: auto;
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  overscroll-behavior: none;
+}
+
+body.reflow-book #content::-webkit-scrollbar {
+  display: none;
+}
+```
+
+`overflow-x: auto` es intencional: permite conservar `scrollLeft`. Sustituirlo por `hidden` puede impedir o volver inconsistente la paginación programática en algunos navegadores.
+
+### Implementación JavaScript
+
+1. Obtener el ancho de página desde `#content.clientWidth`, no desde `window.innerWidth`. El redondeo del viewport puede diferir un píxel y acumular un error que vuelve inalcanzable la última columna.
+2. Calcular la página visible como `Math.round(content.scrollLeft / pageWidth())` y limitarla al intervalo válido.
+3. Centralizar todos los cambios —botones, teclado, Índice, enlaces internos, Glosario, TTS y restauración de anclas— en una única función `goToPage`.
+4. Dentro de `goToPage`, cambiar de página de forma atómica:
+
+```javascript
+const nextLeft = nextPage * pageWidth();
+const previousBehavior = content.style.scrollBehavior;
+content.style.scrollBehavior = "auto";
+content.scrollLeft = nextLeft;
+content.style.scrollBehavior = previousBehavior;
+```
+
+5. No usar `scrollIntoView()` para restaurar una posición: en un libro multicolumna puede mover el documento exterior o elegir una columna incorrecta. Resolver el ancla semántica, calcular su página y llamar a `goToPage`.
+6. Mantener un listener `scroll` pasivo únicamente para reconciliar desplazamientos nativos. Agruparlo brevemente y retornar sin trabajo cuando la página calculada ya coincide con el estado confirmado.
+
+### Rueda y trackpad
+
+Una misma interacción de trackpad puede producir eventos horizontales, verticales y una cola de inercia. Si se deja un eje nativo y se transforma solamente el otro, ambos movimientos compiten y el libro puede oscilar entre columnas.
+
+1. Escuchar `wheel` sobre `#content` con `{ passive: false }`.
+2. Elegir el delta dominante entre `deltaX` y `deltaY`.
+3. Ejecutar `preventDefault()` para apropiarse de ambos ejes dentro del área de lectura.
+4. Acumular como mínimo `24 px` para eventos en modo píxel o una unidad para rueda por líneas.
+5. Bloquear el gesto después del primer salto y liberarlo únicamente tras `260 ms` sin eventos.
+6. Convertir cada gesto físico completo en exactamente una llamada a `goToPage`.
+
+No instalar este controlador sobre `document` o `body`: hacerlo bloquearía el scroll legítimo de Herramientas, Índice, Glosario, cuadros de diálogo o actividades.
+
+### Archivos que deben revisarse
+
+- `content/reflow.css`: viewport, columnas, ejes de overflow, scrollbar y overscroll.
+- `assets/reflow-book.js`: `pageWidth`, `visiblePageIndex`, `goToPage`, rueda/trackpad y reconciliación del evento `scroll`.
+- `index.html`: carga versionada de CSS y JavaScript.
+- `content/viewport-layout.css`: límites de imágenes o portadas que todavía calculen su alto directamente con el viewport.
+
+### Validación estática
+
+```powershell
+rg -n "overflow: hidden|overflow-x: auto|overflow-y: hidden|overscroll-behavior|scroll-behavior" content/reflow.css
+rg -n 'function pageWidth|function visiblePageIndex|function goToPage|wheel|scrollLeft' assets/reflow-book.js
+node --check assets/reflow-book.js
+git diff --check
+```
+
+Confirmar además que el listener de rueda use `{ passive: false }` y que su `preventDefault()` permanezca limitado a `#content`.
+
+### Validación en navegador
+
+1. Registrar `window.scrollX`, `window.scrollY`, `document.documentElement.scrollTop`, `document.body.scrollTop` y `#content.scrollTop`; todos deben permanecer en cero durante la lectura.
+2. Confirmar que `html`, `body` y `main` calculan `overflow: hidden`.
+3. Confirmar en `#content`: `overflow-x: auto`, `overflow-y: hidden`, `scroll-behavior: auto` y `overscroll-behavior: none`.
+4. Usar una rueda de mouse y un gesto de trackpad vertical y horizontal: cada gesto debe avanzar o retroceder exactamente una página, sin mostrar estados intermedios ni rebotar.
+5. Verificar que el incremento de `scrollLeft` sea exactamente `#content.clientWidth` y que `scrollTop` permanezca en cero.
+6. Probar botones, flechas, Page Up/Down, Inicio/Fin, Índice, enlaces internos, Glosario y TTS; todas las rutas deben terminar en la misma función de paginación.
+7. Abrir Herramientas, Índice y Glosario con contenido largo; su contenedor interno debe desplazarse verticalmente sin modificar la página ni el scroll exterior.
+8. Repetir en móvil táctil. No añadir `touch-action: none` de forma global: puede impedir zoom, gestos del navegador y desplazamiento de paneles. Si el nuevo runtime requiere paginación táctil discreta, implementarla en `#content` y validar por separado accesibilidad y zoom.
+
+### Resultado comprobado en este proyecto
+
+- En un viewport de `1280 × 720`, `html`, `body` y `main` calcularon `overflow: hidden`.
+- El documento conservó `scrollX = 0`, `scrollY = 0` y ambos `scrollTop = 0`.
+- `#content` midió `1280 × 584 px`, con `overflow-x: auto`, `overflow-y: hidden`, `scroll-behavior: auto` y `overscroll-behavior: none`.
+- Un gesto de rueda cambió de «Página 10 de 355» a «Página 11 de 355» y movió `scrollLeft` de `11520` a `12800`, exactamente un ancho de página; `scrollTop` permaneció en cero.
+- Herramientas conservó un contenedor propio con `overflow-y: scroll`, `547 px` visibles y `1589 px` de contenido, mientras el documento siguió en cero y la página permaneció en `11 / 355`.
+- `git blame` confirmó que el bloqueo del viewport, el paginador horizontal y el controlador discreto de rueda ya formaban parte del commit inicial `3583f830`.
+
+### Riesgos y excepciones
+
+- Ocultar la scrollbar no desactiva el scroll nativo; la atomicidad depende también de `goToPage` y del controlador de rueda.
+- No aplicar `overflow: hidden` a los contenedores internos de paneles largos: dejaría opciones inaccesibles.
+- No capturar rueda, teclado o gestos dentro de formularios, actividades o diálogos cuando la intención sea operar esos controles.
+- Un contenido más alto que `--reflow-page-height` no debe resolverse habilitando scroll vertical en la página. Debe fragmentarse en otra columna, repaginarse o adaptar su composición.
+- El teclado virtual y `visualViewport` pueden modificar el alto efectivo; repetir la prueba con campos de búsqueda y paneles abiertos.
+- En SCORM, comprobar que el contenedor del LMS no añada un segundo scroll alrededor del iframe.
+
+### Reversión
+
+Restaurar conjuntamente el flujo vertical del documento, retirar la paginación por `scrollLeft` y devolver todas las rutas de navegación al modelo anterior. No revertir solo el CSS o solo JavaScript: mezclar scroll natural y paginación discreta produce páginas inalcanzables, dobles saltos y estados de contador incorrectos.
 
 ---
 

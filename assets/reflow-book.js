@@ -4938,7 +4938,10 @@
         if (pageIndex < 0 || pageIndex >= state.total) return;
         event.preventDefault();
         event.stopImmediatePropagation();
-        goToPage(pageIndex, { announce: true });
+        /* Selecting a page result is an explicit navigation command. Mark it
+           as such so any page-preservation guard started by search or panel
+           focus cannot restore the column that was visible before the click. */
+        goToPage(pageIndex, { announce: true, explicit: true });
         requestAnimationFrame(closeNavigationPanel);
         return;
       }
@@ -4983,6 +4986,15 @@
 
       var dialog = target.closest('[role="dialog"]');
       if (!dialog) return null;
+      /* Page and TOC results intentionally change the reading position. They
+         must never prime the guard whose purpose is to keep ordinary panel
+         controls on the current page. Chrome emits pointerdown, mousedown and
+         click for a physical activation, so classifying these as stable would
+         restore the former column after their navigation completed. */
+      if (target.closest(
+        'button[data-reflow-page-index], button.reflow-index-page-button, ' +
+        'button.reflow-toc-entry'
+      )) return null;
       /* Tabs and search focus do not change typography, so they preserve the
          exact visual page. Settings that repaginate are deliberately omitted:
          they must preserve the semantic anchor, not an obsolete page number. */
