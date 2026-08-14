@@ -2,6 +2,31 @@
 
 Este documento reúne acciones reutilizables para mantener exportaciones web/SCORM de libros similares a **1930: El viaje**. Cada receta debe poder aplicarse a otro proyecto después de revisar sus rutas, su estructura y sus excepciones.
 
+## Cómo usar este manual en un libro nuevo
+
+Este archivo describe el **resultado vigente**, no una secuencia de parches que deba copiarse literalmente. Antes de aplicar una acción en otro proyecto:
+
+1. Crear un commit base y registrar la versión del exportador.
+2. Auditar qué funciones ya ofrece el runtime del nuevo libro y conservarlo como única fuente de estado.
+3. Aplicar primero tipografía, tamaños táctiles y sentence case (Acciones 1–6).
+4. Aplicar la arquitectura canónica de barra, Índice, Herramientas y reproductor TTS definida únicamente en la Acción 7.
+5. Añadir después las mejoras funcionales que correspondan: Glosario, actividades, movimiento, estados, contraste y audio.
+6. Aplicar el bloque de rendimiento de forma incremental y medir después de cada cambio.
+7. Validar por HTTP, SCORM y servidor final; usar `file://` solamente si el entregable exige explícitamente apertura directa.
+
+Los números de versión y las mediciones incluidas en «Resultado obtenido» documentan este libro y sirven como referencia. En otro proyecto deben asignarse identificadores de caché nuevos y volver a medirse; no se copian como valores universales.
+
+Los identificadores de acciones se conservan para poder rastrear commits y decisiones previas. Cuando una receta queda absorbida por otra, su número no se reutiliza; por eso puede haber saltos en la numeración.
+
+### Contrato vigente de la interfaz
+
+- La barra inferior permanente contiene, en este orden: **Índice, Página anterior, Página actual/total, Página siguiente y Herramientas**.
+- «Leer/Pausar» no pertenece a esa barra. La lectura en voz alta usa un reproductor persistente separado que aparece únicamente al activar la sesión TTS.
+- Índice y Herramientas son paneles mutuamente excluyentes. Glosario sustituye temporalmente el contenido de Herramientas y permite regresar.
+- Idioma permanece oculto mientras solo exista `es-UY`.
+- Abrir o cerrar paneles no desplaza, repagina ni tapa el contenido.
+- La Acción 7 es la única definición arquitectónica del Índice y de la barra. Las acciones posteriores solo detallan comportamientos transversales o correcciones técnicas.
+
 ## Principios de trabajo
 
 1. Crear un repositorio Git y un commit base antes de modificar el libro.
@@ -614,30 +639,35 @@ Revertir el commit correspondiente y restaurar conjuntamente los identificadores
 
 ---
 
-## Acción 7: simplificar la arquitectura de la barra inferior
+## Acción 7: aplicar la arquitectura vigente de barra inferior, Índice, Herramientas y TTS
 
 ### Objetivo
 
-Reducir la carga cognitiva y mantener una navegación predecible. El primer nivel debe conservar siempre este orden: Índice, Página anterior, Página actual/total, Página siguiente, Leer/Pausar y Herramientas.
+Reducir la carga cognitiva y mantener una navegación predecible mediante una barra fija de cinco elementos, paneles superpuestos y un reproductor TTS independiente. «Permanente» significa que la barra conserva ubicación, composición y reserva de espacio; puede autoocultarse únicamente si la persona activa esa preferencia. Esta acción es la única fuente de verdad para la arquitectura del Índice y sustituye cualquier variante anterior con «Leer/Pausar» dentro de la barra.
 
 ### Áreas que deben revisarse
 
 - Barra generada por el componente base y paginación añadida por el modo reflujo.
-- Paneles de Índice, Configuración, Glosario, Idioma y lectura en voz alta.
+- Paneles de Índice, Herramientas, Glosario, Idioma y lectura en voz alta.
 - Configuración de idiomas disponibles.
 - Etiquetas visibles, nombres accesibles, orden de foco y tamaños táctiles.
 - Apertura de paneles en escritorio y móvil.
 
 ### Procedimiento
 
-1. Crear una sola barra primaria con seis posiciones invariables.
+1. Crear una sola barra primaria con cinco posiciones invariables: Índice, Anterior, contador, Siguiente y Herramientas.
 2. Mantener el componente base montado únicamente como puente de estado para sus paneles, ocultándolo de la presentación, el puntero y el orden de foco.
 3. Ocultar Idioma cuando exista una única lengua y anular su atajo de teclado.
-4. Mover tamaño de letra, lectura fácil, descripción de imágenes, resaltado, velocidad, reproducción automática, voz y Glosario a Herramientas.
-5. Hacer que Leer/Pausar controle directamente el estado real del audio, sin exigir la apertura de un panel secundario.
-6. Mostrar icono y etiqueta cuando haya espacio; ocultar solo la etiqueta visual en móvil, conservando `aria-label`.
-7. Mantener los paneles superpuestos a la caja del libro y conservar la página visual al abrirlos o cerrarlos.
-8. Distinguir la apertura de un panel de un cambio tipográfico: modificar el tamaño de letra puede repaginar, pero debe preservar el ancla semántica.
+4. Construir Índice como un diálogo con título, botón Cerrar, búsqueda, vista del índice y acceso por páginas. Mantener sentence case, niveles editoriales explícitos, sangría y tamaño diferenciados, resultados de al menos 44 px y `aria-current` en la ubicación activa.
+5. Organizar Herramientas por secciones: apoyos para la lectura, preferencias, audio y voz, atajos y herramientas de consulta. Mover allí tamaño de letra, lectura fácil, descripción de imágenes, resaltado, voz, velocidad, reproducción automática, reducción de movimiento y Glosario.
+6. Usar Glosario como reemplazo temporal de Herramientas, con «Volver a Herramientas» y «Cerrar»; no superponer un tercer panel.
+7. Mantener Índice y Herramientas mutuamente excluyentes. El mismo botón que abre cada panel debe poder cerrarlo.
+8. Al abrir un panel, guardar el origen, llevar el foco a su control inicial y confinar `Tab`. Al cerrar con Cerrar, `Escape`, clic exterior o selección de un resultado, devolver el foco al control de origen, salvo que la acción tenga un destino más específico.
+9. Retirar «Leer/Pausar» de la barra primaria. Al activar TTS, mostrar un reproductor separado con Audio anterior, Reproducir/Pausar, Audio siguiente, Voz y velocidad y Detener.
+10. Mantener el reproductor visible mientras la sesión TTS esté activa, incluso en pausa. Activar TTS prepara la sesión; solo «Reproducir» puede iniciar sonido mediante un gesto explícito.
+11. Mostrar icono y etiqueta cuando haya espacio; simplificar u ocultar solo la etiqueta visual en móvil, conservando `aria-label` completo y áreas de al menos `44 × 44 px`.
+12. Superponer los paneles a la caja del libro, reservar espacio estable para barra y reproductor y conservar la página visual al abrirlos o cerrarlos.
+13. Distinguir la apertura de un panel de un cambio tipográfico: modificar el tamaño de letra puede repaginar, pero debe preservar el ancla semántica.
 
 ### Archivos modificados
 
@@ -649,26 +679,32 @@ Reducir la carga cognitiva y mantener una navegación predecible. El primer nive
 
 ### Validación estática
 
-- Confirmar que `#reflow-pagination` contiene exactamente los cinco botones y el contador esperados.
+- Confirmar que `#reflow-pagination` contiene exactamente cuatro botones (`#reflow-index`, `#reflow-previous`, `#reflow-next` y `#reflow-tools`) y el contador `#reflow-page-status`.
+- Confirmar que `#reflow-tts-player` es un componente separado con sus cinco controles y que no existe un botón Leer/Pausar en la barra primaria.
 - Confirmar que cada botón tiene nombre accesible y una altura mínima de 44 px.
 - Verificar que el componente base recibe `aria-hidden="true"` y que sus controles salen del orden de foco.
 - Verificar que el panel de Idioma no puede mostrarse y que `Alt + Shift + L` queda anulado.
+- Verificar que las entradas del Índice conservan sus niveles, `aria-current` y una altura mínima de 44 px.
 - Comprobar sintaxis JavaScript y ejecutar `git diff --check`.
 
 ### Validación en navegador
 
 1. Recorrer la barra con teclado en escritorio y móvil.
-2. Confirmar el orden Índice → Anterior → contador → Siguiente → Leer/Pausar → Herramientas.
+2. Confirmar el orden Índice → Anterior → contador → Siguiente → Herramientas.
 3. Abrir y cerrar Índice, Herramientas y Glosario sin que cambie la página actual.
-4. Iniciar, pausar y reanudar la lectura desde la barra, comprobando etiqueta, icono y `aria-pressed`.
-5. Confirmar que Idioma no aparece y que todas las preferencias siguen disponibles en Herramientas.
-6. Cambiar el tamaño de letra y verificar que se conserva el fragmento semántico leído.
+4. Abrir Índice, buscar, cambiar entre índice y páginas, seleccionar un resultado y comprobar jerarquía, ubicación actual y retorno del foco.
+5. Activar TTS desde Herramientas y comprobar que el reproductor aparece pausado; reproducir, pausar, cambiar de fragmento y detener.
+6. Confirmar que Idioma no aparece y que todas las preferencias siguen disponibles en Herramientas.
+7. Cambiar el tamaño de letra y verificar que se conserva el fragmento semántico leído.
+8. Probar zoom de 200 % y 400 %, móvil vertical y horizontal, paneles abiertos y teclado virtual sin desbordamiento horizontal ni controles ocultos.
 
 ### Resultado obtenido en este proyecto
 
-- El primer nivel se limita a las seis posiciones definidas.
+- El primer nivel se limita a cinco elementos: Índice, Anterior, contador, Siguiente y Herramientas.
 - Idioma queda oculto porque solo existe `es-UY`.
 - Glosario y las preferencias de lectura se agrupan bajo Herramientas.
+- Índice expone búsqueda, jerarquía editorial, acceso por páginas, ubicación actual y cierre con retorno de foco.
+- La lectura en voz alta se controla desde un reproductor persistente separado; activar el modo no reproduce sonido automáticamente.
 - Los paneles se superponen sin desplazar ni ocultar el libro.
 - La barra mantiene iconos y etiquetas en escritorio, y nombres accesibles completos en móvil.
 - La preferencia «Ocultar menús automáticamente» controla también la barra simplificada; el foco de teclado la mantiene visible.
@@ -725,7 +761,7 @@ Reducir la carga cognitiva y mantener una navegación predecible. El primer nive
 - Usar filtros de atributos específicos y no observar `style`, `class` o todo el subárbol sin una necesidad demostrada.
 - Antes de llamar a `setAttribute()` o modificar una clase, comprobar que el valor realmente cambió.
 - No realizar cálculos de paginación completos desde un observador de alta frecuencia; agruparlos mediante una única actualización programada.
-- Mantener la aplicación abierta al menos 30 segundos durante la prueba y accionar repetidamente Índice, Herramientas, Leer/Pausar y navegación.
+- Mantener la aplicación abierta al menos 30 segundos durante la prueba y accionar repetidamente Índice, Herramientas, navegación y los controles del reproductor TTS.
 
 #### 5. El menú base aparecía brevemente detrás de la barra nueva
 
@@ -777,7 +813,7 @@ Reducir la carga cognitiva y mantener una navegación predecible. El primer nive
 
 ### Reversión
 
-Revertir conjuntamente JavaScript, CSS y documentación. La paginación anterior y el componente base deben restaurarse en el mismo cambio para evitar dos barras visibles.
+Revertir conjuntamente JavaScript, CSS y documentación. La barra, los paneles y el reproductor deben restaurarse en el mismo cambio para evitar dos arquitecturas simultáneas o controles de audio duplicados.
 
 ---
 
@@ -816,42 +852,6 @@ Restaurar conjuntamente los estilos de navegación, los metadatos de teclado y e
 
 ---
 
-## Acción 9: rediseñar el índice con jerarquía semántica
-
-### Objetivo
-
-Presentar capítulos, secciones y páginas con una jerarquía perceptible y navegable, conservar los títulos editoriales en sentence case y mantener una gestión de foco predecible.
-
-### Procedimiento
-
-1. Corregir el sentence case en `content/toc.json`; no aplicar `lowercase` global desde CSS o JavaScript porque dañaría nombres propios, siglas y textos históricos.
-2. Conservar en cada entrada el nivel editorial `level` y exponerlo en la interfaz mediante `data-reflow-toc-level` y `data-reflow-entry-kind`.
-3. Diferenciar los niveles con tamaño, peso y sangría: capítulo en primer nivel, sección en segundo y página o detalle en tercero.
-4. Construir la lista de páginas con encabezados semánticos y resultados subordinados visualmente.
-5. Mantener `aria-current="location"` en la entrada activa del índice y `aria-current="page"` en la página visual actual.
-6. Garantizar un mínimo de 44 px para todos los botones de resultado.
-7. Detectar el cierre real del índice, ya sea mediante el botón, Escape, clic exterior o selección de un resultado, y devolver el foco a `#reflow-index`. Tras elegir un resultado, repetir la comprobación durante la transición breve del componente base, sin robar el foco si el usuario ya lo movió a otro control. No moverlo al cambiar directamente a Herramientas.
-
-### Validación
-
-- Revisar todos los títulos de `toc.json`, con atención especial a nombres propios como «Ana Solari» y «Cabo Frío».
-- Inspeccionar los tres niveles y confirmar que se distinguen sin depender de color ni mayúsculas.
-- En la consola, comprobar que el resultado activo tiene `aria-current` y que cada botón mide al menos 44 px de alto.
-- Abrir el índice con teclado, cerrarlo con Escape y confirmar que `document.activeElement.id` devuelve `reflow-index`.
-- Seleccionar una entrada y repetir la comprobación de foco después de que se cierre el panel.
-
-### Riesgos y excepciones
-
-- Sentence case es una decisión editorial: cualquier importación nueva debe corregir su fuente de datos y preservar conscientemente nombres propios y siglas.
-- No inferir el nivel por color, mayúsculas o posición DOM; usar siempre el campo `level`.
-- No devolver el foco a Índice cuando el usuario haya cambiado directamente a otro panel.
-
-### Reversión
-
-Restaurar conjuntamente los datos del índice, su decorador JavaScript y los estilos de jerarquía para no dejar niveles declarados sin representación visual.
-
----
-
 ## Acción 10: limitar el resaltado del glosario a la página visible
 
 ### Objetivo
@@ -862,12 +862,15 @@ Evitar que «Resaltar palabras» bloquee el hilo principal al procesar un libro 
 
 1. No ejecutar el resaltador global del componente base sobre todo `#content`: combina miles de nodos de texto con todas las palabras y variaciones del glosario.
 2. Obtener únicamente los nodos de texto cuya geometría pertenece a la página visual actual.
-3. Filtrar el catálogo contra el texto de esa página, ordenar las formas por longitud y compilar una sola expresión regular Unicode para sus coincidencias.
-4. Insertar `.glossary-term` solamente en esos nodos y conservar tanto las clases visuales originales (`bg-emerald-100/80`, `text-emerald-800`, `rounded`, `cursor-pointer`) como `role="button"`, `tabindex="0"` y `data-glossary-key` para el popup y el teclado.
-5. Al navegar o apagar la opción, desenvolver exclusivamente los resaltados existentes y normalizar solo sus padres directos.
-6. Ignorar temporalmente esas mutaciones en el observador global de contenido, pues son decorativas y no justifican repaginar el libro completo.
-7. Al construir «En esta página», incluir el texto dentro de los `.glossary-term` existentes; excluirlos únicamente al crear nuevos resaltados para impedir envoltorios anidados.
-8. Incrementar la versión de `reflow-book.js` para impedir que el navegador reutilice la implementación anterior.
+3. Tratar cada hijo directo de `#content` como una raíz importada y calcular su intervalo visual mediante sus anclajes semánticos (`data-id` o `data-reflow-anchor-id`).
+4. Recorrer únicamente las raíces cuyo intervalo contiene la página visible y conservar un filtrado geométrico final para raíces que abarcan varias columnas.
+5. Permitir un recorrido completo solo en vistas todavía no paginadas de una o dos páginas; no usar el libro completo como respaldo después de la paginación.
+6. Filtrar el catálogo contra el texto de esa página, ordenar las formas por longitud y compilar una sola expresión regular Unicode para sus coincidencias.
+7. Insertar `.glossary-term` solamente en esos nodos y conservar tanto las clases visuales originales (`bg-emerald-100/80`, `text-emerald-800`, `rounded`, `cursor-pointer`) como `role="button"`, `tabindex="0"` y `data-glossary-key` para el popup y el teclado.
+8. Al navegar o apagar la opción, desenvolver exclusivamente los resaltados existentes y normalizar solo sus padres directos.
+9. Ignorar temporalmente esas mutaciones en el observador global de contenido, pues son decorativas y no justifican repaginar el libro completo.
+10. Al construir «En esta página», incluir el texto dentro de los `.glossary-term` existentes; excluirlos únicamente al crear nuevos resaltados para impedir envoltorios anidados.
+11. Incrementar la versión de `reflow-book.js` para impedir que el navegador reutilice la implementación anterior.
 
 ### Validación
 
@@ -878,10 +881,19 @@ Evitar que «Resaltar palabras» bloquee el hilo principal al procesar un libro 
 - Desactivar la opción y confirmar que no queda ningún `.glossary-term[data-glossary-key]`.
 - Revisar la consola y ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
 
+### Resultado obtenido en este proyecto
+
+- Antes de limitar las raíces, una navegación con resaltado activo demoró aproximadamente `9,7 s`; con el resaltado apagado demoró `1,2 s`.
+- Después del cambio, cinco páginas consecutivas con resaltado activo respondieron entre `0,36 s` y `0,39 s`.
+- La página 6 conservó nueve términos resaltados y respondió sin congelarse.
+- Inicio y final respondieron en aproximadamente `0,25 s` y `0,22 s`, respectivamente.
+
 ### Riesgos y excepciones
 
 - Una expresión que atraviese dos nodos de texto separados no se resalta; es preferible conservar la estructura semántica a fusionar nodos editoriales.
 - Los encabezados, actividades, cuestionarios, contenido oculto y el propio popup se excluyen deliberadamente.
+- El contenido que deba participar necesita al menos un anclaje semántico renderizado dentro de su raíz importada.
+- No volver a introducir un respaldo de libro completo cuando no se encuentren raíces en una página ya paginada: es preferible omitir un resaltado transitorio a bloquear toda la interfaz.
 - Si cambia el efecto interno del componente base, actualizar el marcador de integración antes de publicar el libro.
 
 ### Reversión
@@ -997,6 +1009,8 @@ Restaurar los tokens anteriores y la versión previa de `reflow.css`; los radios
 
 ## Acción 14: separar el reproductor TTS de la barra principal
 
+Esta acción desarrolla el comportamiento de audio del contrato definido en la Acción 7; no introduce una segunda variante de la barra.
+
 ### Objetivo
 
 Mantener la barra inferior dedicada a navegación y presentar controles de audio persistentes únicamente durante una sesión de lectura en voz alta.
@@ -1094,6 +1108,8 @@ Volver a invocar `startTtsFromUserGesture()` desde el cambio del interruptor y r
 ---
 
 ## Acción 16: cerrar, regresar y controlar el foco de los paneles
+
+Esta acción desarrolla la gestión transversal del foco de los paneles definidos en la Acción 7; no redefine la composición del Índice.
 
 ### Objetivo
 
@@ -1201,6 +1217,8 @@ Retirar la organización y clases del panel, el control personalizado de movimie
 
 ## Acción 18: adaptar la barra y los paneles a móvil
 
+Esta acción adapta responsive el contrato de la Acción 7; el orden y la composición de la barra no cambian según el ancho.
+
 ### Objetivo
 
 Conservar la jerarquía, el orden y la accesibilidad de la barra inferior en anchos reducidos, abreviando las etiquetas de forma progresiva sin reducir las áreas táctiles.
@@ -1255,48 +1273,52 @@ Retirar los cortes progresivos y el límite móvil de los paneles, eliminar `dat
 
 ---
 
-## Acción 19: limitar el resaltado del glosario a la página visible
+## Ruta canónica de rendimiento para un libro nuevo
 
-### Objetivo
+Las Acciones 20–29 y 36 registran correcciones incrementales de este proyecto. Para otro libro deben aplicarse como una sola estrategia, en este orden:
 
-Evitar que «Resaltar palabras» bloquee la navegación o provoque que el navegador marque la página como no disponible en libros extensos.
+1. **Establecer una línea base.** Medir carga inicial, primera apertura y reaperturas de Índice y Herramientas, navegación con Glosario y trabajo de hilo principal. Registrar mediana de al menos tres ejecuciones en caliente y conservar por separado la primera ejecución en frío.
+2. **Evitar trabajo que HTTP no necesita.** No descargar ni analizar el preloader portable bajo HTTP/SCORM; cargarlo solo para el modo `file://` que realmente lo requiera. Acotar esperas de fuentes e imágenes para que un recurso fallido no bloquee la interfaz.
+3. **Cargar bajo demanda.** Descargar al inicio únicamente la voz TTS seleccionada y cargar alternativas al elegirlas. Reutilizar promesas en curso y conservar un respaldo si la voz inicial falla.
+4. **Precalcular por repaginación.** Construir mapas de actividades, finales de sección y raíces visibles del Glosario una vez por cambio geométrico; no medir todo el libro en cada pulsación.
+5. **Limitar el Glosario a la página visible.** Aplicar íntegramente la Acción 10 y excluir sus mutaciones decorativas del observador que dispara repaginación.
+6. **Hacer las personalizaciones idempotentes.** No volver a escribir texto, atributos o clases que ya contienen el valor final; no duplicar nodos personalizados.
+7. **Acotar observadores.** Observar únicamente los contenedores React que montan los paneles, escuchar solo `childList` y atributos necesarios, desconectar el observador durante mutaciones propias y evitar `document.body`, `class` global y sondeo continuo por cuadro.
+8. **Reducir trabajo por navegación.** Ignorar eventos de desplazamiento redundantes, actualizar el Índice dinámico solo cuando esté abierto y no recalcular anclas si la columna no cambió.
+9. **Preparar antes de revelar.** Mantener Herramientas con `visibility: hidden` mediante `reflow-panel-pending` hasta que estructura, TTS, resaltado, tamaño, voz y velocidad reflejen el estado real. Suprimir transiciones solo en los descendientes durante el primer pintado; no bloquear la animación técnica de desmontaje del panel base.
+10. **Conservar el ciclo nativo.** Mantener montaje/desmontaje de React, foco, `Escape` y clic exterior. Optimizar primero observadores y actualizaciones; conservar paneles permanentemente montados solo como una fase posterior con pruebas específicas.
+11. **Usar caché selectiva.** Servir `index.html` con `no-cache`, recursos versionados con caché inmutable y medios/fuentes no versionados con una caché corta. Cambiar `?v=` en cada modificación.
+12. **Repetir la medición funcional.** Verificar apertura/cierre, retorno de foco, estados persistidos, móvil, audio y consola durante al menos cinco ciclos; después comparar medianas con la línea base.
 
-### Procedimiento
+### Criterios de aceptación de rendimiento
 
-1. No recorrer todos los nodos de texto del libro en cada cambio de página.
-2. Tratar cada hijo directo de `#content` como una raíz de contenido importado.
-3. Calcular el intervalo visual de cada raíz mediante su primer y último anclaje semántico renderizado (`data-id` o `data-reflow-anchor-id`).
-4. Recorrer y medir únicamente las raíces cuyo intervalo contiene la página visible.
-5. Mantener el filtrado final por geometría para excluir fragmentos que pertenecen a otra columna de una raíz multipágina.
-6. Permitir el recorrido completo solo en vistas breves de una o dos páginas que todavía no expongan anclajes; no usarlo como respaldo para el libro completo.
-7. Versionar `reflow-book.js` en `index.html` para invalidar la copia anterior.
+- Ningún observador de panel recorre todo `document.body` ni escucha todas las modificaciones de `class`.
+- No existe un `requestAnimationFrame` permanente para comprobar el montaje de Índice o Herramientas.
+- Abrir un panel no repagina ni recalcula el libro cuando la columna visual no cambió.
+- Herramientas nunca se muestra con valores predeterminados que luego «parpadean» hacia el estado persistido.
+- Índice, Herramientas y Glosario completan cinco ciclos de apertura y cierre, con foco correcto y sin crecimiento de instancias.
+- Glosario procesa solo la página visible y la navegación permanece interactiva.
+- La primera reproducción audible requiere un gesto explícito y la carga inicial no intenta reproducir audio.
+- Las mediciones se informan como mediana y rango; no se confunde una primera apertura en frío con reaperturas en caliente.
 
-### Validación
+### Estado de la estrategia incremental en este libro
 
-- Activar «Resaltar palabras» y recorrer varias páginas consecutivas con términos y sin ellos.
-- Confirmar que los resaltados pertenecen exclusivamente a la página visible.
-- Probar la primera y la última página para detectar errores de límites.
-- Abrir el glosario y confirmar que «En esta página» continúa usando el mismo conjunto de texto visible.
-- Ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+- **Implementado — optimizar y limitar observadores:** los observadores de panel se acotan a `#interface-container` y `#nav-container`, filtran atributos y se desconectan durante mutaciones propias.
+- **Implementado — no reconstruir controles existentes:** se conservan los controles del runtime y las inserciones personalizadas usan identificadores y comprobaciones idempotentes.
+- **Implementado — actualizar solo valores modificados:** texto y atributos se escriben únicamente cuando el valor calculado difiere.
+- **Implementado — mantener montaje/desmontaje original:** React continúa administrando la vida de los paneles, el foco, `Escape` y el clic exterior.
+- **Pendiente deliberadamente — conservar paneles siempre montados:** no se implementó porque amplía el riesgo sobre foco, teclado, móvil, audio y estados persistidos. Evaluarlo solo si las mediciones futuras justifican una segunda fase.
 
-### Resultado obtenido
+### Resultado acumulado en este proyecto
 
-- Antes del cambio, una navegación con resaltado activo demoró aproximadamente `9,7 s`; con el resaltado apagado demoró `1,2 s`.
-- Después del cambio, cinco páginas consecutivas con resaltado activo respondieron entre `0,36 s` y `0,39 s`.
-- La página 6 conservó nueve términos resaltados y respondió sin congelarse.
-- Inicio y final respondieron en aproximadamente `0,25 s` y `0,22 s`, respectivamente.
-- La adaptación móvil no era la causa: el bloqueo provenía del recorrido geométrico completo del glosario.
+- Índice pasó de aproximadamente `830 ms` a una mediana cercana a `400 ms` en ejecuciones calientes (muestras: `331,5–852,4 ms`; la variación depende del trabajo simultáneo del runtime).
+- Herramientas pasó de aproximadamente `2.990 ms` a una mediana cercana a `389 ms` en reaperturas calientes; la primera apertura observada quedó entre `750` y `920 ms`.
+- El trabajo medido del hilo principal al preparar Herramientas descendió aproximadamente entre `62 %` y `65 %`.
+- La voz alternativa dejó de añadir unos `8,4 MB` a la carga inicial.
+- La navegación con resaltado de Glosario bajó de aproximadamente `9,7 s` a `0,36–0,39 s` en las páginas medidas.
+- La versión vigente del controlador es `reflow-book.js?v=114-panel-performance`.
 
-### Riesgos y excepciones
-
-- El contenido textual que deba participar del glosario necesita al menos un anclaje semántico renderizado dentro de su raíz importada.
-- Una raíz puede abarcar varias columnas; por eso no basta con comprobar solamente el primer anclaje y se conserva el filtrado final de cada nodo candidato.
-- No volver a introducir un respaldo de libro completo cuando no se encuentren raíces en una página ya paginada: es preferible omitir un resaltado transitorio a bloquear toda la interfaz.
-- Repetir esta prueba con el glosario activado después de modificar la estructura de importación o la paginación.
-
-### Reversión
-
-Restaurar el recorrido completo de `#content`, retirar `glossaryRootsForVisualPage` y volver a la versión anterior de `reflow-book.js` indicada en `index.html`.
+Estas cifras son una línea de referencia de **este** libro. El criterio transferible es conservar la funcionalidad y demostrar una mejora repetible con el mismo protocolo de medición.
 
 ---
 
@@ -2077,6 +2099,46 @@ Mantener la acción «Enviar» dentro del flujo de la tarjeta después de evalua
 ### Reversión
 
 Retirar la política y el bloqueo condicional, volver a ocultar `.quiz-actions` después del feedback, eliminar los atributos de las fuentes y regenerar `offline-preloader.js` antes de restaurar las versiones anteriores.
+
+---
+
+## Acción 36: reducir el trabajo de apertura de Índice y Herramientas
+
+### Objetivo
+
+Reducir la latencia de los paneles sin modificar el ciclo de montaje de React, la restauración de preferencias ni la gestión accesible del foco.
+
+### Procedimiento
+
+1. Desconectar temporalmente el observador de Herramientas mientras se insertan o actualizan controles propios, y reconectarlo al terminar.
+2. Observar los contenedores React `interface-container` y `nav-container`, no todo el cuerpo del libro.
+3. Escuchar únicamente mutaciones estructurales y atributos que determinan la restauración real de los controles.
+4. Sustituir la comprobación en cada `requestAnimationFrame` por eventos de mutación y un respaldo cada 50 ms.
+5. Conservar el montaje y desmontaje originales para no alterar foco, Escape, clic exterior ni estado interno.
+6. Versionar `reflow-book.js` para evitar que Chrome reutilice la copia anterior.
+
+### Validación
+
+- `node --check assets/reflow-book.js` y `git diff --check` pasan.
+- Índice conserva sus 16 entradas, una ubicación con `aria-current` y el cierre desde la barra.
+- Herramientas presenta 20 controles y restaura correctamente lectura en voz alta, resaltado, fuente, voz y velocidad.
+- El foco entra en «Cerrar Herramientas» y vuelve a `#reflow-tools` al cerrar.
+- En Chrome, medir por separado la primera apertura y al menos tres reaperturas; informar mediana y rango, no una única muestra.
+- En esta versión, Índice registró una mediana cercana a `400 ms` en caliente (`331,5–852,4 ms`) frente a unos `830 ms` de referencia.
+- Herramientas registró una mediana cercana a `389 ms` en caliente (`361,2–407,6 ms`) frente a unos `2.990 ms`; la primera apertura permaneció entre `750` y `920 ms`.
+- El trabajo del hilo principal durante la preparación de Herramientas se redujo aproximadamente entre `62 %` y `65 %` respecto de la línea base medida.
+- No aparecen errores de consola.
+- La versión vigente pasa a `reflow-book.js?v=114-panel-performance`.
+
+### Riesgos y excepciones
+
+- No revelar Herramientas antes de que React restaure los estados; la clase `reflow-panel-pending` continúa siendo obligatoria.
+- No observar todas las modificaciones de `class`: los componentes base cambian clases durante el montaje y pueden crear una cascada costosa.
+- Si una futura exportación monta paneles fuera de los dos contenedores React, añadir explícitamente ese nuevo contenedor al observador.
+
+### Reversión
+
+Restaurar los observadores globales y la comprobación por frame junto con la versión anterior de `reflow-book.js` en `index.html`.
 
 ---
 

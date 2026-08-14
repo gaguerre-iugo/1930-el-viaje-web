@@ -3639,6 +3639,15 @@
   function createFontControls() {
     var interfaceContainer = document.getElementById("interface-container");
     var settingsMountScheduled = false;
+    var settingsPanelObserver = null;
+
+    function observeSettingsPanel() {
+      if (!interfaceContainer || !settingsPanelObserver) return;
+      settingsPanelObserver.observe(interfaceContainer, {
+        childList: true,
+        subtree: true
+      });
+    }
 
     function normalizedSettingText(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
@@ -3980,7 +3989,15 @@
       settingsMountScheduled = true;
       requestAnimationFrame(function () {
         settingsMountScheduled = false;
-        mountInSettingsPanel();
+        /* The custom rows added below also produce child-list mutations. Stop
+           observing while applying our own idempotent decoration so one React
+           commit results in one pass instead of a cascade of extra frames. */
+        if (settingsPanelObserver) settingsPanelObserver.disconnect();
+        try {
+          mountInSettingsPanel();
+        } finally {
+          observeSettingsPanel();
+        }
       });
     }
 
@@ -4033,10 +4050,8 @@
 
     mountInSettingsPanel();
     if (interfaceContainer) {
-      new MutationObserver(scheduleSettingsPanelMount).observe(interfaceContainer, {
-        childList: true,
-        subtree: true
-      });
+      settingsPanelObserver = new MutationObserver(scheduleSettingsPanelMount);
+      observeSettingsPanel();
     }
   }
 
@@ -4165,6 +4180,27 @@
 
   function installCompactRuntimePanels() {
     var scheduled = false;
+    var panelObserver = null;
+    var panelReadinessTimer = 0;
+
+    function observeRuntimePanelRoots() {
+      if (!panelObserver) return;
+      var roots = [
+        document.getElementById("interface-container"),
+        document.getElementById("nav-container")
+      ].filter(Boolean);
+      if (!roots.length) roots.push(document.body);
+      roots.forEach(function (root) {
+        panelObserver.observe(root, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: [
+            "aria-checked", "data-checked", "data-unchecked"
+          ]
+        });
+      });
+    }
 
     function normalized(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
@@ -4504,50 +4540,64 @@
 
     function updatePanels() {
       scheduled = false;
-      document.querySelectorAll('[role="dialog"][data-slot="popover-content"]').forEach(function (panel) {
-        classifyPanel(panel);
-        var isTargetPanel = panel.classList.contains("reflow-navigation-panel") ||
-          panel.classList.contains("reflow-accessibility-panel") ||
-          panel.classList.contains("reflow-glossary-panel") ||
-          panel.classList.contains("reflow-language-panel");
-        /* Do not compact a target while React has mounted only its heading
-           and search field. Wait for the tabs/content, then apply the exact
-           same natural height the complete panel used before. */
-        if (isTargetPanel && !panelContentsReady(panel)) {
-          panel.classList.add("reflow-panel-pending");
-          var readinessAttempts = Number(panel.dataset.reflowReadinessAttempts || 0);
-          if (readinessAttempts < 240) {
-            panel.dataset.reflowReadinessAttempts = String(readinessAttempts + 1);
-            requestAnimationFrame(scheduleUpdate);
-          } else {
-            panel.classList.remove("reflow-panel-pending");
+      var pendingRetry = false;
+      /* Attribute/class changes made by this pass are implementation details,
+         not new React work. Pausing the observer prevents them from recursively
+         scheduling another complete scan of every open panel. */
+      if (panelObserver) panelObserver.disconnect();
+      try {
+        document.querySelectorAll('[role="dialog"][data-slot="popover-content"]').forEach(function (panel) {
+          classifyPanel(panel);
+          var isTargetPanel = panel.classList.contains("reflow-navigation-panel") ||
+            panel.classList.contains("reflow-accessibility-panel") ||
+            panel.classList.contains("reflow-glossary-panel") ||
+            panel.classList.contains("reflow-language-panel");
+          /* React reports the meaningful child/attribute changes through the
+             observer. A lightweight fallback every 50 ms handles runtimes that
+             restore state without a mutation; polling every animation frame
+             previously starved the same commit we were waiting for. */
+          if (isTargetPanel && !panelContentsReady(panel)) {
+            panel.classList.add("reflow-panel-pending");
+            var readinessAttempts = Number(panel.dataset.reflowReadinessAttempts || 0);
+            if (readinessAttempts < 80) {
+              panel.dataset.reflowReadinessAttempts = String(readinessAttempts + 1);
+              pendingRetry = true;
+            } else {
+              panel.classList.remove("reflow-panel-pending");
+            }
+            return;
           }
-          return;
-        }
-        panel.classList.remove("reflow-panel-pending");
-        if (
-          panel.classList.contains("reflow-settings-first-paint") &&
-          panel.dataset.reflowFirstPaintReleaseScheduled !== "true"
-        ) {
-          panel.dataset.reflowFirstPaintReleaseScheduled = "true";
-          requestAnimationFrame(function () {
+          panel.classList.remove("reflow-panel-pending");
+          if (
+            panel.classList.contains("reflow-settings-first-paint") &&
+            panel.dataset.reflowFirstPaintReleaseScheduled !== "true"
+          ) {
+            panel.dataset.reflowFirstPaintReleaseScheduled = "true";
             requestAnimationFrame(function () {
-              if (!panel.isConnected) return;
-              panel.classList.remove("reflow-settings-first-paint");
-              delete panel.dataset.reflowFirstPaintReleaseScheduled;
+              requestAnimationFrame(function () {
+                if (!panel.isConnected) return;
+                panel.classList.remove("reflow-settings-first-paint");
+                delete panel.dataset.reflowFirstPaintReleaseScheduled;
+              });
             });
-          });
-        }
-        panel.removeAttribute("data-reflow-readiness-attempts");
-        if (!panel.classList.contains("reflow-reader-panel")) {
-          var rect = panel.getBoundingClientRect();
-          if (!isTargetPanel && rect.width < 480) return;
-          panel.classList.add("reflow-reader-panel");
-          if (rect.height >= 300) panel.classList.add("reflow-reader-panel-tall");
-        }
-        enhancePanelControls(panel);
-        dockPanelToViewport(panel);
-      });
+          }
+          panel.removeAttribute("data-reflow-readiness-attempts");
+          if (!panel.classList.contains("reflow-reader-panel")) {
+            var rect = panel.getBoundingClientRect();
+            if (!isTargetPanel && rect.width < 480) return;
+            panel.classList.add("reflow-reader-panel");
+            if (rect.height >= 300) panel.classList.add("reflow-reader-panel-tall");
+          }
+          enhancePanelControls(panel);
+          dockPanelToViewport(panel);
+        });
+      } finally {
+        observeRuntimePanelRoots();
+      }
+      window.clearTimeout(panelReadinessTimer);
+      if (pendingRetry) {
+        panelReadinessTimer = window.setTimeout(scheduleUpdate, 50);
+      }
       requestAnimationFrame(syncReadingShift);
       requestAnimationFrame(syncPrimaryToolbar);
     }
@@ -4559,21 +4609,11 @@
     }
 
     function primePanels() {
-      document.querySelectorAll('[role="dialog"][data-slot="popover-content"]').forEach(function (panel) {
-        classifyPanel(panel);
-        var isTargetPanel = panel.classList.contains("reflow-navigation-panel") ||
-          panel.classList.contains("reflow-accessibility-panel") ||
-          panel.classList.contains("reflow-glossary-panel") ||
-          panel.classList.contains("reflow-language-panel");
-        if (isTargetPanel && !panelContentsReady(panel)) panel.classList.add("reflow-panel-pending");
-      });
       scheduleUpdate();
     }
 
-    new MutationObserver(primePanels).observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    panelObserver = new MutationObserver(primePanels);
+    observeRuntimePanelRoots();
     window.addEventListener("resize", scheduleUpdate);
     document.addEventListener("keydown", function (event) {
       var panel = event.target && event.target.closest &&
@@ -4915,7 +4955,17 @@
     }, true);
 
     state.runtimeMenuObserver = new MutationObserver(scheduleRefresh);
-    state.runtimeMenuObserver.observe(document.body, { childList: true, subtree: true });
+    /* Navigation is rendered inside its dedicated React root. Observing the
+       complete book body made unrelated TTS, quiz and page mutations rebuild
+       the index decoration even while the index was closed. */
+    var runtimeMenuRoots = [
+      document.getElementById("interface-container"),
+      document.getElementById("nav-container")
+    ].filter(Boolean);
+    if (!runtimeMenuRoots.length) runtimeMenuRoots.push(document.body);
+    runtimeMenuRoots.forEach(function (root) {
+      state.runtimeMenuObserver.observe(root, { childList: true, subtree: true });
+    });
     state.runtimeMenuRefresh = scheduleRefresh;
     scheduleRefresh();
   }
