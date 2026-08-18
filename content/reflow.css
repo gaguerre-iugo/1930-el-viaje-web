@@ -4530,95 +4530,8 @@ body.reflow-book #content .reflow-scene-separator::after {
   line-height: .72;
 }
 
-/* Restore the original semantic contents table instead of treating its rows
-   as overlapping PDF coordinates. */
-body.reflow-book #content > section.reflow-original-contents-page {
-  box-sizing: border-box !important;
-  display: block !important;
-  width: calc(100vw - (2 * var(--reflow-gutter))) !important;
-  min-height: 100% !important;
-  height: auto !important;
-  padding: clamp(.5rem, 2vh, 1.25rem) 1rem !important;
-  overflow: visible !important;
-  -webkit-box-decoration-break: clone !important;
-  box-decoration-break: clone !important;
-  break-after: column !important;
-  break-inside: auto !important;
-  page-break-after: always !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page
-  > .pt-10 {
-  display: block !important;
-  padding-top: .25rem !important;
-  padding-bottom: 1rem !important;
-  break-after: avoid-column !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page
-  > div:last-child {
-  display: block !important;
-  break-inside: auto !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page table {
-  position: static !important;
-  display: block !important;
-  width: min(100%, 52rem) !important;
-  margin: 0 auto !important;
-  border-collapse: collapse !important;
-  break-inside: auto !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page
-  :where(tbody, thead, tfoot) {
-  position: static !important;
-  display: block !important;
-  break-inside: auto !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page tr {
-  box-sizing: border-box !important;
-  position: static !important;
-  display: grid !important;
-  grid-template-columns: clamp(3.5rem, 8vw, 5rem) minmax(0, 1fr) !important;
-  width: 100% !important;
-  margin: 0 !important;
-  break-inside: avoid-column !important;
-  -webkit-column-break-inside: avoid !important;
-  page-break-inside: avoid !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page tr + tr {
-  margin-top: .25rem !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page tr:nth-child(n + 3) {
-  margin-top: .75rem !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page
-  :where(td, th) {
-  position: static !important;
-  display: table-cell !important;
-  inset: auto !important;
-  transform: none !important;
-  width: auto !important;
-  height: auto !important;
-  padding: 0 .45rem !important;
-  text-align: left !important;
-  vertical-align: top !important;
-}
-
-body.reflow-book #content > section.reflow-original-contents-page
-  :where(td, th):first-child {
-  padding-right: .8rem !important;
-  text-align: right !important;
-}
-
-/* Promotional cover and montage pages must show their complete bitmap rather
-   than a crop inherited from the PDF viewport. */
-body.reflow-book #content > section.reflow-promotional-cover-page,
+/* Montage pages must show their complete bitmap rather than a crop inherited
+   from the PDF viewport. */
 body.reflow-book #content > section.reflow-full-image-page {
   display: flex !important;
   align-items: center !important;
@@ -4628,7 +4541,6 @@ body.reflow-book #content > section.reflow-full-image-page {
   overflow: hidden !important;
 }
 
-body.reflow-book #content > section.reflow-promotional-cover-page img,
 body.reflow-book #content > section.reflow-full-image-page img {
   position: static !important;
   inset: auto !important;
@@ -4888,14 +4800,6 @@ body.reflow-book #content > .reflow-quiz-repagination-overlay
   break-inside: auto !important;
 }
 
-/* The contents table and the author biography are distinct backmatter
-   pieces. A break after the complete table is more reliable in Chromium's
-   multi-column flow than asking the first biography heading to break away
-   from a fragmented table row. */
-body.reflow-book #content > section[data-section-id="pg219_sec001"] {
-  break-after: column !important;
-}
-
 body.reflow-book .reflow-editorial-keep-block {
   display: block !important;
   width: 100% !important;
@@ -4993,53 +4897,9 @@ body.reflow-book #content
   line-height: .72 !important;
 }
 
-/* The last two source folios are editorial pages, not ordinary chapter
-   prose. Rebuild their original composition while keeping every caption and
-   synopsis sentence as real, selectable and Easy-Read-aware text. */
-body.reflow-book #content > section.reflow-promotional-cover-page {
-  flex-direction: column !important;
-  gap: clamp(1rem, 2.5vh, 2rem) !important;
-  padding: clamp(.5rem, 1.5vh, 1rem) 0 !important;
-  text-align: center !important;
-}
-
-body.reflow-book #content > section.reflow-promotional-cover-page img {
-  flex: 0 1 auto !important;
-  min-height: 0 !important;
-  max-height: calc(var(--reflow-page-height) - (10.5rem * var(--reflow-font-scale))) !important;
-}
-
-body.reflow-book #content .reflow-promotional-cover-caption {
-  flex: 0 0 auto !important;
-  width: min(100%, 46rem) !important;
-  margin: 0 auto !important;
-  color: #111 !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
-  font-size: calc(1.25rem * var(--reflow-font-scale)) !important;
-  line-height: 1.55 !important;
-  text-align: center !important;
-  break-inside: avoid-column !important;
-}
-
-body.reflow-book #content .reflow-promotional-cover-caption p {
-  display: block !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  color: inherit !important;
-  font: inherit !important;
-  text-align: inherit !important;
-}
-
-body.reflow-book #content .reflow-promotional-cover-caption
-  > p.reading-sentence.reading-sentence {
-  display: block !important;
-  width: 100% !important;
-  padding-right: 0 !important;
-  font-size: inherit !important;
-  line-height: inherit !important;
-  text-align: center !important;
-}
-
+/* The synopsis source folio is an editorial page, not ordinary chapter prose.
+   Rebuild its original composition while keeping every synopsis sentence as
+   real, selectable and Easy-Read-aware text. */
 body.reflow-book #content > section.reflow-back-cover-page {
   box-sizing: border-box !important;
   display: block !important;
@@ -5054,10 +4914,9 @@ body.reflow-book #content > section.reflow-back-cover-page {
   -webkit-box-decoration-break: clone !important;
   box-decoration-break: clone !important;
   break-before: column !important;
-  /* The following institutional page owns the only terminal column break.
-     Leaving the break on this full-height multicolumn block made Chromium
-     paint that sibling one column beyond the reported scroll extent. */
-  break-after: auto !important;
+  /* The synopsis now precedes chapter 1, so it must release a complete
+     column before the reconstructed chapter cover begins. */
+  break-after: column !important;
   break-inside: auto !important;
 }
 
@@ -5342,6 +5201,69 @@ body.reflow-book #content :is(
   max-width: none !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+
+/* Every reconstructed conversation needs the same breathing room from the
+   reading edge. Earlier bespoke chats used between 0 and 20 px, which left
+   several sender labels and bubbles visually attached to the left margin.
+   Keep the full-width shells, but normalize their inner horizontal gutter
+   across original, chapter-one, chapter-five and later semantic chats. */
+body.reflow-book #content :is(
+  [data-section-id="pg020_sec001"] .whatsapp-chat-window,
+  [data-section-id="pg021_sec001"] .whatsapp-chat-window,
+  [data-section-id="pg029_sec001"] .chapter-one-chat-part,
+  .chapter5-chat-page,
+  .reflow-book-chat-window
+) {
+  box-sizing: border-box !important;
+  padding-left: clamp(1.25rem, 3vw, 2rem) !important;
+  padding-right: clamp(1.25rem, 3vw, 2rem) !important;
+}
+
+/* The chapter-five pages are direct story-section children. A legacy prose
+   reset targets that exact structure with greater specificity, so preserve
+   the shared chat gutter explicitly for both halves of that conversation. */
+body.reflow-book #content
+  > section.reflow-story-section:not(.reflow-later-illustrated)
+  > .chapter5-chat-page.chapter5-chat-page {
+  padding-left: clamp(1.25rem, 3vw, 2rem) !important;
+  padding-right: clamp(1.25rem, 3vw, 2rem) !important;
+}
+
+/* Keep every chat bubble from visually touching its sender label and message
+   copy. Some source-page prose resets have greater specificity than the
+   original chat utilities, so restore one consistent inner space at the end
+   of the reflow stylesheet for all reconstructed incoming and outgoing chats. */
+body.reflow-book #content :is(
+  [data-section-id="pg020_sec001"] .whatsapp-message-incoming,
+  [data-section-id="pg020_sec001"] .whatsapp-message-outgoing,
+  [data-section-id="pg021_sec001"] .whatsapp-message-incoming,
+  [data-section-id="pg021_sec001"] .whatsapp-message-outgoing,
+  [data-section-id="pg029_sec001"] .whatsapp-message-incoming,
+  [data-section-id="pg029_sec001"] .whatsapp-message-outgoing,
+  .chapter5-chat-incoming,
+  .chapter5-chat-outgoing,
+  .reflow-chat-incoming,
+  .reflow-chat-outgoing
+) {
+  box-sizing: border-box !important;
+  padding: clamp(.7rem, 1.5vh, .8rem) clamp(.875rem, 2vw, 1.125rem) !important;
+}
+
+/* Pages 20 and 21 place their bubbles directly inside the chat shell. Match
+   that structure explicitly so the legacy story-wrapper padding reset cannot
+   erase the white or green bubble's horizontal inset. */
+body.reflow-book #content
+  > section.reflow-story-section:is(
+    [data-section-id="pg020_sec001"],
+    [data-section-id="pg021_sec001"]
+  )
+  > .whatsapp-chat-window
+  > :is(
+    .whatsapp-message-incoming.whatsapp-message-incoming,
+    .whatsapp-message-outgoing.whatsapp-message-outgoing
+  ) {
+  padding: clamp(.7rem, 1.5vh, .8rem) clamp(.875rem, 2vw, 1.125rem) !important;
 }
 
 body.reflow-book #content

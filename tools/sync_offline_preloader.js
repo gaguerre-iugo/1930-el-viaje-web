@@ -8,6 +8,15 @@ const preloaderPath = path.join(root, "assets", "offline-preloader.js");
 const marker = "  var INLINE = ";
 const afterInlineMarker = ";\n  var BASE_DIR";
 const syncPaths = [
+  "./assets/config.json",
+  "./content/pages.json",
+  "./content/toc.json",
+  "./content/i18n/es-UY/texts.json",
+  "./content/i18n/es-UY/audios.json",
+  "./content/i18n/es-UY/voices/valentina/audios.json",
+  "./content/i18n/es-UY/voices/valentina/timecodes.json",
+  "./content/i18n/es-UY/voices/mateo/audios.json",
+  "./content/i18n/es-UY/voices/mateo/timecodes.json",
   "./index.html",
   "./quiz_final.html",
   "./qz007.html",
@@ -18,6 +27,7 @@ const syncPaths = [
   "./qz022.html",
   "./qz025.html"
 ];
+const removePaths = ["./pg219_sec001.html", "./pg223_sec001.html"];
 
 const source = fs.readFileSync(preloaderPath, "utf8");
 const start = source.indexOf(marker) + marker.length;
@@ -28,6 +38,9 @@ if (start < marker.length || end < 0) {
 }
 
 const inline = JSON.parse(source.slice(start, end));
+for (const relative of removePaths) {
+  delete inline[relative];
+}
 for (const relative of syncPaths) {
   if (!Object.prototype.hasOwnProperty.call(inline, relative)) {
     throw new Error(`El preloader no contiene ${relative}`);

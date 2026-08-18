@@ -11,6 +11,7 @@
     ["pg013_sec001", "pg013_sec001.html"],
     ["pg014_sec001", "pg014_sec001.html"],
     ["pg015_sec001", "pg015_sec001.html"],
+    ["pg224_sec001", "pg224_sec001.html"],
     ["pg016_sec001", "pg016_sec001.html"],
     ["pg017_sec001", "pg017_sec001.html"],
     ["pg019_sec001", "pg019_sec001.html"],
@@ -206,10 +207,7 @@
     ["pg215_sec001", "pg215_sec001.html"],
     ["qz025", "qz025.html"],
     ["pg216217_sec001", "pg216217_sec001.html"],
-    ["pg219_sec001", "pg219_sec001.html"],
-    ["pg221_sec001", "pg221_sec001.html"],
-    ["pg223_sec001", "pg223_sec001.html"],
-    ["pg224_sec001", "pg224_sec001.html"]
+    ["pg221_sec001", "pg221_sec001.html"]
   ];
 
   var fileToSection = Object.create(null);
@@ -225,9 +223,36 @@
   var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
   var reducedMotionStorageKey = "adt-reflow-reduced-motion:1930-libro-completo-v47";
   var editorialTocTitles = {
+    pg001_sec001: "1930: El viaje",
+    pg017_sec001: "Hay algo extraño en esa foto",
+    pg037_sec001: "El Conte Verde debe zarpar",
+    pg058059_sec001: "Un secreto para Fede",
+    pg080081_sec001: "Lo que esconde la caja fuerte",
+    pg104105_sec001: "Una conspiración a bordo",
+    pg122123_sec001: "Otra viajera del tiempo",
+    pg144145_sec001: "Josephine está en peligro",
+    pg176177_sec001: "Dos mundiales, un mismo destino",
     pg221_sec001: "Ana Solari",
-    pg223_sec001: "Misterio de Cabo Frío"
+    pg224_sec001: "Sinopsis"
   };
+  var editorialTocLevels = {
+    pg215_sec001: 1,
+    pg221_sec001: 1,
+    pg224_sec001: 1
+  };
+  function moveCatalogueEntryBefore(entries, movingSectionId, targetSectionId) {
+    if (!Array.isArray(entries)) return;
+    var movingIndex = entries.findIndex(function (entry) {
+      return entry.section_id === movingSectionId;
+    });
+    if (movingIndex < 0) return;
+    var movingEntry = entries.splice(movingIndex, 1)[0];
+    var targetIndex = entries.findIndex(function (entry) {
+      return entry.section_id === targetSectionId;
+    });
+    if (targetIndex < 0) entries.push(movingEntry);
+    else entries.splice(targetIndex, 0, movingEntry);
+  }
   var fontScales = { normal: 1, large: 1.2, xlarge: 1.4 };
   var ttsVoices = { valentina: "Valentina", mateo: "Mateo" };
   var ttsVoiceCatalogs = {
@@ -419,6 +444,7 @@
 
       var data = await response.clone().json();
       if (isConfig) {
+        data.bundleVersion = "55-activities-index";
         data.features.showNavigationControls = false;
       } else if (isAudios) {
         /* Keep every historical semantic id on the same cache-busted file.
@@ -540,8 +566,13 @@
             if (editorialTocTitles[entry.section_id]) {
               entry.title = editorialTocTitles[entry.section_id];
             }
+            if (editorialTocLevels[entry.section_id]) {
+              entry.level = editorialTocLevels[entry.section_id];
+            }
           });
+          moveCatalogueEntryBefore(data, "pg224_sec001", "pg017_sec001");
         }
+        if (isPages) moveCatalogueEntryBefore(data, "pg224_sec001", "pg016_sec001");
         data.forEach(function (entry) {
           entry.href = "index.html#" + entry.section_id;
           /* These values identify source-PDF folios. The generic runtime
@@ -563,7 +594,7 @@
 
   async function loadIndexMetadata() {
     try {
-      var response = await fetch("./content/toc.json?v=3-index-hierarchy");
+      var response = await fetch("./content/toc.json?v=10-activities-index");
       if (!response.ok) throw new Error("No se pudo cargar el índice editorial.");
       var entries = await response.json();
       if (Array.isArray(entries)) window.__adtReflowTocEntries = entries;
@@ -3153,8 +3184,8 @@
     catalogue.status = "loading";
     updateTtsVoiceControls();
     catalogue.promise = Promise.all([
-      fetch(root + "audios.json?v=47-full-book-132-uatsap-no-e"),
-      fetch(root + "timecodes.json?v=47-full-book-132-uatsap-no-e")
+      fetch(root + "audios.json?v=49-full-book-134-remove-printed-contents"),
+      fetch(root + "timecodes.json?v=49-full-book-134-remove-printed-contents")
     ]).then(function (responses) {
       if (!responses[0].ok || !responses[1].ok) throw new Error("missing catalogue");
       return Promise.all([responses[0].json(), responses[1].json()]);
@@ -4713,16 +4744,33 @@
       });
       if (explicit) return explicit;
 
+      var tabpanel = button.closest('[role="tabpanel"]');
+      var buttons = tabpanel
+        ? Array.prototype.slice.call(tabpanel.querySelectorAll("button"))
+        : [];
+      var index = buttons.indexOf(button);
+      if (
+        tabpanel && navigationMode(panel) === "toc" &&
+        buttons.length === toc.length && index >= 0
+      ) {
+        return toc[index] || null;
+      }
+
       var label = normalized(button.textContent);
-      var match = toc.find(function (entry) {
+      var matches = toc.filter(function (entry) {
         return normalized(entry.title).toLocaleLowerCase("es") === label.toLocaleLowerCase("es");
       });
-      if (match) return match;
+      if (matches.length === 1) return matches[0];
+      if (matches.length > 1) {
+        var sameLabelButtons = buttons.filter(function (candidate) {
+          return normalized(candidate.textContent).toLocaleLowerCase("es") ===
+            label.toLocaleLowerCase("es");
+        });
+        var occurrence = sameLabelButtons.indexOf(button);
+        if (occurrence >= 0 && matches[occurrence]) return matches[occurrence];
+      }
 
-      var tabpanel = button.closest('[role="tabpanel"]');
       if (!tabpanel || navigationMode(panel) !== "toc") return null;
-      var buttons = Array.prototype.slice.call(tabpanel.querySelectorAll("button"));
-      var index = buttons.indexOf(button);
       return toc[index] || null;
     }
 
@@ -5595,7 +5643,7 @@
 
   async function fetchSection(entry) {
     var separator = entry[1].indexOf("?") >= 0 ? "&" : "?";
-    var response = await fetch(entry[1] + separator + "v=47-full-book-62");
+    var response = await fetch(entry[1] + separator + "v=49-full-book-65-synopsis-move");
     if (!response.ok) throw new Error("No se pudo cargar " + entry[1]);
     var source = await response.text();
     var documentFragment = new DOMParser().parseFromString(source, "text/html");
@@ -7358,7 +7406,7 @@
       }
     });
 
-    ["pg216217_sec001", "pg219_sec001", "pg221_sec001", "pg223_sec001", "pg224_sec001"].forEach(
+    ["pg216217_sec001", "pg221_sec001"].forEach(
       function (sectionId) {
         var section = content.querySelector('[data-section-id="' + sectionId + '"]');
         if (section) section.classList.add("reflow-backmatter-page");
@@ -7379,9 +7427,6 @@
         montageImage.alt = "Montaje final a doble página: personajes de la historia y el transatlántico Conte Verde sobre el mar.";
       }
     }
-
-    var originalToc = content.querySelector('[data-section-id="pg219_sec001"]');
-    if (originalToc) originalToc.classList.add("reflow-original-contents-page");
 
     /* The biography already owns a forced column start in CSS. An additional
        zero-height breaker here produced an entirely blank page in every
@@ -7411,28 +7456,6 @@
         if (editorialKeepCursor === editorialKeepEnd) break;
         editorialKeepCursor = editorialKeepNext;
       }
-    }
-
-    var promotionalCover = content.querySelector('[data-section-id="pg223_sec001"]');
-    if (promotionalCover && !promotionalCover.dataset.reflowBackmatterNormalized) {
-      promotionalCover.classList.add("reflow-promotional-cover-page");
-      var promotionalImage = promotionalCover.querySelector('[data-id="pg223_im002"]');
-      var promotionalCaption = document.createElement("div");
-      promotionalCaption.className = "reflow-promotional-cover-caption";
-      ["pg223_n0005", "pg223_n0006"].forEach(function (id) {
-        var sourceNode = promotionalCover.querySelector('[data-id="' + id + '"]');
-        if (!sourceNode) return;
-        var line = document.createElement("p");
-        line.dataset.id = id;
-        line.textContent = sourceNode.textContent || "";
-        promotionalCaption.appendChild(line);
-      });
-      if (promotionalImage) {
-        promotionalImage.alt =
-          "Portada de la novela Misterio de Cabo Frío, con varios rostros juveniles superpuestos tras un efecto de grietas.";
-        promotionalCover.replaceChildren(promotionalImage, promotionalCaption);
-      }
-      promotionalCover.dataset.reflowBackmatterNormalized = "true";
     }
 
     var backCover = content.querySelector('[data-section-id="pg224_sec001"]');
@@ -7499,7 +7522,7 @@
          reader made their inline boxes fragment across hundreds of phantom
          columns in Chromium. Besides duplicating the accessible announcement,
          that corrupted page counts and caused large navigation jumps. */
-      backCover.insertAdjacentElement("afterend", collaboratorsPage);
+      content.appendChild(collaboratorsPage);
     }
   }
 
