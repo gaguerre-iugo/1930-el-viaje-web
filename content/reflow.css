@@ -390,7 +390,7 @@ body.reflow-book #content > section[data-section-type="activity_quiz"] .activity
   body.reflow-book #content > section[data-section-id="pg052_sec001"] > div {
     display: flex !important;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     gap: .75rem;
   }
   body.reflow-book #content > section[data-section-id="pg052_sec001"] img {
@@ -911,7 +911,7 @@ body.reflow-book #content > section[data-section-id="pg052_sec001"] > .illustrat
   grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
   grid-template-rows: max-content;
   align-items: start;
-  align-content: center;
+  align-content: start;
   gap: clamp(1.5rem, 4vw, 3rem);
   width: 100% !important;
   height: 100%;
@@ -1112,7 +1112,7 @@ body.reflow-book .tts-image-highlight-overlay {
   body.reflow-book #content > section[data-section-id="pg052_sec001"] > .illustrated-page {
     display: flex !important;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     gap: .75rem;
   }
 
@@ -1813,7 +1813,7 @@ body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrat
   grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   grid-template-rows: max-content;
   align-items: start;
-  align-content: center;
+  align-content: start;
   gap: clamp(.75rem, 1.5vw, 1rem);
   width: 100% !important;
   height: 100%;
@@ -1842,7 +1842,7 @@ body.reflow-book #content > section[data-section-id="pg031_sec001"] > .attic-ill
   grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
   grid-template-rows: max-content;
   align-items: start;
-  align-content: center;
+  align-content: start;
   gap: clamp(1.25rem, 3vw, 2rem);
   width: 100% !important;
   height: 100%;
@@ -2308,7 +2308,7 @@ body.reflow-book #content .quiz-explanation-bank {
   body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrated-page {
     display: flex !important;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     gap: .75rem;
   }
 
@@ -4121,14 +4121,16 @@ body.reflow-book:not(.reflow-easy-read) #content
 }
 
 /* Large narrative illustrations use the same indivisible two-column page
-   geometry as the audited chapter 1/2 examples. */
+   geometry and shared upper page inset as the audited chapter 1/2 examples.
+   Anchoring the row at the start prevents image dimensions from moving the
+   narrative content vertically. */
 body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
   box-sizing: border-box !important;
   display: grid !important;
   grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
   grid-template-rows: max-content !important;
   align-items: start !important;
-  align-content: center !important;
+  align-content: start !important;
   gap: clamp(1.5rem, 4vw, 3rem) !important;
   width: calc(100vw - (2 * var(--reflow-gutter))) !important;
   height: 100% !important;
@@ -4477,12 +4479,13 @@ body.reflow-book #content .illustrated-page
 }
 
 /* The virtual-reality composition has short copy but still owns a complete
-   page. Centre the image and prose together inside the usable column. */
+   page. It follows the shared narrative upper inset instead of introducing
+   an image-specific vertical centre. */
 body.reflow-book #content > section[data-section-id="pg068_sec001"]
   > .illustrated-page {
   height: calc(var(--reflow-page-height) - (2 * var(--reflow-block-padding))) !important;
   min-height: calc(var(--reflow-page-height) - (2 * var(--reflow-block-padding))) !important;
-  align-content: center !important;
+  align-content: start !important;
 }
 
 /* “FIN” is a terminal marker, not the next paragraph. Give it three times
