@@ -2247,7 +2247,7 @@
     overlay.style.setProperty("--reflow-frozen-card-height", rect.height + "px");
     var frozenCard = card.cloneNode(true);
     frozenCard.classList.add("reflow-quiz-repagination-card");
-    stripCloneInteractivity(frozenCard);
+    stripRepaginationCloneSemantics(frozenCard);
     overlay.appendChild(frozenCard);
     content.appendChild(overlay);
     state.quizRepaginationOverlay = overlay;
@@ -5944,8 +5944,10 @@
       overflowBlock.appendChild(paragraph);
     });
 
-    illustratedPage.appendChild(image);
+    /* Keep visual and reading order aligned: prose occupies the left column
+       and its illustration the right column on wide layouts. */
     illustratedPage.appendChild(illustratedCopy);
+    illustratedPage.appendChild(image);
     section.replaceChildren(illustratedPage);
     overflowBlocks.forEach(function (block) { section.appendChild(block); });
   }
@@ -5963,8 +5965,8 @@
     illustratedCopy.className = "illustrated-copy attic-illustrated-copy reading-block";
     sourceParagraph.classList.add("attic-illustrated-source");
     illustratedCopy.appendChild(sourceParagraph);
-    illustratedPage.appendChild(image);
     illustratedPage.appendChild(illustratedCopy);
+    illustratedPage.appendChild(image);
 
     var overflow = document.createElement("div");
     overflow.className = "attic-illustrated-overflow reading-block";
@@ -8340,8 +8342,8 @@
       paragraph.dataset.sourceSection = "pg068_sec001";
       illustratedCopy.appendChild(paragraph);
     });
-    illustratedPage.appendChild(image);
     illustratedPage.appendChild(illustratedCopy);
+    illustratedPage.appendChild(image);
 
     var overflow = document.createElement("div");
     overflow.className = "illustrated-overflow reading-block";

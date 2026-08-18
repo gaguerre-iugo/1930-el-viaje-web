@@ -908,7 +908,7 @@ body.reflow-book #content > section[data-section-id="pg047_sec001"] > .illustrat
 body.reflow-book #content > section[data-section-id="pg052_sec001"] > .illustrated-page {
   box-sizing: border-box;
   display: grid !important;
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
   grid-template-rows: max-content;
   align-items: start;
   align-content: center;
@@ -1810,7 +1810,7 @@ body.reflow-book #content > section[data-section-id="pg025_sec001"] {
 body.reflow-book #content > section[data-section-id="pg025_sec001"] > .illustrated-page {
   box-sizing: border-box;
   display: grid !important;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
   grid-template-rows: max-content;
   align-items: start;
   align-content: center;
@@ -1839,7 +1839,7 @@ body.reflow-book #content > section[data-section-id="pg031_sec001"] {
 body.reflow-book #content > section[data-section-id="pg031_sec001"] > .attic-illustrated-page {
   box-sizing: border-box;
   display: grid !important;
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
   grid-template-rows: max-content;
   align-items: start;
   align-content: center;
@@ -4125,7 +4125,7 @@ body.reflow-book:not(.reflow-easy-read) #content
 body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
   box-sizing: border-box !important;
   display: grid !important;
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr) !important;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important;
   grid-template-rows: max-content !important;
   align-items: start !important;
   align-content: center !important;
@@ -4349,14 +4349,14 @@ body.reflow-book.reflow-easy-read #content
 body.reflow-book.reflow-easy-read #content
   > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
   > .illustrated-page > img {
-  grid-column: 1 !important;
+  grid-column: 2 !important;
   grid-row: 1 !important;
 }
 
 body.reflow-book.reflow-easy-read #content
   > section.reflow-later-illustrated.reflow-easy-illustrated-stacked
   > .illustrated-page > .illustrated-copy {
-  grid-column: 2 !important;
+  grid-column: 1 !important;
   grid-row: 1 !important;
   height: auto !important;
   min-height: 0 !important;
