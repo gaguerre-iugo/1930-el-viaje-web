@@ -729,8 +729,32 @@
       .map(function (value) { return String(value).toLocaleLowerCase("es"); });
   }
 
-  function glossaryEntryMatchesText(entry, text) {
+  function glossaryContextExcludesMatch(termKey, text, start, length) {
+    if (String(termKey || "").toLocaleLowerCase("es") !== "mundial") return false;
+    var expression = /\bguerra(?:s)?\s+mundial(?:es)?\b/giu;
+    var match = expression.exec(String(text || ""));
+    var end = start + length;
+    while (match) {
+      var matchEnd = match.index + match[0].length;
+      if (start < matchEnd && end > match.index) return true;
+      match = expression.exec(String(text || ""));
+    }
+    return false;
+  }
+
+  function glossaryTextWithoutExcludedContexts(entry, text) {
     var haystack = String(text || "").toLocaleLowerCase("es");
+    if (String(entry && entry.word || "").toLocaleLowerCase("es") === "mundial") {
+      /* “Mundial” in “Primera/Segunda Guerra Mundial” is an adjective and
+         must not open the football-championship definition. Remove only that
+         context; standalone uses of Mundial remain searchable/highlightable. */
+      haystack = haystack.replace(/\bguerra(?:s)?\s+mundial(?:es)?\b/giu, " ");
+    }
+    return haystack;
+  }
+
+  function glossaryEntryMatchesText(entry, text) {
+    var haystack = glossaryTextWithoutExcludedContexts(entry, text);
     return glossaryForms(entry).some(function (form) {
       return haystack.indexOf(form) >= 0;
     });
@@ -930,6 +954,11 @@
       matcher.lastIndex = 0;
       var match = matcher.exec(source);
       while (match) {
+        var termKey = formOwners.get(match[0].toLocaleLowerCase("es"));
+        if (glossaryContextExcludesMatch(termKey, source, match.index, match[0].length)) {
+          match = matcher.exec(source);
+          continue;
+        }
         matched = true;
         if (match.index > cursor) fragment.appendChild(
           document.createTextNode(source.slice(cursor, match.index))
@@ -943,9 +972,7 @@
         highlight.setAttribute("tabindex", "0");
         highlight.setAttribute("aria-haspopup", "dialog");
         highlight.setAttribute("aria-expanded", "false");
-        highlight.dataset.glossaryKey = formOwners.get(
-          match[0].toLocaleLowerCase("es")
-        );
+        highlight.dataset.glossaryKey = termKey;
         highlight.textContent = match[0];
         fragment.appendChild(highlight);
         cursor = match.index + match[0].length;
@@ -1031,7 +1058,6 @@
 
     window.__adtReflowLocateGlossaryTerm = function (entry) {
       if (!entry || !content) return false;
-      var forms = glossaryForms(entry);
       var candidates = Array.prototype.slice.call(content.querySelectorAll(
       ".glossary-term[data-glossary-key]"
       )).filter(function (element) {
@@ -1044,8 +1070,7 @@
           acceptNode: function (node) {
             var parent = node.parentElement;
             if (!parent || glossaryExcludedElement(parent)) return NodeFilter.FILTER_REJECT;
-            var text = String(node.textContent || "").toLocaleLowerCase("es");
-            return forms.some(function (form) { return text.indexOf(form) >= 0; })
+            return glossaryEntryMatchesText(entry, node.textContent)
               ? NodeFilter.FILTER_ACCEPT
               : NodeFilter.FILTER_REJECT;
           }
@@ -10398,6 +10423,17 @@
     var glossaryCurrentPageReplacement =
       'c=(0,cx.useMemo)(()=>window.__adtReflowGlossaryEntriesForCurrentPage?' +
       'window.__adtReflowGlossaryEntriesForCurrentPage(u,i):[],[u,i])';
+    /* The stock glossary reads its filter from AN, but rendered the shared
+       search input without ever writing to that atom. The field therefore
+       accepted text while both result lists kept receiving an empty filter.
+       Bind the input explicitly so filtering works in both glossary tabs. */
+    var glossarySearchStateMarker = 'i=se(AN),[s,l]=Ve(Bc)';
+    var glossarySearchStateReplacement = '[i,h]=Ve(AN),[s,l]=Ve(Bc)';
+    var glossarySearchInputMarker =
+      '(0,qt.jsx)(_o.Search,{className:"text-lg font-semibold"})';
+    var glossarySearchInputReplacement =
+      '(0,qt.jsx)(_o.Search,{className:"text-lg font-semibold",value:i,' +
+      'onChange:p=>h(p.target.value)})';
     var glossaryLocateMarker = 'function ux(e){if(typeof document>"u")return!1;';
     var glossaryLocateReplacement = 'function ux(e){if(window.__adtReflowLocateGlossaryTerm)' +
       'return window.__adtReflowLocateGlossaryTerm(e);if(typeof document>"u")return!1;';
@@ -10428,6 +10464,8 @@
       !source.includes(glossaryDedupeReadMarker) ||
       !source.includes(glossaryDedupeWriteMarker) ||
       !source.includes(glossaryCurrentPageMarker) ||
+      !source.includes(glossarySearchStateMarker) ||
+      !source.includes(glossarySearchInputMarker) ||
       !source.includes(glossaryLocateMarker)
     ) {
       throw new Error("La versión del reproductor no admite la integración paginada.");
@@ -10458,6 +10496,8 @@
       .replace(glossaryDedupeReadMarker, glossaryDedupeReadReplacement)
       .replace(glossaryDedupeWriteMarker, glossaryDedupeWriteReplacement)
       .replace(glossaryCurrentPageMarker, glossaryCurrentPageReplacement)
+      .replace(glossarySearchStateMarker, glossarySearchStateReplacement)
+      .replace(glossarySearchInputMarker, glossarySearchInputReplacement)
       .replace(glossaryLocateMarker, glossaryLocateReplacement);
     var script = document.createElement("script");
     script.textContent = source + "\n//# sourceURL=base.bundle.reflow.js";

@@ -5529,7 +5529,7 @@
   },
   "bandita": {
     "word": "bandita",
-    "definition": "Grupo pequeño de personas. En el texto, se usa para hablar de un grupito que molesta o acompaña a alguien.",
+    "definition": "Grupo pequeño de personas. En el texto se usa para hablar de un grupito que acompaña a alguien, en este caso al Loro.",
     "variations": [
       "bandita",
       "banditas",
@@ -5735,16 +5735,6 @@
     "definition": "Campeonato internacional de fútbol en el que compiten selecciones de distintos países.",
     "variations": [
       "Mundial",
-      "mundiales"
-    ],
-    "emoji": "⚽🏆🌍"
-  },
-  "Mundial de Fútbol": {
-    "word": "Mundial de Fútbol",
-    "definition": "Competencia internacional de fútbol en la que participan selecciones de distintos países.",
-    "variations": [
-      "Mundial de Fútbol",
-      "mundial",
       "mundiales"
     ],
     "emoji": "⚽🏆🌍"

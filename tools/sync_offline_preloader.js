@@ -12,6 +12,7 @@ const syncPaths = [
   "./content/pages.json",
   "./content/toc.json",
   "./content/i18n/es-UY/texts.json",
+  "./content/i18n/es-UY/glossary.json",
   "./content/i18n/es-UY/audios.json",
   "./content/i18n/es-UY/voices/valentina/audios.json",
   "./content/i18n/es-UY/voices/valentina/timecodes.json",

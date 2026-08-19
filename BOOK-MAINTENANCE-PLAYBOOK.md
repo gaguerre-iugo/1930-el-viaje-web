@@ -2346,6 +2346,74 @@ Restaurar el guardado numérico anterior y la rama `restore` de `recalculate`, y
 
 ---
 
+## Acción 39: enlazar la búsqueda del glosario con su estado de filtro
+
+### Objetivo
+
+Hacer que el texto escrito en `Buscar` filtre inmediatamente tanto «En esta página» como «Glosario del libro». Un campo editable no prueba que la búsqueda funcione: el valor debe llegar al estado que calcula ambas listas.
+
+### Procedimiento
+
+1. Inspeccionar el componente que monta el glosario y localizar la variable utilizada por sus filtros.
+2. Comprobar que el campo reciba ese valor y que su evento `onChange` actualice la misma fuente de estado.
+3. Mantener la búsqueda como un control React; no ocultar filas mediante un segundo listener DOM ni reconstruir listas fuera del componente.
+4. Conservar el filtro al alternar entre «En esta página» y «Glosario del libro».
+5. En este libro, adaptar `base.bundle.local.js` durante la carga: convertir la lectura aislada del átomo `AN` en lectura/escritura y enlazar `_o.Search` mediante `value` y `onChange`.
+6. Versionar `reflow-book.js` y sincronizar `index.html` dentro de `offline-preloader.js` para que la corrección se aplique también con `file://`.
+
+### Archivos modificados
+
+- `assets/reflow-book.js`
+- `index.html`
+- `assets/offline-preloader.js`
+
+### Validación
+
+- Abrir el glosario y escribir un fragmento presente en una entrada; la lista debe reducirse mientras se escribe.
+- Probar por término, definición y variación.
+- Repetir en ambas pestañas y confirmar que el texto buscado se conserva al alternarlas.
+- Escribir un valor inexistente y verificar el mensaje de ausencia de resultados; borrar el texto y comprobar que vuelve la lista completa.
+- Ejecutar `node --check assets/reflow-book.js` y `git diff --check`.
+
+### Riesgos y reversión
+
+- El parche depende de marcadores concretos del bundle. Validarlos antes de reemplazar y fallar explícitamente si una futura versión cambia el componente.
+- No enlazar un estado local distinto: la lista «En esta página» y la lista completa deben consumir el mismo filtro.
+- Para revertir, retirar los dos reemplazos del componente de glosario y restaurar las versiones previas en `index.html`; volverá el defecto original del campo sin efecto.
+
+---
+
+## Acción 40: excluir acepciones incorrectas por contexto en el glosario
+
+### Objetivo
+
+Evitar que una forma compartida active una definición incorrecta. En este libro, “Mundial” refiere al campeonato de fútbol cuando aparece de forma independiente, pero no dentro de «Primera Guerra Mundial» o «Segunda Guerra Mundial».
+
+### Procedimiento
+
+1. No eliminar la entrada ni su variación cuando sean correctas en otros pasajes.
+2. Definir una exclusión contextual limitada al término afectado; para `Mundial`, excluir las formas «Guerra Mundial» y «Guerras Mundiales».
+3. Aplicar la misma regla al cálculo de «En esta página», al resaltado dentro del texto y a «Mostrar en la página».
+4. Si una página contiene además un uso independiente de “Mundial”, conservar esa coincidencia: eliminar la frase excluida del texto evaluado, no descartar la página completa.
+5. Mantener la frase histórica como texto normal, sin `role="button"`, foco, apertura de definición ni resaltado visual.
+6. Al modificar entradas o definiciones, cambiar `bundleVersion` en `assets/config.json`: el runtime solicita `glossary.json?v=<bundleVersion>` y una versión anterior puede quedar almacenada como recurso inmutable.
+7. Incluir `content/i18n/es-UY/glossary.json` y `assets/config.json` en la sincronización del preloader offline.
+
+### Validación
+
+- Comprobar el modo normal y Lectura fácil en un pasaje con «Primera Guerra Mundial».
+- Repetir con «Segunda Guerra Mundial».
+- Confirmar que un “Mundial” futbolístico cercano continúa resaltado y abre la definición correcta.
+- Verificar ambas pestañas del glosario y la acción «Mostrar en la página».
+- Ejecutar `node --check assets/reflow-book.js`, sincronizar el preloader offline y ejecutar `git diff --check`.
+
+### Riesgos y reversión
+
+- Una exclusión demasiado amplia puede ocultar acepciones válidas; debe estar asociada al término y a una frase inequívoca.
+- Para revertir, retirar `glossaryContextExcludesMatch`, `glossaryTextWithoutExcludedContexts` y volver a evaluar el texto original en las tres rutas del glosario.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
