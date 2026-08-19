@@ -2414,6 +2414,59 @@ Evitar que una forma compartida active una definición incorrecta. En este libro
 
 ---
 
+## Acción 41: mostrar el progreso de las actividades en el índice
+
+### Objetivo
+
+Añadir debajo del título de cada actividad una etiqueta persistente y accesible: «Por hacer», «Incompleta» o «Completa».
+
+### Semántica de los estados
+
+- **Por hacer:** no existe ninguna interacción guardada para la actividad.
+- **Incompleta:** se seleccionó o envió al menos una respuesta, pero todavía no se respondieron correctamente todas sus preguntas.
+- **Completa:** todas las preguntas de la actividad fueron respondidas correctamente al menos una vez.
+
+La finalización es acumulativa: corregir todas las preguntas completa la actividad y una modificación posterior de una respuesta no borra el logro ya alcanzado.
+
+### Procedimiento
+
+1. Usar una clave de `localStorage` exclusiva del libro y un objeto versionado por actividad y pregunta.
+2. Marcar la actividad como iniciada en el evento `change` de una respuesta.
+3. Registrar una pregunta como correcta únicamente después de que el controlador de la actividad confirme el envío mediante `data-quiz-evaluated="true"`.
+4. Calcular «Completa» contra los identificadores reales `.quiz-panel[data-quiz-id]` de la sección, no contra un total fijo.
+5. Conservar cada pregunta correcta como logro; los intentos incorrectos no eliminan aciertos anteriores.
+6. Decorar solamente entradas cuyo `section_id` resuelva una sección `quiz_sequence`; no deducir actividades únicamente por su nivel del índice.
+7. Mostrar la etiqueta debajo del título, sin píldora ni superposición, y mantener un mínimo táctil superior a 44 px.
+8. Incluir el estado en el nombre accesible del botón, por ejemplo «Actividad 2. Estado: Incompleta.»; el color es complementario y nunca la única señal.
+9. Actualizar el índice al guardar progreso y al recibir el evento `storage` desde otra pestaña.
+
+### Persistencia y reinicio
+
+- Los estados sobreviven al cierre y reapertura bajo el mismo origen.
+- `localhost`, `127.0.0.1`, GitHub Pages, SCORM y otros puertos mantienen almacenamientos separados.
+- Se reinician al borrar los datos del sitio o al eliminar la clave específica del libro.
+- En navegación privada o almacenamiento bloqueado, las actividades siguen funcionando, pero el progreso no persiste.
+
+### Validación
+
+- Abrir el índice sin progreso y comprobar ocho etiquetas «Por hacer».
+- Seleccionar una respuesta de una actividad y comprobar «Incompleta».
+- Responder correctamente sus tres preguntas y comprobar «Completa».
+- Recargar y cerrar/abrir el libro; el estado debe conservarse.
+- Verificar que otra actividad continúa «Por hacer».
+- Probar teclado y lector de accesibilidad: el botón debe anunciar título y estado.
+- Comprobar que la búsqueda del índice continúa encontrando el título sin depender del texto del estado.
+- Ejecutar `node --check assets/reflow-book.js`, sincronizar el preloader offline y ejecutar `git diff --check`.
+
+### Riesgos y reversión
+
+- No usar una clave genérica compartida entre libros servidos desde el mismo origen.
+- No declarar completa una actividad por visitar su página ni por acertar sólo la pregunta visible.
+- Si cambia el conjunto de preguntas, recalcular contra los identificadores actuales; un acierto eliminado del libro no debe mantener una finalización falsa.
+- Para revertir, retirar el seguimiento, la decoración y los estilos. La clave almacenada puede eliminarse o conservarse para una futura reinstalación compatible.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:

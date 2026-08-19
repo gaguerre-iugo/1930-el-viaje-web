@@ -222,6 +222,7 @@
   var retiredTextCaseStorageKey = "adt-reflow-text-case:1930-libro-completo-v47";
   var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
   var reducedMotionStorageKey = "adt-reflow-reduced-motion:1930-libro-completo-v47";
+  var activityProgressStorageKey = "adt-reflow-activity-progress:1930-el-viaje:v1";
   var editorialTocTitles = {
     pg001_sec001: "1930: El viaje",
     pg017_sec001: "Hay algo extraño en esa foto",
@@ -406,6 +407,136 @@
   var announcer;
   var ttsWordTickerRefs = new WeakMap();
   var ttsWordTickerRuns = new WeakMap();
+  var activityQuestionIdCache = Object.create(null);
+
+  function emptyActivityProgress() {
+    return { version: 1, activities: {} };
+  }
+
+  function readActivityProgress() {
+    try {
+      var parsed = JSON.parse(window.localStorage.getItem(activityProgressStorageKey) || "null");
+      if (
+        parsed && parsed.version === 1 && parsed.activities &&
+        typeof parsed.activities === "object" && !Array.isArray(parsed.activities)
+      ) return parsed;
+    } catch (_error) {}
+    return emptyActivityProgress();
+  }
+
+  function writeActivityProgress(progress) {
+    try {
+      window.localStorage.setItem(activityProgressStorageKey, JSON.stringify(progress));
+    } catch (_error) {
+      /* Progress labels are an enhancement. Activities remain usable when
+         storage is unavailable in a private, file or restricted context. */
+    }
+  }
+
+  function activitySectionElement(sectionId) {
+    if (!content || !sectionId) return null;
+    var escaped = typeof CSS !== "undefined" && typeof CSS.escape === "function"
+      ? CSS.escape(sectionId)
+      : String(sectionId).replace(/(["\\])/g, "\\$1");
+    return content.querySelector(
+      '[data-section-type="quiz_sequence"][data-section-id="' + escaped + '"]'
+    );
+  }
+
+  function activityQuestionIds(sectionId) {
+    if (Object.prototype.hasOwnProperty.call(activityQuestionIdCache, sectionId)) {
+      return activityQuestionIdCache[sectionId];
+    }
+    var section = activitySectionElement(sectionId);
+    var ids = section ? Array.prototype.slice.call(
+      section.querySelectorAll(".quiz-panel[data-quiz-id]")
+    ).map(function (panel) {
+      return panel.dataset.quizId;
+    }).filter(Boolean) : [];
+    activityQuestionIdCache[sectionId] = ids;
+    return ids;
+  }
+
+  function activityStatusForSection(sectionId, progress) {
+    var questionIds = activityQuestionIds(sectionId);
+    if (!questionIds.length) return null;
+    var record = progress && progress.activities && progress.activities[sectionId];
+    if (!record || record.started !== true) return "todo";
+    var correct = record.correct && typeof record.correct === "object"
+      ? record.correct
+      : {};
+    return questionIds.every(function (questionId) { return correct[questionId] === true; })
+      ? "complete"
+      : "incomplete";
+  }
+
+  function activityStatusLabel(status) {
+    return status === "complete" ? "Completa" :
+      status === "incomplete" ? "Incompleta" : "Por hacer";
+  }
+
+  function recordActivityInteraction(panel, correct) {
+    if (!panel) return;
+    var section = panel.closest(
+      '[data-section-type="quiz_sequence"][data-section-id]'
+    );
+    var sectionId = section && section.dataset.sectionId;
+    var questionId = panel.dataset.quizId;
+    if (!sectionId || !questionId) return;
+    var progress = readActivityProgress();
+    var record = progress.activities[sectionId];
+    if (!record || typeof record !== "object") {
+      record = { started: true, correct: {} };
+      progress.activities[sectionId] = record;
+    }
+    record.started = true;
+    if (!record.correct || typeof record.correct !== "object") record.correct = {};
+    if (correct === true) record.correct[questionId] = true;
+    record.updatedAt = new Date().toISOString();
+    writeActivityProgress(progress);
+    document.dispatchEvent(new CustomEvent("adt:activity-progress", {
+      detail: {
+        sectionId: sectionId,
+        status: activityStatusForSection(sectionId, progress)
+      }
+    }));
+  }
+
+  function installActivityProgressTracking() {
+    if (document.documentElement.dataset.reflowActivityProgress === "true") return;
+    document.documentElement.dataset.reflowActivityProgress = "true";
+
+    document.addEventListener("change", function (event) {
+      var input = event.target;
+      if (!input || !input.matches || !input.matches(
+        '.quiz-panel input[type="radio"]'
+      )) return;
+      recordActivityInteraction(input.closest(".quiz-panel"), false);
+    }, true);
+
+    document.addEventListener("click", function (event) {
+      var button = event.target && event.target.closest &&
+        event.target.closest(".quiz-submit");
+      if (!button) return;
+      var panel = button.closest(".quiz-panel");
+      window.setTimeout(function () {
+        if (!panel || panel.dataset.quizEvaluated !== "true") return;
+        var selected = panel.querySelector('input[type="radio"]:checked');
+        var option = selected && selected.closest(".quiz-option");
+        recordActivityInteraction(panel, Boolean(option && option.dataset.correct === "true"));
+      }, 0);
+    });
+
+    document.addEventListener("adt:activity-progress", function () {
+      if (typeof state.runtimeMenuRefresh === "function") state.runtimeMenuRefresh();
+    });
+    window.addEventListener("storage", function (event) {
+      if (
+        event.key === activityProgressStorageKey &&
+        typeof state.runtimeMenuRefresh === "function"
+      ) state.runtimeMenuRefresh();
+    });
+  }
 
   function suppressBlankCatalogueResidues(catalogue) {
     if (!catalogue || !content) return;
@@ -444,7 +575,7 @@
 
       var data = await response.clone().json();
       if (isConfig) {
-        data.bundleVersion = "55-activities-index";
+        data.bundleVersion = "57-activity-progress";
         data.features.showNavigationControls = false;
       } else if (isAudios) {
         /* Keep every historical semantic id on the same cache-busted file.
@@ -4779,8 +4910,49 @@
     }
 
     function tocKind(entry) {
+      if (entry && activityQuestionIds(entry.section_id).length) return "activity";
       var level = tocLevel(entry);
       return level === 1 ? "chapter" : level === 2 ? "section" : "page";
+    }
+
+    function decorateActivityEntry(button, entry, progress) {
+      var status = activityStatusForSection(entry.section_id, progress);
+      if (!status) return false;
+      button.classList.add("reflow-toc-activity-entry");
+      button.dataset.reflowActivityStatus = status;
+
+      var title = button.querySelector(":scope > .reflow-toc-activity-title");
+      if (!title) {
+        title = document.createElement("span");
+        title.className = "reflow-toc-activity-title";
+        button.replaceChildren(title);
+      }
+      if (normalized(title.textContent) !== normalized(entry.title)) {
+        title.textContent = entry.title;
+      }
+
+      var statusText = activityStatusLabel(status);
+      var statusElement = button.querySelector(":scope > .reflow-toc-activity-status");
+      if (!statusElement) {
+        statusElement = document.createElement("span");
+        statusElement.className = "reflow-toc-activity-status";
+        statusElement.setAttribute("aria-hidden", "true");
+        button.appendChild(statusElement);
+      }
+      if (statusElement.textContent !== statusText) statusElement.textContent = statusText;
+      statusElement.dataset.status = status;
+      button.setAttribute("aria-label", entry.title + ". Estado: " + statusText + ".");
+      return true;
+    }
+
+    function clearActivityEntryDecoration(button) {
+      if (!button.classList.contains("reflow-toc-activity-entry")) return;
+      var title = button.querySelector(":scope > .reflow-toc-activity-title");
+      var titleText = title ? title.textContent : "";
+      button.classList.remove("reflow-toc-activity-entry");
+      button.removeAttribute("data-reflow-activity-status");
+      button.removeAttribute("aria-label");
+      button.replaceChildren(document.createTextNode(titleText));
     }
 
     function isNavigationPanel(panel) {
@@ -4968,6 +5140,7 @@
 
     function decorateToc(panel) {
       var toc = window.__adtReflowTocEntries || [];
+      var activityProgress = readActivityProgress();
       var chapters = visualChapters();
       var activeChapter = null;
       chapters.forEach(function (chapter, index) {
@@ -4995,8 +5168,11 @@
         ) {
           button.setAttribute("aria-current", "location");
         }
-        var label = button.querySelector("span") || button;
-        if (normalized(label.textContent) !== normalized(entry.title)) label.textContent = entry.title;
+        if (!decorateActivityEntry(button, entry, activityProgress)) {
+          clearActivityEntryDecoration(button);
+          var label = button.querySelector("span") || button;
+          if (normalized(label.textContent) !== normalized(entry.title)) label.textContent = entry.title;
+        }
       });
     }
 
@@ -10904,6 +11080,7 @@
       prepareQuizFeedbackAudio();
       installTtsMediaBridge();
       installReflowGlossaryBridge();
+      installActivityProgressTracking();
 
       var hashSection = decodeURIComponent(window.location.hash.slice(1));
       var hashIndex = sections.findIndex(function (entry) { return entry[0] === hashSection; });
