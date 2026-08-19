@@ -1582,10 +1582,48 @@
     }
   }
 
-  function saveProgress() {
+  function readStoredProgress() {
     try {
-      var ratio = state.total > 1 ? state.current / (state.total - 1) : 0;
-      localStorage.setItem(progressStorageKey, String(ratio));
+      var raw = localStorage.getItem(progressStorageKey);
+      if (!raw) return null;
+      try {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.version === 2 && typeof parsed.anchorId === "string") {
+          return { anchorId: parsed.anchorId };
+        }
+      } catch (_parseError) {
+        /* Values written before semantic progress were plain ratios. They are
+           accepted once and replaced by an anchor on the next goToPage(). */
+      }
+      var legacyRatio = Number(raw);
+      if (Number.isFinite(legacyRatio)) {
+        return { legacyRatio: Math.max(0, Math.min(1, legacyRatio)) };
+      }
+    } catch (_error) {
+      // Storage is optional in offline and private browsing contexts.
+    }
+    return null;
+  }
+
+  function elementForSemanticAnchor(anchorId) {
+    if (!anchorId || !content) return null;
+    return Array.prototype.slice.call(content.querySelectorAll(
+      "[data-id], [data-reflow-anchor-id]"
+    )).find(function (element) {
+      return element.dataset.id === anchorId ||
+        element.dataset.reflowAnchorId === anchorId;
+    }) || null;
+  }
+
+  function saveProgress(anchorId) {
+    try {
+      var semanticAnchorId = anchorId || state.currentAnchorId ||
+        anchorIdForPage(state.current);
+      if (!semanticAnchorId) return;
+      localStorage.setItem(progressStorageKey, JSON.stringify({
+        version: 2,
+        anchorId: semanticAnchorId
+      }));
     } catch (_error) {
       // Storage is optional in offline and private browsing contexts.
     }
@@ -1677,14 +1715,15 @@
     content.style.scrollBehavior = "auto";
     content.scrollLeft = nextLeft;
     content.style.scrollBehavior = inheritedScrollBehavior;
-    var paintedAnchorId = paintedSemanticAnchorId();
+    var paintedAnchorId = settings.semanticAnchorId ||
+      paintedSemanticAnchorId() || anchorIdForPage(nextPage);
     state.currentAnchorId = paintedAnchorId || state.currentAnchorId;
     if (settings.explicit && state.settingsRepaginationActive && paintedAnchorId) {
       state.settingsRepaginationAnchorId = paintedAnchorId;
       rememberSettingsAnchor(paintedAnchorId);
     }
     updateControls(settings.announce !== false);
-    saveProgress();
+    saveProgress(settings.semanticAnchorId || state.currentAnchorId);
     if (
       nextPage !== previousPage &&
       !settings.fromTts &&
@@ -2040,13 +2079,28 @@
     }
 
     if (settings.restore) {
-      var stored = 0;
-      try {
-        stored = Number(localStorage.getItem(progressStorageKey)) || 0;
-      } catch (_error) {
-        stored = 0;
+      var storedProgress = readStoredProgress();
+      var storedAnchor = storedProgress && storedProgress.anchorId
+        ? elementForSemanticAnchor(storedProgress.anchorId)
+        : null;
+      if (storedAnchor && storedAnchor.getClientRects().length) {
+        state.currentAnchorId = storedProgress.anchorId;
+        goToPage(pageForElement(storedAnchor), {
+          instant: true,
+          announce: false,
+          preserveHash: true,
+          semanticAnchorId: storedProgress.anchorId
+        });
+        return;
       }
-      goToPage(stored * Math.max(0, state.total - 1), { instant: true, announce: false });
+      if (storedProgress && Number.isFinite(storedProgress.legacyRatio)) {
+        goToPage(storedProgress.legacyRatio * Math.max(0, state.total - 1), {
+          instant: true,
+          announce: false
+        });
+        return;
+      }
+      goToPage(0, { instant: true, announce: false });
       return;
     }
 
@@ -5526,7 +5580,8 @@
            this path as soon as it enters a different visual column. */
         if (scrolledPage === state.current) return;
         state.current = scrolledPage;
-        state.currentAnchorId = paintedSemanticAnchorId() || state.currentAnchorId;
+        state.currentAnchorId = paintedSemanticAnchorId() ||
+          anchorIdForPage(scrolledPage) || state.currentAnchorId;
         updateControls(false);
         saveProgress();
       }, 80);

@@ -2302,6 +2302,50 @@ Restaurar conjuntamente el flujo vertical del documento, retirar la paginación 
 
 ---
 
+## Acción 38: restaurar la lectura mediante un ancla semántica
+
+### Objetivo
+
+Cuando la URL no contiene un hash válido, reabrir el libro en el párrafo o elemento semántico visible al cerrar, aunque hayan cambiado la cantidad de páginas, el tamaño tipográfico, el zoom o la geometría del viewport.
+
+### Procedimiento
+
+1. Mantener el hash de la URL como destino de mayor prioridad.
+2. Al confirmar una página, obtener un identificador estable desde `data-id` o `data-reflow-anchor-id`; preferir el elemento realmente pintado en la columna visible.
+3. Guardar en `localStorage` un objeto versionado, por ejemplo `{ "version": 2, "anchorId": "pg033_n0017" }`. No guardar el número de página ni una proporción como formato vigente.
+4. Durante la carga sin hash, resolver el elemento por su identificador después de construir y paginar todo el libro; calcular entonces su página actual y navegar mediante `goToPage`.
+5. Pasar el identificador restaurado a `goToPage` para que el primer guardado no lo sustituya inmediatamente por otro elemento del centro de la misma página.
+6. Aceptar temporalmente el valor numérico del formato anterior: restaurar por proporción una sola vez y dejar que esa navegación lo migre al objeto semántico.
+7. Si el identificador dejó de existir, comenzar en la primera página y escribir una nueva ancla válida.
+8. Conservar la separación por origen: `localhost`, `127.0.0.1`, GitHub Pages, SCORM y otros puertos mantienen historiales independientes por las reglas del navegador.
+
+### Archivos modificados
+
+- `assets/reflow-book.js`
+- `index.html`
+- `assets/offline-preloader.js`
+
+### Validación
+
+- Navegar sin hash a una página intermedia, identificar el párrafo visible, recargar y confirmar que el mismo identificador sigue en la página restaurada.
+- Repetir después de cambiar tamaño de letra y Lectura fácil; el número visual puede variar, pero el párrafo debe mantenerse.
+- Abrir una URL con hash y confirmar que prevalece sobre el progreso guardado.
+- Probar un valor numérico legado y comprobar que la primera navegación lo sustituye por el registro semántico.
+- Revisar que no aparezcan errores de consola y que el cambio de página conserve el rendimiento constante de `paintedSemanticAnchorId`.
+
+### Riesgos y excepciones
+
+- Si un párrafo se elimina o cambia su `data-id`, no puede restaurarse exactamente; la primera página es el respaldo seguro.
+- No usar `scrollIntoView`: en el libro multicolumna puede desplazar el documento exterior o elegir una fragmentación incorrecta.
+- Varias pestañas del mismo origen siguen compartiendo la clave; la última navegación confirmada conserva prioridad.
+- El almacenamiento privado, bloqueado o eliminado vuelve a la primera página.
+
+### Reversión
+
+Restaurar el guardado numérico anterior y la rama `restore` de `recalculate`, y volver a la versión previa de `reflow-book.js` en `index.html`. Los objetos JSON ya guardados no son números, por lo que una reversión debe limpiar o migrar explícitamente la clave.
+
+---
+
 ## Plantilla para las próximas acciones
 
 Copiar esta estructura al documentar una nueva receta:
