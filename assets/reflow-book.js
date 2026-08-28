@@ -1636,6 +1636,7 @@
   }
 
   function startTtsFromSettings(attempts) {
+    ensureTtsVoiceCatalog();
     window.clearTimeout(state.ttsActivationTimer);
     var remaining = typeof attempts === "number" ? attempts : 40;
     var enabled = readAloudSettingIsEnabled();
@@ -1660,6 +1661,7 @@
   }
 
   function startTtsFromUserGesture() {
+    ensureTtsVoiceCatalog();
     state.ttsExplicitlyStarted = true;
     var api = window.__adtReflowAudio;
     if (!api || !api.items || !api.playAtIndex) {
@@ -1676,6 +1678,7 @@
   }
 
   function activateTtsFromSettings() {
+    ensureTtsVoiceCatalog();
     window.clearTimeout(state.ttsActivationTimer);
     clearTtsAlignmentState();
     state.ttsPlayerStopPendingUntil = 0;
@@ -3434,6 +3437,16 @@
     document.body.dataset.reflowTtsVoice = fallbackVoice;
     window.__adtReflowTtsVoice = fallbackVoice;
     try { localStorage.setItem(ttsVoiceStorageKey, fallbackVoice); } catch (_error) {}
+  }
+
+  /* Carga diferida del catalogo por voz: se invoca en la primera interaccion de
+     lectura en voz alta. Es idempotente (una sola descarga) y no bloquea; hasta
+     que resuelve, la narracion usa el catalogo base. */
+  var ttsVoiceCatalogRequested = false;
+  function ensureTtsVoiceCatalog() {
+    if (ttsVoiceCatalogRequested) return;
+    ttsVoiceCatalogRequested = true;
+    loadInitialTtsVoiceCatalog();
   }
 
   var modernWhatsAppWindowAudioIds = [
@@ -11052,7 +11065,11 @@
     loadTtsVoicePreference();
     loadReducedMotionPreference();
     installReflowDataAdapter();
-    var voiceCatalogPromise = loadInitialTtsVoiceCatalog();
+    /* El catalogo por voz (audios + timecodes especificos, ~9 MB en Valentina)
+       era descargado y esperado aqui, bloqueando el primer render con datos que
+       solo hacen falta al narrar. Se difiere a la primera activacion de lectura
+       en voz alta (ensureTtsVoiceCatalog); hasta entonces la narracion usa el
+       catalogo base ya cargado por el runtime, que es autosuficiente. */
     var indexMetadataPromise = loadIndexMetadata();
 
     var loading = document.createElement("div");
@@ -11090,7 +11107,6 @@
         document.querySelector('meta[name="page-section-id"]').content = String(hashIndex + 1);
       }
 
-      await voiceCatalogPromise;
       await indexMetadataPromise;
       await loadRuntime();
       syncReducedMotionRuntime();
