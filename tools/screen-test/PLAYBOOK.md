@@ -52,19 +52,25 @@ Revisá `config.mjs`:
 
 ## 2. Instrucciones para darle al agente
 
-Copiá y pegá esto (ajustando la primera línea) como pedido inicial al agente que
-trabaje sobre el nuevo libro:
+Copiá y pegá esto como pedido inicial al agente que trabaje sobre el nuevo
+libro. **Reemplazá `<RAÍZ-DEL-NUEVO-LIBRO>` por la ruta absoluta real** donde
+copiaste el repo (por ejemplo `C:\Users\germa\Desktop\otro-libro`):
 
+> Antes de empezar, leé completo el playbook en
+> `<RAÍZ-DEL-NUEVO-LIBRO>\tools\screen-test\PLAYBOOK.md` y seguí sus pasos.
+>
 > Este repo es un libro web "reflow" (Ceibal/UNICEF) que debe verse bien en
 > pizarras interactivas de 65" (16:9 apaisado, Android/Chrome, dedo y lápiz),
 > además de en móvil. Quiero que:
 >
-> 1. Uses el arnés en `tools/screen-test/` (`node run.mjs`) para auditar el
->    lector en todos los viewports y me muestres capturas de las páginas de
->    solo texto, ilustradas y de quiz en 4K.
+> 1. Uses el arnés de pruebas en `<RAÍZ-DEL-NUEVO-LIBRO>\tools\screen-test\`
+>    (ejecutá `node run.mjs` desde esa carpeta) para auditar el lector en todos
+>    los viewports y me muestres capturas 4K de las páginas de solo texto,
+>    ilustradas y de quiz. Las capturas quedan en
+>    `<RAÍZ-DEL-NUEVO-LIBRO>\tools\screen-test\report\`.
 > 2. Corrijas **solo** estos tres problemas, con cambios **aislados al final de
->    `content/reflow.css`** (para no tocar la geometría móvil, las ilustraciones,
->    los quizzes ni la portada):
+>    `<RAÍZ-DEL-NUEVO-LIBRO>\content\reflow.css`** (para no tocar la geometría
+>    móvil, las ilustraciones, los quizzes ni la portada):
 >    - **Ancho de línea (medida):** la prosa corre de borde a borde (~150+
 >      caracteres en pantallas grandes). Limitala a una medida legible (~65
 >      caracteres).
@@ -77,7 +83,7 @@ trabaje sobre el nuevo libro:
 > 3. Después de cada cambio, re-ejecutes el arnés y **verifiques con capturas**
 >    que la paginación no se rompió y que el texto quedó uniforme.
 > 4. No agregues dependencias nuevas al libro; el único archivo del libro que
->    debés modificar es `content/reflow.css`.
+>    debés modificar es `<RAÍZ-DEL-NUEVO-LIBRO>\content\reflow.css`.
 >
 > Ojo con estas trampas propias de este lector (documentadas en el playbook):
 > las secciones `text_only` usan `display:contents` y el lector "eleva" la
