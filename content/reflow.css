@@ -4,7 +4,7 @@
   --reflow-controls-height: 0rem;
   --reflow-tts-player-lane: 4rem;
   --reflow-toolbar-reserve: calc(4rem + var(--reflow-tts-player-lane));
-  --reflow-text-measure: 72ch;
+  --reflow-text-measure: 42rem;
   --reflow-panel-reserve: 18.75rem;
   --reflow-gutter: 1.25rem;
   --reflow-block-padding: clamp(1.5rem, 4vh, 3rem);
@@ -5601,4 +5601,114 @@ body.reflow-book #content .quiz-feedback:focus {
   outline-offset: 3px !important;
   box-shadow: var(--ceibal-shadow-focus) !important;
   scroll-margin-block: 1rem;
+}
+
+/* ===========================================================================
+   Large interactive display (65" boards / 16:9 landscape) adjustments.
+   Added after the base rules so cascade order guarantees they apply. Three
+   concerns, isolated so they never touch mobile geometry, artwork, quiz or
+   cover layouts:
+     1. Running-prose reading measure (all sizes).
+     2. Distance legibility on very large boards (>=100rem).
+     3. Comfortable touch/pen targets on large screens (>=72rem).
+   =========================================================================== */
+
+/* 1. Reading measure. This reader deliberately makes running prose fill the
+   whole column and hoists most paragraphs to be direct <p> children of a
+   `display:contents` section, so a per-wrapper cap alone catches only the few
+   grouped paragraphs and leaves the rest full width. On a 65" board that yields
+   ~150+ char lines (far more at 4K), hard to track at classroom distance.
+
+   text_only pages carry no artwork, so give the whole section a centred reading
+   measure (this also re-establishes a box the hoisted paragraphs live in). The
+   duplicated `#content#content` raises ID specificity so this wins over the
+   reader's own !important rules (all authored at a single #content). On phones
+   the column is already narrower than the measure, so this is a no-op there. */
+body.reflow-book #content#content section[data-section-type="text_only"] {
+  display: block !important;
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* For sections that also hold artwork, keep the image at full column width and
+   only cap the prose wrapper (the direct parent of the <p> runs), never an
+   ancestor, and never illustrated copy that is meant to track the image. */
+body.reflow-book #content#content section[data-section-type="text_and_single_image"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow),
+body.reflow-book #content#content section[data-section-type="text_and_images"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow),
+body.reflow-book #content#content section[data-section-type="boxed_text"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow) {
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* 2. Distance legibility. Interactive boards are read from 1.5-3 m. Above the
+   laptop scale the body copy stays at 20px; give very large boards a further
+   step. Font scaling only changes wrapping/paging, never reader geometry. */
+@media (min-width: 100rem) {
+  body.reflow-book {
+    --reflow-body-size: 1.5rem;            /* 24 px */
+    --reflow-chapter-title-size: 2.75rem;  /* 44 px */
+    --reflow-subheading-size: 1.625rem;    /* 26 px */
+    /* Widen the measure in step with the larger type so the column keeps a
+       ~65-char line, reads from across a classroom and no longer sits as a
+       narrow island in the middle of a 4K board. */
+    --reflow-text-measure: 52rem;          /* 832 px */
+  }
+}
+
+/* 3. Touch/pen targets. On phones the reader keeps the 44px minimum; on large
+   boards, operated standing with a finger or capacitive pen, raise the flagged
+   controls to a 48px minimum with a little more breathing room. */
+@media (min-width: 72rem) {
+  body.reflow-book #reflow-pagination button {
+    min-height: 3rem !important;
+  }
+
+  body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button,
+  body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+    .reflow-index-page-button,
+  body.reflow-book .reflow-panel-control-header button,
+  body.reflow-book .reflow-settings-organized #reflow-open-glossary,
+  body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system {
+    min-height: 3rem !important;
+  }
+
+  /* Segmented radios (Resaltado Palabra/Oración, narrator voice, speed) have
+     no explicit height and were the main sub-44px offenders. */
+  body.reflow-book .reflow-accessibility-panel [role="radio"] {
+    display: inline-flex !important;
+    min-height: 3rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button {
+    margin-bottom: .5rem !important;
+  }
+
+  /* Grow the switch hit area to 48px while keeping the visible track identical
+     (background-clip:content-box paints only the padding-inset content box). */
+  body.reflow-book [role="switch"] {
+    width: 3rem !important;
+    min-width: 3rem !important;
+    height: 3rem !important;
+    min-height: 3rem !important;
+    padding: .6875rem .1875rem !important;
+  }
+
+  /* Quiz answers: the whole option label is the hit area, so give it a 48px
+     floor, and enlarge the small native radio so it reads clearly at board
+     distance (its grid column widens to match). */
+  body.reflow-book #content .quiz-option {
+    min-height: 3rem !important;
+    align-items: center !important;
+    grid-template-columns: 1.6rem minmax(0, 1fr) !important;
+  }
+
+  body.reflow-book #content .quiz-option input {
+    width: 1.4rem !important;
+    height: 1.4rem !important;
+    margin-top: 0 !important;
+  }
 }
