@@ -5957,7 +5957,7 @@
 
     var composite = document.createElement("img");
     composite.className = "chapter-cover-composite";
-    composite.src = "images/chapter1_cover.png";
+    composite.src = "images/chapter1_cover.jpg";
     composite.alt = "";
     composite.setAttribute("aria-hidden", "true");
     cover.appendChild(composite);
@@ -6004,7 +6004,7 @@
 
     var composite = document.createElement("img");
     composite.className = "chapter-cover-composite";
-    composite.src = "images/chapter2_cover.png";
+    composite.src = "images/chapter2_cover.jpg";
     composite.alt = "";
     composite.setAttribute("aria-hidden", "true");
     cover.appendChild(composite);
@@ -7681,7 +7681,7 @@
     if (montage) {
       var montageImage = montage.querySelector('[data-id="pg216217_im002"]');
       if (montageImage) {
-        montageImage.src = "images/pg216217_spread_integrated_v4.png?v=47-montage-spread-4";
+        montageImage.src = "images/pg216217_spread_integrated_v4.jpg?v=47-montage-spread-4";
         montageImage.alt = "Montaje final a doble página: personajes de la historia y el transatlántico Conte Verde sobre el mar.";
       }
     }
