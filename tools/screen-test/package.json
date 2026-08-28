@@ -1,0 +1,13 @@
+{
+  "name": "screen-test",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Harness de testeo del lector en pantallas interactivas grandes (65\", 16:9).",
+  "scripts": {
+    "test:screen": "node run.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}
