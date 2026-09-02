@@ -63,6 +63,32 @@
   --ceibal-focus-on-dark: var(--ceibal-institutional-400);
 }
 
+/* Skip link (WCAG 2.4.1): hidden until it receives keyboard focus, then
+   pinned to the top-left with an accessible dark-teal background. */
+.reflow-skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  transform: translateY(-120%);
+  margin: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--ceibal-institutional-600);
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease-in-out;
+}
+
+.reflow-skip-link:focus,
+.reflow-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid var(--ceibal-institutional-400);
+  outline-offset: 2px;
+}
+
 /* From laptop width upward, the book owns one stable central viewport and
    permanently reserves the exact width of both reader panels. Font scaling
    therefore changes only line wrapping and page count, never the width of
@@ -2413,7 +2439,7 @@ body.reflow-book #content .quiz-explanation-bank {
 
 .reflow-font-settings-options {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--ceibal-space-1);
   padding: var(--ceibal-space-1);
   border-radius: var(--ceibal-radius-md);
@@ -3024,7 +3050,10 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:focus-vi
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-current] {
   border-color: var(--ceibal-institutional-400) !important;
   color: #fff !important;
-  background: var(--ceibal-quiz-page) !important;
+  /* Accessible variant (#008078 = 4.82:1 with white text) instead of the
+     identity teal --ceibal-quiz-page (#00A096 = 3.25:1), so the selected index
+     entry meets WCAG 1.4.3 for normal-size text. */
+  background: var(--ceibal-institutional-500) !important;
   box-shadow: inset .25rem 0 0 var(--ceibal-institutional-200) !important;
 }
 
@@ -5396,6 +5425,18 @@ body.reflow-book .reflow-reader-panel [role="tab"][aria-selected="true"],
 body.reflow-book .reflow-reader-panel [role="radio"][aria-checked="true"],
 body.reflow-book .reflow-reader-panel button[aria-pressed="true"]:not([role="switch"]) {
   border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-500) !important;
+}
+
+/* Selected Index entries (chapter/section in the TOC and page-number list)
+   mark themselves with aria-current and are painted by the runtime with the
+   identity teal #00A096, giving white text only 3.25:1 (below the 4.5:1 needed
+   for normal-size text, WCAG 1.4.3). Repaint the active item with the darker
+   accessible variant #008078 (institutional-500 = 4.82:1) keeping white text. */
+body.reflow-book .reflow-navigation-panel [aria-current]:not([aria-current="false"]),
+body.reflow-book .reflow-reader-panel [aria-current="location"],
+body.reflow-book .reflow-reader-panel [aria-current="page"] {
   color: #fff !important;
   background: var(--ceibal-institutional-500) !important;
 }

@@ -254,7 +254,7 @@
     if (targetIndex < 0) entries.push(movingEntry);
     else entries.splice(targetIndex, 0, movingEntry);
   }
-  var fontScales = { normal: 1, large: 1.2, xlarge: 1.4 };
+  var fontScales = { normal: 1, large: 1.2, xlarge: 1.4, xxlarge: 2 };
   var ttsVoices = { valentina: "Valentina", mateo: "Mateo" };
   var ttsVoiceCatalogs = {
     valentina: {
@@ -1719,6 +1719,49 @@
     }
   }
 
+  /* WCAG 2.4.2: reflect the current chapter in the page title so screen-reader
+     and browser-tab orientation matches where the reader is. The active chapter
+     is resolved with the same logic the index uses to highlight the current
+     location (visual reading order, not source order), so title and index stay
+     consistent. The cover and front matter keep the plain book title. */
+  var reflowBaseTitle = "1930 El viaje";
+  function currentChapterTitle() {
+    if (!content) return null;
+    var toc = window.__adtReflowTocEntries || [];
+    var chapters = toc.map(function (entry) {
+      var heading = entry.chapter_id
+        ? content.querySelector('[data-id="' + entry.chapter_id + '"]')
+        : null;
+      var headingPages = heading ? pagesForElement(heading) : [];
+      var pageIndex = headingPages.length
+        ? headingPages[0]
+        : visiblePageForSection(entry.section_id);
+      return pageIndex === null ? null : { entry: entry, pageIndex: pageIndex };
+    }).filter(Boolean).sort(function (left, right) {
+      return left.pageIndex - right.pageIndex;
+    });
+    var activeTitle = null;
+    chapters.forEach(function (chapter, index) {
+      var nextPage = index + 1 < chapters.length
+        ? chapters[index + 1].pageIndex
+        : state.total;
+      if (state.current >= chapter.pageIndex && state.current < nextPage) {
+        activeTitle = chapter.entry.section_id === "pg001_sec001"
+          ? null
+          : chapter.entry.title || null;
+      }
+    });
+    return activeTitle;
+  }
+
+  function updateDocumentTitle() {
+    var chapterTitle = currentChapterTitle();
+    var nextTitle = chapterTitle
+      ? chapterTitle + " — " + reflowBaseTitle
+      : reflowBaseTitle;
+    if (document.title !== nextTitle) document.title = nextTitle;
+  }
+
   function updateControls(announce) {
     previousButton.disabled = state.current <= 0;
     nextButton.disabled = state.current >= state.total - 1;
@@ -1731,6 +1774,7 @@
     syncPrimaryToolbar();
     updateQuizPageBackground();
     updateBackMatterPageBackground();
+    updateDocumentTitle();
     if (state.runtimeMenuRefresh && state.runtimeMenu === "toc") {
       state.runtimeMenuRefresh();
     }
@@ -4111,6 +4155,7 @@
               '<button type="button" role="radio" data-reflow-font-size="normal" aria-pressed="false">Normal</button>' +
               '<button type="button" role="radio" data-reflow-font-size="large" aria-pressed="false">Grande</button>' +
               '<button type="button" role="radio" data-reflow-font-size="xlarge" aria-pressed="false">Extra grande</button>' +
+              '<button type="button" role="radio" data-reflow-font-size="xxlarge" aria-pressed="false">Máximo</button>' +
             '</div>' +
             '<div class="reflow-reduce-motion-setting">' +
               '<label for="reflow-reduce-motion">' +
@@ -5716,6 +5761,17 @@
 
       var link = target.closest("a[href]");
       if (!link) return;
+      /* WCAG 2.4.1: the skip link must send keyboard focus to the main
+         content. This capture-phase handler otherwise consumes every in-page
+         link (treating #content as index.html → first section), so it is the
+         only place the skip link can be honoured. */
+      if (link.classList.contains("reflow-skip-link")) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (!content.hasAttribute("tabindex")) content.setAttribute("tabindex", "-1");
+        content.focus();
+        return;
+      }
       var url;
       try {
         url = new URL(link.href, window.location.href);
