@@ -3781,6 +3781,41 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
   margin-top: 2rem !important;
 }
 
+/* Mobile browsers (phones) expose a `100dvh` that can exceed the actually
+   visible area while the browser's collapsing toolbars are shown, so the
+   `100dvh`-based quiz card grows taller than the reading column and, being
+   vertically centred, gets its top (the question) clipped behind the chrome.
+   On narrow viewports pin the card to the always-visible `100svh`, top-align
+   its content so the question can never be cut, and tighten the spacious gaps
+   so the whole quiz fits. Scoped to phones; large panels are unaffected. */
+@media (max-width: 640px) {
+  body.reflow-book #content .quiz-panel {
+    align-content: start !important;
+  }
+  body.reflow-book #content .quiz-card {
+    min-height: 0 !important;
+    max-height: calc(
+      100svh - max(
+        var(--nav-height, 80px),
+        calc(var(--reflow-toolbar-reserve) + .5rem)
+      ) - var(--reflow-controls-height)
+    ) !important;
+    justify-content: flex-start !important;
+  }
+  body.reflow-book #content .quiz-options,
+  body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options,
+  body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
+    gap: .6rem !important;
+    margin-top: .75rem !important;
+  }
+  body.reflow-book #content
+    .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions,
+  body.reflow-book[data-reflow-font-size="xlarge"] #content
+    .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions {
+    margin-top: .9rem !important;
+  }
+}
+
 /* The selected state replaces the original grey border in the same box. Its
    four-pixel light-green stroke is twice the base two-pixel outline, without
    creating the second, larger frame that previously cluttered the option. */
