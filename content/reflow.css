@@ -4614,55 +4614,20 @@ body.reflow-book #content .illustrated-page
   transform-origin: left top !important;
 }
 
-/* Phone stacking for the bespoke pg025 spread. Its desktop grid measures the
-   image and copy to one shared target height and shifts the copy up to align
-   with the painted image edge. On a phone the spread switches to a vertical
-   flex column, where those measured heights make the stack taller than the
-   visible reading column (so it splits and the illustration bleeds over the
-   next column's text) and the negative copy shift drags the text up over the
-   image. Placed after the generic illustrated rules so it wins on source
-   order; scoped to phones so the large-screen grid layout is untouched. */
+/* Phone stacking for EVERY illustrated spread (bespoke pg025/pg031/pg047/pg052
+   and the generic reflow-later-illustrated sections such as pg092/pg096).
+   On large screens these use a two-column grid: image beside a copy column
+   measured to a shared height, with the copy shifted up to align with the
+   painted image edge. On a ~350px phone column that grid squeezes the copy
+   into a ~140px sliver whose forced full-column height overflows and paints
+   over the following text — the widespread image/text overlap. On phones,
+   stack them as a normal block: whole image, then full-width copy that flows
+   naturally. The doubled `#content#content` raises ID specificity so this wins
+   over every per-section bespoke grid rule (which use id+attribute selectors).
+   Large screens keep the grid untouched. */
 @media (max-width: 47.999rem) {
-  /* Use block flow (not flex) so the multicol fragmenter honours the image's
-     `break-inside: avoid`. Inside a flex container WebKit/iOS ignores it and
-     splits the illustration across two pages; as a block, the copy flows and
-     the whole image moves to the next column when it does not fit. */
-  body.reflow-book #content > section[data-section-id="pg025_sec001"]
-    > .illustrated-page {
-    display: block !important;
-    height: auto !important;
-    min-height: 0 !important;
-    break-inside: auto !important;
-  }
-
-  body.reflow-book #content > section[data-section-id="pg025_sec001"]
-    > .illustrated-page > img {
-    height: auto !important;
-    max-height: none !important;
-    /* Keep the illustration whole: never let a page break run through it. */
-    break-inside: avoid !important;
-    break-before: auto !important;
-    margin-top: .75rem !important;
-  }
-
-  body.reflow-book #content > section[data-section-id="pg025_sec001"]
-    > .illustrated-page > .illustrated-copy {
-    height: auto !important;
-    min-height: 0 !important;
-    transform: none !important;
-  }
-}
-
-/* General phone stacking for every later-book illustrated section
-   (`reflow-later-illustrated`, e.g. pg092, pg096 and many more). On large
-   screens these use a two-column grid (image beside measured copy). On a
-   ~350px phone column that grid squeezes the copy into a ~140px sliver whose
-   forced full-column height overflows and paints over the following section's
-   text — the widespread image/text overlap. Stack them: whole image, then
-   full-width copy that flows normally, mirroring the bespoke pg025 fix but for
-   the generic class so it covers the whole book. Large screens keep the grid. */
-@media (max-width: 47.999rem) {
-  body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
+  body.reflow-book #content#content
+    :is(.illustrated-page, .attic-illustrated-page) {
     display: block !important;
     grid-template-columns: none !important;
     height: auto !important;
@@ -4670,20 +4635,22 @@ body.reflow-book #content .illustrated-page
     break-inside: auto !important;
   }
 
-  body.reflow-book #content > section.reflow-later-illustrated
-    > .illustrated-page > img {
+  body.reflow-book #content#content
+    :is(.illustrated-page, .attic-illustrated-page) > img {
     width: 100% !important;
     height: auto !important;
     max-height: none !important;
     /* Keep the illustration whole: move it entirely to the next page if it
-       does not fit rather than splitting it. */
+       does not fit rather than splitting it across a column break. */
     break-inside: avoid !important;
     break-before: auto !important;
+    margin: 0 auto !important;
   }
 
-  body.reflow-book #content > section.reflow-later-illustrated
-    > .illustrated-page > .illustrated-copy {
+  body.reflow-book #content#content
+    :is(.illustrated-copy, .attic-illustrated-copy) {
     width: 100% !important;
+    max-width: none !important;
     height: auto !important;
     min-height: 0 !important;
     transform: none !important;
