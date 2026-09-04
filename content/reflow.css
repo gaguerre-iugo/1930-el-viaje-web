@@ -4139,6 +4139,26 @@ body.reflow-book #content .reflow-chat-head {
   break-inside: avoid-column !important;
 }
 
+/* On phones the visible reading column is short (and shrinks further as the
+   browser toolbars collapse). A chat window kept atomic with
+   `break-inside: avoid-column` then grows taller than the column and its lower
+   bubbles are clipped off the page (the cut-off "Chau"/overflow seen on
+   mobile). Let the window itself break across columns so a long chat continues
+   on the next page — exactly the "long chats may continue on the following
+   viewport" behaviour the head rule above anticipates. Individual bubbles, the
+   head and the date stay atomic so a single message never splits. The sliced
+   card edge on the continuation page is acceptable and expected. */
+@media (max-width: 47.999rem) {
+  body.reflow-book #content :is(.reflow-book-chat-window, .whatsapp-chat-window) {
+    break-inside: auto !important;
+    -webkit-column-break-inside: auto !important;
+  }
+  body.reflow-book #content :is(.reflow-chat-bubble, .reflow-chat-head, .reflow-chat-date) {
+    break-inside: avoid-column !important;
+    -webkit-column-break-inside: avoid !important;
+  }
+}
+
 /* These nodes are the two semantic halves of one sentence that the source PDF
    happened to divide at a physical-page boundary. They remain separate for
    TTS/highlighting, but the responsive paginator must keep them together. */
