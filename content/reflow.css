@@ -78,7 +78,7 @@
       100svh - max(
         var(--nav-height, 80px),
         calc(var(--reflow-toolbar-reserve) + .5rem)
-      ) - var(--reflow-controls-height)
+      ) - var(--reflow-controls-height) - 1rem
     );
   }
 }
