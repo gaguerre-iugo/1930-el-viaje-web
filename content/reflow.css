@@ -4586,6 +4586,35 @@ body.reflow-book #content .illustrated-page
   transform-origin: left top !important;
 }
 
+/* Phone stacking for the bespoke pg025 spread. Its desktop grid measures the
+   image and copy to one shared target height and shifts the copy up to align
+   with the painted image edge. On a phone the spread switches to a vertical
+   flex column, where those measured heights make the stack taller than the
+   visible reading column (so it splits and the illustration bleeds over the
+   next column's text) and the negative copy shift drags the text up over the
+   image. Placed after the generic illustrated rules so it wins on source
+   order; scoped to phones so the large-screen grid layout is untouched. */
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > section[data-section-id="pg025_sec001"]
+    > .illustrated-page {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  body.reflow-book #content > section[data-section-id="pg025_sec001"]
+    > .illustrated-page > img {
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  body.reflow-book #content > section[data-section-id="pg025_sec001"]
+    > .illustrated-page > .illustrated-copy {
+    height: auto !important;
+    min-height: 0 !important;
+    transform: none !important;
+  }
+}
+
 /* The virtual-reality composition has short copy but still owns a complete
    page. It follows the shared narrative upper inset instead of introducing
    an image-specific vertical centre. */
