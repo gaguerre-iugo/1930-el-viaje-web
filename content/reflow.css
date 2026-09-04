@@ -3838,6 +3838,7 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
       ) - var(--reflow-controls-height)
     ) !important;
     justify-content: flex-start !important;
+    padding: .8rem !important;
     /* Long quizzes (a multi-line question plus three multi-line options and the
        submit button) can still exceed the short phone column. The card clips
        its overflow, hiding the "Enviar" button. Allow the card to scroll
@@ -3845,17 +3846,24 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
   }
+  /* Tighten the vertical rhythm on phones so a three-option quiz plus its submit
+     button fits within the short column without needing to scroll. The options
+     stay well above the 44px touch minimum (each is multiple text lines tall),
+     so trimming their block padding does not affect accessibility. */
+  body.reflow-book #content .quiz-option {
+    padding-block: .3rem !important;
+  }
   body.reflow-book #content .quiz-options,
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
-    gap: .6rem !important;
-    margin-top: .75rem !important;
+    gap: .4rem !important;
+    margin-top: .5rem !important;
   }
   body.reflow-book #content
     .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions,
   body.reflow-book[data-reflow-font-size="xlarge"] #content
     .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions {
-    margin-top: .9rem !important;
+    margin-top: .55rem !important;
   }
 }
 
