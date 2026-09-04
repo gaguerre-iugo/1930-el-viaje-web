@@ -1582,6 +1582,20 @@ body.reflow-book #content > .book-cover-final {
   background: #fff;
 }
 
+/* The front cover already forces a column break after itself (break-after:
+   column, above). The first preliminary title that follows it additionally
+   requests break-before: column. Two consecutive forced breaks make
+   WebKit/Safari emit an EMPTY column between them — the phantom blank page
+   reported right after the cover on iPhone. Blink coalesces the pair, which is
+   why it never reproduced in Chromium. Neutralize the redundant break-before on
+   the title that immediately follows the cover so only the cover's single break
+   remains; the other preliminary titles keep their own break-before: column. */
+body.reflow-book #content > .book-cover-final + section .preliminary-title-continuous {
+  break-before: avoid-column !important;
+  -webkit-column-break-before: avoid !important;
+  page-break-before: avoid !important;
+}
+
 body.reflow-book #content .book-cover-final .book-cover-layout {
   --book-cover-title-color: #f4bd32;
   box-sizing: border-box;
@@ -4159,9 +4173,23 @@ body.reflow-book #content .reflow-chat-head {
     break-inside: auto !important;
     -webkit-column-break-inside: auto !important;
   }
-  body.reflow-book #content :is(.reflow-chat-bubble, .reflow-chat-head, .reflow-chat-date) {
+  /* Let the conversational blocks flow (and, if a single long message is taller
+     than the short mobile column, continue) rather than stay atomic. An atomic
+     block close to a full column tall could not fit in the remaining space and
+     jumped whole to the next column, leaving the chat's cream card painted over
+     a nearly empty page — the phantom cream strip/blank page reported on iPhone.
+     Allowing them to break fills the column instead of stranding an empty card.
+     The date pill stays atomic and glued to the message that follows it so a
+     timestamp never lands alone or splits. */
+  body.reflow-book #content :is(.reflow-chat-bubble, .reflow-chat-head) {
+    break-inside: auto !important;
+    -webkit-column-break-inside: auto !important;
+  }
+  body.reflow-book #content .reflow-chat-date {
     break-inside: avoid-column !important;
     -webkit-column-break-inside: avoid !important;
+    break-after: avoid-column !important;
+    -webkit-column-break-after: avoid !important;
   }
 }
 
