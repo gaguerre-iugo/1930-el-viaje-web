@@ -1573,7 +1573,10 @@ body.reflow-book #content > .book-cover-final {
   padding: 0 !important;
   break-after: column;
   break-inside: avoid-column;
-  overflow: visible;
+  /* Clip instead of letting an over-tall cover bleed a strip into the next
+     column (a phantom second page on mobile browsers whose dynamic viewport
+     makes the `100dvh` column taller than the visible area). */
+  overflow: hidden;
   background: #fff;
 }
 

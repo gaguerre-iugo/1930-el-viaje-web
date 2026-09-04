@@ -2583,13 +2583,20 @@
     var coverRatio = 738 / 1078;
     var coverHeight = Math.max(1, availableHeight - (2 * targetGap));
     coverHeight = Math.min(coverHeight, horizontalRoom / coverRatio);
-    /* Never let the cover exceed the real paginated column. On mobile browsers
-       the visible area (window.innerHeight) can momentarily be taller than the
-       `100dvh`-derived column, which would push a sliver of the artwork into a
-       second, otherwise-empty page. Clamping to the column height keeps the
-       whole cover on a single page. */
-    var columnHeight = Math.max(1, content.clientHeight - (2 * targetGap));
-    coverHeight = Math.min(coverHeight, columnHeight);
+    /* Never let the cover exceed the real paginated column. `.book-cover-final`
+       is `height: 100%` of the column content box, i.e. the padded height of
+       #content. On mobile browsers the visible area (window.innerHeight) can be
+       momentarily taller than that `100dvh`-derived column, which would push a
+       sliver of the artwork into a second, otherwise-empty page. Clamp to the
+       column content height (clientHeight minus vertical padding) with a small
+       safety margin so sub-pixel rounding can never spill into a new column. */
+    var columnContentHeight = Math.max(
+      1,
+      content.clientHeight -
+        (parseFloat(contentStyle.paddingTop) || 0) -
+        (parseFloat(contentStyle.paddingBottom) || 0)
+    );
+    coverHeight = Math.min(coverHeight, columnContentHeight - 2);
     var coverWidth = coverHeight * coverRatio;
 
     cover.style.transform = "none";
