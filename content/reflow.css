@@ -1580,6 +1580,26 @@ body.reflow-book #content > .book-cover-final {
   background: #fff;
 }
 
+/* On mobile browsers the `100dvh`-derived reading column can be taller than the
+   visible area (collapsing toolbars). The cover wrapper is `height: 100%` of
+   that column, so it can fragment a sliver into a second column: originally a
+   visible strip, now — with the clip above — a blank phantom page before the
+   content. Pin the wrapper to the always-visible `100svh` height (minus a
+   safety pixel) so it stays strictly shorter than the column, occupies exactly
+   one page, and lets `break-after: column` move the content to the very next
+   page with no empty column in between. Large screens keep `height: 100%`
+   because there svh, dvh and vh are identical. */
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > .book-cover-final {
+    height: calc(
+      100svh - max(
+        var(--nav-height, 80px),
+        calc(var(--reflow-toolbar-reserve) + .5rem)
+      ) - var(--reflow-controls-height) - 2px
+    ) !important;
+  }
+}
+
 body.reflow-book #content .book-cover-final .book-cover-layout {
   --book-cover-title-color: #f4bd32;
   box-sizing: border-box;
