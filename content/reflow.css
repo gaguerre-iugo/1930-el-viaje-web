@@ -3806,6 +3806,12 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
       ) - var(--reflow-controls-height)
     ) !important;
     justify-content: flex-start !important;
+    /* Long quizzes (a multi-line question plus three multi-line options and the
+       submit button) can still exceed the short phone column. The card clips
+       its overflow, hiding the "Enviar" button. Allow the card to scroll
+       internally so every option and the button stay reachable. */
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
   body.reflow-book #content .quiz-options,
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-options,
