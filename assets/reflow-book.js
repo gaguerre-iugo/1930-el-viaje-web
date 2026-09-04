@@ -2538,77 +2538,48 @@
     });
   }
 
-  /* Center the cover against the real visible reading area rather than the
-     nominal column box. Runtime navigation bars can differ slightly from the
-     configured --nav-height, which otherwise leaves unequal white margins.
-     A fixed four-percent breathing space keeps both margins equal and no
-     larger than the approved upper margin on ordinary desktop viewports. */
+  /* Center the cover against the real paginated column box (#content minus its
+     vertical padding) rather than window.innerHeight. On mobile browsers the
+     layout viewport (window.innerHeight) does not match the `100dvh`-based
+     column height, so sizing/positioning against innerHeight pushed the artwork
+     partly outside its column — clipping it and spilling phantom pages. Sizing
+     and centering against the column keeps the whole cover on its single page
+     on every browser. */
   function balanceCoverMargins() {
     if (!content) return;
     var cover = content.querySelector(".book-cover-final .book-cover-layout");
-    var main = document.querySelector("main");
-    if (!cover || !main) return;
+    if (!cover) return;
 
-    var mainRect = main.getBoundingClientRect();
-    var availableTop = Math.max(0, mainRect.top);
-    var availableBottom = Math.min(window.innerHeight, mainRect.bottom);
-    var detectedNavTop = null;
-    var navContainer = document.getElementById("nav-container");
-    if (navContainer) {
-      Array.prototype.slice.call(navContainer.querySelectorAll("*")).forEach(function (element) {
-        var rect = element.getBoundingClientRect();
-        var isBottomBar = rect.width >= window.innerWidth * .75 &&
-          rect.height >= 40 && rect.height <= 160 &&
-          rect.bottom >= window.innerHeight - 3 &&
-          rect.top > window.innerHeight * .55;
-        if (isBottomBar) {
-          detectedNavTop = detectedNavTop === null ? rect.top : Math.min(detectedNavTop, rect.top);
-        }
-      });
-    }
-    /* The reading column can end slightly above the visible toolbar. When a
-       real bottom bar exists, its upper edge is the visual limit that matters
-       for the requested equal white margins. */
-    if (detectedNavTop !== null) availableBottom = detectedNavTop;
-
-    var availableHeight = Math.max(1, availableBottom - availableTop);
-    var targetGap = Math.max(18, Math.min(42, window.innerHeight * .04));
     var contentStyle = getComputedStyle(content);
+    var paddingTop = parseFloat(contentStyle.paddingTop) || 0;
+    var paddingBottom = parseFloat(contentStyle.paddingBottom) || 0;
+    var columnHeight = Math.max(
+      1,
+      content.clientHeight - paddingTop - paddingBottom
+    );
     var horizontalRoom = Math.max(
       1,
       content.clientWidth -
         (parseFloat(contentStyle.paddingLeft) || 0) -
         (parseFloat(contentStyle.paddingRight) || 0)
     );
+    var targetGap = Math.max(12, Math.min(42, columnHeight * .04));
     var coverRatio = 738 / 1078;
-    var coverHeight = Math.max(1, availableHeight - (2 * targetGap));
+    /* Fit strictly inside the column so the wrapper never fragments a sliver
+       into the next column. */
+    var coverHeight = Math.max(1, columnHeight - (2 * targetGap));
     coverHeight = Math.min(coverHeight, horizontalRoom / coverRatio);
-    /* Never let the cover exceed the real paginated column. `.book-cover-final`
-       is `height: 100%` of the column content box, i.e. the padded height of
-       #content. On mobile browsers the visible area (window.innerHeight) can be
-       momentarily taller than that `100dvh`-derived column, which would push a
-       sliver of the artwork into a second, otherwise-empty page. Clamp to the
-       column content height (clientHeight minus vertical padding) with a small
-       safety margin so sub-pixel rounding can never spill into a new column. */
-    var columnContentHeight = Math.max(
-      1,
-      content.clientHeight -
-        (parseFloat(contentStyle.paddingTop) || 0) -
-        (parseFloat(contentStyle.paddingBottom) || 0)
-    );
-    coverHeight = Math.min(coverHeight, columnContentHeight - 2);
     var coverWidth = coverHeight * coverRatio;
 
-    cover.style.transform = "none";
     cover.style.width = coverWidth + "px";
     cover.style.height = coverHeight + "px";
     cover.style.maxWidth = "none";
     cover.style.maxHeight = "none";
     cover.style.flex = "0 0 auto";
-
-    var coverRect = cover.getBoundingClientRect();
-    var desiredTop = availableTop + ((availableHeight - coverHeight) / 2);
-    cover.style.transform = "translateY(" + (desiredTop - coverRect.top) + "px)";
+    /* The wrapper is height:100% of the column and flex-centers its child, so
+       the art is already vertically centred within the page. No innerHeight-
+       based transform is needed. */
+    cover.style.transform = "none";
   }
 
   function hideOriginalPagination() {
