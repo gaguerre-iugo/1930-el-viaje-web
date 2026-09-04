@@ -4627,6 +4627,44 @@ body.reflow-book #content .illustrated-page
   }
 }
 
+/* General phone stacking for every later-book illustrated section
+   (`reflow-later-illustrated`, e.g. pg092, pg096 and many more). On large
+   screens these use a two-column grid (image beside measured copy). On a
+   ~350px phone column that grid squeezes the copy into a ~140px sliver whose
+   forced full-column height overflows and paints over the following section's
+   text — the widespread image/text overlap. Stack them: whole image, then
+   full-width copy that flows normally, mirroring the bespoke pg025 fix but for
+   the generic class so it covers the whole book. Large screens keep the grid. */
+@media (max-width: 47.999rem) {
+  body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page {
+    display: block !important;
+    grid-template-columns: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    break-inside: auto !important;
+  }
+
+  body.reflow-book #content > section.reflow-later-illustrated
+    > .illustrated-page > img {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    /* Keep the illustration whole: move it entirely to the next page if it
+       does not fit rather than splitting it. */
+    break-inside: avoid !important;
+    break-before: auto !important;
+  }
+
+  body.reflow-book #content > section.reflow-later-illustrated
+    > .illustrated-page > .illustrated-copy {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    transform: none !important;
+    margin-top: .75rem !important;
+  }
+}
+
 /* The virtual-reality composition has short copy but still owns a complete
    page. It follows the shared narrative upper inset instead of introducing
    an image-specific vertical centre. */
@@ -4835,6 +4873,32 @@ body.reflow-book:not(.reflow-easy-read) #content > section.reflow-flat-prose
   break-inside: avoid-column !important;
   -webkit-column-break-inside: avoid !important;
   page-break-inside: avoid !important;
+}
+
+/* On phones the reading column is only ~350px wide, so a reconstructed
+   sentence that fits on one line on large screens wraps to several lines. As
+   an `inline-block` (kept atomic to avoid a column split), that multi-line box
+   grows far taller than its single line-height line box and paints over the
+   sentences above and below it — the widespread text-on-text overlap seen
+   across the chapters. On phones, let these chains and their inner sentences
+   flow as ordinary inline text: no tall atomic box, no overlap. A sentence may
+   now continue across a column break, which is normal in a paginated reader.
+   Large screens keep the atomic inline-block layout. Covers both prose layouts
+   (flat-prose sections and `.reading-block` sections); Easy Read keeps its
+   full-width block rows. */
+@media (max-width: 47.999rem) {
+  body.reflow-book:not(.reflow-easy-read) #content
+    > section.reflow-flat-prose :is(.sentence-chain, .reading-sentence),
+  body.reflow-book:not(.reflow-easy-read) #content
+    .reading-block :is(.sentence-chain, .reading-sentence) {
+    display: inline !important;
+    width: auto !important;
+    max-width: none !important;
+    vertical-align: baseline !important;
+    break-inside: auto !important;
+    -webkit-column-break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
 }
 
 /* Backmatter headings keep their own row. They must never be absorbed into
@@ -5749,6 +5813,23 @@ body.reflow-book #content#content section[data-section-type="text_only"] {
   max-width: var(--reflow-text-measure) !important;
   margin-left: auto !important;
   margin-right: auto !important;
+}
+
+/* The rule above forces every text_only section to `display: block` to give a
+   centred reading measure on large boards. Its comment assumed this is a no-op
+   on phones, but it is not: it overrides the `display: contents` that
+   flat-prose sections rely on to hoist their paragraphs directly into the
+   multicol. As a block, the whole section becomes one tall box that the narrow
+   mobile column fragments incorrectly, painting paragraphs on top of each
+   other (the severe text-on-text overlap on flat-prose chapters). On phones the
+   reading measure is irrelevant (the column is already narrower), so restore
+   `display: contents` there. Higher ID+attribute+class specificity wins. */
+@media (max-width: 47.999rem) {
+  body.reflow-book #content#content
+    section[data-section-type="text_only"].reflow-flat-prose {
+    display: contents !important;
+    max-width: none !important;
+  }
 }
 
 /* For sections that also hold artwork, keep the image at full column width and
