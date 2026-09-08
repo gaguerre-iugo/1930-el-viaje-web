@@ -1,0 +1,38 @@
+File: render.html
+  - Missing <meta name='viewport'>
+  - Image without alt attribute: <img alt="" class="h-[200px] w-[155px] max-w-full object-cover shadow-sm" data-id="pg013_im003" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im003"/>
+  - Image without alt attribute: <img alt="" class="-mt-2 h-[320px] w-[320px] max-w-full rounded-full object-cover max-sm:h-[250px] max-sm:w-[250px]" data-id="pg013_im004" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im004"/>
+  - Image without alt attribute: <img alt="" class="h-[205px] w-[212px] max-w-full object-cover" data-id="pg013_im001" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im001"/>
+  - Image without alt attribute: <img alt="" class="h-[105px] w-[70px] max-w-full object-cover" data-id="pg013_im002_seg001_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg001_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[170px] w-[120px] max-w-full object-cover" data-id="pg013_im002_seg002_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg002_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[250px] w-[250px] max-w-full object-contain max-sm:h-[210px] max-sm:w-[210px]" data-id="pg013_im009" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im009"/>
+  - Image without alt attribute: <img alt="" class="h-[188px] w-[145px] max-w-full object-cover shadow-sm" data-id="pg013_im003" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im003"/>
+  - Image without alt attribute: <img alt="" class="-mt-2 h-[260px] w-[260px] max-w-full rounded-full object-cover" data-id="pg013_im004" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im004"/>
+  - Image without alt attribute: <img alt="" class="h-[195px] w-[200px] max-w-full object-cover" data-id="pg013_im001" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im001"/>
+  - Image without alt attribute: <img alt="" class="h-[105px] w-[70px] max-w-full object-cover" data-id="pg013_im002_seg001_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg001_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[170px] w-[120px] max-w-full object-cover" data-id="pg013_im002_seg002_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg002_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[250px] w-[250px] max-w-full object-contain" data-id="pg013_im009" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im009"/>
+
+File: render_total.html
+  - Missing <meta name='viewport'>
+  - Image without alt attribute: <img alt="" class="h-[200px] w-[155px] max-w-full object-cover shadow-sm" data-id="pg013_im003" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im003"/>
+  - Image without alt attribute: <img alt="" class="-mt-2 h-[320px] w-[320px] max-w-full rounded-full object-cover max-sm:h-[250px] max-sm:w-[250px]" data-id="pg013_im004" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im004"/>
+  - Image without alt attribute: <img alt="" class="h-[205px] w-[212px] max-w-full object-cover" data-id="pg013_im001" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im001"/>
+  - Image without alt attribute: <img alt="" class="h-[105px] w-[70px] max-w-full object-cover" data-id="pg013_im002_seg001_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg001_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[170px] w-[120px] max-w-full object-cover" data-id="pg013_im002_seg002_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg002_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[250px] w-[250px] max-w-full object-contain max-sm:h-[210px] max-sm:w-[210px]" data-id="pg013_im009" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im009"/>
+  - Image without alt attribute: <img alt="" class="h-[188px] w-[145px] max-w-full object-cover shadow-sm" data-id="pg013_im003" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im003"/>
+  - Image without alt attribute: <img alt="" class="-mt-2 h-[260px] w-[260px] max-w-full rounded-full object-cover" data-id="pg013_im004" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im004"/>
+  - Image without alt attribute: <img alt="" class="h-[195px] w-[200px] max-w-full object-cover" data-id="pg013_im001" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im001"/>
+  - Image without alt attribute: <img alt="" class="h-[105px] w-[70px] max-w-full object-cover" data-id="pg013_im002_seg001_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg001_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[170px] w-[120px] max-w-full object-cover" data-id="pg013_im002_seg002_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg002_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[250px] w-[250px] max-w-full object-contain" data-id="pg013_im009" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im009"/>
+
+File: web_rendering.html
+  - Missing <meta name='viewport'>
+  - Image without alt attribute: <img alt="" class="h-[188px] w-[145px] object-cover shadow-sm" data-id="pg013_im003" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im003"/>
+  - Image without alt attribute: <img alt="" class="-mt-2 h-[260px] w-[260px] rounded-full object-cover" data-id="pg013_im004" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im004"/>
+  - Image without alt attribute: <img alt="" class="h-[195px] w-[200px] object-cover" data-id="pg013_im001" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im001"/>
+  - Image without alt attribute: <img alt="" class="h-[105px] w-[70px] object-cover" data-id="pg013_im002_seg001_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg001_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[170px] w-[120px] object-cover" data-id="pg013_im002_seg002_v1" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im002_seg002_v1"/>
+  - Image without alt attribute: <img alt="" class="h-[250px] w-[250px] object-contain" data-id="pg013_im009" src="/api/books/Cuaderno_maker_2024_ceibal/images/pg013_im009"/>
