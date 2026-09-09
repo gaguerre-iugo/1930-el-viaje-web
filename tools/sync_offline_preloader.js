@@ -6,7 +6,7 @@ const path = require("path");
 const root = path.resolve(__dirname, "..");
 const preloaderPath = path.join(root, "assets", "offline-preloader.js");
 const marker = "  var INLINE = ";
-const afterInlineMarker = ";\n  var BASE_DIR";
+const afterInlineMarkerPattern = /;\r?\n  var BASE_DIR/g;
 const syncPaths = [
   "./assets/config.json",
   "./content/pages.json",
@@ -32,7 +32,9 @@ const removePaths = ["./pg219_sec001.html", "./pg223_sec001.html"];
 
 const source = fs.readFileSync(preloaderPath, "utf8");
 const start = source.indexOf(marker) + marker.length;
-const end = source.indexOf(afterInlineMarker, start);
+afterInlineMarkerPattern.lastIndex = start;
+const afterInlineMatch = afterInlineMarkerPattern.exec(source);
+const end = afterInlineMatch ? afterInlineMatch.index : -1;
 
 if (start < marker.length || end < 0) {
   throw new Error("No se encontró el catálogo INLINE del preloader.");
