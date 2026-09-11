@@ -136,6 +136,10 @@
       <file href="content/i18n/es-UY/audio/qz006_o2_es-UY.mp3"/>
       <file href="content/i18n/es-UY/audio/qz006_o2_exp_es-UY.mp3"/>
       <file href="content/i18n/es-UY/audio/qz006_que_es-UY.mp3"/>
+      <file href="pg225_sec001.html"/>
+      <file href="pg226_sec001.html"/>
+      <file href="pg227_sec001.html"/>
+      <file href="content/i18n/es-UY/speech_texts.json"/>
     </resource>
   </resources>
 

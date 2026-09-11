@@ -207,7 +207,10 @@
     ["pg215_sec001", "pg215_sec001.html"],
     ["qz025", "qz025.html"],
     ["pg216217_sec001", "pg216217_sec001.html"],
-    ["pg221_sec001", "pg221_sec001.html"]
+    ["pg221_sec001", "pg221_sec001.html"],
+    ["pg225_sec001", "pg225_sec001.html"],
+    ["pg226_sec001", "pg226_sec001.html"],
+    ["pg227_sec001", "pg227_sec001.html"]
   ];
 
   var fileToSection = Object.create(null);
@@ -234,12 +237,18 @@
     pg144145_sec001: "Josephine está en peligro",
     pg176177_sec001: "Dos mundiales, un mismo destino",
     pg221_sec001: "Ana Solari",
-    pg224_sec001: "Sinopsis"
+    pg224_sec001: "Sinopsis",
+    pg225_sec001: "Créditos",
+    pg226_sec001: "Agradecimientos",
+    pg227_sec001: "Fin"
   };
   var editorialTocLevels = {
     pg215_sec001: 1,
     pg221_sec001: 1,
-    pg224_sec001: 1
+    pg224_sec001: 1,
+    pg225_sec001: 1,
+    pg226_sec001: 1,
+    pg227_sec001: 1
   };
   function moveCatalogueEntryBefore(entries, movingSectionId, targetSectionId) {
     if (!Array.isArray(entries)) return;
