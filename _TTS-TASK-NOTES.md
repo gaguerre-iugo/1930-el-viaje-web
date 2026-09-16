@@ -131,10 +131,37 @@ git status --short venv
 | Archivo | Qué es | ¿Conservar? |
 |---|---|---|
 | `tools/_batch_tts.py` | respaldo + inyección quirúrgica para las voces | reutilizable |
-| `tools/_basefix.py` | completa el catálogo base (MP3 + catálogo + timecodes) | reutilizable |
+| `tools/build_offline_preloader.py` | regenera el mapa `INLINE` del precargador offline | **reutilizable** |
 | `tools/report_quiz_audio_gaps.py` | auditoría de audios vs textos | reutilizable |
 | `tools/quiz-audio-gaps.json` | informe de la auditoría | reutilizable |
+| ~~`tools/_basefix.py`~~ | recreaba el audio del catálogo base | **ELIMINADO** (ver abajo) |
 | `_TTS-TASK-NOTES.md` | este archivo | borrar |
+
+## CIERRE: limpieza final
+
+Commit `794ac016`. Tres cosas:
+
+1. **Overrides muertos del adaptador.** Fijaba a mano el audio de 28 ids. Con
+   `rewriteBaseAudioMapToVoice()` ya no hacían nada: sus claves están en el
+   archivo y el rewrite pisa sus valores. Se conserva **solo**
+   `whatsapp_chat_intro_v31`, el único id que no está en el mapa base y que por
+   eso hace falta registrar para que entre en la cola de narración.
+
+2. **`tools/_basefix.py`, eliminado.** Era un footgun: su función era recrear el
+   audio del catálogo base, lo contrario de lo que ahora se busca. Correrlo
+   encontraba 10.057 entradas del mapa apuntando a archivos inexistentes y las
+   recreaba, deshaciendo el cambio.
+
+3. **73 huérfanos de `audio/`, eliminados** (4,4 MB). Se conservan los 50
+   declarados en `imsmanifest.xml`: verificado después del borrado, **0 recursos
+   faltantes**.
+
+`audio/` cierra en **65 archivos, 6,1 MB** y el repo sin `.git` en **587 MB**.
+
+Verificado en HTTP y en `file://`: mapa base con 10.074 claves, **100 % apuntando
+a los catálogos de voz y 0 al base**; cuatro páginas por modo (quiz, cierre y dos
+de chat de WhatsApp) narran sin una sola petición al base, 0 fallidas y 0
+errores; y el alias `whatsapp_chat_intro_v31` resuelve a la voz.
 
 ## HALLAZGO POSTERIOR: el catálogo base también hay que corregirlo
 
