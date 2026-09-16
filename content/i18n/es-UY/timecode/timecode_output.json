@@ -141912,5 +141912,2356 @@
         ]
       }
     ]
+  },
+  "pg225_n0002": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "1930",
+            "start": 0.0988,
+            "end": 1.3131
+          },
+          {
+            "text": "EL",
+            "start": 1.3131,
+            "end": 1.3845
+          },
+          {
+            "text": "VIAJE",
+            "start": 1.4083,
+            "end": 1.8369
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0003": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Novela",
+            "start": 0.0988,
+            "end": 0.5035
+          },
+          {
+            "text": "educativa",
+            "start": 0.5155,
+            "end": 1.0512
+          },
+          {
+            "text": "transmedia",
+            "start": 1.1107,
+            "end": 1.7178
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0007": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Dirección",
+            "start": 0.0988,
+            "end": 0.7655
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0009": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ramón",
+            "start": 0.0976,
+            "end": 0.4667
+          },
+          {
+            "text": "Silveira",
+            "start": 0.4905,
+            "end": 1.0857
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2762,
+            "end": 1.8238
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0012": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Autora",
+            "start": 0.0982,
+            "end": 0.5387
+          },
+          {
+            "text": "de",
+            "start": 0.5982,
+            "end": 0.622
+          },
+          {
+            "text": "la",
+            "start": 0.6577,
+            "end": 0.7411
+          },
+          {
+            "text": "novela",
+            "start": 0.7768,
+            "end": 1.2292
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0014": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ana",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "Solari",
+            "start": 0.3714,
+            "end": 0.8238
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0017": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Abordaje",
+            "start": 0.0976,
+            "end": 0.6571
+          },
+          {
+            "text": "educativo",
+            "start": 0.6571,
+            "end": 1.2524
+          },
+          {
+            "text": "y",
+            "start": 1.3,
+            "end": 1.3476
+          },
+          {
+            "text": "jugabilidad",
+            "start": 1.3714,
+            "end": 2.0857
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0019": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Pablo",
+            "start": 0.0976,
+            "end": 0.3952
+          },
+          {
+            "text": "Fradiletti",
+            "start": 0.419,
+            "end": 1.0976
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2762,
+            "end": 1.8238
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0020": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Virginia",
+            "start": 0.0988,
+            "end": 0.5512
+          },
+          {
+            "text": "Benzano",
+            "start": 0.575,
+            "end": 1.1226
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.325,
+            "end": 1.8845
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0021": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Paul",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "Cevallos",
+            "start": 0.3595,
+            "end": 1.0143
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.1571,
+            "end": 1.7047
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0022": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Mariana",
+            "start": 0.0988,
+            "end": 0.6107
+          },
+          {
+            "text": "Antonelli",
+            "start": 0.6345,
+            "end": 1.2417
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.4321,
+            "end": 1.9798
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0023": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Darío",
+            "start": 0.0988,
+            "end": 0.4559
+          },
+          {
+            "text": "Zarauza",
+            "start": 0.4798,
+            "end": 1.0988
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3012,
+            "end": 1.8488
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0026": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Diseño",
+            "start": 0.0988,
+            "end": 0.5274
+          },
+          {
+            "text": "de",
+            "start": 0.5869,
+            "end": 0.6465
+          },
+          {
+            "text": "trama",
+            "start": 0.7179,
+            "end": 1.0869
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0028": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Maximiliano",
+            "start": 0.0982,
+            "end": 0.8363
+          },
+          {
+            "text": "Xicart",
+            "start": 0.8601,
+            "end": 1.3244
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.5268,
+            "end": 2.0744
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0029": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Manuel",
+            "start": 0.0988,
+            "end": 0.444
+          },
+          {
+            "text": "Latorres",
+            "start": 0.444,
+            "end": 1.1345
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0032": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Adaptación",
+            "start": 0.0976,
+            "end": 0.7643
+          },
+          {
+            "text": "a",
+            "start": 0.7643,
+            "end": 0.8119
+          },
+          {
+            "text": "primer",
+            "start": 0.8714,
+            "end": 1.1333
+          },
+          {
+            "text": "ciclo",
+            "start": 1.169,
+            "end": 1.6095
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0034": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Pablo",
+            "start": 0.0976,
+            "end": 0.3952
+          },
+          {
+            "text": "Fradiletti",
+            "start": 0.419,
+            "end": 1.0976
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2762,
+            "end": 1.8238
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0035": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ana",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "Solari",
+            "start": 0.3714,
+            "end": 0.8238
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0038": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Experiencia",
+            "start": 0.0976,
+            "end": 0.7524
+          },
+          {
+            "text": "digital",
+            "start": 0.7881,
+            "end": 1.2047
+          },
+          {
+            "text": "de",
+            "start": 1.2405,
+            "end": 1.2881
+          },
+          {
+            "text": "aprendizajes",
+            "start": 1.3,
+            "end": 2.2048
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0040": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Juan",
+            "start": 0.0976,
+            "end": 0.3952
+          },
+          {
+            "text": "Marrero",
+            "start": 0.419,
+            "end": 0.9428
+          },
+          {
+            "text": "UTEC",
+            "start": 1.1333,
+            "end": 1.5262
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0041": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Martin",
+            "start": 0.0982,
+            "end": 0.5149
+          },
+          {
+            "text": "Zanoniani",
+            "start": 0.5387,
+            "end": 1.253
+          },
+          {
+            "text": "UTEC",
+            "start": 1.4315,
+            "end": 1.8244
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0042": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Guillermo",
+            "start": 0.0988,
+            "end": 0.5512
+          },
+          {
+            "text": "Ortiz",
+            "start": 0.5512,
+            "end": 1.0512
+          },
+          {
+            "text": "UTEC",
+            "start": 1.194,
+            "end": 1.575
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0043": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Fabricio",
+            "start": 0.0982,
+            "end": 0.5863
+          },
+          {
+            "text": "Camargo",
+            "start": 0.6339,
+            "end": 1.1577
+          },
+          {
+            "text": "UTEC",
+            "start": 1.3125,
+            "end": 1.7292
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0044": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Maria",
+            "start": 0.0976,
+            "end": 0.4905
+          },
+          {
+            "text": "Noel",
+            "start": 0.5381,
+            "end": 0.7643
+          },
+          {
+            "text": "Hernández",
+            "start": 0.7881,
+            "end": 1.4667
+          },
+          {
+            "text": "UTEC",
+            "start": 1.5976,
+            "end": 2.0024
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0045": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Paolo",
+            "start": 0.0976,
+            "end": 0.4429
+          },
+          {
+            "text": "González",
+            "start": 0.4786,
+            "end": 1.1333
+          },
+          {
+            "text": "UTEC",
+            "start": 1.3,
+            "end": 1.7047
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0046": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Alessi",
+            "start": 0.0976,
+            "end": 0.5024
+          },
+          {
+            "text": "Peréz",
+            "start": 0.5738,
+            "end": 0.9667
+          },
+          {
+            "text": "UTEC",
+            "start": 1.1214,
+            "end": 1.5262
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0049": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Coordinación",
+            "start": 0.0976,
+            "end": 0.7762
+          },
+          {
+            "text": "editorial",
+            "start": 0.7881,
+            "end": 1.4785
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0051": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Maximiliano",
+            "start": 0.0982,
+            "end": 0.8363
+          },
+          {
+            "text": "Xicart",
+            "start": 0.8601,
+            "end": 1.3244
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.5268,
+            "end": 2.0744
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0054": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Producción",
+            "start": 0.0982,
+            "end": 0.8244
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0056": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Carla",
+            "start": 0.0976,
+            "end": 0.4429
+          },
+          {
+            "text": "Vega",
+            "start": 0.4786,
+            "end": 0.8357
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.0381,
+            "end": 1.6095
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0057": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Guadalupe",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Muñoz",
+            "start": 0.6929,
+            "end": 1.2048
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3595,
+            "end": 1.9191
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0060": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Análisis",
+            "start": 0.0976,
+            "end": 0.669
+          },
+          {
+            "text": "integrado",
+            "start": 0.681,
+            "end": 1.1572
+          },
+          {
+            "text": "de",
+            "start": 1.2047,
+            "end": 1.2762
+          },
+          {
+            "text": "datos",
+            "start": 1.3238,
+            "end": 1.6928
+          },
+          {
+            "text": "y",
+            "start": 1.7286,
+            "end": 1.7762
+          },
+          {
+            "text": "economía",
+            "start": 1.7762,
+            "end": 2.3238
+          },
+          {
+            "text": "comportamental",
+            "start": 2.3833,
+            "end": 3.2762
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0062": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Carlos",
+            "start": 0.0976,
+            "end": 0.4429
+          },
+          {
+            "text": "Libisch",
+            "start": 0.4667,
+            "end": 0.9786
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.181,
+            "end": 1.7167
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0063": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Anahí",
+            "start": 0.0988,
+            "end": 0.4678
+          },
+          {
+            "text": "Cancela",
+            "start": 0.5274,
+            "end": 1.0988
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3012,
+            "end": 1.8607
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0064": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Fiorella",
+            "start": 0.0988,
+            "end": 0.5512
+          },
+          {
+            "text": "Nahmias",
+            "start": 0.5869,
+            "end": 1.0988
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2774,
+            "end": 1.825
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0067": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Pensamiento",
+            "start": 0.0976,
+            "end": 0.681
+          },
+          {
+            "text": "Computacional",
+            "start": 0.7286,
+            "end": 1.5262
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0069": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Santiago",
+            "start": 0.0976,
+            "end": 0.6214
+          },
+          {
+            "text": "Olivera",
+            "start": 0.6214,
+            "end": 1.1095
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3,
+            "end": 1.8595
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0070": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Lucía",
+            "start": 0.0976,
+            "end": 0.4905
+          },
+          {
+            "text": "Crivelli",
+            "start": 0.55,
+            "end": 1.0976
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3,
+            "end": 1.8476
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0071": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Irina",
+            "start": 0.0982,
+            "end": 0.503
+          },
+          {
+            "text": "Rodríguez",
+            "start": 0.5387,
+            "end": 1.2054
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3601,
+            "end": 1.9197
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0074": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ceibal",
+            "start": 0.0982,
+            "end": 0.5268
+          },
+          {
+            "text": "en",
+            "start": 0.5268,
+            "end": 0.6101
+          },
+          {
+            "text": "inglés",
+            "start": 0.6339,
+            "end": 1.1815
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0076": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Gabriela",
+            "start": 0.0988,
+            "end": 0.5631
+          },
+          {
+            "text": "Kaplan",
+            "start": 0.6345,
+            "end": 1.1226
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2774,
+            "end": 1.8369
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0077": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Natalia",
+            "start": 0.0988,
+            "end": 0.575
+          },
+          {
+            "text": "Font",
+            "start": 0.5988,
+            "end": 0.9083
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.075,
+            "end": 1.6345
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0078": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Agustina",
+            "start": 0.0988,
+            "end": 0.6345
+          },
+          {
+            "text": "Sieburger",
+            "start": 0.6703,
+            "end": 1.3012
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.4679,
+            "end": 2.0155
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0079": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Rafael",
+            "start": 0.0976,
+            "end": 0.55
+          },
+          {
+            "text": "Fariñas",
+            "start": 0.5738,
+            "end": 1.2524
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.4429,
+            "end": 2.0024
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0082": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Comunicación",
+            "start": 0.0976,
+            "end": 0.919
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0084": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Marcelo",
+            "start": 0.0976,
+            "end": 0.5738
+          },
+          {
+            "text": "Uruzabal",
+            "start": 0.5976,
+            "end": 1.2881
+          },
+          {
+            "text": "ANEP",
+            "start": 1.4429,
+            "end": 1.7881
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0085": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Stephanie",
+            "start": 0.0982,
+            "end": 0.6935
+          },
+          {
+            "text": "Estevez",
+            "start": 0.7173,
+            "end": 1.3244
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.4792,
+            "end": 2.0268
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0086": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Martín",
+            "start": 0.0982,
+            "end": 0.5268
+          },
+          {
+            "text": "Fernández",
+            "start": 0.5387,
+            "end": 1.2768
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.4315,
+            "end": 1.9792
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0087": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Romina",
+            "start": 0.0982,
+            "end": 0.5149
+          },
+          {
+            "text": "Lacoste",
+            "start": 0.5387,
+            "end": 1.0982
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3125,
+            "end": 1.872
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0088": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Inés",
+            "start": 0.0988,
+            "end": 0.4559
+          },
+          {
+            "text": "Fornos",
+            "start": 0.4917,
+            "end": 1.0869
+          },
+          {
+            "text": "UTEC",
+            "start": 1.2417,
+            "end": 1.6464
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0089": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Fernanda",
+            "start": 0.0982,
+            "end": 0.6458
+          },
+          {
+            "text": "Gómez",
+            "start": 0.6815,
+            "end": 1.2053
+          },
+          {
+            "text": "MEC",
+            "start": 1.4196,
+            "end": 1.7172
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0090": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Facundo",
+            "start": 0.0982,
+            "end": 0.6458
+          },
+          {
+            "text": "Álvarez",
+            "start": 0.6696,
+            "end": 1.2768
+          },
+          {
+            "text": "SND",
+            "start": 1.4672,
+            "end": 2.1696
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0093": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "TI",
+            "start": 0.0976,
+            "end": 0.3
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0095": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Martín",
+            "start": 0.0982,
+            "end": 0.5149
+          },
+          {
+            "text": "Anza",
+            "start": 0.5149,
+            "end": 0.9196
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.1101,
+            "end": 1.6697
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0096": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Esteban",
+            "start": 0.0982,
+            "end": 0.5268
+          },
+          {
+            "text": "Arias",
+            "start": 0.5506,
+            "end": 1.0387
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.1935,
+            "end": 1.753
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0097": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Matías",
+            "start": 0.0988,
+            "end": 0.575
+          },
+          {
+            "text": "Basso",
+            "start": 0.5988,
+            "end": 1.0274
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.2297,
+            "end": 1.7774
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0098": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Álvaro",
+            "start": 0.0988,
+            "end": 0.4797
+          },
+          {
+            "text": "Barrios",
+            "start": 0.5036,
+            "end": 1.0036
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.1583,
+            "end": 1.706
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0099": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Matías",
+            "start": 0.0988,
+            "end": 0.5631
+          },
+          {
+            "text": "Rozman",
+            "start": 0.5869,
+            "end": 1.194
+          },
+          {
+            "text": "Ceibal",
+            "start": 1.3488,
+            "end": 1.8964
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0102": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Embajador",
+            "start": 0.0976,
+            "end": 0.669
+          },
+          {
+            "text": "de",
+            "start": 0.7047,
+            "end": 0.7762
+          },
+          {
+            "text": "desafioprofundo.org",
+            "start": 0.8476,
+            "end": 2.3357
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0104": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Guillermo",
+            "start": 0.0988,
+            "end": 0.5274
+          },
+          {
+            "text": "Lockhart",
+            "start": 0.575,
+            "end": 1.0036
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0107": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Desarrollos",
+            "start": 0.0976,
+            "end": 0.6929
+          },
+          {
+            "text": "corporativos",
+            "start": 0.7286,
+            "end": 1.5976
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0109": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Tráiler",
+            "start": 0.0976,
+            "end": 0.5381
+          },
+          {
+            "text": "oficial",
+            "start": 0.5381,
+            "end": 1.1452
+          },
+          {
+            "text": "Cielomoto",
+            "start": 1.2881,
+            "end": 1.9905
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0110": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Desarrollo",
+            "start": 0.0982,
+            "end": 0.6935
+          },
+          {
+            "text": "editorial",
+            "start": 0.6935,
+            "end": 1.3482
+          },
+          {
+            "text": "Manosanta",
+            "start": 1.5149,
+            "end": 2.253
+          }
+        ]
+      }
+    ]
+  },
+  "pg225_n0111": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ilustraciones",
+            "start": 0.0988,
+            "end": 1.0155
+          },
+          {
+            "text": "Demian",
+            "start": 1.1703,
+            "end": 1.5155
+          },
+          {
+            "text": "Godoluz",
+            "start": 1.5393,
+            "end": 2.1464
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0002": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "AGRADECIMIENTOS",
+            "start": 0.0988,
+            "end": 1.2535
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0004": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "Alfredo",
+            "start": 0.2047,
+            "end": 0.5976
+          },
+          {
+            "text": "Etchandy",
+            "start": 0.5976,
+            "end": 0.9786
+          },
+          {
+            "text": "por",
+            "start": 1.05,
+            "end": 1.1333
+          },
+          {
+            "text": "la",
+            "start": 1.1453,
+            "end": 1.2286
+          },
+          {
+            "text": "generosidad",
+            "start": 1.2524,
+            "end": 1.8476
+          },
+          {
+            "text": "de",
+            "start": 1.8833,
+            "end": 1.919
+          },
+          {
+            "text": "sus",
+            "start": 1.9429,
+            "end": 2.1215
+          },
+          {
+            "text": "palabras",
+            "start": 2.1452,
+            "end": 2.6215
+          },
+          {
+            "text": "en",
+            "start": 2.6333,
+            "end": 2.7047
+          },
+          {
+            "text": "el",
+            "start": 2.7286,
+            "end": 2.8119
+          },
+          {
+            "text": "prólogo",
+            "start": 2.8833,
+            "end": 3.2167
+          },
+          {
+            "text": "de",
+            "start": 3.2643,
+            "end": 3.3119
+          },
+          {
+            "text": "esta",
+            "start": 3.3357,
+            "end": 3.5976
+          },
+          {
+            "text": "obra",
+            "start": 3.6452,
+            "end": 3.9072
+          },
+          {
+            "text": "y",
+            "start": 3.9429,
+            "end": 4.0024
+          },
+          {
+            "text": "aportes",
+            "start": 4.0143,
+            "end": 4.4905
+          },
+          {
+            "text": "a",
+            "start": 4.5024,
+            "end": 4.5381
+          },
+          {
+            "text": "la",
+            "start": 4.5619,
+            "end": 4.5976
+          },
+          {
+            "text": "investigación",
+            "start": 4.6095,
+            "end": 5.2524
+          },
+          {
+            "text": "histórica",
+            "start": 5.2524,
+            "end": 5.7405
+          },
+          {
+            "text": "de",
+            "start": 5.7881,
+            "end": 5.8119
+          },
+          {
+            "text": "la",
+            "start": 5.8357,
+            "end": 5.919
+          },
+          {
+            "text": "novela",
+            "start": 5.9547,
+            "end": 6.3833
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0005": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "CAFO",
+            "start": 0.2762,
+            "end": 0.5143
+          },
+          {
+            "text": "por",
+            "start": 0.5857,
+            "end": 0.6928
+          },
+          {
+            "text": "permitirnos",
+            "start": 0.7643,
+            "end": 1.3952
+          },
+          {
+            "text": "el",
+            "start": 1.3953,
+            "end": 1.4786
+          },
+          {
+            "text": "uso",
+            "start": 1.5143,
+            "end": 1.7167
+          },
+          {
+            "text": "del",
+            "start": 1.7643,
+            "end": 1.8476
+          },
+          {
+            "text": "Estadio",
+            "start": 1.8595,
+            "end": 2.2524
+          },
+          {
+            "text": "Centenario",
+            "start": 2.2762,
+            "end": 2.8715
+          },
+          {
+            "text": "y",
+            "start": 2.919,
+            "end": 2.9786
+          },
+          {
+            "text": "el",
+            "start": 2.9905,
+            "end": 3.0738
+          },
+          {
+            "text": "Museo",
+            "start": 3.0976,
+            "end": 3.4547
+          },
+          {
+            "text": "del",
+            "start": 3.5024,
+            "end": 3.6095
+          },
+          {
+            "text": "Fútbol",
+            "start": 3.6333,
+            "end": 4.1571
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0006": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "Carlos",
+            "start": 0.2762,
+            "end": 0.5381
+          },
+          {
+            "text": "Fiordelmondo",
+            "start": 0.5619,
+            "end": 1.2167
+          },
+          {
+            "text": "de",
+            "start": 1.2762,
+            "end": 1.2881
+          },
+          {
+            "text": "la",
+            "start": 1.3238,
+            "end": 1.4071
+          },
+          {
+            "text": "Secretaría",
+            "start": 1.431,
+            "end": 2.0024
+          },
+          {
+            "text": "Nacional",
+            "start": 2.0381,
+            "end": 2.4547
+          },
+          {
+            "text": "de",
+            "start": 2.5024,
+            "end": 2.55
+          },
+          {
+            "text": "Deportes",
+            "start": 2.6452,
+            "end": 3.0619
+          },
+          {
+            "text": "por",
+            "start": 3.1214,
+            "end": 3.2047
+          },
+          {
+            "text": "su",
+            "start": 3.2405,
+            "end": 3.3357
+          },
+          {
+            "text": "compromiso",
+            "start": 3.3833,
+            "end": 3.9071
+          },
+          {
+            "text": "con",
+            "start": 3.9548,
+            "end": 4.0381
+          },
+          {
+            "text": "la",
+            "start": 4.0381,
+            "end": 4.1095
+          },
+          {
+            "text": "iniciativa",
+            "start": 4.1214,
+            "end": 4.7762
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0007": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "la",
+            "start": 0.2286,
+            "end": 0.3119
+          },
+          {
+            "text": "Cámara",
+            "start": 0.3833,
+            "end": 0.6571
+          },
+          {
+            "text": "Uruguaya",
+            "start": 0.681,
+            "end": 1.1333
+          },
+          {
+            "text": "del",
+            "start": 1.181,
+            "end": 1.2881
+          },
+          {
+            "text": "Libro",
+            "start": 1.2881,
+            "end": 1.6095
+          },
+          {
+            "text": "por",
+            "start": 1.681,
+            "end": 1.7762
+          },
+          {
+            "text": "integrarnos",
+            "start": 1.7762,
+            "end": 2.419
+          },
+          {
+            "text": "a",
+            "start": 2.419,
+            "end": 2.4547
+          },
+          {
+            "text": "la",
+            "start": 2.4786,
+            "end": 2.5381
+          },
+          {
+            "text": "propuesta",
+            "start": 2.5976,
+            "end": 3.05
+          },
+          {
+            "text": "de",
+            "start": 3.1095,
+            "end": 3.1215
+          },
+          {
+            "text": "la",
+            "start": 3.1571,
+            "end": 3.2524
+          },
+          {
+            "text": "Feria",
+            "start": 3.2881,
+            "end": 3.5738
+          },
+          {
+            "text": "Internacional",
+            "start": 3.5738,
+            "end": 4.2047
+          },
+          {
+            "text": "del",
+            "start": 4.2524,
+            "end": 4.3476
+          },
+          {
+            "text": "Libro",
+            "start": 4.3476,
+            "end": 4.7524
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0008": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "Juan",
+            "start": 0.2405,
+            "end": 0.4905
+          },
+          {
+            "text": "Carlos",
+            "start": 0.5143,
+            "end": 0.8
+          },
+          {
+            "text": "Scelza",
+            "start": 0.8,
+            "end": 1.3476
+          },
+          {
+            "text": "Diego",
+            "start": 1.55,
+            "end": 1.8
+          },
+          {
+            "text": "Muñoz",
+            "start": 1.8357,
+            "end": 2.3595
+          },
+          {
+            "text": "Gonzalo",
+            "start": 2.6214,
+            "end": 3.0381
+          },
+          {
+            "text": "Delgado",
+            "start": 3.0857,
+            "end": 3.5857
+          },
+          {
+            "text": "Iliana",
+            "start": 3.8952,
+            "end": 4.2524
+          },
+          {
+            "text": "da",
+            "start": 4.3238,
+            "end": 4.3833
+          },
+          {
+            "text": "Silva",
+            "start": 4.419,
+            "end": 4.7762
+          },
+          {
+            "text": "y",
+            "start": 4.8238,
+            "end": 4.8833
+          },
+          {
+            "text": "Sofía",
+            "start": 4.9071,
+            "end": 5.2642
+          },
+          {
+            "text": "Romano",
+            "start": 5.3,
+            "end": 5.669
+          },
+          {
+            "text": "por",
+            "start": 5.7405,
+            "end": 5.8476
+          },
+          {
+            "text": "ser",
+            "start": 5.8833,
+            "end": 6.0619
+          },
+          {
+            "text": "nuestros",
+            "start": 6.0738,
+            "end": 6.3714
+          },
+          {
+            "text": "cómplices",
+            "start": 6.4429,
+            "end": 6.9191
+          },
+          {
+            "text": "en",
+            "start": 6.931,
+            "end": 7.0024
+          },
+          {
+            "text": "el",
+            "start": 7.0262,
+            "end": 7.0976
+          },
+          {
+            "text": "lanzamiento",
+            "start": 7.0976,
+            "end": 7.7167
+          },
+          {
+            "text": "de",
+            "start": 7.7762,
+            "end": 7.8
+          },
+          {
+            "text": "la",
+            "start": 7.8357,
+            "end": 7.8833
+          },
+          {
+            "text": "historia",
+            "start": 7.8833,
+            "end": 8.3833
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0009": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2286
+          },
+          {
+            "text": "Radio",
+            "start": 0.2643,
+            "end": 0.55
+          },
+          {
+            "text": "Sarandí",
+            "start": 0.5738,
+            "end": 1.1452
+          },
+          {
+            "text": "VTV",
+            "start": 1.4071,
+            "end": 2.05
+          },
+          {
+            "text": "y",
+            "start": 2.0619,
+            "end": 2.0738
+          },
+          {
+            "text": "Del",
+            "start": 2.1333,
+            "end": 2.2881
+          },
+          {
+            "text": "Sol",
+            "start": 2.3119,
+            "end": 2.5381
+          },
+          {
+            "text": "FM",
+            "start": 2.5619,
+            "end": 2.9786
+          },
+          {
+            "text": "por",
+            "start": 3.0619,
+            "end": 3.1572
+          },
+          {
+            "text": "permitirnos",
+            "start": 3.2286,
+            "end": 3.7881
+          },
+          {
+            "text": "utilizar",
+            "start": 3.8,
+            "end": 4.2405
+          },
+          {
+            "text": "sus",
+            "start": 4.2762,
+            "end": 4.4547
+          },
+          {
+            "text": "estudios",
+            "start": 4.4547,
+            "end": 5.1095
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0010": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Al",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "LATU",
+            "start": 0.2524,
+            "end": 0.5381
+          },
+          {
+            "text": "por",
+            "start": 0.5976,
+            "end": 0.7167
+          },
+          {
+            "text": "habilitarnos",
+            "start": 0.7167,
+            "end": 1.3357
+          },
+          {
+            "text": "sus",
+            "start": 1.3357,
+            "end": 1.4786
+          },
+          {
+            "text": "laboratorios",
+            "start": 1.5024,
+            "end": 2.1452
+          },
+          {
+            "text": "para",
+            "start": 2.2167,
+            "end": 2.3476
+          },
+          {
+            "text": "el",
+            "start": 2.3476,
+            "end": 2.4429
+          },
+          {
+            "text": "tráiler",
+            "start": 2.4667,
+            "end": 2.919
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0011": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "la",
+            "start": 0.2405,
+            "end": 0.3119
+          },
+          {
+            "text": "oficina",
+            "start": 0.3119,
+            "end": 0.7524
+          },
+          {
+            "text": "de",
+            "start": 0.8238,
+            "end": 0.8238
+          },
+          {
+            "text": "Locaciones",
+            "start": 0.8595,
+            "end": 1.3715
+          },
+          {
+            "text": "de",
+            "start": 1.3833,
+            "end": 1.431
+          },
+          {
+            "text": "la",
+            "start": 1.4667,
+            "end": 1.5143
+          },
+          {
+            "text": "Intendencia",
+            "start": 1.5262,
+            "end": 2.0976
+          },
+          {
+            "text": "de",
+            "start": 2.1333,
+            "end": 2.181
+          },
+          {
+            "text": "Montevideo",
+            "start": 2.2167,
+            "end": 2.8
+          },
+          {
+            "text": "por",
+            "start": 2.8714,
+            "end": 2.9547
+          },
+          {
+            "text": "facilitarnos",
+            "start": 2.9786,
+            "end": 3.7167
+          },
+          {
+            "text": "el",
+            "start": 3.7286,
+            "end": 3.8
+          },
+          {
+            "text": "rodaje",
+            "start": 3.8357,
+            "end": 4.2762
+          },
+          {
+            "text": "en",
+            "start": 4.2762,
+            "end": 4.3476
+          },
+          {
+            "text": "la",
+            "start": 4.3476,
+            "end": 4.4547
+          },
+          {
+            "text": "vía",
+            "start": 4.4905,
+            "end": 4.669
+          },
+          {
+            "text": "pública",
+            "start": 4.7405,
+            "end": 5.2167
+          }
+        ]
+      }
+    ]
+  },
+  "pg226_n0012": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "A",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "Marcelo",
+            "start": 0.2405,
+            "end": 0.6571
+          },
+          {
+            "text": "Bravo",
+            "start": 0.681,
+            "end": 0.9667
+          },
+          {
+            "text": "por",
+            "start": 1.0381,
+            "end": 1.1333
+          },
+          {
+            "text": "la",
+            "start": 1.1453,
+            "end": 1.2286
+          },
+          {
+            "text": "generosidad",
+            "start": 1.2524,
+            "end": 1.8476
+          },
+          {
+            "text": "de",
+            "start": 1.8833,
+            "end": 1.9429
+          },
+          {
+            "text": "compartir",
+            "start": 1.9905,
+            "end": 2.4428
+          },
+          {
+            "text": "sus",
+            "start": 2.4786,
+            "end": 2.6572
+          },
+          {
+            "text": "ideas",
+            "start": 2.681,
+            "end": 3.0381
+          },
+          {
+            "text": "que",
+            "start": 3.0738,
+            "end": 3.1214
+          },
+          {
+            "text": "inspiraron",
+            "start": 3.1214,
+            "end": 3.6571
+          },
+          {
+            "text": "este",
+            "start": 3.681,
+            "end": 3.8833
+          },
+          {
+            "text": "diseño",
+            "start": 3.9548,
+            "end": 4.3119
+          },
+          {
+            "text": "de",
+            "start": 4.3714,
+            "end": 4.4071
+          },
+          {
+            "text": "trama",
+            "start": 4.4786,
+            "end": 4.8119
+          }
+        ]
+      }
+    ]
   }
 }
