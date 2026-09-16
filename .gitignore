@@ -1,0 +1,12 @@
+# Entorno virtual de Python (se recrea con pip install; no se versiona)
+venv/
+
+# Cache de Python
+__pycache__/
+*.pyc
+
+# Dependencias de Node (el harness de screen-test tiene el suyo)
+node_modules/
+
+# Carpeta de trabajo de las herramientas de portada (mascaras y previews)
+tmp/

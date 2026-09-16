@@ -53,7 +53,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   │   └── nav.html           ← Navegación del libro
 │   └── i18n/
 │       └── es-UY/             ← Único idioma disponible
-│           ├── audio/         ← Archivos MP3 (voces Valentina y Mateo)
+│           ├── audio/         ← Solo los archivos del manifiesto SCORM; el audio narrable vive en voices/
 │           ├── timecode/      ← Sincronización palabra por palabra
 │           ├── images.json    ← Descripciones de imágenes
 │           └── videos.json    ← Metadatos de video
@@ -77,15 +77,16 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── blend_cover_seam.py        ← Mezcla de costura de portada
 │   └── screen-test/               ← Tests de screenshot con Playwright
 │
-├── AGENTS.md                  ← Este archivo
-├── AUDIT-CHANGELOG-v*.md      ← Changelogs detallados por versión
-├── INTEGRATION-MANIFEST.md    ← Manifiesto de integración (v45)
-├── LEEME-WEB-EXPORT.txt       ← Instructivo de uso
-├── LEEME-V47.txt              ← Notas de la versión 47
-├── REFLOW-TYPOGRAPHY-KNOWHOW.md ← Know-how de tipografía reflow
-├── REFLOW-NAVIGATION-KNOWHOW.md ← Know-how de navegación reflow
-├── TTS-PROSODY-PLAN.md        ← Plan de prosodia TTS
-└── cover.png                  ← Miniatura de portada
+├── AGENTS.md                  ← Este archivo (se lee desde la raíz, no se mueve)
+├── .gitignore                 ← Excluye venv/, __pycache__/, node_modules/ y tmp/
+├── cover.png                  ← Miniatura de portada
+├── imsmanifest.xml            ← Manifiesto SCORM 1.2 (debe quedar en la raíz)
+│
+└── docs/                      ← Documentación de trabajo (ver docs/README.md)
+    ├── README.md              ← Índice de la documentación
+    ├── guias/                 ← Manual de mantenimiento y instructivos
+    ├── arquitectura/          ← Integración, continuidad y know-how del reflow y TTS
+    └── auditorias/            ← Auditorías y changelogs por versión
 ```
 
 ---
@@ -221,7 +222,8 @@ El libro exporta como **SCORM 1.2**. El archivo `imsmanifest.xml` declara todos 
 | v46 | Integración de capítulos 1 y 2 + validaciones |
 | v47 | **Libro completo** — capítulos 3 a 8 + páginas finales |
 
-Los cambios detallados están documentados en los archivos `AUDIT-CHANGELOG-v*.md` e `INTEGRATION-MANIFEST.md`.
+Los cambios detallados están documentados en `docs/auditorias/` (changelogs por
+versión) y `docs/arquitectura/INTEGRATION-MANIFEST.md`.
 
 ---
 
