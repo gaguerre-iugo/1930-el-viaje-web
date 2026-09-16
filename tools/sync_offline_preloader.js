@@ -48,10 +48,17 @@ for (const relative of syncPaths) {
   if (!Object.prototype.hasOwnProperty.call(inline, relative)) {
     throw new Error(`El preloader no contiene ${relative}`);
   }
-  inline[relative] = fs.readFileSync(
+  const contenido = fs.readFileSync(
     path.join(root, relative.replace(/^\.\//, "")),
     "utf8"
   );
+  /* El manejador del precargador hace JSON.stringify(data) sobre las claves
+     .json, asi que esos valores tienen que guardarse como objeto. Guardarlos
+     como texto los devolvia doblemente escapados y el lector recibia un
+     string en vez de un objeto. */
+  inline[relative] = relative.endsWith(".json")
+    ? JSON.parse(contenido)
+    : contenido;
 }
 
 const escaped = JSON.stringify(inline)
