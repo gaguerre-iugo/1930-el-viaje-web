@@ -587,40 +587,15 @@
         data.bundleVersion = "57-activity-progress";
         data.features.showNavigationControls = false;
       } else if (isAudios) {
-        /* Keep every historical semantic id on the same cache-busted file.
-           The final binding is repeated immediately before play() below so
-           an already-created TTS queue cannot retain an older WhatsApp clip. */
-        data.whatsapp_chat_intro = "whatsapp_chat_intro_v33_es-UY.mp3?v=45-integrated-35-uatsap";
-        data.whatsapp_chat_intro_v31 = "whatsapp_chat_intro_v33_es-UY.mp3?v=45-integrated-35-uatsap";
-        data.whatsapp_chat_intro_v33 = "whatsapp_chat_intro_v33_es-UY.mp3?v=45-integrated-35-uatsap";
-        data.whatsapp_chat_continuation_v45 =
-          "whatsapp_chat_continuation_es-UY.mp3?v=45-integrated-35-uatsap";
-        /* The bundled reader only adds elements to its TTS queue when their
-           semantic id exists in the base audio catalogue.  The visible chat
-           cards are composed after the source pages load, so register every
-           generated intro id here as an alias.  The media bridge below still
-           swaps these placeholders for the selected Valentina/Mateo clip and
-           its matching timings immediately before playback. */
-        [
-          "pg068_im004", "pg069_im004", "pg069_im005", "pg079_im002",
-          "pg127_im002", "whatsapp_chat_intro_pg020",
-          "whatsapp_chat_intro_pg021", "whatsapp_chat_intro_pg029",
-          "whatsapp_chat_intro_pg070"
-        ].forEach(function (audioId) {
-          data[audioId] = data.whatsapp_chat_intro;
-        });
-        data.whatsapp_chat_intro_historical =
-          "whatsapp_chat_intro_historical.mp3?v=47-uatsap-final-stress";
-        [
-          "pg083_im002", "pg084_im002", "pg094_im002", "pg094_im003",
-          "pg095_im002", "pg117_im002", "pg117_im002_continuation",
-          "pg183_im002", "pg183_im003"
-        ].forEach(function (audioId) {
-          data[audioId] = data.whatsapp_chat_intro_historical;
-        });
-        data.pg009_n0002 = "pg009_title_continuous.mp3";
-        data.pg001_n0004 = "pg001_n0004_es-UY.mp3";
-        data.pg001_n0004_easy_read = "pg001_n0004_es-UY.mp3";
+        /* El runtime solo agrega a su cola de narracion los elementos cuyo id
+           existe en el catalogo base. Este id historico no esta en el archivo,
+           asi que se registra aqui para que entre en la cola. El valor es solo
+           un marcador: rewriteBaseAudioMapToVoice() reapunta todos los valores
+           del mapa al archivo de la voz elegida.
+           Los demas alias de WhatsApp y los reemplazos de pg009_n0002 y
+           pg001_n0004 ya no hacen falta: sus claves estan en el archivo y el
+           rewrite pisa sus valores, asi que fijarlos aqui era codigo muerto. */
+        data.whatsapp_chat_intro_v31 = data.whatsapp_chat_intro || "";
         /* Apuntar el mapa base al narrador elegido (ver
            rewriteBaseAudioMapToVoice). Se descarga el catalogo de voz con la
            misma URL que loadTtsVoiceCatalog() para reutilizar la descarga. */
