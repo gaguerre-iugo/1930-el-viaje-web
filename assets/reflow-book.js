@@ -621,6 +621,19 @@
         data.pg009_n0002 = "pg009_title_continuous.mp3";
         data.pg001_n0004 = "pg001_n0004_es-UY.mp3";
         data.pg001_n0004_easy_read = "pg001_n0004_es-UY.mp3";
+        /* Apuntar el mapa base al narrador elegido (ver
+           rewriteBaseAudioMapToVoice). Se descarga el catalogo de voz con la
+           misma URL que loadTtsVoiceCatalog() para reutilizar la descarga. */
+        try {
+          var vozRespuesta = await inheritedFetch(
+            ttsVoiceCatalogUrl(state.ttsVoice, "audios.json")
+          );
+          rewriteBaseAudioMapToVoice(data, await vozRespuesta.json());
+        } catch (_voiceMapError) {
+          if (document.body) {
+            document.body.dataset.reflowTtsBaseRewrite = "error";
+          }
+        }
         window.__adtReflowAudioFiles = data;
       } else if (isTimecodes) {
         delete data.pg009_n0002;
@@ -3426,6 +3439,35 @@
     pg185_n0002_easy_read: "pg185_n0002"
   };
 
+  /* Etiqueta de cache de los catalogos por voz. La usan tanto su carga normal
+     como el adaptador de datos, para que la descarga se reutilice. */
+  var ttsVoiceCatalogVersion = "49-full-book-134-remove-printed-contents";
+
+  function ttsVoiceCatalogUrl(voiceKey, file) {
+    return "./content/i18n/es-UY/voices/" + voiceKey + "/" + file +
+      "?v=" + ttsVoiceCatalogVersion;
+  }
+
+  /* El catalogo base es el indice con el que el runtime decide que se narra,
+     pero su audio es redundante: cada id narrable existe tambien en los
+     catalogos de voz. Reescribir sus valores para que apunten al narrador
+     elegido hace que el respaldo use la voz seleccionada en lugar de un tercer
+     narrador, y que el audio del catalogo base deje de ser necesario. */
+  function rewriteBaseAudioMapToVoice(audioMap, voiceMap) {
+    if (!audioMap || !voiceMap) return 0;
+    var reescritos = 0;
+    Object.keys(audioMap).forEach(function (audioId) {
+      if (voiceMap[audioId]) {
+        audioMap[audioId] = voiceMap[audioId];
+        reescritos += 1;
+      }
+    });
+    if (document.body) {
+      document.body.dataset.reflowTtsBaseRewrite = String(reescritos);
+    }
+    return reescritos;
+  }
+
   function loadTtsVoiceCatalog(voiceKey) {
     var catalogue = ttsVoiceCatalogs[voiceKey];
     if (!catalogue) return Promise.resolve(false);
@@ -3436,8 +3478,8 @@
     catalogue.status = "loading";
     updateTtsVoiceControls();
     catalogue.promise = Promise.all([
-      fetch(root + "audios.json?v=49-full-book-134-remove-printed-contents"),
-      fetch(root + "timecodes.json?v=49-full-book-134-remove-printed-contents")
+      fetch(ttsVoiceCatalogUrl(voiceKey, "audios.json")),
+      fetch(ttsVoiceCatalogUrl(voiceKey, "timecodes.json"))
     ]).then(function (responses) {
       if (!responses[0].ok || !responses[1].ok) throw new Error("missing catalogue");
       return Promise.all([responses[0].json(), responses[1].json()]);
@@ -3451,6 +3493,11 @@
           catalogue.timecodes[easyId] = catalogue.timecodes[normalId];
         }
       });
+      /* Si es el narrador activo, reapuntar el mapa base a sus archivos: cubre
+         el caso de que el usuario cambie de voz despues de cargar la pagina. */
+      if (voiceKey === state.ttsVoice) {
+        rewriteBaseAudioMapToVoice(window.__adtReflowAudioFiles, catalogue.audios);
+      }
       catalogue.available = true;
       catalogue.status = "ready";
       return true;
