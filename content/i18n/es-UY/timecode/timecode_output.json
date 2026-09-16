@@ -134968,5 +134968,6949 @@
         ]
       }
     ]
+  },
+  "qz010_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "El",
+            "start": 0.0982,
+            "end": 0.2172
+          },
+          {
+            "text": "Rumano",
+            "start": 0.2411,
+            "end": 0.7292
+          }
+        ]
+      }
+    ]
+  },
+  "qz010_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.381
+          },
+          {
+            "text": "Rumano",
+            "start": 1.4047,
+            "end": 1.7976
+          },
+          {
+            "text": "ayuda",
+            "start": 1.8095,
+            "end": 2.1429
+          },
+          {
+            "text": "a",
+            "start": 2.1429,
+            "end": 2.1667
+          },
+          {
+            "text": "Javier",
+            "start": 2.1905,
+            "end": 2.5357
+          },
+          {
+            "text": "en",
+            "start": 2.5357,
+            "end": 2.6428
+          },
+          {
+            "text": "1930",
+            "start": 2.6429,
+            "end": 3.9167
+          },
+          {
+            "text": "pero",
+            "start": 4.2262,
+            "end": 4.381
+          },
+          {
+            "text": "no",
+            "start": 4.4167,
+            "end": 4.5
+          },
+          {
+            "text": "interviene",
+            "start": 4.5119,
+            "end": 5.0238
+          },
+          {
+            "text": "en",
+            "start": 5.0357,
+            "end": 5.0952
+          },
+          {
+            "text": "este",
+            "start": 5.119,
+            "end": 5.3333
+          },
+          {
+            "text": "ataque",
+            "start": 5.3333,
+            "end": 5.631
+          },
+          {
+            "text": "del",
+            "start": 5.6905,
+            "end": 5.7857
+          },
+          {
+            "text": "Loro",
+            "start": 5.7857,
+            "end": 6.1428
+          }
+        ]
+      }
+    ]
+  },
+  "qz010_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Federica",
+            "start": 0.0988,
+            "end": 0.7178
+          }
+        ]
+      }
+    ]
+  },
+  "qz010_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Federica",
+            "start": 1.5595,
+            "end": 2.0952
+          },
+          {
+            "text": "aparece",
+            "start": 2.1071,
+            "end": 2.6667
+          },
+          {
+            "text": "enfrenta",
+            "start": 2.9167,
+            "end": 3.3333
+          },
+          {
+            "text": "al",
+            "start": 3.3333,
+            "end": 3.4286
+          },
+          {
+            "text": "grupo",
+            "start": 3.4405,
+            "end": 3.7738
+          },
+          {
+            "text": "y",
+            "start": 3.8214,
+            "end": 3.8928
+          },
+          {
+            "text": "ayuda",
+            "start": 3.9047,
+            "end": 4.25
+          },
+          {
+            "text": "a",
+            "start": 4.2619,
+            "end": 4.2738
+          },
+          {
+            "text": "Javier",
+            "start": 4.2976,
+            "end": 4.6071
+          },
+          {
+            "text": "a",
+            "start": 4.6071,
+            "end": 4.6667
+          },
+          {
+            "text": "ponerse",
+            "start": 4.7381,
+            "end": 5.1071
+          },
+          {
+            "text": "de",
+            "start": 5.1786,
+            "end": 5.2143
+          },
+          {
+            "text": "pie",
+            "start": 5.2857,
+            "end": 5.4881
+          }
+        ]
+      }
+    ]
+  },
+  "qz010_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Quién",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "defiende",
+            "start": 0.3476,
+            "end": 0.7405
+          },
+          {
+            "text": "a",
+            "start": 0.7524,
+            "end": 0.8
+          },
+          {
+            "text": "Javier",
+            "start": 0.8238,
+            "end": 1.2047
+          },
+          {
+            "text": "cuando",
+            "start": 1.2524,
+            "end": 1.4786
+          },
+          {
+            "text": "el",
+            "start": 1.4786,
+            "end": 1.5381
+          },
+          {
+            "text": "Loro",
+            "start": 1.5381,
+            "end": 1.8357
+          },
+          {
+            "text": "y",
+            "start": 1.8476,
+            "end": 1.8953
+          },
+          {
+            "text": "sus",
+            "start": 1.919,
+            "end": 2.0619
+          },
+          {
+            "text": "compañeros",
+            "start": 2.0976,
+            "end": 2.5976
+          },
+          {
+            "text": "lo",
+            "start": 2.6214,
+            "end": 2.6928
+          },
+          {
+            "text": "atacan",
+            "start": 2.6929,
+            "end": 3.2286
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "quiere",
+            "start": 0.4071,
+            "end": 0.5976
+          },
+          {
+            "text": "venderlos",
+            "start": 0.6333,
+            "end": 1.0976
+          },
+          {
+            "text": "por",
+            "start": 1.169,
+            "end": 1.2643
+          },
+          {
+            "text": "internet",
+            "start": 1.2643,
+            "end": 1.8119
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Federica",
+            "start": 1.25,
+            "end": 1.7738
+          },
+          {
+            "text": "no",
+            "start": 1.8214,
+            "end": 1.8928
+          },
+          {
+            "text": "piensa",
+            "start": 1.9762,
+            "end": 2.25
+          },
+          {
+            "text": "en",
+            "start": 2.25,
+            "end": 2.3214
+          },
+          {
+            "text": "vender",
+            "start": 2.3929,
+            "end": 2.6547
+          },
+          {
+            "text": "los",
+            "start": 2.6547,
+            "end": 2.7976
+          },
+          {
+            "text": "recortes",
+            "start": 2.8214,
+            "end": 3.5357
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3238
+          },
+          {
+            "text": "espera",
+            "start": 0.3238,
+            "end": 0.669
+          },
+          {
+            "text": "encontrar",
+            "start": 0.669,
+            "end": 1.0857
+          },
+          {
+            "text": "pruebas",
+            "start": 1.181,
+            "end": 1.5262
+          },
+          {
+            "text": "o",
+            "start": 1.5738,
+            "end": 1.6452
+          },
+          {
+            "text": "una",
+            "start": 1.6929,
+            "end": 1.8238
+          },
+          {
+            "text": "explicación",
+            "start": 1.8238,
+            "end": 2.4905
+          },
+          {
+            "text": "de",
+            "start": 2.5381,
+            "end": 2.5857
+          },
+          {
+            "text": "lo",
+            "start": 2.6214,
+            "end": 2.7047
+          },
+          {
+            "text": "que",
+            "start": 2.7643,
+            "end": 2.8238
+          },
+          {
+            "text": "le",
+            "start": 2.8595,
+            "end": 2.919
+          },
+          {
+            "text": "ocurrió",
+            "start": 2.919,
+            "end": 3.3119
+          },
+          {
+            "text": "a",
+            "start": 3.3119,
+            "end": 3.3595
+          },
+          {
+            "text": "Javier",
+            "start": 3.3833,
+            "end": 3.7881
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Federica",
+            "start": 1.5595,
+            "end": 2.0952
+          },
+          {
+            "text": "toma",
+            "start": 2.1786,
+            "end": 2.369
+          },
+          {
+            "text": "en",
+            "start": 2.381,
+            "end": 2.4762
+          },
+          {
+            "text": "serio",
+            "start": 2.5,
+            "end": 2.7619
+          },
+          {
+            "text": "el",
+            "start": 2.7619,
+            "end": 2.8215
+          },
+          {
+            "text": "relato",
+            "start": 2.8333,
+            "end": 3.2976
+          },
+          {
+            "text": "y",
+            "start": 3.3571,
+            "end": 3.4405
+          },
+          {
+            "text": "busca",
+            "start": 3.4643,
+            "end": 3.8095
+          },
+          {
+            "text": "en",
+            "start": 3.8095,
+            "end": 3.881
+          },
+          {
+            "text": "los",
+            "start": 3.881,
+            "end": 4.0119
+          },
+          {
+            "text": "recortes",
+            "start": 4.0238,
+            "end": 4.5238
+          },
+          {
+            "text": "una",
+            "start": 4.5595,
+            "end": 4.6905
+          },
+          {
+            "text": "clave",
+            "start": 4.75,
+            "end": 5
+          },
+          {
+            "text": "que",
+            "start": 5.0595,
+            "end": 5.1191
+          },
+          {
+            "text": "permita",
+            "start": 5.1786,
+            "end": 5.5119
+          },
+          {
+            "text": "comprender",
+            "start": 5.5595,
+            "end": 6.0119
+          },
+          {
+            "text": "el",
+            "start": 6.0119,
+            "end": 6.1072
+          },
+          {
+            "text": "viaje",
+            "start": 6.131,
+            "end": 6.5476
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3476
+          },
+          {
+            "text": "necesita",
+            "start": 0.3833,
+            "end": 0.8357
+          },
+          {
+            "text": "preparar",
+            "start": 0.8952,
+            "end": 1.2881
+          },
+          {
+            "text": "una",
+            "start": 1.3,
+            "end": 1.4547
+          },
+          {
+            "text": "tarea",
+            "start": 1.5262,
+            "end": 1.7643
+          },
+          {
+            "text": "de",
+            "start": 1.8,
+            "end": 1.8714
+          },
+          {
+            "text": "Geografía",
+            "start": 1.8953,
+            "end": 2.5738
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "La",
+            "start": 1.25,
+            "end": 1.4167
+          },
+          {
+            "text": "búsqueda",
+            "start": 1.4524,
+            "end": 1.8571
+          },
+          {
+            "text": "se",
+            "start": 1.881,
+            "end": 1.9881
+          },
+          {
+            "text": "relaciona",
+            "start": 2.0238,
+            "end": 2.5119
+          },
+          {
+            "text": "con",
+            "start": 2.5595,
+            "end": 2.6667
+          },
+          {
+            "text": "el",
+            "start": 2.6905,
+            "end": 2.7857
+          },
+          {
+            "text": "viaje",
+            "start": 2.8095,
+            "end": 3.119
+          },
+          {
+            "text": "en",
+            "start": 3.119,
+            "end": 3.1786
+          },
+          {
+            "text": "el",
+            "start": 3.2024,
+            "end": 3.3333
+          },
+          {
+            "text": "tiempo",
+            "start": 3.369,
+            "end": 3.7738
+          },
+          {
+            "text": "no",
+            "start": 4.0833,
+            "end": 4.2381
+          },
+          {
+            "text": "con",
+            "start": 4.2976,
+            "end": 4.4167
+          },
+          {
+            "text": "una",
+            "start": 4.4405,
+            "end": 4.5952
+          },
+          {
+            "text": "tarea",
+            "start": 4.6667,
+            "end": 4.9047
+          },
+          {
+            "text": "de",
+            "start": 4.9524,
+            "end": 5.0119
+          },
+          {
+            "text": "clase",
+            "start": 5.0595,
+            "end": 5.4286
+          }
+        ]
+      }
+    ]
+  },
+  "qz011_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2405
+          },
+          {
+            "text": "qué",
+            "start": 0.3119,
+            "end": 0.3833
+          },
+          {
+            "text": "Federica",
+            "start": 0.419,
+            "end": 0.8952
+          },
+          {
+            "text": "propone",
+            "start": 0.9667,
+            "end": 1.3595
+          },
+          {
+            "text": "revisar",
+            "start": 1.3953,
+            "end": 1.7881
+          },
+          {
+            "text": "los",
+            "start": 1.7881,
+            "end": 1.919
+          },
+          {
+            "text": "recortes",
+            "start": 1.9429,
+            "end": 2.4072
+          },
+          {
+            "text": "del",
+            "start": 2.419,
+            "end": 2.4905
+          },
+          {
+            "text": "altillo",
+            "start": 2.5024,
+            "end": 2.9071
+          },
+          {
+            "text": "después",
+            "start": 2.9548,
+            "end": 3.2524
+          },
+          {
+            "text": "de",
+            "start": 3.2643,
+            "end": 3.3
+          },
+          {
+            "text": "escuchar",
+            "start": 3.3,
+            "end": 3.6929
+          },
+          {
+            "text": "a",
+            "start": 3.6929,
+            "end": 3.7524
+          },
+          {
+            "text": "Javier",
+            "start": 3.7762,
+            "end": 4.1929
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Escucha",
+            "start": 0.0976,
+            "end": 0.5857
+          },
+          {
+            "text": "un",
+            "start": 0.5976,
+            "end": 0.6929
+          },
+          {
+            "text": "relato",
+            "start": 0.7286,
+            "end": 1.05
+          },
+          {
+            "text": "increíble",
+            "start": 1.05,
+            "end": 1.5857
+          },
+          {
+            "text": "sin",
+            "start": 1.6214,
+            "end": 1.8119
+          },
+          {
+            "text": "burlarse",
+            "start": 1.8714,
+            "end": 2.419
+          },
+          {
+            "text": "y",
+            "start": 2.4667,
+            "end": 2.55
+          },
+          {
+            "text": "ayuda",
+            "start": 2.5619,
+            "end": 2.9071
+          },
+          {
+            "text": "a",
+            "start": 2.9071,
+            "end": 2.9309
+          },
+          {
+            "text": "buscar",
+            "start": 2.9667,
+            "end": 3.2881
+          },
+          {
+            "text": "evidencias",
+            "start": 3.2881,
+            "end": 4.0976
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Federica",
+            "start": 1.5595,
+            "end": 2.0476
+          },
+          {
+            "text": "combina",
+            "start": 2.1071,
+            "end": 2.4642
+          },
+          {
+            "text": "confianza",
+            "start": 2.5119,
+            "end": 3.1667
+          },
+          {
+            "text": "escucha",
+            "start": 3.4405,
+            "end": 3.8928
+          },
+          {
+            "text": "y",
+            "start": 3.9167,
+            "end": 3.9881
+          },
+          {
+            "text": "una",
+            "start": 4,
+            "end": 4.1429
+          },
+          {
+            "text": "búsqueda",
+            "start": 4.1786,
+            "end": 4.5833
+          },
+          {
+            "text": "razonada",
+            "start": 4.619,
+            "end": 5.0714
+          },
+          {
+            "text": "de",
+            "start": 5.1429,
+            "end": 5.2024
+          },
+          {
+            "text": "pruebas",
+            "start": 5.2738,
+            "end": 5.8095
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Se",
+            "start": 0.0976,
+            "end": 0.2762
+          },
+          {
+            "text": "interesa",
+            "start": 0.2881,
+            "end": 0.7524
+          },
+          {
+            "text": "solamente",
+            "start": 0.7881,
+            "end": 1.2881
+          },
+          {
+            "text": "por",
+            "start": 1.3595,
+            "end": 1.4667
+          },
+          {
+            "text": "conocer",
+            "start": 1.5143,
+            "end": 1.9071
+          },
+          {
+            "text": "a",
+            "start": 1.9071,
+            "end": 1.9667
+          },
+          {
+            "text": "los",
+            "start": 1.9905,
+            "end": 2.0738
+          },
+          {
+            "text": "gemelos",
+            "start": 2.0857,
+            "end": 2.7047
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Su",
+            "start": 1.25,
+            "end": 1.4286
+          },
+          {
+            "text": "curiosidad",
+            "start": 1.4881,
+            "end": 2.0714
+          },
+          {
+            "text": "por",
+            "start": 2.131,
+            "end": 2.2143
+          },
+          {
+            "text": "los",
+            "start": 2.2262,
+            "end": 2.3333
+          },
+          {
+            "text": "gemelos",
+            "start": 2.3453,
+            "end": 2.8333
+          },
+          {
+            "text": "no",
+            "start": 2.881,
+            "end": 3.0238
+          },
+          {
+            "text": "es",
+            "start": 3.0357,
+            "end": 3.0952
+          },
+          {
+            "text": "la",
+            "start": 3.119,
+            "end": 3.2143
+          },
+          {
+            "text": "mejor",
+            "start": 3.25,
+            "end": 3.5238
+          },
+          {
+            "text": "prueba",
+            "start": 3.6071,
+            "end": 3.8452
+          },
+          {
+            "text": "de",
+            "start": 3.8929,
+            "end": 3.9524
+          },
+          {
+            "text": "apoyo",
+            "start": 3.9643,
+            "end": 4.3333
+          },
+          {
+            "text": "a",
+            "start": 4.3333,
+            "end": 4.3452
+          },
+          {
+            "text": "Javier",
+            "start": 4.381,
+            "end": 4.7857
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Decide",
+            "start": 0.0976,
+            "end": 0.5262
+          },
+          {
+            "text": "que",
+            "start": 0.5857,
+            "end": 0.6452
+          },
+          {
+            "text": "Javier",
+            "start": 0.681,
+            "end": 1.0381
+          },
+          {
+            "text": "está",
+            "start": 1.0381,
+            "end": 1.2881
+          },
+          {
+            "text": "loco",
+            "start": 1.3238,
+            "end": 1.5976
+          },
+          {
+            "text": "antes",
+            "start": 1.5976,
+            "end": 1.8953
+          },
+          {
+            "text": "de",
+            "start": 1.8953,
+            "end": 1.9667
+          },
+          {
+            "text": "revisar",
+            "start": 2.0024,
+            "end": 2.4071
+          },
+          {
+            "text": "lo",
+            "start": 2.4071,
+            "end": 2.4905
+          },
+          {
+            "text": "ocurrido",
+            "start": 2.4905,
+            "end": 3.0262
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Aunque",
+            "start": 1.25,
+            "end": 1.5238
+          },
+          {
+            "text": "considera",
+            "start": 1.5714,
+            "end": 2.0595
+          },
+          {
+            "text": "distintas",
+            "start": 2.1071,
+            "end": 2.5357
+          },
+          {
+            "text": "posibilidades",
+            "start": 2.5833,
+            "end": 3.4643
+          },
+          {
+            "text": "no",
+            "start": 3.7619,
+            "end": 3.9167
+          },
+          {
+            "text": "lo",
+            "start": 3.9524,
+            "end": 4.0119
+          },
+          {
+            "text": "descalifica",
+            "start": 4.0595,
+            "end": 4.7381
+          },
+          {
+            "text": "ni",
+            "start": 4.7857,
+            "end": 4.881
+          },
+          {
+            "text": "lo",
+            "start": 4.9167,
+            "end": 4.9881
+          },
+          {
+            "text": "abandona",
+            "start": 4.9881,
+            "end": 5.5476
+          }
+        ]
+      }
+    ]
+  },
+  "qz012_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2286
+          },
+          {
+            "text": "conducta",
+            "start": 0.2881,
+            "end": 0.669
+          },
+          {
+            "text": "de",
+            "start": 0.7167,
+            "end": 0.7524
+          },
+          {
+            "text": "Federica",
+            "start": 0.7762,
+            "end": 1.2524
+          },
+          {
+            "text": "demuestra",
+            "start": 1.3,
+            "end": 1.681
+          },
+          {
+            "text": "mejor",
+            "start": 1.7167,
+            "end": 2.0619
+          },
+          {
+            "text": "que",
+            "start": 2.1333,
+            "end": 2.2047
+          },
+          {
+            "text": "es",
+            "start": 2.2048,
+            "end": 2.3119
+          },
+          {
+            "text": "una",
+            "start": 2.3476,
+            "end": 2.4667
+          },
+          {
+            "text": "amiga",
+            "start": 2.4667,
+            "end": 2.7524
+          },
+          {
+            "text": "confiable",
+            "start": 2.8119,
+            "end": 3.419
+          }
+        ]
+      }
+    ]
+  },
+  "qz013_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Que",
+            "start": 0.0976,
+            "end": 0.1929
+          },
+          {
+            "text": "es",
+            "start": 0.1929,
+            "end": 0.3715
+          },
+          {
+            "text": "una",
+            "start": 0.4071,
+            "end": 0.4905
+          },
+          {
+            "text": "impostora",
+            "start": 0.4905,
+            "end": 1.1214
+          }
+        ]
+      }
+    ]
+  },
+  "qz013_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Los",
+            "start": 1.5595,
+            "end": 1.7619
+          },
+          {
+            "text": "datos",
+            "start": 1.7619,
+            "end": 2.0476
+          },
+          {
+            "text": "históricos",
+            "start": 2.0476,
+            "end": 2.5833
+          },
+          {
+            "text": "que",
+            "start": 2.5953,
+            "end": 2.631
+          },
+          {
+            "text": "encuentra",
+            "start": 2.631,
+            "end": 3.0357
+          },
+          {
+            "text": "Federica",
+            "start": 3.0714,
+            "end": 3.5833
+          },
+          {
+            "text": "no",
+            "start": 3.631,
+            "end": 3.7262
+          },
+          {
+            "text": "coinciden",
+            "start": 3.7857,
+            "end": 4.2976
+          },
+          {
+            "text": "con",
+            "start": 4.2976,
+            "end": 4.4047
+          },
+          {
+            "text": "el",
+            "start": 4.4286,
+            "end": 4.5119
+          },
+          {
+            "text": "relato",
+            "start": 4.5357,
+            "end": 4.9047
+          },
+          {
+            "text": "de",
+            "start": 4.9643,
+            "end": 4.9762
+          },
+          {
+            "text": "la",
+            "start": 5.0119,
+            "end": 5.0833
+          },
+          {
+            "text": "mujer",
+            "start": 5.1071,
+            "end": 5.4167
+          },
+          {
+            "text": "del",
+            "start": 5.4524,
+            "end": 5.5595
+          },
+          {
+            "text": "barco",
+            "start": 5.5833,
+            "end": 5.9762
+          }
+        ]
+      }
+    ]
+  },
+  "qz013_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2167
+          },
+          {
+            "text": "descubre",
+            "start": 0.2643,
+            "end": 0.669
+          },
+          {
+            "text": "Federica",
+            "start": 0.6929,
+            "end": 1.181
+          },
+          {
+            "text": "al",
+            "start": 1.181,
+            "end": 1.2524
+          },
+          {
+            "text": "investigar",
+            "start": 1.2643,
+            "end": 1.7881
+          },
+          {
+            "text": "a",
+            "start": 1.7881,
+            "end": 1.8476
+          },
+          {
+            "text": "la",
+            "start": 1.8714,
+            "end": 1.9428
+          },
+          {
+            "text": "mujer",
+            "start": 1.9786,
+            "end": 2.3238
+          },
+          {
+            "text": "que",
+            "start": 2.3714,
+            "end": 2.431
+          },
+          {
+            "text": "dice",
+            "start": 2.4786,
+            "end": 2.681
+          },
+          {
+            "text": "ser",
+            "start": 2.7167,
+            "end": 2.8714
+          },
+          {
+            "text": "Josephine",
+            "start": 2.8952,
+            "end": 3.3238
+          },
+          {
+            "text": "Baker",
+            "start": 3.3714,
+            "end": 3.7285
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3476
+          },
+          {
+            "text": "quiere",
+            "start": 0.419,
+            "end": 0.5976
+          },
+          {
+            "text": "usarlo",
+            "start": 0.5976,
+            "end": 0.9786
+          },
+          {
+            "text": "solamente",
+            "start": 1.0024,
+            "end": 1.5262
+          },
+          {
+            "text": "para",
+            "start": 1.5976,
+            "end": 1.7524
+          },
+          {
+            "text": "sacar",
+            "start": 1.7762,
+            "end": 2.0619
+          },
+          {
+            "text": "fotografías",
+            "start": 2.0976,
+            "end": 3.0143
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Las",
+            "start": 1.25,
+            "end": 1.4047
+          },
+          {
+            "text": "fotografías",
+            "start": 1.4286,
+            "end": 2.0833
+          },
+          {
+            "text": "son",
+            "start": 2.0833,
+            "end": 2.2619
+          },
+          {
+            "text": "útiles",
+            "start": 2.2857,
+            "end": 2.7976
+          },
+          {
+            "text": "pero",
+            "start": 3.0357,
+            "end": 3.1905
+          },
+          {
+            "text": "no",
+            "start": 3.2262,
+            "end": 3.3333
+          },
+          {
+            "text": "son",
+            "start": 3.3571,
+            "end": 3.5238
+          },
+          {
+            "text": "la",
+            "start": 3.5357,
+            "end": 3.6428
+          },
+          {
+            "text": "razón",
+            "start": 3.6786,
+            "end": 3.9881
+          },
+          {
+            "text": "principal",
+            "start": 4.0238,
+            "end": 4.6071
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3238
+          },
+          {
+            "text": "el",
+            "start": 0.3238,
+            "end": 0.419
+          },
+          {
+            "text": "celular",
+            "start": 0.4429,
+            "end": 0.8595
+          },
+          {
+            "text": "le",
+            "start": 0.8833,
+            "end": 0.9786
+          },
+          {
+            "text": "permite",
+            "start": 1.05,
+            "end": 1.3714
+          },
+          {
+            "text": "mantener",
+            "start": 1.4071,
+            "end": 1.8119
+          },
+          {
+            "text": "el",
+            "start": 1.8119,
+            "end": 1.931
+          },
+          {
+            "text": "contacto",
+            "start": 1.9547,
+            "end": 2.3952
+          },
+          {
+            "text": "con",
+            "start": 2.4429,
+            "end": 2.5619
+          },
+          {
+            "text": "Federica",
+            "start": 2.5738,
+            "end": 3.0262
+          },
+          {
+            "text": "a",
+            "start": 3.0262,
+            "end": 3.0738
+          },
+          {
+            "text": "través",
+            "start": 3.1214,
+            "end": 3.3476
+          },
+          {
+            "text": "del",
+            "start": 3.3714,
+            "end": 3.4785
+          },
+          {
+            "text": "tiempo",
+            "start": 3.5262,
+            "end": 3.931
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Sin",
+            "start": 1.5595,
+            "end": 1.8095
+          },
+          {
+            "text": "una",
+            "start": 1.8333,
+            "end": 2.0119
+          },
+          {
+            "text": "forma",
+            "start": 2.0476,
+            "end": 2.3453
+          },
+          {
+            "text": "segura",
+            "start": 2.381,
+            "end": 2.75
+          },
+          {
+            "text": "de",
+            "start": 2.7976,
+            "end": 2.8453
+          },
+          {
+            "text": "cargarlo",
+            "start": 2.9047,
+            "end": 3.4762
+          },
+          {
+            "text": "conservar",
+            "start": 3.7381,
+            "end": 4.1905
+          },
+          {
+            "text": "la",
+            "start": 4.1905,
+            "end": 4.2738
+          },
+          {
+            "text": "batería",
+            "start": 4.3095,
+            "end": 4.7619
+          },
+          {
+            "text": "es",
+            "start": 4.7976,
+            "end": 4.9047
+          },
+          {
+            "text": "esencial",
+            "start": 4.9047,
+            "end": 5.4167
+          },
+          {
+            "text": "para",
+            "start": 5.4762,
+            "end": 5.631
+          },
+          {
+            "text": "recibir",
+            "start": 5.6667,
+            "end": 6.0595
+          },
+          {
+            "text": "información",
+            "start": 6.0595,
+            "end": 6.6905
+          },
+          {
+            "text": "desde",
+            "start": 6.7381,
+            "end": 6.9167
+          },
+          {
+            "text": "2030",
+            "start": 6.9643,
+            "end": 7.8333
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3476
+          },
+          {
+            "text": "teme",
+            "start": 0.419,
+            "end": 0.6214
+          },
+          {
+            "text": "que",
+            "start": 0.681,
+            "end": 0.7047
+          },
+          {
+            "text": "el",
+            "start": 0.7047,
+            "end": 0.8238
+          },
+          {
+            "text": "capitán",
+            "start": 0.8357,
+            "end": 1.2167
+          },
+          {
+            "text": "le",
+            "start": 1.2167,
+            "end": 1.3238
+          },
+          {
+            "text": "cobre",
+            "start": 1.3953,
+            "end": 1.6333
+          },
+          {
+            "text": "por",
+            "start": 1.7047,
+            "end": 1.8119
+          },
+          {
+            "text": "usarlo",
+            "start": 1.8357,
+            "end": 2.3119
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.4047
+          },
+          {
+            "text": "capitán",
+            "start": 1.4286,
+            "end": 1.7857
+          },
+          {
+            "text": "desconoce",
+            "start": 1.8214,
+            "end": 2.3214
+          },
+          {
+            "text": "ese",
+            "start": 2.3571,
+            "end": 2.5238
+          },
+          {
+            "text": "aparato",
+            "start": 2.5357,
+            "end": 3.0595
+          },
+          {
+            "text": "y",
+            "start": 3.119,
+            "end": 3.1905
+          },
+          {
+            "text": "no",
+            "start": 3.2143,
+            "end": 3.3095
+          },
+          {
+            "text": "puede",
+            "start": 3.3929,
+            "end": 3.5833
+          },
+          {
+            "text": "cobrarle",
+            "start": 3.6547,
+            "end": 4.0476
+          },
+          {
+            "text": "por",
+            "start": 4.119,
+            "end": 4.2143
+          },
+          {
+            "text": "su",
+            "start": 4.25,
+            "end": 4.3929
+          },
+          {
+            "text": "uso",
+            "start": 4.4047,
+            "end": 4.7143
+          }
+        ]
+      }
+    ]
+  },
+  "qz014_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "qué",
+            "start": 0.3238,
+            "end": 0.3833
+          },
+          {
+            "text": "Javier",
+            "start": 0.419,
+            "end": 0.7643
+          },
+          {
+            "text": "cuida",
+            "start": 0.8238,
+            "end": 1.0857
+          },
+          {
+            "text": "la",
+            "start": 1.1214,
+            "end": 1.1928
+          },
+          {
+            "text": "batería",
+            "start": 1.2286,
+            "end": 1.6333
+          },
+          {
+            "text": "del",
+            "start": 1.669,
+            "end": 1.8
+          },
+          {
+            "text": "celular",
+            "start": 1.8119,
+            "end": 2.2286
+          },
+          {
+            "text": "durante",
+            "start": 2.2643,
+            "end": 2.5976
+          },
+          {
+            "text": "el",
+            "start": 2.5976,
+            "end": 2.681
+          },
+          {
+            "text": "viaje",
+            "start": 2.7048,
+            "end": 3.1214
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Federica",
+            "start": 0.0988,
+            "end": 0.5988
+          },
+          {
+            "text": "compara",
+            "start": 0.6583,
+            "end": 1.0274
+          },
+          {
+            "text": "fechas",
+            "start": 1.0512,
+            "end": 1.4679
+          },
+          {
+            "text": "y",
+            "start": 1.4797,
+            "end": 1.5155
+          },
+          {
+            "text": "datos",
+            "start": 1.5512,
+            "end": 1.825
+          },
+          {
+            "text": "de",
+            "start": 1.8369,
+            "end": 1.8965
+          },
+          {
+            "text": "Josephine",
+            "start": 1.9083,
+            "end": 2.3726
+          },
+          {
+            "text": "Baker",
+            "start": 2.4321,
+            "end": 2.7298
+          },
+          {
+            "text": "antes",
+            "start": 2.7298,
+            "end": 3.0155
+          },
+          {
+            "text": "de",
+            "start": 3.0274,
+            "end": 3.075
+          },
+          {
+            "text": "advertir",
+            "start": 3.075,
+            "end": 3.5155
+          },
+          {
+            "text": "a",
+            "start": 3.5155,
+            "end": 3.575
+          },
+          {
+            "text": "Javier",
+            "start": 3.5988,
+            "end": 4.0035
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "La",
+            "start": 1.5595,
+            "end": 1.7262
+          },
+          {
+            "text": "verificación",
+            "start": 1.7619,
+            "end": 2.3929
+          },
+          {
+            "text": "de",
+            "start": 2.4286,
+            "end": 2.4881
+          },
+          {
+            "text": "fuentes",
+            "start": 2.5119,
+            "end": 2.8572
+          },
+          {
+            "text": "convierte",
+            "start": 2.9047,
+            "end": 3.3333
+          },
+          {
+            "text": "una",
+            "start": 3.369,
+            "end": 3.5238
+          },
+          {
+            "text": "sospecha",
+            "start": 3.5595,
+            "end": 4.0238
+          },
+          {
+            "text": "en",
+            "start": 4.0238,
+            "end": 4.0833
+          },
+          {
+            "text": "información",
+            "start": 4.1071,
+            "end": 4.7142
+          },
+          {
+            "text": "útil",
+            "start": 4.7619,
+            "end": 5.0119
+          },
+          {
+            "text": "para",
+            "start": 5.0714,
+            "end": 5.2024
+          },
+          {
+            "text": "actuar",
+            "start": 5.2024,
+            "end": 5.5953
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Javier",
+            "start": 0.0976,
+            "end": 0.5262
+          },
+          {
+            "text": "esconde",
+            "start": 0.5262,
+            "end": 0.919
+          },
+          {
+            "text": "el",
+            "start": 0.919,
+            "end": 1.0024
+          },
+          {
+            "text": "celular",
+            "start": 1.0143,
+            "end": 1.4667
+          },
+          {
+            "text": "cada",
+            "start": 1.5024,
+            "end": 1.6571
+          },
+          {
+            "text": "vez",
+            "start": 1.6929,
+            "end": 1.8952
+          },
+          {
+            "text": "que",
+            "start": 1.919,
+            "end": 2.0024
+          },
+          {
+            "text": "alguien",
+            "start": 2.0143,
+            "end": 2.3357
+          },
+          {
+            "text": "pasa",
+            "start": 2.3476,
+            "end": 2.5381
+          },
+          {
+            "text": "cerca",
+            "start": 2.5738,
+            "end": 2.9905
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Esa",
+            "start": 1.25,
+            "end": 1.5238
+          },
+          {
+            "text": "acción",
+            "start": 1.5357,
+            "end": 1.881
+          },
+          {
+            "text": "lo",
+            "start": 1.8929,
+            "end": 1.9881
+          },
+          {
+            "text": "protege",
+            "start": 2.0476,
+            "end": 2.5357
+          },
+          {
+            "text": "pero",
+            "start": 2.8453,
+            "end": 3
+          },
+          {
+            "text": "no",
+            "start": 3.0238,
+            "end": 3.119
+          },
+          {
+            "text": "depende",
+            "start": 3.1667,
+            "end": 3.5238
+          },
+          {
+            "text": "de",
+            "start": 3.5714,
+            "end": 3.6428
+          },
+          {
+            "text": "una",
+            "start": 3.6905,
+            "end": 3.8095
+          },
+          {
+            "text": "investigación",
+            "start": 3.8095,
+            "end": 4.4881
+          },
+          {
+            "text": "histórica",
+            "start": 4.5,
+            "end": 5.0833
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Los",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "gemelos",
+            "start": 0.2643,
+            "end": 0.7047
+          },
+          {
+            "text": "observan",
+            "start": 0.7047,
+            "end": 1.1452
+          },
+          {
+            "text": "el",
+            "start": 1.169,
+            "end": 1.2643
+          },
+          {
+            "text": "mar",
+            "start": 1.2881,
+            "end": 1.4667
+          },
+          {
+            "text": "desde",
+            "start": 1.5024,
+            "end": 1.6928
+          },
+          {
+            "text": "la",
+            "start": 1.7286,
+            "end": 1.8
+          },
+          {
+            "text": "cubierta",
+            "start": 1.8714,
+            "end": 2.3714
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Contemplar",
+            "start": 1.25,
+            "end": 1.7619
+          },
+          {
+            "text": "el",
+            "start": 1.7619,
+            "end": 1.869
+          },
+          {
+            "text": "mar",
+            "start": 1.8929,
+            "end": 2.0715
+          },
+          {
+            "text": "no",
+            "start": 2.1071,
+            "end": 2.2142
+          },
+          {
+            "text": "aporta",
+            "start": 2.2143,
+            "end": 2.5595
+          },
+          {
+            "text": "evidencia",
+            "start": 2.5595,
+            "end": 3.0715
+          },
+          {
+            "text": "para",
+            "start": 3.1429,
+            "end": 3.2976
+          },
+          {
+            "text": "resolver",
+            "start": 3.3214,
+            "end": 3.7143
+          },
+          {
+            "text": "el",
+            "start": 3.7143,
+            "end": 3.8214
+          },
+          {
+            "text": "conflicto",
+            "start": 3.8453,
+            "end": 4.3929
+          }
+        ]
+      }
+    ]
+  },
+  "qz015_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2167
+          },
+          {
+            "text": "acción",
+            "start": 0.2167,
+            "end": 0.5738
+          },
+          {
+            "text": "muestra",
+            "start": 0.6095,
+            "end": 0.9191
+          },
+          {
+            "text": "mejor",
+            "start": 0.9547,
+            "end": 1.3119
+          },
+          {
+            "text": "cómo",
+            "start": 1.3595,
+            "end": 1.5262
+          },
+          {
+            "text": "la",
+            "start": 1.5738,
+            "end": 1.6214
+          },
+          {
+            "text": "investigación",
+            "start": 1.6333,
+            "end": 2.3
+          },
+          {
+            "text": "histórica",
+            "start": 2.3119,
+            "end": 2.8
+          },
+          {
+            "text": "orienta",
+            "start": 2.8,
+            "end": 3.1452
+          },
+          {
+            "text": "las",
+            "start": 3.169,
+            "end": 3.3
+          },
+          {
+            "text": "decisiones",
+            "start": 3.3,
+            "end": 3.8119
+          },
+          {
+            "text": "de",
+            "start": 3.8238,
+            "end": 3.8714
+          },
+          {
+            "text": "los",
+            "start": 3.8952,
+            "end": 3.9905
+          },
+          {
+            "text": "personajes",
+            "start": 4.05,
+            "end": 4.8357
+          }
+        ]
+      }
+    ]
+  },
+  "qz016_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "El",
+            "start": 0.0982,
+            "end": 0.2172
+          },
+          {
+            "text": "Rumano",
+            "start": 0.2411,
+            "end": 0.7292
+          }
+        ]
+      }
+    ]
+  },
+  "qz016_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "El",
+            "start": 1.5595,
+            "end": 1.7024
+          },
+          {
+            "text": "Rumano",
+            "start": 1.7262,
+            "end": 2.0952
+          },
+          {
+            "text": "les",
+            "start": 2.119,
+            "end": 2.2619
+          },
+          {
+            "text": "transmite",
+            "start": 2.2738,
+            "end": 2.7262
+          },
+          {
+            "text": "la",
+            "start": 2.7619,
+            "end": 2.8214
+          },
+          {
+            "text": "advertencia",
+            "start": 2.8214,
+            "end": 3.4762
+          },
+          {
+            "text": "y",
+            "start": 3.4762,
+            "end": 3.5119
+          },
+          {
+            "text": "les",
+            "start": 3.5357,
+            "end": 3.6905
+          },
+          {
+            "text": "pide",
+            "start": 3.7619,
+            "end": 3.9643
+          },
+          {
+            "text": "que",
+            "start": 4.0357,
+            "end": 4.1071
+          },
+          {
+            "text": "hablen",
+            "start": 4.119,
+            "end": 4.4524
+          },
+          {
+            "text": "con",
+            "start": 4.4524,
+            "end": 4.5595
+          },
+          {
+            "text": "el",
+            "start": 4.5714,
+            "end": 4.6905
+          },
+          {
+            "text": "capitán",
+            "start": 4.7024,
+            "end": 5.2262
+          }
+        ]
+      }
+    ]
+  },
+  "qz016_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Quién",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "les",
+            "start": 0.3119,
+            "end": 0.5024
+          },
+          {
+            "text": "advierte",
+            "start": 0.5024,
+            "end": 0.931
+          },
+          {
+            "text": "que",
+            "start": 0.9786,
+            "end": 1.0262
+          },
+          {
+            "text": "existe",
+            "start": 1.0262,
+            "end": 1.4072
+          },
+          {
+            "text": "un",
+            "start": 1.419,
+            "end": 1.55
+          },
+          {
+            "text": "plan",
+            "start": 1.5738,
+            "end": 1.8238
+          },
+          {
+            "text": "para",
+            "start": 1.8357,
+            "end": 1.9786
+          },
+          {
+            "text": "asesinar",
+            "start": 1.9786,
+            "end": 2.5024
+          },
+          {
+            "text": "al",
+            "start": 2.5024,
+            "end": 2.6095
+          },
+          {
+            "text": "rey",
+            "start": 2.6333,
+            "end": 2.8
+          },
+          {
+            "text": "Carol",
+            "start": 2.8476,
+            "end": 3.1214
+          },
+          {
+            "text": "II",
+            "start": 3.169,
+            "end": 3.5024
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3595
+          },
+          {
+            "text": "es",
+            "start": 0.3595,
+            "end": 0.4667
+          },
+          {
+            "text": "la",
+            "start": 0.4905,
+            "end": 0.5738
+          },
+          {
+            "text": "persona",
+            "start": 0.6452,
+            "end": 0.9905
+          },
+          {
+            "text": "con",
+            "start": 1.0381,
+            "end": 1.1333
+          },
+          {
+            "text": "autoridad",
+            "start": 1.1453,
+            "end": 1.7048
+          },
+          {
+            "text": "para",
+            "start": 1.7524,
+            "end": 1.8953
+          },
+          {
+            "text": "proteger",
+            "start": 1.9547,
+            "end": 2.3714
+          },
+          {
+            "text": "al",
+            "start": 2.3714,
+            "end": 2.5024
+          },
+          {
+            "text": "rey",
+            "start": 2.5262,
+            "end": 2.7762
+          },
+          {
+            "text": "y",
+            "start": 2.7762,
+            "end": 2.8357
+          },
+          {
+            "text": "actuar",
+            "start": 2.8714,
+            "end": 3.1928
+          },
+          {
+            "text": "dentro",
+            "start": 3.2286,
+            "end": 3.4905
+          },
+          {
+            "text": "del",
+            "start": 3.55,
+            "end": 3.6333
+          },
+          {
+            "text": "barco",
+            "start": 3.6571,
+            "end": 4.0381
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "El",
+            "start": 1.5595,
+            "end": 1.7024
+          },
+          {
+            "text": "peligro",
+            "start": 1.7738,
+            "end": 2.1309
+          },
+          {
+            "text": "es",
+            "start": 2.131,
+            "end": 2.2381
+          },
+          {
+            "text": "urgente",
+            "start": 2.2619,
+            "end": 2.6905
+          },
+          {
+            "text": "y",
+            "start": 2.7143,
+            "end": 2.7857
+          },
+          {
+            "text": "el",
+            "start": 2.7857,
+            "end": 2.9047
+          },
+          {
+            "text": "capitán",
+            "start": 2.9167,
+            "end": 3.3571
+          },
+          {
+            "text": "puede",
+            "start": 3.381,
+            "end": 3.5476
+          },
+          {
+            "text": "movilizar",
+            "start": 3.5833,
+            "end": 4.0952
+          },
+          {
+            "text": "a",
+            "start": 4.0953,
+            "end": 4.1548
+          },
+          {
+            "text": "la",
+            "start": 4.1786,
+            "end": 4.2619
+          },
+          {
+            "text": "tripulación",
+            "start": 4.3214,
+            "end": 5.0357
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "quieren",
+            "start": 0.4071,
+            "end": 0.6809
+          },
+          {
+            "text": "que",
+            "start": 0.6929,
+            "end": 0.7405
+          },
+          {
+            "text": "los",
+            "start": 0.7762,
+            "end": 0.9072
+          },
+          {
+            "text": "deje",
+            "start": 0.919,
+            "end": 1.1333
+          },
+          {
+            "text": "manejar",
+            "start": 1.169,
+            "end": 1.5857
+          },
+          {
+            "text": "el",
+            "start": 1.5857,
+            "end": 1.6928
+          },
+          {
+            "text": "Conte",
+            "start": 1.7286,
+            "end": 1.9786
+          },
+          {
+            "text": "Verde",
+            "start": 2.0143,
+            "end": 2.3833
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Nunca",
+            "start": 1.25,
+            "end": 1.619
+          },
+          {
+            "text": "pretenden",
+            "start": 1.6905,
+            "end": 2.0952
+          },
+          {
+            "text": "dirigir",
+            "start": 2.131,
+            "end": 2.5119
+          },
+          {
+            "text": "el",
+            "start": 2.5119,
+            "end": 2.619
+          },
+          {
+            "text": "barco",
+            "start": 2.6429,
+            "end": 3.0476
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "desean",
+            "start": 0.3952,
+            "end": 0.7167
+          },
+          {
+            "text": "recibir",
+            "start": 0.7524,
+            "end": 1.169
+          },
+          {
+            "text": "una",
+            "start": 1.169,
+            "end": 1.3357
+          },
+          {
+            "text": "recompensa",
+            "start": 1.3595,
+            "end": 1.9191
+          },
+          {
+            "text": "económica",
+            "start": 1.931,
+            "end": 2.5381
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Actúan",
+            "start": 1.25,
+            "end": 1.75
+          },
+          {
+            "text": "para",
+            "start": 1.7619,
+            "end": 1.8929
+          },
+          {
+            "text": "evitar",
+            "start": 1.8929,
+            "end": 2.2262
+          },
+          {
+            "text": "el",
+            "start": 2.2262,
+            "end": 2.3572
+          },
+          {
+            "text": "crimen",
+            "start": 2.3929,
+            "end": 2.8572
+          },
+          {
+            "text": "no",
+            "start": 3.119,
+            "end": 3.2857
+          },
+          {
+            "text": "para",
+            "start": 3.3453,
+            "end": 3.5
+          },
+          {
+            "text": "ganar",
+            "start": 3.5357,
+            "end": 3.7619
+          },
+          {
+            "text": "dinero",
+            "start": 3.7976,
+            "end": 4.2143
+          }
+        ]
+      }
+    ]
+  },
+  "qz017_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "qué",
+            "start": 0.3238,
+            "end": 0.3952
+          },
+          {
+            "text": "los",
+            "start": 0.431,
+            "end": 0.5143
+          },
+          {
+            "text": "jóvenes",
+            "start": 0.5262,
+            "end": 0.9667
+          },
+          {
+            "text": "deciden",
+            "start": 0.9786,
+            "end": 1.3952
+          },
+          {
+            "text": "contarle",
+            "start": 1.3953,
+            "end": 1.8238
+          },
+          {
+            "text": "al",
+            "start": 1.8238,
+            "end": 1.9071
+          },
+          {
+            "text": "capitán",
+            "start": 1.931,
+            "end": 2.3238
+          },
+          {
+            "text": "lo",
+            "start": 2.3238,
+            "end": 2.4428
+          },
+          {
+            "text": "que",
+            "start": 2.5024,
+            "end": 2.5619
+          },
+          {
+            "text": "saben",
+            "start": 2.5976,
+            "end": 3.0619
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "La",
+            "start": 0.0976,
+            "end": 0.2405
+          },
+          {
+            "text": "tripulación",
+            "start": 0.3,
+            "end": 0.8476
+          },
+          {
+            "text": "detiene",
+            "start": 0.8833,
+            "end": 1.2047
+          },
+          {
+            "text": "a",
+            "start": 1.2167,
+            "end": 1.2524
+          },
+          {
+            "text": "los",
+            "start": 1.2762,
+            "end": 1.431
+          },
+          {
+            "text": "implicados",
+            "start": 1.4547,
+            "end": 2.0619
+          },
+          {
+            "text": "y",
+            "start": 2.1095,
+            "end": 2.1572
+          },
+          {
+            "text": "el",
+            "start": 2.169,
+            "end": 2.2881
+          },
+          {
+            "text": "rey",
+            "start": 2.3119,
+            "end": 2.4786
+          },
+          {
+            "text": "continúa",
+            "start": 2.5143,
+            "end": 2.9547
+          },
+          {
+            "text": "con",
+            "start": 3.0143,
+            "end": 3.1214
+          },
+          {
+            "text": "vida",
+            "start": 3.181,
+            "end": 3.5024
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Las",
+            "start": 1.5595,
+            "end": 1.7619
+          },
+          {
+            "text": "detenciones",
+            "start": 1.7738,
+            "end": 2.3928
+          },
+          {
+            "text": "y",
+            "start": 2.4167,
+            "end": 2.4405
+          },
+          {
+            "text": "la",
+            "start": 2.4762,
+            "end": 2.5595
+          },
+          {
+            "text": "seguridad",
+            "start": 2.5833,
+            "end": 3.0595
+          },
+          {
+            "text": "del",
+            "start": 3.0833,
+            "end": 3.2381
+          },
+          {
+            "text": "rey",
+            "start": 3.2619,
+            "end": 3.4286
+          },
+          {
+            "text": "confirman",
+            "start": 3.4762,
+            "end": 4
+          },
+          {
+            "text": "que",
+            "start": 4.0238,
+            "end": 4.0714
+          },
+          {
+            "text": "el",
+            "start": 4.0714,
+            "end": 4.1547
+          },
+          {
+            "text": "peligro",
+            "start": 4.2262,
+            "end": 4.5952
+          },
+          {
+            "text": "era",
+            "start": 4.619,
+            "end": 4.7738
+          },
+          {
+            "text": "real",
+            "start": 4.8095,
+            "end": 5.2024
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Javier",
+            "start": 0.0982,
+            "end": 0.503
+          },
+          {
+            "text": "se",
+            "start": 0.5387,
+            "end": 0.6577
+          },
+          {
+            "text": "queda",
+            "start": 0.7292,
+            "end": 0.9077
+          },
+          {
+            "text": "sin",
+            "start": 0.9435,
+            "end": 1.1339
+          },
+          {
+            "text": "batería",
+            "start": 1.1815,
+            "end": 1.5982
+          },
+          {
+            "text": "en",
+            "start": 1.5982,
+            "end": 1.6577
+          },
+          {
+            "text": "el",
+            "start": 1.6815,
+            "end": 1.7887
+          },
+          {
+            "text": "celular",
+            "start": 1.8006,
+            "end": 2.2649
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "La",
+            "start": 1.25,
+            "end": 1.4167
+          },
+          {
+            "text": "falta",
+            "start": 1.4524,
+            "end": 1.7262
+          },
+          {
+            "text": "de",
+            "start": 1.7976,
+            "end": 1.8095
+          },
+          {
+            "text": "batería",
+            "start": 1.8453,
+            "end": 2.25
+          },
+          {
+            "text": "aumenta",
+            "start": 2.25,
+            "end": 2.631
+          },
+          {
+            "text": "la",
+            "start": 2.6547,
+            "end": 2.7262
+          },
+          {
+            "text": "tensión",
+            "start": 2.7857,
+            "end": 3.3333
+          },
+          {
+            "text": "pero",
+            "start": 3.6071,
+            "end": 3.7619
+          },
+          {
+            "text": "no",
+            "start": 3.7976,
+            "end": 3.881
+          },
+          {
+            "text": "prueba",
+            "start": 3.9524,
+            "end": 4.1547
+          },
+          {
+            "text": "la",
+            "start": 4.1905,
+            "end": 4.2619
+          },
+          {
+            "text": "conspiración",
+            "start": 4.3214,
+            "end": 5.1071
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Antonella",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "se",
+            "start": 0.6929,
+            "end": 0.7643
+          },
+          {
+            "text": "esconde",
+            "start": 0.7643,
+            "end": 1.1452
+          },
+          {
+            "text": "debajo",
+            "start": 1.2047,
+            "end": 1.5857
+          },
+          {
+            "text": "de",
+            "start": 1.6333,
+            "end": 1.6929
+          },
+          {
+            "text": "una",
+            "start": 1.7405,
+            "end": 1.8952
+          },
+          {
+            "text": "mesa",
+            "start": 1.931,
+            "end": 2.2881
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Su",
+            "start": 1.25,
+            "end": 1.4524
+          },
+          {
+            "text": "miedo",
+            "start": 1.4881,
+            "end": 1.7381
+          },
+          {
+            "text": "es",
+            "start": 1.7381,
+            "end": 1.8571
+          },
+          {
+            "text": "comprensible",
+            "start": 1.881,
+            "end": 2.6547
+          },
+          {
+            "text": "pero",
+            "start": 2.9881,
+            "end": 3.1428
+          },
+          {
+            "text": "no",
+            "start": 3.1786,
+            "end": 3.2738
+          },
+          {
+            "text": "constituye",
+            "start": 3.3333,
+            "end": 3.881
+          },
+          {
+            "text": "una",
+            "start": 3.9047,
+            "end": 4.0595
+          },
+          {
+            "text": "prueba",
+            "start": 4.131,
+            "end": 4.4762
+          }
+        ]
+      }
+    ]
+  },
+  "qz018_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2286
+          },
+          {
+            "text": "hecho",
+            "start": 0.2286,
+            "end": 0.4548
+          },
+          {
+            "text": "confirma",
+            "start": 0.5024,
+            "end": 0.931
+          },
+          {
+            "text": "con",
+            "start": 0.9905,
+            "end": 1.0976
+          },
+          {
+            "text": "más",
+            "start": 1.1095,
+            "end": 1.2643
+          },
+          {
+            "text": "fuerza",
+            "start": 1.2881,
+            "end": 1.669
+          },
+          {
+            "text": "que",
+            "start": 1.7286,
+            "end": 1.7762
+          },
+          {
+            "text": "la",
+            "start": 1.8119,
+            "end": 1.8715
+          },
+          {
+            "text": "advertencia",
+            "start": 1.8833,
+            "end": 2.5024
+          },
+          {
+            "text": "sobre",
+            "start": 2.5262,
+            "end": 2.7524
+          },
+          {
+            "text": "la",
+            "start": 2.7881,
+            "end": 2.8714
+          },
+          {
+            "text": "conspiración",
+            "start": 2.931,
+            "end": 3.6214
+          },
+          {
+            "text": "era",
+            "start": 3.6452,
+            "end": 3.8119
+          },
+          {
+            "text": "verdadera",
+            "start": 3.8476,
+            "end": 4.3952
+          }
+        ]
+      }
+    ]
+  },
+  "qz019_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Vanja",
+            "start": 0.0988,
+            "end": 0.5631
+          }
+        ]
+      }
+    ]
+  },
+  "qz019_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Federica",
+            "start": 1.5595,
+            "end": 2.131
+          },
+          {
+            "text": "elige",
+            "start": 2.1667,
+            "end": 2.4286
+          },
+          {
+            "text": "el",
+            "start": 2.4286,
+            "end": 2.5
+          },
+          {
+            "text": "nombre",
+            "start": 2.5238,
+            "end": 2.8095
+          },
+          {
+            "text": "Vanja",
+            "start": 2.8453,
+            "end": 3.2619
+          },
+          {
+            "text": "y",
+            "start": 3.3095,
+            "end": 3.3691
+          },
+          {
+            "text": "dice",
+            "start": 3.4047,
+            "end": 3.6667
+          },
+          {
+            "text": "que",
+            "start": 3.7262,
+            "end": 3.7976
+          },
+          {
+            "text": "tiene",
+            "start": 3.8571,
+            "end": 4.0595
+          },
+          {
+            "text": "antepasados",
+            "start": 4.0595,
+            "end": 4.6429
+          },
+          {
+            "text": "rusos",
+            "start": 4.6667,
+            "end": 5.2381
+          }
+        ]
+      }
+    ]
+  },
+  "qz019_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2167
+          },
+          {
+            "text": "nombre",
+            "start": 0.2643,
+            "end": 0.5381
+          },
+          {
+            "text": "usa",
+            "start": 0.5619,
+            "end": 0.7405
+          },
+          {
+            "text": "Federica",
+            "start": 0.7762,
+            "end": 1.2524
+          },
+          {
+            "text": "para",
+            "start": 1.3238,
+            "end": 1.4667
+          },
+          {
+            "text": "presentarse",
+            "start": 1.5262,
+            "end": 2.0857
+          },
+          {
+            "text": "ante",
+            "start": 2.0976,
+            "end": 2.2762
+          },
+          {
+            "text": "Tomassino",
+            "start": 2.3357,
+            "end": 2.8595
+          },
+          {
+            "text": "y",
+            "start": 2.8952,
+            "end": 2.9429
+          },
+          {
+            "text": "Antonella",
+            "start": 2.9548,
+            "end": 3.4905
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "que",
+            "start": 0.3595,
+            "end": 0.4191
+          },
+          {
+            "text": "pueda",
+            "start": 0.4905,
+            "end": 0.669
+          },
+          {
+            "text": "mezclarse",
+            "start": 0.7047,
+            "end": 1.1928
+          },
+          {
+            "text": "con",
+            "start": 1.2405,
+            "end": 1.3357
+          },
+          {
+            "text": "los",
+            "start": 1.3357,
+            "end": 1.4547
+          },
+          {
+            "text": "pasajeros",
+            "start": 1.5024,
+            "end": 2.0024
+          },
+          {
+            "text": "de",
+            "start": 2.0262,
+            "end": 2.0857
+          },
+          {
+            "text": "1930",
+            "start": 2.1214,
+            "end": 3.2524
+          },
+          {
+            "text": "sin",
+            "start": 3.2881,
+            "end": 3.4667
+          },
+          {
+            "text": "revelar",
+            "start": 3.5024,
+            "end": 3.8595
+          },
+          {
+            "text": "de",
+            "start": 3.8952,
+            "end": 3.9667
+          },
+          {
+            "text": "dónde",
+            "start": 4.0143,
+            "end": 4.2405
+          },
+          {
+            "text": "viene",
+            "start": 4.2762,
+            "end": 4.6572
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "La",
+            "start": 1.5595,
+            "end": 1.6905
+          },
+          {
+            "text": "identidad",
+            "start": 1.7262,
+            "end": 2.1786
+          },
+          {
+            "text": "inventada",
+            "start": 2.1905,
+            "end": 2.6667
+          },
+          {
+            "text": "reduce",
+            "start": 2.6905,
+            "end": 3.0595
+          },
+          {
+            "text": "el",
+            "start": 3.0595,
+            "end": 3.1548
+          },
+          {
+            "text": "riesgo",
+            "start": 3.1786,
+            "end": 3.5
+          },
+          {
+            "text": "de",
+            "start": 3.5476,
+            "end": 3.6072
+          },
+          {
+            "text": "que",
+            "start": 3.6667,
+            "end": 3.7143
+          },
+          {
+            "text": "sus",
+            "start": 3.75,
+            "end": 3.9286
+          },
+          {
+            "text": "palabras",
+            "start": 3.9524,
+            "end": 4.4286
+          },
+          {
+            "text": "y",
+            "start": 4.4881,
+            "end": 4.5476
+          },
+          {
+            "text": "su",
+            "start": 4.5714,
+            "end": 4.6785
+          },
+          {
+            "text": "procedencia",
+            "start": 4.7262,
+            "end": 5.2619
+          },
+          {
+            "text": "despierten",
+            "start": 5.2976,
+            "end": 5.7738
+          },
+          {
+            "text": "sospechas",
+            "start": 5.7976,
+            "end": 6.5119
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.2881
+          },
+          {
+            "text": "participar",
+            "start": 0.3595,
+            "end": 0.9071
+          },
+          {
+            "text": "en",
+            "start": 0.9071,
+            "end": 0.9905
+          },
+          {
+            "text": "una",
+            "start": 1.0143,
+            "end": 1.1929
+          },
+          {
+            "text": "obra",
+            "start": 1.2286,
+            "end": 1.431
+          },
+          {
+            "text": "de",
+            "start": 1.4786,
+            "end": 1.55
+          },
+          {
+            "text": "teatro",
+            "start": 1.6214,
+            "end": 1.931
+          },
+          {
+            "text": "del",
+            "start": 1.9786,
+            "end": 2.0738
+          },
+          {
+            "text": "barco",
+            "start": 2.0976,
+            "end": 2.5024
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "La",
+            "start": 1.25,
+            "end": 1.4286
+          },
+          {
+            "text": "representación",
+            "start": 1.4643,
+            "end": 2.2262
+          },
+          {
+            "text": "no",
+            "start": 2.2381,
+            "end": 2.3452
+          },
+          {
+            "text": "forma",
+            "start": 2.369,
+            "end": 2.6667
+          },
+          {
+            "text": "parte",
+            "start": 2.75,
+            "end": 3
+          },
+          {
+            "text": "de",
+            "start": 3.0476,
+            "end": 3.1072
+          },
+          {
+            "text": "un",
+            "start": 3.1429,
+            "end": 3.2143
+          },
+          {
+            "text": "espectáculo",
+            "start": 3.2381,
+            "end": 3.9762
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "convencer",
+            "start": 0.3714,
+            "end": 0.7881
+          },
+          {
+            "text": "al",
+            "start": 0.7881,
+            "end": 0.9071
+          },
+          {
+            "text": "capitán",
+            "start": 0.931,
+            "end": 1.2881
+          },
+          {
+            "text": "de",
+            "start": 1.3476,
+            "end": 1.3953
+          },
+          {
+            "text": "que",
+            "start": 1.4667,
+            "end": 1.5262
+          },
+          {
+            "text": "le",
+            "start": 1.5619,
+            "end": 1.6452
+          },
+          {
+            "text": "venda",
+            "start": 1.681,
+            "end": 1.919
+          },
+          {
+            "text": "un",
+            "start": 1.9429,
+            "end": 2.0619
+          },
+          {
+            "text": "pasaje",
+            "start": 2.0738,
+            "end": 2.5738
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Federica",
+            "start": 1.2506,
+            "end": 1.7982
+          },
+          {
+            "text": "no",
+            "start": 1.8458,
+            "end": 1.9172
+          },
+          {
+            "text": "intenta",
+            "start": 1.9411,
+            "end": 2.322
+          },
+          {
+            "text": "comprar",
+            "start": 2.3815,
+            "end": 2.7149
+          },
+          {
+            "text": "un",
+            "start": 2.7149,
+            "end": 2.8339
+          },
+          {
+            "text": "pasaje",
+            "start": 2.8458,
+            "end": 3.3339
+          }
+        ]
+      }
+    ]
+  },
+  "qz020_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "qué",
+            "start": 0.3238,
+            "end": 0.3833
+          },
+          {
+            "text": "Javier",
+            "start": 0.419,
+            "end": 0.8
+          },
+          {
+            "text": "y",
+            "start": 0.8,
+            "end": 0.8476
+          },
+          {
+            "text": "Federica",
+            "start": 0.8714,
+            "end": 1.3357
+          },
+          {
+            "text": "inventan",
+            "start": 1.3476,
+            "end": 1.7643
+          },
+          {
+            "text": "un",
+            "start": 1.7881,
+            "end": 1.8714
+          },
+          {
+            "text": "nombre",
+            "start": 1.8833,
+            "end": 2.3238
+          },
+          {
+            "text": "un",
+            "start": 2.5143,
+            "end": 2.6214
+          },
+          {
+            "text": "origen",
+            "start": 2.6452,
+            "end": 3.0738
+          },
+          {
+            "text": "y",
+            "start": 3.1214,
+            "end": 3.1928
+          },
+          {
+            "text": "un",
+            "start": 3.2048,
+            "end": 3.2762
+          },
+          {
+            "text": "acento",
+            "start": 3.3,
+            "end": 3.7047
+          },
+          {
+            "text": "para",
+            "start": 3.7643,
+            "end": 3.919
+          },
+          {
+            "text": "ella",
+            "start": 4.0024,
+            "end": 4.2762
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Adaptar",
+            "start": 0.0976,
+            "end": 0.55
+          },
+          {
+            "text": "la",
+            "start": 0.55,
+            "end": 0.6929
+          },
+          {
+            "text": "ropa",
+            "start": 0.7286,
+            "end": 1.1215
+          },
+          {
+            "text": "el",
+            "start": 1.3714,
+            "end": 1.4667
+          },
+          {
+            "text": "lenguaje",
+            "start": 1.4667,
+            "end": 2.0143
+          },
+          {
+            "text": "y",
+            "start": 2.05,
+            "end": 2.0976
+          },
+          {
+            "text": "la",
+            "start": 2.1333,
+            "end": 2.2167
+          },
+          {
+            "text": "conducta",
+            "start": 2.2762,
+            "end": 2.681
+          },
+          {
+            "text": "para",
+            "start": 2.7524,
+            "end": 2.919
+          },
+          {
+            "text": "no",
+            "start": 2.9667,
+            "end": 3.0619
+          },
+          {
+            "text": "alterar",
+            "start": 3.0619,
+            "end": 3.431
+          },
+          {
+            "text": "la",
+            "start": 3.431,
+            "end": 3.5143
+          },
+          {
+            "text": "historia",
+            "start": 3.5262,
+            "end": 4.0262
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Federica",
+            "start": 1.5595,
+            "end": 2.131
+          },
+          {
+            "text": "debe",
+            "start": 2.1667,
+            "end": 2.3333
+          },
+          {
+            "text": "controlar",
+            "start": 2.3929,
+            "end": 2.8572
+          },
+          {
+            "text": "lo",
+            "start": 2.881,
+            "end": 2.9762
+          },
+          {
+            "text": "que",
+            "start": 3.0357,
+            "end": 3.0952
+          },
+          {
+            "text": "dice",
+            "start": 3.1429,
+            "end": 3.4524
+          },
+          {
+            "text": "y",
+            "start": 3.4643,
+            "end": 3.5476
+          },
+          {
+            "text": "cómo",
+            "start": 3.5953,
+            "end": 3.7738
+          },
+          {
+            "text": "actúa",
+            "start": 3.7738,
+            "end": 4.1428
+          },
+          {
+            "text": "para",
+            "start": 4.2143,
+            "end": 4.3572
+          },
+          {
+            "text": "parecer",
+            "start": 4.4286,
+            "end": 4.7976
+          },
+          {
+            "text": "una",
+            "start": 4.8095,
+            "end": 4.9762
+          },
+          {
+            "text": "joven",
+            "start": 5,
+            "end": 5.2976
+          },
+          {
+            "text": "de",
+            "start": 5.3453,
+            "end": 5.3929
+          },
+          {
+            "text": "la",
+            "start": 5.4286,
+            "end": 5.5119
+          },
+          {
+            "text": "época",
+            "start": 5.5953,
+            "end": 5.9881
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Aprender",
+            "start": 0.0976,
+            "end": 0.5738
+          },
+          {
+            "text": "a",
+            "start": 0.5738,
+            "end": 0.6333
+          },
+          {
+            "text": "conducir",
+            "start": 0.6929,
+            "end": 1.1214
+          },
+          {
+            "text": "un",
+            "start": 1.1214,
+            "end": 1.2405
+          },
+          {
+            "text": "transatlántico",
+            "start": 1.2524,
+            "end": 1.9667
+          },
+          {
+            "text": "moderno",
+            "start": 1.9905,
+            "end": 2.5024
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Ninguno",
+            "start": 1.25,
+            "end": 1.6905
+          },
+          {
+            "text": "de",
+            "start": 1.7619,
+            "end": 1.7738
+          },
+          {
+            "text": "los",
+            "start": 1.8095,
+            "end": 1.9048
+          },
+          {
+            "text": "jóvenes",
+            "start": 1.9167,
+            "end": 2.369
+          },
+          {
+            "text": "conduce",
+            "start": 2.4047,
+            "end": 2.7738
+          },
+          {
+            "text": "el",
+            "start": 2.7738,
+            "end": 2.8452
+          },
+          {
+            "text": "barco",
+            "start": 2.869,
+            "end": 3.2738
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Encontrar",
+            "start": 0.0976,
+            "end": 0.5976
+          },
+          {
+            "text": "conexión",
+            "start": 0.6452,
+            "end": 1.1572
+          },
+          {
+            "text": "a",
+            "start": 1.181,
+            "end": 1.2047
+          },
+          {
+            "text": "internet",
+            "start": 1.2167,
+            "end": 1.669
+          },
+          {
+            "text": "en",
+            "start": 1.7286,
+            "end": 1.8833
+          },
+          {
+            "text": "cada",
+            "start": 1.8833,
+            "end": 2.0738
+          },
+          {
+            "text": "camarote",
+            "start": 2.1214,
+            "end": 2.6333
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.381
+          },
+          {
+            "text": "desafío",
+            "start": 1.4286,
+            "end": 1.8333
+          },
+          {
+            "text": "central",
+            "start": 1.869,
+            "end": 2.2857
+          },
+          {
+            "text": "no",
+            "start": 2.2976,
+            "end": 2.3929
+          },
+          {
+            "text": "es",
+            "start": 2.4047,
+            "end": 2.5238
+          },
+          {
+            "text": "conectarse",
+            "start": 2.5357,
+            "end": 3.0714
+          },
+          {
+            "text": "a",
+            "start": 3.0714,
+            "end": 3.0833
+          },
+          {
+            "text": "internet",
+            "start": 3.131,
+            "end": 3.6429
+          },
+          {
+            "text": "sino",
+            "start": 3.9167,
+            "end": 4.1905
+          },
+          {
+            "text": "ocultar",
+            "start": 4.1905,
+            "end": 4.619
+          },
+          {
+            "text": "que",
+            "start": 4.6667,
+            "end": 4.7381
+          },
+          {
+            "text": "vienen",
+            "start": 4.7738,
+            "end": 5.0238
+          },
+          {
+            "text": "del",
+            "start": 5.0714,
+            "end": 5.1667
+          },
+          {
+            "text": "futuro",
+            "start": 5.1905,
+            "end": 5.6428
+          }
+        ]
+      }
+    ]
+  },
+  "qz021_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2286
+          },
+          {
+            "text": "dificultad",
+            "start": 0.2524,
+            "end": 0.7762
+          },
+          {
+            "text": "de",
+            "start": 0.8238,
+            "end": 0.8476
+          },
+          {
+            "text": "viajar",
+            "start": 0.8833,
+            "end": 1.2405
+          },
+          {
+            "text": "al",
+            "start": 1.2405,
+            "end": 1.3357
+          },
+          {
+            "text": "pasado",
+            "start": 1.3953,
+            "end": 1.7762
+          },
+          {
+            "text": "se",
+            "start": 1.8,
+            "end": 1.931
+          },
+          {
+            "text": "hace",
+            "start": 1.9429,
+            "end": 2.1333
+          },
+          {
+            "text": "más",
+            "start": 2.169,
+            "end": 2.3833
+          },
+          {
+            "text": "evidente",
+            "start": 2.3833,
+            "end": 2.8238
+          },
+          {
+            "text": "con",
+            "start": 2.8714,
+            "end": 2.9785
+          },
+          {
+            "text": "la",
+            "start": 2.9786,
+            "end": 3.0619
+          },
+          {
+            "text": "llegada",
+            "start": 3.0857,
+            "end": 3.431
+          },
+          {
+            "text": "de",
+            "start": 3.5143,
+            "end": 3.5381
+          },
+          {
+            "text": "Federica",
+            "start": 3.5619,
+            "end": 4.1333
+          }
+        ]
+      }
+    ]
+  },
+  "qz022_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "El",
+            "start": 0.0976,
+            "end": 0.2643
+          },
+          {
+            "text": "secuestro",
+            "start": 0.2881,
+            "end": 0.7643
+          },
+          {
+            "text": "de",
+            "start": 0.8,
+            "end": 0.8595
+          },
+          {
+            "text": "Josephine",
+            "start": 0.8714,
+            "end": 1.3714
+          },
+          {
+            "text": "y",
+            "start": 1.4071,
+            "end": 1.4547
+          },
+          {
+            "text": "el",
+            "start": 1.4667,
+            "end": 1.55
+          },
+          {
+            "text": "desvío",
+            "start": 1.5976,
+            "end": 1.931
+          },
+          {
+            "text": "del",
+            "start": 1.9667,
+            "end": 2.1095
+          },
+          {
+            "text": "Conte",
+            "start": 2.1452,
+            "end": 2.3833
+          },
+          {
+            "text": "Verde",
+            "start": 2.419,
+            "end": 2.7881
+          }
+        ]
+      }
+    ]
+  },
+  "qz022_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2286
+          },
+          {
+            "text": "peligro",
+            "start": 0.3119,
+            "end": 0.681
+          },
+          {
+            "text": "logran",
+            "start": 0.7167,
+            "end": 1.0024
+          },
+          {
+            "text": "evitar",
+            "start": 1.0262,
+            "end": 1.3714
+          },
+          {
+            "text": "los",
+            "start": 1.3714,
+            "end": 1.4905
+          },
+          {
+            "text": "jóvenes",
+            "start": 1.5024,
+            "end": 1.9905
+          },
+          {
+            "text": "y",
+            "start": 2.0262,
+            "end": 2.0738
+          },
+          {
+            "text": "sus",
+            "start": 2.0976,
+            "end": 2.3
+          },
+          {
+            "text": "aliados",
+            "start": 2.3,
+            "end": 2.9071
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.2881
+          },
+          {
+            "text": "obligarlo",
+            "start": 0.2881,
+            "end": 0.7762
+          },
+          {
+            "text": "a",
+            "start": 0.7762,
+            "end": 0.8238
+          },
+          {
+            "text": "revelar",
+            "start": 0.8476,
+            "end": 1.2524
+          },
+          {
+            "text": "que",
+            "start": 1.3,
+            "end": 1.3595
+          },
+          {
+            "text": "conoce",
+            "start": 1.4071,
+            "end": 1.7643
+          },
+          {
+            "text": "el",
+            "start": 1.7762,
+            "end": 1.8595
+          },
+          {
+            "text": "plan",
+            "start": 1.9429,
+            "end": 2.1572
+          },
+          {
+            "text": "y",
+            "start": 2.2167,
+            "end": 2.2762
+          },
+          {
+            "text": "quebrar",
+            "start": 2.3357,
+            "end": 2.6214
+          },
+          {
+            "text": "su",
+            "start": 2.6571,
+            "end": 2.7643
+          },
+          {
+            "text": "falsa",
+            "start": 2.7881,
+            "end": 3.0976
+          },
+          {
+            "text": "inocencia",
+            "start": 3.1214,
+            "end": 3.7762
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "El",
+            "start": 1.5595,
+            "end": 1.7262
+          },
+          {
+            "text": "miedo",
+            "start": 1.7619,
+            "end": 1.9762
+          },
+          {
+            "text": "del",
+            "start": 2.0357,
+            "end": 2.1786
+          },
+          {
+            "text": "Káiser",
+            "start": 2.2143,
+            "end": 2.5476
+          },
+          {
+            "text": "ante",
+            "start": 2.5476,
+            "end": 2.7381
+          },
+          {
+            "text": "las",
+            "start": 2.7738,
+            "end": 2.8571
+          },
+          {
+            "text": "botellitas",
+            "start": 2.881,
+            "end": 3.4286
+          },
+          {
+            "text": "demuestra",
+            "start": 3.4405,
+            "end": 3.869
+          },
+          {
+            "text": "que",
+            "start": 3.9286,
+            "end": 3.9881
+          },
+          {
+            "text": "sabe",
+            "start": 4.0238,
+            "end": 4.2738
+          },
+          {
+            "text": "qué",
+            "start": 4.3333,
+            "end": 4.3929
+          },
+          {
+            "text": "contienen",
+            "start": 4.4405,
+            "end": 5.0238
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "celebrar",
+            "start": 0.3357,
+            "end": 0.7762
+          },
+          {
+            "text": "que",
+            "start": 0.8357,
+            "end": 0.8714
+          },
+          {
+            "text": "el",
+            "start": 0.8714,
+            "end": 0.9785
+          },
+          {
+            "text": "barco",
+            "start": 0.9905,
+            "end": 1.3119
+          },
+          {
+            "text": "sigue",
+            "start": 1.3476,
+            "end": 1.5976
+          },
+          {
+            "text": "su",
+            "start": 1.6333,
+            "end": 1.7643
+          },
+          {
+            "text": "rumbo",
+            "start": 1.8,
+            "end": 2.2167
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Los",
+            "start": 1.25,
+            "end": 1.4524
+          },
+          {
+            "text": "líquidos",
+            "start": 1.4881,
+            "end": 1.881
+          },
+          {
+            "text": "no",
+            "start": 1.9286,
+            "end": 2.0357
+          },
+          {
+            "text": "son",
+            "start": 2.0595,
+            "end": 2.2381
+          },
+          {
+            "text": "bebidas",
+            "start": 2.2857,
+            "end": 2.631
+          },
+          {
+            "text": "de",
+            "start": 2.631,
+            "end": 2.6905
+          },
+          {
+            "text": "celebración",
+            "start": 2.7262,
+            "end": 3.4524
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Para",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "curarlo",
+            "start": 0.3833,
+            "end": 0.7524
+          },
+          {
+            "text": "de",
+            "start": 0.8,
+            "end": 0.8714
+          },
+          {
+            "text": "una",
+            "start": 0.919,
+            "end": 1.0619
+          },
+          {
+            "text": "enfermedad",
+            "start": 1.0619,
+            "end": 1.6095
+          },
+          {
+            "text": "del",
+            "start": 1.6095,
+            "end": 1.7524
+          },
+          {
+            "text": "viaje",
+            "start": 1.7762,
+            "end": 2.2048
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.4047
+          },
+          {
+            "text": "capitán",
+            "start": 1.4286,
+            "end": 1.8333
+          },
+          {
+            "text": "sabe",
+            "start": 1.8571,
+            "end": 2.0952
+          },
+          {
+            "text": "que",
+            "start": 2.1667,
+            "end": 2.2381
+          },
+          {
+            "text": "forman",
+            "start": 2.2619,
+            "end": 2.631
+          },
+          {
+            "text": "parte",
+            "start": 2.6547,
+            "end": 2.9047
+          },
+          {
+            "text": "de",
+            "start": 2.9405,
+            "end": 2.9642
+          },
+          {
+            "text": "la",
+            "start": 3,
+            "end": 3.0714
+          },
+          {
+            "text": "conspiración",
+            "start": 3.131,
+            "end": 3.9405
+          }
+        ]
+      }
+    ]
+  },
+  "qz023_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "qué",
+            "start": 0.3238,
+            "end": 0.3714
+          },
+          {
+            "text": "el",
+            "start": 0.3714,
+            "end": 0.4905
+          },
+          {
+            "text": "capitán",
+            "start": 0.5143,
+            "end": 0.8714
+          },
+          {
+            "text": "amenaza",
+            "start": 0.8833,
+            "end": 1.3238
+          },
+          {
+            "text": "al",
+            "start": 1.3238,
+            "end": 1.419
+          },
+          {
+            "text": "Káiser",
+            "start": 1.4547,
+            "end": 1.8119
+          },
+          {
+            "text": "con",
+            "start": 1.8238,
+            "end": 1.9309
+          },
+          {
+            "text": "hacerle",
+            "start": 1.9429,
+            "end": 2.2881
+          },
+          {
+            "text": "beber",
+            "start": 2.3238,
+            "end": 2.5738
+          },
+          {
+            "text": "los",
+            "start": 2.5857,
+            "end": 2.7167
+          },
+          {
+            "text": "líquidos",
+            "start": 2.7405,
+            "end": 3.169
+          },
+          {
+            "text": "encontrados",
+            "start": 3.169,
+            "end": 3.931
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "La",
+            "start": 0.0976,
+            "end": 0.2643
+          },
+          {
+            "text": "cooperación",
+            "start": 0.3357,
+            "end": 0.8952
+          },
+          {
+            "text": "entre",
+            "start": 0.9071,
+            "end": 1.1214
+          },
+          {
+            "text": "los",
+            "start": 1.1571,
+            "end": 1.2524
+          },
+          {
+            "text": "jóvenes",
+            "start": 1.2643,
+            "end": 1.8357
+          },
+          {
+            "text": "Josephine",
+            "start": 1.9905,
+            "end": 2.6452
+          },
+          {
+            "text": "el",
+            "start": 2.7643,
+            "end": 2.8714
+          },
+          {
+            "text": "Rumano",
+            "start": 2.8952,
+            "end": 3.4072
+          },
+          {
+            "text": "el",
+            "start": 3.669,
+            "end": 3.7881
+          },
+          {
+            "text": "capitán",
+            "start": 3.8119,
+            "end": 4.2405
+          },
+          {
+            "text": "y",
+            "start": 4.3,
+            "end": 4.3595
+          },
+          {
+            "text": "la",
+            "start": 4.3833,
+            "end": 4.4667
+          },
+          {
+            "text": "tripulación",
+            "start": 4.5262,
+            "end": 5.2286
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Cada",
+            "start": 1.5595,
+            "end": 1.8095
+          },
+          {
+            "text": "participante",
+            "start": 1.881,
+            "end": 2.4643
+          },
+          {
+            "text": "aporta",
+            "start": 2.4762,
+            "end": 2.7738
+          },
+          {
+            "text": "información",
+            "start": 2.7857,
+            "end": 3.5476
+          },
+          {
+            "text": "valentía",
+            "start": 3.8214,
+            "end": 4.3571
+          },
+          {
+            "text": "o",
+            "start": 4.381,
+            "end": 4.4643
+          },
+          {
+            "text": "autoridad",
+            "start": 4.4643,
+            "end": 5.0238
+          },
+          {
+            "text": "para",
+            "start": 5.0833,
+            "end": 5.2143
+          },
+          {
+            "text": "detener",
+            "start": 5.2976,
+            "end": 5.631
+          },
+          {
+            "text": "a",
+            "start": 5.631,
+            "end": 5.6905
+          },
+          {
+            "text": "los",
+            "start": 5.7143,
+            "end": 5.8572
+          },
+          {
+            "text": "conspiradores",
+            "start": 5.881,
+            "end": 6.75
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "La",
+            "start": 0.0976,
+            "end": 0.2643
+          },
+          {
+            "text": "suerte",
+            "start": 0.3,
+            "end": 0.6095
+          },
+          {
+            "text": "de",
+            "start": 0.669,
+            "end": 0.6928
+          },
+          {
+            "text": "que",
+            "start": 0.7643,
+            "end": 0.8119
+          },
+          {
+            "text": "los",
+            "start": 0.8476,
+            "end": 0.9786
+          },
+          {
+            "text": "conspiradores",
+            "start": 1.0024,
+            "end": 1.7286
+          },
+          {
+            "text": "abandonen",
+            "start": 1.7405,
+            "end": 2.2405
+          },
+          {
+            "text": "el",
+            "start": 2.2762,
+            "end": 2.3715
+          },
+          {
+            "text": "barco",
+            "start": 2.3952,
+            "end": 2.6929
+          },
+          {
+            "text": "por",
+            "start": 2.7643,
+            "end": 2.8714
+          },
+          {
+            "text": "sí",
+            "start": 2.8952,
+            "end": 3.0024
+          },
+          {
+            "text": "solos",
+            "start": 3.0262,
+            "end": 3.5381
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Los",
+            "start": 1.25,
+            "end": 1.4405
+          },
+          {
+            "text": "responsables",
+            "start": 1.4524,
+            "end": 2.0357
+          },
+          {
+            "text": "son",
+            "start": 2.0357,
+            "end": 2.2024
+          },
+          {
+            "text": "descubiertos",
+            "start": 2.2381,
+            "end": 2.881
+          },
+          {
+            "text": "y",
+            "start": 2.9167,
+            "end": 2.9524
+          },
+          {
+            "text": "detenidos",
+            "start": 2.9881,
+            "end": 3.4285
+          },
+          {
+            "text": "mediante",
+            "start": 3.4762,
+            "end": 3.8929
+          },
+          {
+            "text": "un",
+            "start": 3.9167,
+            "end": 4.0357
+          },
+          {
+            "text": "plan",
+            "start": 4.0476,
+            "end": 4.369
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "La",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "decisión",
+            "start": 0.3238,
+            "end": 0.7285
+          },
+          {
+            "text": "de",
+            "start": 0.7643,
+            "end": 0.8119
+          },
+          {
+            "text": "Javier",
+            "start": 0.8476,
+            "end": 1.1929
+          },
+          {
+            "text": "de",
+            "start": 1.2286,
+            "end": 1.2881
+          },
+          {
+            "text": "actuar",
+            "start": 1.3119,
+            "end": 1.5976
+          },
+          {
+            "text": "completamente",
+            "start": 1.6571,
+            "end": 2.2881
+          },
+          {
+            "text": "solo",
+            "start": 2.3238,
+            "end": 2.7047
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.3929
+          },
+          {
+            "text": "resultado",
+            "start": 1.4167,
+            "end": 1.8929
+          },
+          {
+            "text": "depende",
+            "start": 1.9405,
+            "end": 2.2738
+          },
+          {
+            "text": "del",
+            "start": 2.3453,
+            "end": 2.4524
+          },
+          {
+            "text": "trabajo",
+            "start": 2.4762,
+            "end": 2.881
+          },
+          {
+            "text": "en",
+            "start": 2.881,
+            "end": 2.9405
+          },
+          {
+            "text": "equipo",
+            "start": 2.9643,
+            "end": 3.4047
+          }
+        ]
+      }
+    ]
+  },
+  "qz024_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2167
+          },
+          {
+            "text": "explica",
+            "start": 0.2167,
+            "end": 0.7047
+          },
+          {
+            "text": "mejor",
+            "start": 0.7405,
+            "end": 1.0857
+          },
+          {
+            "text": "que",
+            "start": 1.1453,
+            "end": 1.1929
+          },
+          {
+            "text": "el",
+            "start": 1.1929,
+            "end": 1.2881
+          },
+          {
+            "text": "plan",
+            "start": 1.3595,
+            "end": 1.5857
+          },
+          {
+            "text": "para",
+            "start": 1.5976,
+            "end": 1.7524
+          },
+          {
+            "text": "salvar",
+            "start": 1.7881,
+            "end": 2.1214
+          },
+          {
+            "text": "a",
+            "start": 2.1214,
+            "end": 2.181
+          },
+          {
+            "text": "Josephine",
+            "start": 2.2048,
+            "end": 2.7524
+          },
+          {
+            "text": "tenga",
+            "start": 2.7643,
+            "end": 2.9786
+          },
+          {
+            "text": "éxito",
+            "start": 3.0262,
+            "end": 3.4429
+          }
+        ]
+      }
+    ]
+  },
+  "qz025_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Su",
+            "start": 0.0976,
+            "end": 0.2762
+          },
+          {
+            "text": "celular",
+            "start": 0.3119,
+            "end": 0.7405
+          },
+          {
+            "text": "y",
+            "start": 0.7762,
+            "end": 0.8595
+          },
+          {
+            "text": "un",
+            "start": 0.8714,
+            "end": 1.0143
+          },
+          {
+            "text": "cable",
+            "start": 1.0262,
+            "end": 1.3
+          },
+          {
+            "text": "para",
+            "start": 1.3714,
+            "end": 1.5262
+          },
+          {
+            "text": "cargarlo",
+            "start": 1.5857,
+            "end": 2.0976
+          }
+        ]
+      }
+    ]
+  },
+  "qz025_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2047
+          },
+          {
+            "text": "les",
+            "start": 0.2524,
+            "end": 0.4071
+          },
+          {
+            "text": "deja",
+            "start": 0.419,
+            "end": 0.6333
+          },
+          {
+            "text": "Federica",
+            "start": 0.669,
+            "end": 1.1214
+          },
+          {
+            "text": "a",
+            "start": 1.1214,
+            "end": 1.169
+          },
+          {
+            "text": "Tomassino",
+            "start": 1.2286,
+            "end": 1.7881
+          },
+          {
+            "text": "y",
+            "start": 1.8238,
+            "end": 1.8833
+          },
+          {
+            "text": "Antonella",
+            "start": 1.8953,
+            "end": 2.3595
+          },
+          {
+            "text": "antes",
+            "start": 2.419,
+            "end": 2.7047
+          },
+          {
+            "text": "de",
+            "start": 2.7048,
+            "end": 2.7167
+          },
+          {
+            "text": "despedirse",
+            "start": 2.8,
+            "end": 3.419
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3238
+          },
+          {
+            "text": "están",
+            "start": 0.3238,
+            "end": 0.6095
+          },
+          {
+            "text": "contemplando",
+            "start": 0.6095,
+            "end": 1.169
+          },
+          {
+            "text": "el",
+            "start": 1.169,
+            "end": 1.2405
+          },
+          {
+            "text": "mismo",
+            "start": 1.2643,
+            "end": 1.5262
+          },
+          {
+            "text": "lugar",
+            "start": 1.5619,
+            "end": 1.8595
+          },
+          {
+            "text": "desde",
+            "start": 1.8953,
+            "end": 2.1215
+          },
+          {
+            "text": "1930",
+            "start": 2.1571,
+            "end": 3.2762
+          },
+          {
+            "text": "y",
+            "start": 3.2881,
+            "end": 3.3357
+          },
+          {
+            "text": "desde",
+            "start": 3.3595,
+            "end": 3.5381
+          },
+          {
+            "text": "2030",
+            "start": 3.5857,
+            "end": 4.3714
+          },
+          {
+            "text": "al",
+            "start": 4.3952,
+            "end": 4.5143
+          },
+          {
+            "text": "mismo",
+            "start": 4.5381,
+            "end": 4.7881
+          },
+          {
+            "text": "tiempo",
+            "start": 4.8595,
+            "end": 5.2762
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "Cada",
+            "start": 1.5595,
+            "end": 1.8215
+          },
+          {
+            "text": "pareja",
+            "start": 1.8929,
+            "end": 2.2143
+          },
+          {
+            "text": "percibe",
+            "start": 2.2857,
+            "end": 2.619
+          },
+          {
+            "text": "las",
+            "start": 2.6547,
+            "end": 2.7738
+          },
+          {
+            "text": "construcciones",
+            "start": 2.7976,
+            "end": 3.5714
+          },
+          {
+            "text": "y",
+            "start": 3.619,
+            "end": 3.6786
+          },
+          {
+            "text": "los",
+            "start": 3.7024,
+            "end": 3.8214
+          },
+          {
+            "text": "sonidos",
+            "start": 3.8214,
+            "end": 4.2381
+          },
+          {
+            "text": "de",
+            "start": 4.25,
+            "end": 4.3095
+          },
+          {
+            "text": "su",
+            "start": 4.3333,
+            "end": 4.4524
+          },
+          {
+            "text": "propia",
+            "start": 4.5,
+            "end": 4.7976
+          },
+          {
+            "text": "época",
+            "start": 4.8453,
+            "end": 5.25
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3476
+          },
+          {
+            "text": "una",
+            "start": 0.3714,
+            "end": 0.5262
+          },
+          {
+            "text": "niebla",
+            "start": 0.5619,
+            "end": 0.8952
+          },
+          {
+            "text": "cubre",
+            "start": 0.9786,
+            "end": 1.2643
+          },
+          {
+            "text": "la",
+            "start": 1.3,
+            "end": 1.3833
+          },
+          {
+            "text": "mitad",
+            "start": 1.419,
+            "end": 1.7167
+          },
+          {
+            "text": "del",
+            "start": 1.7167,
+            "end": 1.8357
+          },
+          {
+            "text": "puerto",
+            "start": 1.9071,
+            "end": 2.3119
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "La",
+            "start": 1.25,
+            "end": 1.3929
+          },
+          {
+            "text": "diferencia",
+            "start": 1.4405,
+            "end": 1.9762
+          },
+          {
+            "text": "no",
+            "start": 2.0238,
+            "end": 2.119
+          },
+          {
+            "text": "se",
+            "start": 2.1429,
+            "end": 2.25
+          },
+          {
+            "text": "debe",
+            "start": 2.2976,
+            "end": 2.4762
+          },
+          {
+            "text": "al",
+            "start": 2.4762,
+            "end": 2.5952
+          },
+          {
+            "text": "clima",
+            "start": 2.631,
+            "end": 3
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Porque",
+            "start": 0.0976,
+            "end": 0.3357
+          },
+          {
+            "text": "Tomassino",
+            "start": 0.3952,
+            "end": 0.919
+          },
+          {
+            "text": "y",
+            "start": 0.9547,
+            "end": 1.0024
+          },
+          {
+            "text": "Antonella",
+            "start": 1.0262,
+            "end": 1.5024
+          },
+          {
+            "text": "nunca",
+            "start": 1.55,
+            "end": 1.8119
+          },
+          {
+            "text": "habían",
+            "start": 1.8119,
+            "end": 2.0976
+          },
+          {
+            "text": "visto",
+            "start": 2.1452,
+            "end": 2.3715
+          },
+          {
+            "text": "barcos",
+            "start": 2.4071,
+            "end": 2.9548
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Los",
+            "start": 1.25,
+            "end": 1.4047
+          },
+          {
+            "text": "gemelos",
+            "start": 1.4167,
+            "end": 1.8095
+          },
+          {
+            "text": "llevan",
+            "start": 1.8214,
+            "end": 2.0952
+          },
+          {
+            "text": "días",
+            "start": 2.1547,
+            "end": 2.3333
+          },
+          {
+            "text": "viajando",
+            "start": 2.3571,
+            "end": 2.869
+          },
+          {
+            "text": "en",
+            "start": 2.9047,
+            "end": 2.9881
+          },
+          {
+            "text": "el",
+            "start": 3.0119,
+            "end": 3.131
+          },
+          {
+            "text": "Conte",
+            "start": 3.1667,
+            "end": 3.3929
+          },
+          {
+            "text": "Verde",
+            "start": 3.4286,
+            "end": 3.7976
+          }
+        ]
+      }
+    ]
+  },
+  "qz026_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Por",
+            "start": 0.0976,
+            "end": 0.2524
+          },
+          {
+            "text": "qué",
+            "start": 0.3238,
+            "end": 0.3952
+          },
+          {
+            "text": "los",
+            "start": 0.431,
+            "end": 0.5024
+          },
+          {
+            "text": "gemelos",
+            "start": 0.5143,
+            "end": 0.9905
+          },
+          {
+            "text": "y",
+            "start": 1.0262,
+            "end": 1.0619
+          },
+          {
+            "text": "los",
+            "start": 1.0857,
+            "end": 1.2643
+          },
+          {
+            "text": "amigos",
+            "start": 1.2643,
+            "end": 1.5738
+          },
+          {
+            "text": "describen",
+            "start": 1.5857,
+            "end": 2.0024
+          },
+          {
+            "text": "de",
+            "start": 2.05,
+            "end": 2.0976
+          },
+          {
+            "text": "manera",
+            "start": 2.1333,
+            "end": 2.4429
+          },
+          {
+            "text": "distinta",
+            "start": 2.4786,
+            "end": 2.8952
+          },
+          {
+            "text": "el",
+            "start": 2.8952,
+            "end": 2.9548
+          },
+          {
+            "text": "puerto",
+            "start": 3.0262,
+            "end": 3.2762
+          },
+          {
+            "text": "de",
+            "start": 3.3476,
+            "end": 3.3595
+          },
+          {
+            "text": "Montevideo",
+            "start": 3.3952,
+            "end": 4.0381
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o0": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "La",
+            "start": 0.0976,
+            "end": 0.2405
+          },
+          {
+            "text": "amistad",
+            "start": 0.2405,
+            "end": 0.7047
+          },
+          {
+            "text": "puede",
+            "start": 0.7643,
+            "end": 0.931
+          },
+          {
+            "text": "unir",
+            "start": 0.9429,
+            "end": 1.1691
+          },
+          {
+            "text": "personas",
+            "start": 1.2405,
+            "end": 1.6214
+          },
+          {
+            "text": "separadas",
+            "start": 1.6214,
+            "end": 2.1333
+          },
+          {
+            "text": "por",
+            "start": 2.2048,
+            "end": 2.3119
+          },
+          {
+            "text": "un",
+            "start": 2.3238,
+            "end": 2.4309
+          },
+          {
+            "text": "siglo",
+            "start": 2.4548,
+            "end": 2.8
+          },
+          {
+            "text": "y",
+            "start": 2.8357,
+            "end": 2.8714
+          },
+          {
+            "text": "transformar",
+            "start": 2.9071,
+            "end": 3.4309
+          },
+          {
+            "text": "lo",
+            "start": 3.4548,
+            "end": 3.55
+          },
+          {
+            "text": "que",
+            "start": 3.5976,
+            "end": 3.669
+          },
+          {
+            "text": "cada",
+            "start": 3.7405,
+            "end": 3.919
+          },
+          {
+            "text": "una",
+            "start": 3.9667,
+            "end": 4.1214
+          },
+          {
+            "text": "comprende",
+            "start": 4.181,
+            "end": 4.5619
+          },
+          {
+            "text": "de",
+            "start": 4.6333,
+            "end": 4.669
+          },
+          {
+            "text": "su",
+            "start": 4.6929,
+            "end": 4.7881
+          },
+          {
+            "text": "historia",
+            "start": 4.7881,
+            "end": 5.2762
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o0_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Correcto",
+            "start": 0.0976,
+            "end": 0.6572
+          },
+          {
+            "text": "La",
+            "start": 1.5595,
+            "end": 1.6905
+          },
+          {
+            "text": "aventura",
+            "start": 1.6905,
+            "end": 2.1309
+          },
+          {
+            "text": "crea",
+            "start": 2.2024,
+            "end": 2.3928
+          },
+          {
+            "text": "un",
+            "start": 2.4047,
+            "end": 2.4762
+          },
+          {
+            "text": "vínculo",
+            "start": 2.5238,
+            "end": 2.9047
+          },
+          {
+            "text": "que",
+            "start": 2.9524,
+            "end": 3
+          },
+          {
+            "text": "supera",
+            "start": 3.0238,
+            "end": 3.369
+          },
+          {
+            "text": "la",
+            "start": 3.3929,
+            "end": 3.4643
+          },
+          {
+            "text": "distancia",
+            "start": 3.5119,
+            "end": 3.9643
+          },
+          {
+            "text": "temporal",
+            "start": 4.0238,
+            "end": 4.4642
+          },
+          {
+            "text": "y",
+            "start": 4.5,
+            "end": 4.5714
+          },
+          {
+            "text": "cambia",
+            "start": 4.631,
+            "end": 4.9286
+          },
+          {
+            "text": "a",
+            "start": 4.9286,
+            "end": 4.9643
+          },
+          {
+            "text": "los",
+            "start": 4.9881,
+            "end": 5.1071
+          },
+          {
+            "text": "cuatro",
+            "start": 5.1786,
+            "end": 5.5833
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o1": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Los",
+            "start": 0.0976,
+            "end": 0.3
+          },
+          {
+            "text": "viajes",
+            "start": 0.3,
+            "end": 0.669
+          },
+          {
+            "text": "solo",
+            "start": 0.669,
+            "end": 0.9428
+          },
+          {
+            "text": "tienen",
+            "start": 1.0143,
+            "end": 1.2286
+          },
+          {
+            "text": "valor",
+            "start": 1.2881,
+            "end": 1.5976
+          },
+          {
+            "text": "cuando",
+            "start": 1.6571,
+            "end": 1.8595
+          },
+          {
+            "text": "producen",
+            "start": 1.919,
+            "end": 2.3714
+          },
+          {
+            "text": "una",
+            "start": 2.3952,
+            "end": 2.5619
+          },
+          {
+            "text": "recompensa",
+            "start": 2.5857,
+            "end": 3.1333
+          },
+          {
+            "text": "material",
+            "start": 3.169,
+            "end": 3.7405
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o1_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "El",
+            "start": 1.25,
+            "end": 1.4047
+          },
+          {
+            "text": "valor",
+            "start": 1.4167,
+            "end": 1.6786
+          },
+          {
+            "text": "principal",
+            "start": 1.75,
+            "end": 2.2143
+          },
+          {
+            "text": "está",
+            "start": 2.2143,
+            "end": 2.4524
+          },
+          {
+            "text": "en",
+            "start": 2.4643,
+            "end": 2.5119
+          },
+          {
+            "text": "los",
+            "start": 2.5238,
+            "end": 2.6667
+          },
+          {
+            "text": "vínculos",
+            "start": 2.6786,
+            "end": 3.3095
+          },
+          {
+            "text": "el",
+            "start": 3.5357,
+            "end": 3.631
+          },
+          {
+            "text": "aprendizaje",
+            "start": 3.6429,
+            "end": 4.4167
+          },
+          {
+            "text": "y",
+            "start": 4.4405,
+            "end": 4.5119
+          },
+          {
+            "text": "la",
+            "start": 4.5357,
+            "end": 4.619
+          },
+          {
+            "text": "memoria",
+            "start": 4.6547,
+            "end": 5.0119
+          },
+          {
+            "text": "compartida",
+            "start": 5.0714,
+            "end": 5.7024
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o2": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Conocer",
+            "start": 0.0976,
+            "end": 0.5143
+          },
+          {
+            "text": "el",
+            "start": 0.5143,
+            "end": 0.6095
+          },
+          {
+            "text": "pasado",
+            "start": 0.669,
+            "end": 0.9786
+          },
+          {
+            "text": "impide",
+            "start": 1.0024,
+            "end": 1.3476
+          },
+          {
+            "text": "volver",
+            "start": 1.3833,
+            "end": 1.7047
+          },
+          {
+            "text": "a",
+            "start": 1.7047,
+            "end": 1.7643
+          },
+          {
+            "text": "disfrutar",
+            "start": 1.8,
+            "end": 2.2167
+          },
+          {
+            "text": "el",
+            "start": 2.2167,
+            "end": 2.3238
+          },
+          {
+            "text": "presente",
+            "start": 2.3833,
+            "end": 2.9071
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_o2_exp": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "No",
+            "start": 0.0988,
+            "end": 0.3369
+          },
+          {
+            "text": "Javier",
+            "start": 1.2506,
+            "end": 1.703
+          },
+          {
+            "text": "y",
+            "start": 1.703,
+            "end": 1.7506
+          },
+          {
+            "text": "Federica",
+            "start": 1.7744,
+            "end": 2.2982
+          },
+          {
+            "text": "regresan",
+            "start": 2.3339,
+            "end": 2.8458
+          },
+          {
+            "text": "con",
+            "start": 2.8458,
+            "end": 2.9649
+          },
+          {
+            "text": "una",
+            "start": 2.9887,
+            "end": 3.1316
+          },
+          {
+            "text": "comprensión",
+            "start": 3.203,
+            "end": 3.7744
+          },
+          {
+            "text": "más",
+            "start": 3.7982,
+            "end": 4.0006
+          },
+          {
+            "text": "profunda",
+            "start": 4.0601,
+            "end": 4.453
+          },
+          {
+            "text": "de",
+            "start": 4.5244,
+            "end": 4.5363
+          },
+          {
+            "text": "su",
+            "start": 4.5601,
+            "end": 4.6673
+          },
+          {
+            "text": "presente",
+            "start": 4.7149,
+            "end": 5.2506
+          }
+        ]
+      }
+    ]
+  },
+  "qz027_que": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Qué",
+            "start": 0.0976,
+            "end": 0.2405
+          },
+          {
+            "text": "idea",
+            "start": 0.2405,
+            "end": 0.5381
+          },
+          {
+            "text": "resume",
+            "start": 0.5619,
+            "end": 0.919
+          },
+          {
+            "text": "mejor",
+            "start": 0.9547,
+            "end": 1.2762
+          },
+          {
+            "text": "la",
+            "start": 1.2881,
+            "end": 1.3833
+          },
+          {
+            "text": "despedida",
+            "start": 1.4429,
+            "end": 1.9191
+          },
+          {
+            "text": "de",
+            "start": 1.9667,
+            "end": 2.0024
+          },
+          {
+            "text": "los",
+            "start": 2.0381,
+            "end": 2.1452
+          },
+          {
+            "text": "cuatro",
+            "start": 2.2167,
+            "end": 2.4786
+          },
+          {
+            "text": "jóvenes",
+            "start": 2.4905,
+            "end": 3.1452
+          }
+        ]
+      }
+    ]
+  },
+  "whatsapp_chat_intro_pg070": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ventana",
+            "start": 0.0976,
+            "end": 0.5738
+          },
+          {
+            "text": "de",
+            "start": 0.6333,
+            "end": 0.6929
+          },
+          {
+            "text": "chat",
+            "start": 0.7524,
+            "end": 0.9905
+          },
+          {
+            "text": "de",
+            "start": 0.9905,
+            "end": 1.0619
+          },
+          {
+            "text": "Uatsáp",
+            "start": 1.1095,
+            "end": 1.6929
+          }
+        ]
+      }
+    ]
+  },
+  "pg029_n0018_emoji01": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0988,
+            "end": 0.5035
+          },
+          {
+            "text": "de",
+            "start": 0.5631,
+            "end": 0.6345
+          },
+          {
+            "text": "mono",
+            "start": 0.6703,
+            "end": 1.0036
+          }
+        ]
+      }
+    ]
+  },
+  "pg029_n0018_emoji01_easy_read": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0988,
+            "end": 0.5035
+          },
+          {
+            "text": "de",
+            "start": 0.5631,
+            "end": 0.6345
+          },
+          {
+            "text": "mono",
+            "start": 0.6703,
+            "end": 1.0036
+          }
+        ]
+      }
+    ]
+  },
+  "pg069_n0009": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0976,
+            "end": 0.5262
+          },
+          {
+            "text": "de",
+            "start": 0.5738,
+            "end": 0.6452
+          },
+          {
+            "text": "cara",
+            "start": 0.7167,
+            "end": 0.9071
+          },
+          {
+            "text": "gritando",
+            "start": 0.9547,
+            "end": 1.3833
+          },
+          {
+            "text": "de",
+            "start": 1.4429,
+            "end": 1.4905
+          },
+          {
+            "text": "miedo",
+            "start": 1.5262,
+            "end": 1.8833
+          }
+        ]
+      }
+    ]
+  },
+  "pg069_n0009_easy_read": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0976,
+            "end": 0.5262
+          },
+          {
+            "text": "de",
+            "start": 0.5738,
+            "end": 0.6452
+          },
+          {
+            "text": "cara",
+            "start": 0.7167,
+            "end": 0.9071
+          },
+          {
+            "text": "gritando",
+            "start": 0.9547,
+            "end": 1.3833
+          },
+          {
+            "text": "de",
+            "start": 1.4429,
+            "end": 1.4905
+          },
+          {
+            "text": "miedo",
+            "start": 1.5262,
+            "end": 1.8833
+          }
+        ]
+      }
+    ]
+  },
+  "pg069_n0019_emoji01": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0976,
+            "end": 0.5143
+          },
+          {
+            "text": "de",
+            "start": 0.5738,
+            "end": 0.6452
+          },
+          {
+            "text": "cara",
+            "start": 0.7167,
+            "end": 0.9071
+          },
+          {
+            "text": "haciendo",
+            "start": 0.9071,
+            "end": 1.2762
+          },
+          {
+            "text": "una",
+            "start": 1.2762,
+            "end": 1.431
+          },
+          {
+            "text": "mueca",
+            "start": 1.4547,
+            "end": 1.8357
+          }
+        ]
+      }
+    ]
+  },
+  "pg069_n0019_emoji01_easy_read": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Emolli",
+            "start": 0.0976,
+            "end": 0.5143
+          },
+          {
+            "text": "de",
+            "start": 0.5738,
+            "end": 0.6452
+          },
+          {
+            "text": "cara",
+            "start": 0.7167,
+            "end": 0.9071
+          },
+          {
+            "text": "haciendo",
+            "start": 0.9071,
+            "end": 1.2762
+          },
+          {
+            "text": "una",
+            "start": 1.2762,
+            "end": 1.431
+          },
+          {
+            "text": "mueca",
+            "start": 1.4547,
+            "end": 1.8357
+          }
+        ]
+      }
+    ]
+  },
+  "pg094_im002": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ventana",
+            "start": 0.0976,
+            "end": 0.5619
+          },
+          {
+            "text": "de",
+            "start": 0.6333,
+            "end": 0.681
+          },
+          {
+            "text": "chat",
+            "start": 0.7405,
+            "end": 0.9547
+          },
+          {
+            "text": "de",
+            "start": 0.9667,
+            "end": 1.05
+          },
+          {
+            "text": "Uatsáp",
+            "start": 1.1095,
+            "end": 1.5619
+          },
+          {
+            "text": "con",
+            "start": 1.6095,
+            "end": 1.7167
+          },
+          {
+            "text": "estética",
+            "start": 1.7286,
+            "end": 2.181
+          },
+          {
+            "text": "antigua",
+            "start": 2.181,
+            "end": 2.6929
+          }
+        ]
+      }
+    ]
+  },
+  "pg094_im003": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ventana",
+            "start": 0.0976,
+            "end": 0.5619
+          },
+          {
+            "text": "de",
+            "start": 0.6333,
+            "end": 0.681
+          },
+          {
+            "text": "chat",
+            "start": 0.7405,
+            "end": 0.9547
+          },
+          {
+            "text": "de",
+            "start": 0.9667,
+            "end": 1.05
+          },
+          {
+            "text": "Uatsáp",
+            "start": 1.1095,
+            "end": 1.5619
+          },
+          {
+            "text": "con",
+            "start": 1.6095,
+            "end": 1.7167
+          },
+          {
+            "text": "estética",
+            "start": 1.7286,
+            "end": 2.181
+          },
+          {
+            "text": "antigua",
+            "start": 2.181,
+            "end": 2.6929
+          }
+        ]
+      }
+    ]
+  },
+  "pg176177_n0006": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "¿?",
+            "start": 0.0982,
+            "end": 1.4434
+          }
+        ]
+      }
+    ]
+  },
+  "pg176177_n0006_easy_read": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "¿?",
+            "start": 0.0982,
+            "end": 1.4434
+          }
+        ]
+      }
+    ]
+  },
+  "pg176177_n0011": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "¿?",
+            "start": 0.0982,
+            "end": 1.4434
+          }
+        ]
+      }
+    ]
+  },
+  "pg176177_n0011_easy_read": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "¿?",
+            "start": 0.0982,
+            "end": 1.4434
+          }
+        ]
+      }
+    ]
+  },
+  "whatsapp_chat_intro_historical": {
+    "timecodes": [
+      null,
+      {
+        "word_timestamps": [
+          {
+            "text": "Ventana",
+            "start": 0.0976,
+            "end": 0.5619
+          },
+          {
+            "text": "de",
+            "start": 0.6214,
+            "end": 0.6814
+          },
+          {
+            "text": "chat",
+            "start": 0.7405,
+            "end": 0.9548
+          },
+          {
+            "text": "de",
+            "start": 0.9667,
+            "end": 1.05
+          },
+          {
+            "text": "uátsap",
+            "start": 1.0976,
+            "end": 1.6333
+          },
+          {
+            "text": "con",
+            "start": 1.6929,
+            "end": 1.8
+          },
+          {
+            "text": "estética",
+            "start": 1.8238,
+            "end": 2.2762
+          },
+          {
+            "text": "antigua",
+            "start": 2.2762,
+            "end": 2.7881
+          }
+        ]
+      }
+    ]
   }
 }

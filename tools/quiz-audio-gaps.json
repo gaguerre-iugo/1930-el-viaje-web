@@ -3,36 +3,7 @@
   "textos_con_cambio_registrado": 189,
   "audios_desactualizados": 0,
   "ids_desactualizados": [],
-  "regenerados_sin_commitear": [
-    "qz007_o0",
-    "qz007_o0_exp",
-    "qz007_o2",
-    "qz007_o2_exp",
-    "qz010_o2",
-    "qz010_o2_exp",
-    "qz013_o1",
-    "qz013_o1_exp",
-    "qz013_o2",
-    "qz013_o2_exp",
-    "qz016_o1",
-    "qz016_o1_exp",
-    "qz016_o2",
-    "qz016_o2_exp",
-    "qz019_o1",
-    "qz019_o1_exp",
-    "qz019_o2",
-    "qz019_o2_exp",
-    "qz022_o0_exp",
-    "qz022_o1",
-    "qz022_o1_exp",
-    "qz022_o2",
-    "qz022_o2_exp",
-    "qz025_o0_exp",
-    "qz025_o1",
-    "qz025_o1_exp",
-    "qz025_o2",
-    "qz025_o2_exp"
-  ],
+  "regenerados_sin_commitear": [],
   "desactualizados_por_quiz": {},
   "archivos_a_regenerar_por_voz": 0,
   "audios_sin_registro_en_catalogo": [],
@@ -1566,23 +1537,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -1602,23 +1573,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -1710,23 +1681,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -1746,23 +1717,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -2321,7 +2292,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2357,7 +2328,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2393,7 +2364,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2429,7 +2400,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2466,23 +2437,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -2502,23 +2473,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -2537,7 +2508,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2573,7 +2544,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2609,7 +2580,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2645,7 +2616,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2681,7 +2652,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2717,7 +2688,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2753,7 +2724,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2789,7 +2760,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2825,7 +2796,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2861,7 +2832,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2897,7 +2868,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2933,7 +2904,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -2969,7 +2940,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3005,7 +2976,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3041,7 +3012,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3077,7 +3048,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3113,7 +3084,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3150,23 +3121,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3186,23 +3157,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3222,23 +3193,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3258,23 +3229,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3293,7 +3264,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3329,7 +3300,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3365,7 +3336,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3401,7 +3372,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3437,7 +3408,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3473,7 +3444,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3509,7 +3480,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3545,7 +3516,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3581,7 +3552,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3617,7 +3588,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3653,7 +3624,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3689,7 +3660,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3725,7 +3696,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3761,7 +3732,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3797,7 +3768,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3833,7 +3804,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3869,7 +3840,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -3906,23 +3877,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3942,23 +3913,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -3978,23 +3949,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4014,23 +3985,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4049,7 +4020,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4085,7 +4056,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4121,7 +4092,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4157,7 +4128,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4193,7 +4164,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4229,7 +4200,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4265,7 +4236,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4301,7 +4272,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4337,7 +4308,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4373,7 +4344,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4409,7 +4380,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4445,7 +4416,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4481,7 +4452,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4517,7 +4488,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4553,7 +4524,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4589,7 +4560,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4625,7 +4596,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4662,23 +4633,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4698,23 +4669,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4734,23 +4705,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4770,23 +4741,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -4805,7 +4776,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4841,7 +4812,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4877,7 +4848,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4913,7 +4884,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4949,7 +4920,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -4985,7 +4956,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5021,7 +4992,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5057,7 +5028,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5093,7 +5064,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5129,7 +5100,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5165,7 +5136,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5201,7 +5172,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5237,7 +5208,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5273,7 +5244,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5309,7 +5280,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5345,7 +5316,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5382,23 +5353,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -5418,23 +5389,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -5454,23 +5425,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -5490,23 +5461,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -5526,23 +5497,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -5561,7 +5532,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5597,7 +5568,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5633,7 +5604,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5669,7 +5640,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5705,7 +5676,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5741,7 +5712,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5777,7 +5748,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5813,7 +5784,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5849,7 +5820,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5885,7 +5856,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5921,7 +5892,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5957,7 +5928,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -5993,7 +5964,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6029,7 +6000,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6065,7 +6036,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6101,7 +6072,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6138,23 +6109,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -6174,23 +6145,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -6210,23 +6181,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -6246,23 +6217,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -6282,23 +6253,23 @@
         "base": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": null,
-          "fecha": null,
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
           "modificado_sin_commitear": false
         },
         "valentina": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         },
         "mateo": {
           "registrado": true,
           "archivo_existe": true,
-          "ultimo_commit": "3583f830",
-          "fecha": "2026-08-11",
-          "modificado_sin_commitear": true
+          "ultimo_commit": "416b6c4f",
+          "fecha": "2026-09-16",
+          "modificado_sin_commitear": false
         }
       }
     },
@@ -6317,7 +6288,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6353,7 +6324,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6389,7 +6360,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6425,7 +6396,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6461,7 +6432,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6497,7 +6468,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6533,7 +6504,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6569,7 +6540,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6605,7 +6576,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6641,7 +6612,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6677,7 +6648,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6713,7 +6684,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6749,7 +6720,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6785,7 +6756,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
@@ -6821,7 +6792,7 @@
       "audios": {
         "base": {
           "registrado": true,
-          "archivo_existe": false,
+          "archivo_existe": true,
           "ultimo_commit": null,
           "fecha": null,
           "modificado_sin_commitear": false
