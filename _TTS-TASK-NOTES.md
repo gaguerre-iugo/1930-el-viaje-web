@@ -393,6 +393,193 @@ Solución: copiar el render de Valentina a `audio/`, reetiquetar con
 Verificado: 74/74 MP3 y timecodes idénticos a los de la voz, 0 claves
 ajenas, 0 colgadas, bitrate normalizado de 192 a 96 kbps.
 
+## PRUEBA DE CONCEPTO: eliminar el audio del catálogo base (opción B)
+
+**Estado: implementada y validada. Sin borrar nada.** El cambio está sin
+commitear en `assets/reflow-book.js` (+30 líneas) y el `?v=` de `index.html`.
+
+### Por qué el base es necesario (y qué no lo es)
+
+El runtime descarga `content/i18n/es-UY/audios.json` **por su cuenta** (función
+`Rj()` en `bundle.local.js`, que hace `r.set(ny, a.audios)`) y arma la cola de
+narración con sus claves. Por eso `reflow-book.js` intercepta ese fetch: los
+ids que no estén en ese mapa **nunca se leen**. Eso es estructural y no se puede
+quitar sin tocar el runtime.
+
+Lo que **sí** es prescindible es el **audio**: de los 773 MB de `audio/`,
+**764 MB (99 %)** corresponden a ids que también están en los dos catálogos de
+voz. Los 29 restantes tienen texto vacío en `texts.json`.
+
+### El cambio
+
+En `installReflowDataAdapter`, después de los overrides, se reescribe cada id
+del mapa base para que apunte al archivo del narrador elegido:
+
+```js
+var vozMapa = await (await inheritedFetch(
+  "./content/i18n/es-UY/voices/" + state.ttsVoice + "/audios.json?v=..."
+)).json();
+Object.keys(data).forEach(function (id) {
+  if (vozMapa[id]) data[id] = vozMapa[id];
+});
+```
+
+El motor ya soporta rutas `voices/` en el mapa (tres lugares comprueban
+`filename.indexOf("voices/") === 0`).
+
+### Verificación en navegador
+
+| Página | Audio | De voz | De base |
+|---|---|---|---|
+| portada | 4 | 4 | 0 |
+| quiz `#qz007` | 4 | 4 | 0 |
+| créditos `#pg225_sec001` | 7 | 7 | 0 |
+| agradecimientos `#pg226_sec001` | 7 | 7 | 0 |
+| chat WhatsApp `#pg069_sec001` | 6 | 6 | 0 |
+| lectura fácil `#pg022_sec001` | 5 | 5 | 0 |
+| `#pg071` / `#pg152` (residuos) | 4 / 2 | 4 / 2 | 0 |
+| **con Mateo** `#pg225_sec001` | 5 | **5 de Mateo** | 0 |
+
+Mapa: **10.074 de 10.074** ids del catálogo de voz reescritos (**100 %**).
+Quedan 29 rutas base. 0 errores y 0 peticiones fallidas.
+
+Cubre las cuatro rutas de audio: quiz, cierre, WhatsApp y lectura fácil. Y el
+cambio de narrador funciona: los 5 audios de la prueba con Mateo salieron de
+`voices/mateo/`, 0 del base.
+
+### Lo único que queda pendiente
+
+Los 29 ids con texto vacío. Son residuos de la exportación que el motor **vacía
+a propósito** (`data.pg113_n0002_easy_read = ""` + `suppressBlankCatalogueResidues`),
+así que no son contenido narrable. Pero en `#pg113_sec001` **sí se pidió**
+`audio/pg113_n0002.mp3`: hoy se reproducen ~2 s de audio viejo para un fragmento
+que está vaciado y oculto. Borrar el base lo volvería silencio (más correcto),
+aunque conviene quitarlos del mapa o apuntarlos a un silencio para no depender
+de un 404.
+
+### Costo
+
+El adaptador pasa a descargar `voices/<voz>/audios.json` (**1.032.918 B**) al
+arrancar, cuando antes se difería a la primera narración. A cambio, 764 MB
+dejan de ser necesarios.
+
+### Antes de borrar, falta
+
+1. Decidir qué hacer con los 29 residuos (quitarlos del mapa o apuntarlos a silencio).
+2. Reaplicar el rewrite si el usuario cambia de narrador (hoy no hace falta
+   porque el catálogo de voz gana, pero conviene dejarlo explícito).
+3. Centralizar el `?v=` que quedó duplicado en la URL.
+4. Probar `file://`, donde el precargador sirve el `audios.json` desde memoria.
+5. Bumpear el `?v=` al commitear.
+
+## OPCIÓN B IMPLEMENTADA: el audio del catálogo base se elimina
+
+### Los 29 residuos: resueltos
+
+Se quitaron del mapa base (10.102 → 10.073 claves). Son fragmentos cuyo texto
+está vacío en `texts.json` y que el motor ya vacía y oculta a propósito
+(`suppressBlankCatalogueResidues`). Al quitarlos del mapa dejan de encolarse, y
+se termina el efecto de que sonara audio viejo para un fragmento invisible.
+
+### El borrado: 762 MB
+
+Se borraron 10.036 archivos de `content/i18n/es-UY/audio/` (762 MB), es decir
+todos los referenciados por el mapa base. Se conservaron:
+
+- los **15 declarados en `imsmanifest.xml`** (SCORM), para no desincronizar el paquete;
+- los **123 huérfanos**, por decisión previa.
+
+`audio/` pasó de 773 MB a **11 MB**.
+
+### El cambio en el motor
+
+En `installReflowDataAdapter`, el mapa base se reapunta al narrador elegido
+mediante `rewriteBaseAudioMapToVoice()`, que también se invoca al cargar el
+catálogo de voz (así sigue un cambio de narrador). La etiqueta de versión de los
+catálogos de voz quedó centralizada en `ttsVoiceCatalogVersion`.
+
+### Verificación
+
+| Escenario | Resultado |
+|---|---|
+| Mapa base | 10.074 claves, **100 % apuntando a las voces**, 0 en base |
+| 7 páginas por HTTP (quiz, cierre, WhatsApp, lectura fácil, residuos) | 0 peticiones al base, 0 fallidas |
+| Cambio de narrador a Mateo | 7 de 8 de Mateo, 0 del base |
+| `file://` | arranca y narra, ver abajo |
+
+## El precargador offline: dos bugs preexistentes, arreglados
+
+Al verificar `file://` el usuario reportó «No fue posible preparar el libro
+reflowable». **No lo causó el borrado**: era un defecto previo, y había dos.
+
+### Bug 1: le faltaban secciones
+
+El precargador inlinea las páginas del libro, y el lector hace `Promise.all`
+sobre **todas** (`reflow-book.js`, línea 11180): si una falla, no arranca.
+Inlineaba 197 de 200 secciones — le faltaban exactamente las tres de cierre
+(`pg225/226/227_sec001.html`), agregadas en `393868ba` (11 sep) **después** de
+generarse el precargador, que nunca se regeneró. Por eso `file://` estaba roto
+desde 3 días antes de este trabajo.
+
+### Bug 2: los catálogos iban como texto
+
+El manejador hace:
+
+```js
+var isJson = key.slice(-5) === ".json";
+var body = isJson ? JSON.stringify(data) : data;
+```
+
+o sea que los `.json` deben guardarse como **objeto**. El archivo guardaba
+**224 de 228 valores como string**, incluidos `audios.json`, `texts.json` y los
+catálogos de voz: `JSON.stringify(texto)` los devolvía doblemente escapados, y
+el lector recibía un string en vez de un objeto.
+
+### Bug 3 (de paso): codificación
+
+`pg225_sec001.html` tenía un byte Latin-1 suelto (`Cr\xe9ditos` en vez de UTF-8).
+Reparado.
+
+### El generador: `tools/build_offline_preloader.py`
+
+El original (`tools/build_portable_web_export.py`) no está en el repositorio, así
+que se escribió uno. Preserva intacta la lógica del precargador (el wrapper,
+`lookup()` y el reemplazo de `window.fetch`) y regenera **solo** el mapa
+`INLINE`, con el formato correcto: **objetos** para los `.json` y strings para
+el resto. Además serializa los JSON compactos, así que el archivo **baja de
+24,6 a 15,6 MB**.
+
+```
+venv\Scripts\python.exe tools/build_offline_preloader.py          # dry-run
+venv\Scripts\python.exe tools/build_offline_preloader.py --apply
+```
+
+Inlinea 231 archivos: `index.html`, las 215 páginas, el bundle, los catálogos,
+la navegación y los índices.
+
+### Verificación de `file://` tras el arreglo
+
+| Página | Audio | De voz | De base |
+|---|---|---|---|
+| portada | 3 | 3 | 0 |
+| texto pg100 | 3 | 3 | 0 |
+| quiz qz007 | 4 | 4 | 0 |
+| créditos pg225 | 5 | 5 | 0 |
+| agradecimientos pg226 | 4 | 4 | 0 |
+| glosario | 4 | 4 | 0 |
+
+4.463 elementos compuestos, 0 peticiones fallidas. Los únicos avisos son de
+fuentes (`Access to font ... from origin`), una restricción conocida de `file://`
+que no afecta al libro.
+
+## Resultado en tamaño
+
+| | Antes | Ahora |
+|---|---|---|
+| `content/i18n/es-UY/audio/` | 773 MB | **11 MB** |
+| `assets/offline-preloader.js` | 24,6 MB | **15,6 MB** |
+| Repo sin `.git` | 1.362 MB | **591 MB** |
+
 ## Trabajo pendiente (no hecho, a decisión del usuario)
 
 1. **26 locuciones de lectura fácil** (`pg022`…`pg214`) cambiadas en `15824ee9`
