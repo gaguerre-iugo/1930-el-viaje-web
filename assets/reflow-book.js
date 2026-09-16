@@ -223,7 +223,7 @@
   var defaultReaderStateMigrationKey =
     "adt-reflow-default-reader-state:47-full-book-45";
   var retiredTextCaseStorageKey = "adt-reflow-text-case:1930-libro-completo-v47";
-  var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v48-puck-zephyr";
+  var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
   var reducedMotionStorageKey = "adt-reflow-reduced-motion:1930-libro-completo-v47";
   var activityProgressStorageKey = "adt-reflow-activity-progress:1930-el-viaje:v1";
   var editorialTocTitles = {
@@ -264,13 +264,13 @@
     else entries.splice(targetIndex, 0, movingEntry);
   }
   var fontScales = { normal: 1, large: 1.2, xlarge: 1.4, xxlarge: 2 };
-  var ttsVoices = { puck: "Puck", zephyr: "Zephyr" };
+  var ttsVoices = { valentina: "Valentina", mateo: "Mateo" };
   var ttsVoiceCatalogs = {
-    puck: {
+    valentina: {
       audios: Object.create(null), timecodes: Object.create(null),
       available: false, status: "idle", promise: null
     },
-    zephyr: {
+    mateo: {
       audios: Object.create(null), timecodes: Object.create(null),
       available: false, status: "idle", promise: null
     }
@@ -396,7 +396,7 @@
     glossaryHighlightFocusPage: null,
     glossaryHighlightFocusUntil: 0,
     fontSize: "normal",
-    ttsVoice: "puck",
+    ttsVoice: "valentina",
     ttsVoiceStatusTimer: 0
   };
 
@@ -599,7 +599,7 @@
            semantic id exists in the base audio catalogue.  The visible chat
            cards are composed after the source pages load, so register every
            generated intro id here as an alias.  The media bridge below still
-           swaps these placeholders for the selected Puck/Zephyr clip and
+           swaps these placeholders for the selected Valentina/Mateo clip and
            its matching timings immediately before playback. */
         [
           "pg068_im004", "pg069_im004", "pg069_im005", "pg079_im002",
@@ -3314,7 +3314,7 @@
       var stored = localStorage.getItem(ttsVoiceStorageKey);
       if (Object.prototype.hasOwnProperty.call(ttsVoices, stored)) state.ttsVoice = stored;
     } catch (_error) {
-      state.ttsVoice = "puck";
+      state.ttsVoice = "valentina";
     }
     document.body.dataset.reflowTtsVoice = state.ttsVoice;
     window.__adtReflowTtsVoice = state.ttsVoice;
@@ -3521,7 +3521,7 @@
        never keeps narrating the simplified asset in ordinary reading. */
     var baseId = requestedId.replace(/_easy_read$/, "");
     if (!document.body.classList.contains("reflow-easy-read")) return baseId;
-    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.puck;
+    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.valentina;
     var easyId = baseId + "_easy_read";
     if ((catalogue.audios && catalogue.audios[easyId]) ||
         (window.__adtReflowAudioFiles && window.__adtReflowAudioFiles[easyId])) {
@@ -3532,12 +3532,12 @@
 
   function ttsVoiceFilename(audioId) {
     if (isSceneSeparatorAudioId(audioId)) {
-      var sceneCatalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.puck;
+      var sceneCatalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.valentina;
       return sceneCatalogue.audios.pg166_n0007 ||
         ("voices/" + state.ttsVoice +
           "/audio/pg166_n0007.mp3?v=47-scene-separator-2");
     }
-    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.puck;
+    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.valentina;
     var whatsAppKind = whatsAppWindowAudioKind(audioId);
     if (whatsAppKind) {
       var sharedWhatsAppId = whatsAppKind === "historical"
@@ -3553,7 +3553,7 @@
   }
 
   function ttsTimingsForItem(audioId, fallback) {
-    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.puck;
+    var catalogue = ttsVoiceCatalogs[state.ttsVoice] || ttsVoiceCatalogs.valentina;
     var whatsAppKind = whatsAppWindowAudioKind(audioId);
     var effectiveId = ttsEffectiveAudioId(audioId);
     var timings = isSceneSeparatorAudioId(audioId)
@@ -4194,10 +4194,10 @@
           '<span id="reflow-tts-voice-label">Voz del narrador</span>' +
           '<div class="reflow-tts-voice-options" role="radiogroup" ' +
             'aria-labelledby="reflow-tts-voice-label">' +
-            '<button type="button" role="radio" data-reflow-tts-voice="puck" ' +
-              'aria-checked="false" aria-pressed="false">Puck</button>' +
-            '<button type="button" role="radio" data-reflow-tts-voice="zephyr" ' +
-              'aria-checked="false" aria-pressed="false">Zephyr</button>' +
+            '<button type="button" role="radio" data-reflow-tts-voice="valentina" ' +
+              'aria-checked="false" aria-pressed="false">Valentina</button>' +
+            '<button type="button" role="radio" data-reflow-tts-voice="mateo" ' +
+              'aria-checked="false" aria-pressed="false">Mateo</button>' +
           '</div>' +
           '<span id="reflow-tts-voice-status" class="reflow-control-status" ' +
             'role="status" aria-live="polite" hidden></span>';
@@ -8562,7 +8562,7 @@
 
     /* An emoji embedded at the end of a sentence is a separate spoken unit.
        This prevents the message audio from consuming it silently and gives
-       the emoji its own Puck/Zephyr clip without making it yellow. */
+       the emoji its own Valentina/Mateo clip without making it yellow. */
     function splitTextualEmoji(sourceId, symbol, emojiId, label) {
       var source = content.querySelector('[data-id="' + sourceId + '"]');
       if (!source || content.querySelector('[data-id="' + emojiId + '"]')) return;
@@ -11061,7 +11061,7 @@
       } else if (action === "startTts") {
         startTtsFromSettings();
       } else if (action === "voice") {
-        applyTtsVoice(String(payload.voice || bridge.dataset.voice || "puck"));
+        applyTtsVoice(String(payload.voice || bridge.dataset.voice || "valentina"));
       }
       bridge.dataset.current = String(state.current + 1);
       bridge.dataset.total = String(state.total);
@@ -11116,7 +11116,7 @@
     loadTtsVoicePreference();
     loadReducedMotionPreference();
     installReflowDataAdapter();
-    /* El catalogo por voz (audios + timecodes especificos, ~9 MB en Puck)
+    /* El catalogo por voz (audios + timecodes especificos, ~9 MB en Valentina)
        era descargado y esperado aqui, bloqueando el primer render con datos que
        solo hacen falta al narrar. Se difiere a la primera activacion de lectura
        en voz alta (ensureTtsVoiceCatalog); hasta entonces la narracion usa el

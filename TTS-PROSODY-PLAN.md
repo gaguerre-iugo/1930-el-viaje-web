@@ -73,13 +73,13 @@ Una transcripción prosódica derivada de una lectura humana es la referencia
 más fiable. Si no existe audio humano, el modelo puede inferir una partitura,
 pero esa salida sigue siendo una interpretación que conviene revisar.
 
-## Evaluación del piloto Gemini/Puck recibido
+## Perfil estable y partitura contextual
 
-El prompt recibido define una identidad vocal general —español montevideano,
-articulación compacta, altura algo aguda, ritmo conversacional y ausencia de
-musicalidad mexicana—, por lo que es un buen **perfil base de voz**. No alcanza
-por sí solo como dirección de una obra extensa porque no describe qué debe
-ocurrir en cada enunciado.
+Una identidad vocal general —español montevideano, articulación compacta,
+altura media, ritmo conversacional y ausencia de musicalidad ajena al
+rioplatense— es un buen **perfil base de voz**, pero no alcanza por sí sola
+como dirección de una obra extensa porque no describe qué debe ocurrir en cada
+enunciado.
 
 La versión de control debe separar dos capas:
 
@@ -98,7 +98,7 @@ etiquetas o instrucciones de lenguaje natural).
 
 ### Prueba comparativa mínima
 
-Para evaluar Gemini/Puck, Azure u otro sintetizador se usarán los mismos
+Para evaluar Azure u otro sintetizador se usarán los mismos
 20–30 pasajes y cuatro variantes:
 
 - texto plano;
