@@ -39182,14 +39182,14 @@
   ],
   "pg010_n0002_easy_read": [
     {
-      "text": "Pusimos",
+      "text": "pusimos",
       "start": 0.0976,
       "end": 0.5976
     },
     {
       "text": "a",
       "start": 0.5976,
-      "end": 0.6576
+      "end": 0.6452
     },
     {
       "text": "disposición",
@@ -39204,7 +39204,7 @@
     {
       "text": "de",
       "start": 2.7381,
-      "end": 2.7981
+      "end": 2.7976
     },
     {
       "text": "acompañamiento",
@@ -39224,7 +39224,7 @@
     {
       "text": "un",
       "start": 6.9417,
-      "end": 7.0846
+      "end": 7.0845
     },
     {
       "text": "club",
@@ -39239,7 +39239,7 @@
     {
       "text": "lectura",
       "start": 7.4774,
-      "end": 7.8227
+      "end": 7.8226
     },
     {
       "text": "abierto",
@@ -45748,9 +45748,9 @@
   ],
   "pg014_n0002_easy_read": [
     {
-      "text": "con",
+      "text": "Con",
       "start": 0.0976,
-      "end": 0.2523
+      "end": 0.2524
     },
     {
       "text": "la",
@@ -45760,12 +45760,12 @@
     {
       "text": "realización",
       "start": 0.3952,
-      "end": 0.9547
+      "end": 0.9548
     },
     {
       "text": "de",
       "start": 0.9905,
-      "end": 1.0505
+      "end": 1.0381
     },
     {
       "text": "la",
@@ -45785,7 +45785,7 @@
     {
       "text": "Mundo",
       "start": 1.5976,
-      "end": 1.9309
+      "end": 1.931
     },
     {
       "text": "en",
@@ -45810,22 +45810,17 @@
     {
       "text": "los",
       "start": 3.8476,
-      "end": 3.9904
+      "end": 3.9905
     },
     {
-      "text": "100",
+      "text": "100 años",
       "start": 3.9905,
-      "end": 4.2171
-    },
-    {
-      "text": "años",
-      "start": 4.2171,
       "end": 4.5024
     },
     {
       "text": "de",
       "start": 4.5143,
-      "end": 4.5743
+      "end": 4.5619
     },
     {
       "text": "la",
@@ -45845,12 +45840,12 @@
     {
       "text": "de",
       "start": 5.669,
-      "end": 5.729
+      "end": 5.7167
     },
     {
       "text": "este",
       "start": 5.7167,
-      "end": 5.9072
+      "end": 5.9071
     },
     {
       "text": "tipo",
@@ -61431,99 +61426,94 @@
   ],
   "pg023_n0002_easy_read": [
     {
-      "text": "Dicen",
-      "start": 0.0976,
-      "end": 0.5143
-    },
-    {
       "text": "que",
-      "start": 0.5381,
-      "end": 0.7048
+      "start": 0.0976,
+      "end": 0.3
     },
     {
       "text": "gracias",
-      "start": 0.9429,
-      "end": 1.3119
+      "start": 0.5976,
+      "end": 0.9667
     },
     {
       "text": "al",
-      "start": 1.3119,
-      "end": 1.3952
+      "start": 0.9667,
+      "end": 1.0381
     },
     {
       "text": "Mundial",
-      "start": 1.419,
-      "end": 1.9309
+      "start": 1.0619,
+      "end": 1.6095
     },
     {
       "text": "van",
-      "start": 2.2048,
-      "end": 2.3595
+      "start": 1.8714,
+      "end": 2.0262
     },
     {
       "text": "a",
-      "start": 2.3714,
-      "end": 2.4314
+      "start": 2.0381,
+      "end": 2.0857
     },
     {
       "text": "venir",
-      "start": 2.4548,
-      "end": 2.6929
+      "start": 2.1214,
+      "end": 2.3595
     },
     {
       "text": "muchos",
-      "start": 2.7286,
-      "end": 3.0619
+      "start": 2.3952,
+      "end": 2.7286
     },
     {
       "text": "inversores",
-      "start": 3.0857,
-      "end": 3.6214
+      "start": 2.7524,
+      "end": 3.2881
     },
     {
       "text": "extranjeros",
-      "start": 3.6214,
-      "end": 4.2762
+      "start": 3.2881,
+      "end": 3.9547
     },
     {
       "text": "y",
-      "start": 4.3476,
-      "end": 4.4076
+      "start": 4.0262,
+      "end": 4.0857
     },
     {
       "text": "la",
-      "start": 4.4429,
-      "end": 4.5029
+      "start": 4.1214,
+      "end": 4.181
     },
     {
       "text": "economía",
-      "start": 4.5024,
-      "end": 4.9786
+      "start": 4.181,
+      "end": 4.669
     },
     {
       "text": "del",
-      "start": 5.0381,
-      "end": 5.1095
+      "start": 4.7286,
+      "end": 4.8
     },
     {
       "text": "país",
-      "start": 5.181,
-      "end": 5.5024
+      "start": 4.8714,
+      "end": 5.181
     },
     {
       "text": "va",
-      "start": 5.5619,
-      "end": 5.6809
+      "start": 5.2286,
+      "end": 5.3476
     },
     {
       "text": "a",
-      "start": 5.681,
-      "end": 5.741
+      "start": 5.3476,
+      "end": 5.3952
     },
     {
       "text": "mejorar",
-      "start": 5.7762,
-      "end": 6.2405
+      "start": 5.431,
+      "end": 5.8833
     }
   ],
   "pg023_n0003": [
@@ -86171,84 +86161,79 @@
   ],
   "pg033_n0002_easy_read": [
     {
-      "text": "Lo",
-      "start": 0.0976,
-      "end": 0.2523
-    },
-    {
       "text": "que",
-      "start": 0.3,
-      "end": 0.36
+      "start": 0.0976,
+      "end": 0.2047
     },
     {
       "text": "tenía",
-      "start": 0.419,
-      "end": 0.7404
+      "start": 0.2643,
+      "end": 0.5857
     },
     {
       "text": "era",
-      "start": 0.7643,
-      "end": 0.8953
+      "start": 0.6095,
+      "end": 0.7405
     },
     {
       "text": "de",
-      "start": 0.9429,
-      "end": 1.0143
+      "start": 0.7762,
+      "end": 0.8476
     },
     {
       "text": "cuando",
-      "start": 1.0857,
-      "end": 1.3119
+      "start": 0.919,
+      "end": 1.1571
     },
     {
       "text": "se",
-      "start": 1.3357,
-      "end": 1.431
+      "start": 1.181,
+      "end": 1.2762
     },
     {
       "text": "sentaba",
-      "start": 1.4667,
-      "end": 1.8357
+      "start": 1.3119,
+      "end": 1.7047
     },
     {
       "text": "a",
-      "start": 1.8357,
-      "end": 1.8957
+      "start": 1.7047,
+      "end": 1.7285
     },
     {
       "text": "escribir",
-      "start": 1.8714,
-      "end": 2.3
+      "start": 1.7405,
+      "end": 2.1928
     },
     {
       "text": "en",
-      "start": 2.3119,
-      "end": 2.3952
+      "start": 2.2048,
+      "end": 2.2881
     },
     {
       "text": "unos",
-      "start": 2.419,
-      "end": 2.6333
+      "start": 2.3119,
+      "end": 2.5381
     },
     {
       "text": "cuadernos",
-      "start": 2.669,
-      "end": 3.0976
+      "start": 2.5738,
+      "end": 3.0142
     },
     {
       "text": "de",
-      "start": 3.1214,
-      "end": 3.1814
+      "start": 3.0262,
+      "end": 3.0976
     },
     {
       "text": "tapas",
-      "start": 3.2405,
-      "end": 3.4905
+      "start": 3.1571,
+      "end": 3.4071
     },
     {
       "text": "negras",
-      "start": 3.5262,
-      "end": 4.0857
+      "start": 3.4429,
+      "end": 4.0024
     }
   ],
   "pg033_n0003": [
@@ -88990,34 +88975,29 @@
   ],
   "pg034_n0002_easy_read": [
     {
-      "text": "El",
-      "start": 0.0976,
-      "end": 0.2523
-    },
-    {
-      "text": "recorte",
-      "start": 0.2762,
-      "end": 0.6572
+      "text": "y",
+      "start": 0.0988,
+      "end": 0.1821
     },
     {
       "text": "termina",
-      "start": 0.7167,
-      "end": 1.0738
+      "start": 0.2417,
+      "end": 0.6464
     },
     {
       "text": "a",
-      "start": 1.0738,
-      "end": 1.1338
+      "start": 0.6583,
+      "end": 0.706
     },
     {
       "text": "sus",
-      "start": 1.1333,
-      "end": 1.288
+      "start": 0.7298,
+      "end": 0.8845
     },
     {
       "text": "pies",
-      "start": 1.3595,
-      "end": 1.7166
+      "start": 0.9679,
+      "end": 1.3369
     }
   ],
   "pg034_n0003": [

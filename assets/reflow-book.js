@@ -694,6 +694,20 @@
        and the runtime cannot diverge. */
     data.pg025_n0019_easy_read = "";
     data.pg015_n0002_easy_read = "";
+    /* The remaining five forced joins kept an Easy Read half that restarted the
+       clause, so the seam read as broken text: "Para colmo, la gente cree
+       Dicen que…", "…más vivo Lo que tenía era…", "…uno revolotea El recorte
+       termina…", "…están conectados. con la realización…" and "Para eso
+       Pusimos a disposición…". In every one of them the defect is confined to
+       the second fragment, so widening that fragment to continue the clause
+       repairs the join and leaves the first half — and its recorded audio —
+       untouched. Mirrored in texts.json so the offline snapshot and the runtime
+       cannot diverge. */
+    data.pg014_n0002_easy_read = "Con la realización de la Copa del Mundo en 2030, para celebrar los 100 años de la primera competencia de este tipo.";
+    data.pg023_n0002_easy_read = "que, gracias al Mundial, van a venir muchos inversores extranjeros y la economía del país va a mejorar.";
+    data.pg033_n0002_easy_read = "que tenía era de cuando se sentaba a escribir en unos cuadernos de tapas negras.";
+    data.pg034_n0002_easy_read = "y termina a sus pies.";
+    data.pg010_n0002_easy_read = "pusimos a disposición:\n- cursos de acompañamiento\n- recursos educativos\n- un club de lectura abierto.";
         suppressBlankCatalogueResidues(data);
         state.textCatalog = data;
       } else {
