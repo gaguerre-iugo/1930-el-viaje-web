@@ -5883,12 +5883,46 @@ body.reflow-book #content#content section[data-section-type="text_only"] {
   }
 }
 
+/* The centred measure above was applied to `text_only` sections only, while
+   illustrated story pages hoist their paragraphs into full-column
+   `.reading-block`s. Whenever the paginator placed both kinds on one visual
+   page, the same running prose showed two different left edges and the reader
+   saw a mid-page jump between consecutive paragraphs (pg025_n0018 -> pg026_n0002
+   was the reported case). Measured offsets: 47 px at 1366, 244 px at 1920 and
+   1204 px on a 3840 board, because the gap grows with the free space beside the
+   measure.
+
+   The reader's own rule is that reflow prose must occupy the full text measure
+   and start on the common left edge, so give every running-prose block the same
+   measure and the same centred origin. Illustration grids, the copy column that
+   tracks artwork, and any block that owns imagery keep the full column and are
+   never re-measured through an ancestor. On phones the column is already
+   narrower than the measure, so this stays a no-op there. */
+body.reflow-book #content#content
+  > section.reflow-story-section
+  .reading-block:not(.illustrated-copy):not(.attic-illustrated-copy):not(:has(img)):not(:has(.illustrated-copy)):not(:has(.attic-illustrated-copy)) {
+  width: 100% !important;
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 /* For sections that also hold artwork, keep the image at full column width and
    only cap the prose wrapper (the direct parent of the <p> runs), never an
-   ancestor, and never illustrated copy that is meant to track the image. */
-body.reflow-book #content#content section[data-section-type="text_and_single_image"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow),
-body.reflow-book #content#content section[data-section-type="text_and_images"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow),
-body.reflow-book #content#content section[data-section-type="boxed_text"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow) {
+   ancestor, and never illustrated copy that is meant to track the image.
+
+   Reconstructed chats are interface fragments, not prose, but they live in
+   exactly the same sections and their bubbles are divs with a direct <p>. This
+   selector therefore used to catch them too: being the higher-specificity rule
+   it overrode the chat stylesheet's `margin: 0` (incoming) and
+   `margin: 0 0 0 auto` (outgoing), centring every bubble and erasing the
+   left/right speaker convention. Measured on pg029 both bubbles resolved to
+   equal left and right margins (312.484px / 312.484px and 223.781px /
+   223.797px). Keep all three chat shells and everything inside them out of the
+   prose measure so the chat owns its own geometry again. */
+body.reflow-book #content#content section[data-section-type="text_and_single_image"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow):not(:is(.whatsapp-chat-window, .whatsapp-chat-window *, .reflow-book-chat-window, .reflow-book-chat-window *, .chapter5-chat-page, .chapter5-chat-page *)),
+body.reflow-book #content#content section[data-section-type="text_and_images"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow):not(:is(.whatsapp-chat-window, .whatsapp-chat-window *, .reflow-book-chat-window, .reflow-book-chat-window *, .chapter5-chat-page, .chapter5-chat-page *)),
+body.reflow-book #content#content section[data-section-type="boxed_text"] div:has(> p):not(.illustrated-copy):not(.attic-illustrated-copy):not(.illustrated-overflow):not(.attic-illustrated-overflow):not(:is(.whatsapp-chat-window, .whatsapp-chat-window *, .reflow-book-chat-window, .reflow-book-chat-window *, .chapter5-chat-page, .chapter5-chat-page *)) {
   max-width: var(--reflow-text-measure) !important;
   margin-left: auto !important;
   margin-right: auto !important;
