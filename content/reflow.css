@@ -5295,13 +5295,18 @@ body.reflow-book.reflow-easy-read #content
 }
 
 /* Suppressed source-page residues must not reserve an empty row or become a
-   TTS/search landmark in the visible Easy Read flow. */
-body.reflow-book.reflow-easy-read #content
+   TTS/search landmark in the visible Easy Read flow.
+   `#content#content` raises ID specificity on purpose: an Easy Read rule that
+   forces `display: inline` on sentence-chain children accumulates several
+   `:not(.class)` clauses and otherwise outranks these resets, which left every
+   emptied fragment as a live zero-width inline box — and a TTS stop whose
+   recorded audio no longer matches any visible text. */
+body.reflow-book.reflow-easy-read #content#content
   :is(p, span)[data-id]:empty {
   display: none !important;
 }
 
-body.reflow-book.reflow-easy-read #content .reflow-empty-easy-read {
+body.reflow-book.reflow-easy-read #content#content .reflow-empty-easy-read {
   display: none !important;
 }
 
@@ -5318,7 +5323,7 @@ body.reflow-book.reflow-easy-read #content
   display: none !important;
 }
 
-body.reflow-book.reflow-easy-read #content
+body.reflow-book.reflow-easy-read #content#content
   .sentence-chain > :is(p, span)[data-id]:empty {
   display: none !important;
 }

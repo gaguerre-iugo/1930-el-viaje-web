@@ -683,6 +683,17 @@
     data.pg132_n0016_easy_read = "";
     data.pg139_n0045_easy_read = "Les presento a…";
     data.pg181_n0011_easy_read = "";
+    /* Two forced sentence joins kept the Easy Read half of a split source
+       sentence, so the seam read as damaged text: "El bisabuelo había Habían
+       nacido…" repeated subject and verb, and a dangling "singular." was
+       stranded after "…atrapará a los lectores.". In both joins the second
+       half is already a complete Easy Read sentence, so the absorbed first
+       half is emptied and createSentenceChain drops the residue before the
+       chain is built. The full catalogue keeps both fragments, where the join
+       is grammatically correct. Mirrored in texts.json so the offline snapshot
+       and the runtime cannot diverge. */
+    data.pg025_n0019_easy_read = "";
+    data.pg015_n0002_easy_read = "";
         suppressBlankCatalogueResidues(data);
         state.textCatalog = data;
       } else {
