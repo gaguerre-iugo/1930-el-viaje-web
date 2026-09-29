@@ -45,6 +45,12 @@ const DEVICES = [
     ua: "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Mobile Safari/537.36" },
   { name: "galaxy-tab-portrait", width: 800, height: 1280, dpr: 2, ui: CHROME_UI_PORTRAIT,
     ua: "Mozilla/5.0 (Linux; Android 13; SM-X200) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36" },
+  // Perfil del reporte original ("no se ve la barra de menú"): pantalla de
+  // 1067x576 CSS a dpr 1.5 en horizontal, con la barra de direcciones ocupando
+  // 96 px, es decir 1067x480 visibles. Es el caso que destapó el inflado del
+  // initial containing block (innerWidth/innerHeight de 4268x1920).
+  { name: "tablet-landscape-1067x480", width: 1067, height: 576, dpr: 1.5, ui: 96,
+    ua: "Mozilla/5.0 (Linux; Android 13; SM-X200) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36" },
 ];
 
 const SAMPLE_FRACTIONS = [0, 0.05, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 0.99];
@@ -56,17 +62,30 @@ function diagnose(input) {
   const { simulatedVisibleHeight, innerWidthPx } = input;
   const out = {};
 
-  // IMPORTANTE: en Chromium con `isMobile: true` y DPR != 1, Playwright
-  // reporta un `window.innerWidth/innerHeight` ficticio (pantalla x4) y
-  // posiciona los `position: fixed` contra esa caja inexistente. Por eso la
-  // auditoría corre con `isMobile: false` + `hasTouch` (que sí reproduce el
-  // viewport móvil real: mismo ancho CSS y mismo layout) y mide contra
-  // `documentElement`, que es el valor fiable.
+  // IMPORTANTE: se mide contra `documentElement`, no contra
+  // `window.innerWidth/innerHeight`. En Chrome Android esos dos valores pueden
+  // dejar de coincidir con el viewport de layout si algo infla el initial
+  // containing block (era el caso de este libro antes de `contain: paint`:
+  // innerWidth reportaba 4x el layout y todo `position: fixed` caía fuera de
+  // pantalla). `documentElement.clientWidth/clientHeight` es el valor fiable
+  // del área de layout.
   const VW = document.documentElement.clientWidth || window.innerWidth;
   const VH = document.documentElement.clientHeight || window.innerHeight;
 
   void innerWidthPx;
   out.viewportPx = { w: VW, h: VH };
+
+  // Diagnóstico del viewport móvil: si `innerWidth/innerHeight` no coinciden con
+  // el layout, el libro está escalado o inflado y los `fixed` caerán mal.
+  out.viewportCoherence = {
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    layoutWidth: VW,
+    layoutHeight: VH,
+    ratio: Number((window.innerWidth / Math.max(1, VW)).toFixed(3)),
+    coherente: Math.abs(window.innerWidth / Math.max(1, VW) - 1) < 0.02,
+    visualScale: window.visualViewport ? window.visualViewport.scale : null,
+  };
 
   const px = (v) => {
     const n = parseFloat(v);
@@ -427,6 +446,14 @@ function diagnose(input) {
     signals.push(`chrome fijo solapando texto: ${out.overlaps.map((o) => o.chrome).join(", ")}`);
   if (out.toolbar && !out.toolbar.usable)
     signals.push(`la barra de navegación NO es usable (opacity ${out.toolbar.opacity}, pointer-events ${out.toolbar.pointerEvents}): no se puede pasar de página con el dedo`);
+  if (out.viewportCoherence && !out.viewportCoherence.coherente)
+    signals.push(
+      `el viewport está inflado o escalado: innerWidth ${out.viewportCoherence.innerWidth} vs layout ${out.viewportCoherence.layoutWidth} (x${out.viewportCoherence.ratio}); los elementos position: fixed caen fuera de pantalla`
+    );
+  if (out.chrome.pagination && out.chrome.pagination.bottom > VH + 1)
+    signals.push(
+      `la barra de navegación está en y=${out.chrome.pagination.bottom} y el área de layout termina en ${VH}: queda fuera de la pantalla`
+    );
   out.signals = signals;
 
   return out;
@@ -602,11 +629,19 @@ async function runDevice(browser, dev) {
   // barra de direcciones de Chrome desplegada). La retracción de esa barra se
   // simula luego con setViewportSize, que es exactamente lo que hace Chrome
   // Android al hacer scroll.
+  //
+  // `isMobile: true` es el modo fiel a Chrome Android (respeta el meta viewport
+  // y el escalado de página). Antes daba geometrías imposibles --innerWidth 4x
+  // el viewport de layout, con los `position: fixed` fuera de pantalla-- y se
+  // creyó un artefacto de Playwright. Era un error real del libro: la tira
+  // multicolumna de `#content` (cientos de miles de píxeles de ancho) inflaba
+  // el initial containing block. Se corrigió con `contain: paint` en
+  // content/reflow.css, así que ahora se audita en modo móvil de verdad.
   const visibleHeight = dev.height - dev.ui;
   const context = await browser.newContext({
     viewport: { width: dev.width, height: visibleHeight },
     deviceScaleFactor: dev.dpr,
-    isMobile: false,
+    isMobile: true,
     hasTouch: true,
     userAgent: dev.ua,
     locale: "es-UY",

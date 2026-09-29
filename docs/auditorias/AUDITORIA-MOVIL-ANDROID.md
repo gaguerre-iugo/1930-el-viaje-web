@@ -15,9 +15,14 @@ Tres problemas explican la mayor parte de la mala experiencia en un teléfono:
 
 | # | Problema | Magnitud medida |
 |---|---|---|
+| **0** | **El viewport se infla y todo lo `position: fixed` cae fuera de la pantalla.** La tira multicolumna de `#content` (cientos de miles de píxeles de ancho) hace que Chrome Android infle el *initial containing block* a 4× el viewport de layout; la barra de navegación, el reproductor TTS y los paneles se posicionan contra esa caja inflada | `window.innerWidth/innerHeight` = 4268×1920 con layout de 1067×480; la barra terminaba en `y=1920` en una pantalla de 480 px — **CORREGIDO**, ver §8 |
 | **1** | La barra de navegación inferior (Índice / Anterior / Siguiente / Herramientas) **no existe o está invisible y sin recibir toques durante los primeros 7 a 30 segundos** | Contenido visible a los 6,5–12 s; barra usable a los 6,8–29 s. En ese lapso, deslizar o tocar "Siguiente" **no cambia de página** — **CORREGIDO**, ver §7 |
-| **2** | **Teléfono en horizontal (915×412)**: la columna de lectura queda de **228 px de alto** con 875 px de ancho → ~10 líneas por página y **965 páginas** (contra 393 en vertical). Las portadas de capítulo se dibujan a **105×59 px** (originales de 1484×825) | `--reflow-page-height` = 228 px; portada pintada a 107×156 px — pendiente |
+| **2** | **Teléfono en horizontal (915×412)**: la columna de lectura queda de **228 px de alto** con 875 px de ancho → ~10 líneas por página y **964 páginas** (contra 395 en vertical). Las portadas de capítulo se dibujan a **105×59 px** (originales de 1484×825) | `--reflow-page-height` = 228 px; portada pintada a 107×156 px — pendiente |
 | **3** | La barra de direcciones de Chrome Android **re-pagina el libro** en horizontal y en tablet (la columna cambia de 228→276 px y de 1088→1144 px), porque esas ramas usaban `100dvh`, que Chrome cambia dinámicamente | Medido con `setViewportSize` — **CORREGIDO** en el CSS (`100svh`), ver §7 |
+
+> El problema **0** es el que explica el reporte original ("en Chrome de Android no se
+> ve bien"): es invisible en escritorio y catastrófico en el teléfono, y no produce
+> ningún error de consola.
 
 En vertical (el caso normal) el libro se ve correcto: portada completa, prosa de
 34 líneas por página, sin texto cortado, sin solapamiento de barras, sin desborde
@@ -338,10 +343,100 @@ inlina `index.html`. La única entrada que cambió es `./index.html`
 ### 7.4 Qué queda pendiente
 
 Los puntos 3 a 8 de §4, en especial la reserva de barras proporcional al alto
-(es lo que hace inservible el modo horizontal del teléfono) y el peso del arranque,
-que es la otra mitad del síntoma: entre 6,5 s (creación de la barra) y ~12 s
-(paginación terminada) con 22 s de bloqueo acumulado del hilo principal.
+(es lo que hace inservible el modo horizontal del teléfono: en el dispositivo del
+reporte quedan 11 líneas por página) y el peso del arranque, que es la otra mitad
+del síntoma: entre 6,5 s (creación de la barra) y ~12 s (paginación terminada) con
+22 s de bloqueo acumulado del hilo principal.
 
 Los cambios ya están publicados: GitHub Pages sirve
-`reflow-book.js?v=135-barra-sin-espera`, `reflow.css?v=93-svh-estable` y el panel
-`?diag=1`.
+`reflow-book.js?v=136-viewport-sin-inflar`, `reflow.css?v=94-viewport-sin-inflar`
+y el panel `?diag=1`.
+
+## 8. Causa raíz principal: el viewport inflado por la tira multicolumna
+
+Este es el error que explica el reporte original ("en Chrome de Android no se ve
+bien"), y el único de la lista que **no aparece en escritorio**.
+
+### 8.1 Síntoma reportado desde el dispositivo
+
+El panel `?diag=1` en el teléfono mostró:
+
+```
+La barra de navegación termina en 1920px, por debajo del área visible 480px
+viewport 4269x1920 dpr 1.5 horizontal vh=576 dvh=480
+```
+
+`window.innerWidth/innerHeight` (4269×1920) era **exactamente 4×** el viewport de
+layout (≈1067×480), y por eso todo lo `position: fixed` aterrizaba en `y≈1920` de
+una pantalla de 480 px: **la barra de menú no se veía**.
+
+### 8.2 Causa
+
+`#content` contiene el libro entero como una tira horizontal de columnas: medido,
+**662.607 px de ancho** en el teléfono. Ese desbordamiento se recorta y se desplaza
+dentro de `#content` (`overflow-x: auto`), pero Chromium lo sigue contando como el
+desbordamiento de layout del documento y, en modo móvil, **infla el initial
+containing block** hasta el mínimo de escala de página (0,25 → ×4).
+
+Reproducción mínima: una página con `<meta name="viewport" content="width=device-width,
+initial-scale=1">` y un solo `div` de 150.000 px de ancho ya devuelve la misma firma:
+
+```
+inner: 4268x1920 · layout: 1067x480 · icb: 4268x1920 · scrollWidth: 150000
+```
+
+En modo escritorio el ICB es el viewport sin importar el desbordamiento, y por eso
+el libro se veía bien en la computadora. Es también la razón de que el error pasara
+desapercibido: en el arnés de pantallas grandes (`isMobile: false`) nunca aparece.
+
+### 8.3 Corrección
+
+```css
+body.reflow-book #content {
+  /* … comentario completo en content/reflow.css … */
+  contain: paint;
+}
+```
+
+La contención de pintado saca el subárbol del desbordamiento del ancestro **sin
+tocar el layout de columnas ni el scroll propio de la tira**. Se probaron y
+descartaron `html, body { overflow: clip }` y envolver `#content` en un contenedor
+con `overflow: hidden`: ninguno evita el inflado.
+
+Además, el overlay de repaginación de cuestionarios dejó de colgar de `#content`
+(ahora va a `body`, ubicación que el CSS ya contemplaba): dentro de una caja con
+`contain: paint` un `position: fixed` se mide contra ella, y como la tira se
+desplaza cientos de miles de píxeles, la tarjeta congelada aparecía corrida. Se
+extendió la regla del overlay para que conserve `inset: 0` y el fondo blanco en las
+dos ubicaciones.
+
+### 8.4 Verificación (perfil del dispositivo: 1067×480, dpr 1.5, horizontal, modo móvil)
+
+| Medición | Antes | Después |
+|---|---|---|
+| `window.innerWidth×innerHeight` | 4268×1920 | **1067×480** |
+| Initial containing block | 4268×1920 | **1067×480** |
+| Barra de navegación | `y 1856..1920`: **fuera de pantalla** | **`y 416..480`, visible y con opacidad 1** |
+| Toque en "Siguiente" | imposible | **página 1 → 2** (`scrollLeft` 0 → 1067) |
+| Paneles Índice / Herramientas | — | `0,8 288x400` y `779,8 288x400`, dentro de pantalla |
+| Tarjeta de cuestionario | — | visible en pantalla (pág 74) |
+| Overlay de repaginación | — | la tarjeta congelada coincide **exactamente** con la original |
+| Páginas del libro | 964 (`vw` inflado ⇒ columnas de 4228 px) | 622 (columnas de 1027 px) |
+| `#content` scrollWidth | 654.091 | 662.607 (intacto: el paginado no se rompió) |
+| Errores de consola | 0 | 0 |
+
+Regresiones: los cuatro perfiles Android quedan con `inner == layout` (coherente) y
+la barra usable junto con el contenido; el arnés de pantallas grandes (FHD
+1920×1080) sigue con `táctil<44px = 0` y los mismos contadores que antes.
+
+### 8.5 Cambio de método en el arnés
+
+`tools/screen-test/mobile-audit.mjs` ahora audita con **`isMobile: true`** (modo
+móvil fiel a Chrome Android). La firma de "×4" que en la primera pasada se
+descartó como artefacto de emulación **era este error del libro**. El arnés ahora
+mide la coherencia entre `window.innerWidth` y el viewport de layout, y avisa si la
+barra de navegación queda fuera del área visible o si el viewport está inflado.
+
+El panel `?diag=1` también se ancló **arriba** (antes tapaba justamente la barra que
+tiene que diagnosticar) y muestra `layout`, `pantalla` y una línea `coherencia ok /
+INFLADO x4`.
