@@ -276,12 +276,25 @@
     }
   };
 
+  /* Plazo máximo que la barra de navegación espera al runtime empaquetado antes
+     de mostrarse igual. El libro ya es navegable con Anterior/Siguiente sin el
+     runtime, así que nunca conviene dejarla oculta más que esto. */
+  var PRIMARY_TOOLBAR_FALLBACK_MS = 4000;
+
   var state = {
     current: 0,
     total: 1,
     wheelGestureActive: false,
     wheelGestureDistance: 0,
     wheelGestureTimer: 0,
+    /* La barra de navegación no puede depender de que el runtime empaquetado
+       monte su dock: en un teléfono eso tarda entre 7 y 30 segundos, y hasta
+       entonces la barra queda invisible y sin recibir toques, así que el
+       lector no tiene ninguna forma de pasar de página. Estos dos campos
+       sostienen el vencimiento de seguridad que la muestra igual. */
+    primaryToolbarDeadline: 0,
+    primaryToolbarFallbackTimer: 0,
+    primaryToolbarRuntimeWatched: false,
     resizeTimer: 0,
     layoutObserverTimer: 0,
     layoutObserver: null,
@@ -2917,6 +2930,41 @@
     }
   }
 
+  /* Vencimiento de seguridad: si la barra sigue esperando y nadie más vuelve a
+     sincronizarla (el runtime todavía no montó su dock), la mostramos igual. */
+  function schedulePrimaryToolbarFallback() {
+    if (state.primaryToolbarFallbackTimer) return;
+    var wait = Math.max(0, state.primaryToolbarDeadline - Date.now()) + 40;
+    state.primaryToolbarFallbackTimer = window.setTimeout(function () {
+      state.primaryToolbarFallbackTimer = 0;
+      syncPrimaryToolbar();
+    }, wait);
+  }
+
+  /* Si la barra ya se mostró pero el runtime todavía no está listo, Índice y
+     Herramientas quedan deshabilitados. Revisamos una vez por segundo (como
+     máximo un minuto) para habilitarlos apenas aparezca, sin depender de que el
+     lector cambie de página. */
+  function watchRuntimeForPrimaryToolbar() {
+    if (state.primaryToolbarRuntimeWatched) return;
+    state.primaryToolbarRuntimeWatched = true;
+    var attempts = 0;
+    var timer = window.setInterval(function () {
+      attempts += 1;
+      syncPrimaryToolbar();
+      var ready = Boolean(
+        runtimeDockButton(["Menú principal", "Main Menu"]) &&
+        runtimeDockButton(["Configuración", "Settings"]) &&
+        typeof window.__adtReflowSetDockMenu === "function" &&
+        typeof window.__adtReflowGetDockMenu === "function"
+      );
+      if (ready || attempts > 90) {
+        window.clearInterval(timer);
+        state.primaryToolbarRuntimeWatched = false;
+      }
+    }, 1000);
+  }
+
   function syncPrimaryToolbar() {
     if (!indexButton || !toolsButton) return;
     var indexTrigger = runtimeDockButton(["Menú principal", "Main Menu"]);
@@ -2943,8 +2991,34 @@
       upstreamDock && upstreamDock.classList.contains("opacity-0")
     );
 
-    primaryToolbar.classList.toggle("reflow-primary-toolbar-pending", !runtimeMenuReady);
-    setAttributeIfChanged(primaryToolbar, "aria-busy", !runtimeMenuReady);
+    /* Mientras la barra esperaba al runtime del libro quedaba invisible
+       (`opacity: 0`) y sin recibir toques (`pointer-events: none`), así que en
+       un teléfono el libro no se podía pasar de página durante los primeros
+       segundos (medido: entre 7 y 30 s según el equipo y la caché). La barra
+       solo está "pendiente" mientras el libro todavía no está paginado; en
+       cuanto hay más de una página —o vence el plazo de seguridad— se muestra.
+       Anterior/Siguiente son del lector y funcionan siempre; Índice y
+       Herramientas quedan deshabilitados hasta que el runtime esté listo. */
+    if (!state.primaryToolbarDeadline) {
+      state.primaryToolbarDeadline = Date.now() + PRIMARY_TOOLBAR_FALLBACK_MS;
+    }
+    var bookPaginated = Number(state.total) > 1;
+    var toolbarPending = !runtimeMenuReady && !bookPaginated &&
+      Date.now() < state.primaryToolbarDeadline;
+    if (toolbarPending) schedulePrimaryToolbarFallback();
+    else if (state.primaryToolbarFallbackTimer) {
+      window.clearTimeout(state.primaryToolbarFallbackTimer);
+      state.primaryToolbarFallbackTimer = 0;
+    }
+
+    primaryToolbar.classList.toggle("reflow-primary-toolbar-pending", toolbarPending);
+    setAttributeIfChanged(primaryToolbar, "aria-busy", toolbarPending);
+    /* Índice y Herramientas delegan en el runtime; hasta que exista, tocarlos
+       no haría nada. Se anuncian deshabilitados en vez de quedar como un toque
+       muerto. */
+    if (indexButton.disabled !== !runtimeMenuReady) indexButton.disabled = !runtimeMenuReady;
+    if (toolsButton.disabled !== !runtimeMenuReady) toolsButton.disabled = !runtimeMenuReady;
+    if (!runtimeMenuReady) watchRuntimeForPrimaryToolbar();
     setAttributeIfChanged(indexButton, "aria-expanded", currentMenu === "toc");
     setAttributeIfChanged(
       toolsButton,

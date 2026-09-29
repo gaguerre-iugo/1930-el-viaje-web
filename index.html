@@ -9,7 +9,7 @@
     <meta name="page-section-id" content="1" />
     <link href="./content/tailwind_output.css?v=2-sentence-case" rel="stylesheet">
     <link href="./content/viewport-layout.css" rel="stylesheet">
-    <link href="./content/reflow.css?v=92-mobile-svh-clip" rel="stylesheet">
+    <link href="./content/reflow.css?v=93-svh-estable" rel="stylesheet">
     <link href="./assets/libs/fontawesome/css/all.min.css" rel="stylesheet">
     <link rel="preload" href="./assets/fonts/AtkinsonHyperlegible-400-latin.woff2?v=2-atkinson-runtime" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="./assets/fonts/AtkinsonHyperlegible-700-latin.woff2?v=2-atkinson-runtime" as="font" type="font/woff2" crossorigin>
@@ -45,8 +45,17 @@
         document.write('<script src="./assets/offline-preloader.js?v=70-alt-fixes-img"><\/script>');
       }
     </script>
+    <script>
+      // Diagnóstico móvil opcional: agregar ?diag=1 a la URL muestra en
+      // pantalla los errores de JS y las medidas reales del viewport, sin
+      // necesidad de la consola de Chrome (ver assets/mobile-diagnostics.js).
+      // Sin ese parámetro no se carga nada y el libro queda igual.
+      if (/[?&]diag=1(?:&|$)/.test(window.location.search)) {
+        document.write('<script src="./assets/mobile-diagnostics.js?v=1"><\/script>');
+      }
+    </script>
     <script src="./assets/scorm.js"></script>
-  <script src="./assets/reflow-book.js?v=134-alt-fixes-img"></script>
+  <script src="./assets/reflow-book.js?v=135-barra-sin-espera"></script>
     <script src="./assets/quiz-sequence.js?v=9-retry-policy-fallback"></script>
 </body>
 

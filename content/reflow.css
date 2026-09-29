@@ -9,7 +9,7 @@
   --reflow-gutter: 1.25rem;
   --reflow-block-padding: clamp(1.5rem, 4vh, 3rem);
   --reflow-page-height: calc(
-    100dvh - max(
+    100svh - max(
       var(--nav-height, 80px),
       calc(var(--reflow-toolbar-reserve) + .5rem)
     ) - var(--reflow-controls-height)
@@ -63,15 +63,18 @@
   --ceibal-focus-on-dark: var(--ceibal-institutional-400);
 }
 
-/* On phones the reading column height is derived from `100dvh`, which mobile
-   browsers report as the LARGE viewport (toolbars collapsed). While the address
-   bar and bottom toolbar are on screen the actually visible area is smaller
-   (`100svh`), so a `dvh`-sized column is taller than what fits and its last
-   line(s) are hidden behind the browser chrome (the half-cut bottom line
-   reported on iPhone). Pin the column to the always-visible `100svh` instead:
-   the column then never exceeds the visible area, so nothing is clipped. When
-   the toolbars collapse the only cost is a little extra blank space at the
-   bottom of the page, which is preferable to losing a line of text. */
+/* On phones the reading column height is derived from the viewport, which mobile
+   browsers report in two flavours: the LARGE viewport (`dvh`/`lvh`, toolbars
+   collapsed) and the SMALL one (`svh`, toolbars on screen). While the address bar
+   and bottom toolbar are visible the actually visible area is the small viewport,
+   so a `dvh`-sized column is taller than what fits and its last line(s) are hidden
+   behind the browser chrome. Worse: `dvh` CHANGES while the page is open (Chrome
+   Android retracts the address bar as you scroll), so the column height changes,
+   the whole book re-paginates and the text under the reader jumps.
+   Pin the column to the always-visible `svh` instead: it never exceeds the visible
+   area and never changes while the page is open. When the toolbars collapse the
+   only cost is a little extra blank space at the bottom of the page, which is
+   preferable to losing a line of text or re-flowing the book. */
 @media (max-width: 47.999rem) {
   :root {
     --reflow-page-height: calc(

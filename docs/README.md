@@ -27,6 +27,7 @@
 | Archivo | Para qué |
 |---|---|
 | `auditorias/AUDITORIA-GENERAL.md` | Auditoría medida del repositorio: tamaño, performance, carga, archivos sin uso e higiene. |
+| `auditorias/AUDITORIA-MOVIL-ANDROID.md` | Auditoría medida de Chrome en Android (teléfono y tablet): tiempos de arranque, barra de navegación, modo horizontal, ilustraciones y objetivos táctiles. Incluye el panel `?diag=1` para ver errores en el dispositivo. |
 | `auditorias/AUDIT-CHANGELOG-v46-integrated.md` | Changelog detallado de la v46. |
 | `auditorias/AUDIT-CHANGELOG-v45-*.md` | Changelogs detallados de la v45 (una serie de iteraciones). |
 | `auditorias/_TTS-TASK-NOTES.md` | Registro de la tarea de audio (regeneración de locuciones, catálogo base y precargador). Archivo de trabajo, candidato a eliminarse. |
