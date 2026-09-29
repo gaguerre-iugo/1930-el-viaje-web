@@ -41,6 +41,39 @@ HEAD = "var INLINE = {"
 TAIL = "var BASE_DIR"
 
 
+def cierre_mapa(texto: str, inicio: int, limite: int) -> int:
+    """Devuelve el indice de la llave que cierra el objeto abierto en `inicio`.
+
+    Respeta cadenas y escapes, de modo que las llaves que aparecen dentro de un
+    valor no cuentan. `limite` corta la busqueda antes del wrapper del
+    precargador. Devuelve -1 si no encuentra el cierre.
+    """
+    if inicio < 0 or texto[inicio] != "{":
+        return -1
+    profundidad = 0
+    en_cadena = False
+    escape = False
+    for pos in range(inicio, min(limite, len(texto))):
+        ch = texto[pos]
+        if en_cadena:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                en_cadena = False
+            continue
+        if ch == '"':
+            en_cadena = True
+        elif ch == "{":
+            profundidad += 1
+        elif ch == "}":
+            profundidad -= 1
+            if profundidad == 0:
+                return pos
+    return -1
+
+
 def claves_a_inlinear() -> list[tuple[str, Path]]:
     """Devuelve (clave, ruta) de todo lo que el precargador tiene que servir."""
     pares: list[tuple[str, Path]] = []
@@ -121,11 +154,16 @@ def main() -> int:
         return 1
     i_head += len(HEAD)
 
-    cierre = original.rfind('"}', 0, i_tail)
-    if cierre < 0 or original[cierre + 1] != "}":
+    # El cierre del mapa debe ubicarse con un escaneo de profundidad consciente
+    # de cadenas. Buscar el patron '"}'' es incorrecto: esa secuencia tambien
+    # aparece dentro de los valores escapados ('\"}' dentro de un string), y
+    # `rfind` devolvia una posicion interna, de modo que la "cola" conservada
+    # arrancaba a mitad de un valor y dejaba el archivo como JS invalido.
+    cierre = cierre_mapa(original, i_head - 1, i_tail)
+    if cierre < 0:
         print("no se encontro el cierre del mapa INLINE", file=sys.stderr)
         return 1
-    cola = original[cierre + 2:]  # desde ";" inclusive
+    cola = original[cierre + 1:]  # desde ";" inclusive
 
     pares = claves_a_inlinear()
     print(f"archivos a inlinear: {len(pares)}")
@@ -159,6 +197,22 @@ def main() -> int:
     esperadas = {c for c, _ in pares}
     huecos = sorted(esperadas - claves_nuevas)
     print(f"  claves esperadas ausentes: {len(huecos)} {huecos[:5]}")
+
+    # El mapa es un objeto JSON valido por construccion; si no parsea, alguna
+    # entrada se serializo mal (o la cola conservada invade el mapa). Sin esta
+    # comprobacion el archivo se escribia y recien fallaba en el navegador.
+    inicio_mapa = nuevo.find(HEAD) + len(HEAD) - 1
+    fin_mapa = cierre_mapa(nuevo, inicio_mapa, nuevo.find(TAIL))
+    if fin_mapa < 0:
+        print("  ERROR: el mapa nuevo no cierra; no se escribe", file=sys.stderr)
+        return 1
+    try:
+        mapa_nuevo = json.loads(nuevo[inicio_mapa:fin_mapa + 1])
+    except json.JSONDecodeError as error:
+        print(f"  ERROR: el mapa nuevo no es JSON valido ({error}); no se escribe",
+              file=sys.stderr)
+        return 1
+    print(f"  mapa nuevo parsea como objeto con {len(mapa_nuevo)} claves")
 
     if not args.apply:
         print("\n(dry-run; usar --apply)")

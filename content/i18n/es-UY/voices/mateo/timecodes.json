@@ -94347,23 +94347,23 @@
     },
     {
       "text": "y",
-      "start": 0.9429,
-      "end": 0.9905
+      "start": 0.9547,
+      "end": 1.0024
     },
     {
       "text": "lentes",
-      "start": 1.0024,
-      "end": 1.2881
+      "start": 1.0143,
+      "end": 1.3
     },
     {
       "text": "redondos",
-      "start": 1.3,
-      "end": 1.8952
+      "start": 1.3119,
+      "end": 1.919
     },
     {
       "text": "transpirado",
-      "start": 2.0976,
-      "end": 2.7047
+      "start": 2.1095,
+      "end": 2.7048
     },
     {
       "text": "y",
@@ -94372,78 +94372,38 @@
     },
     {
       "text": "con",
-      "start": 2.8357,
-      "end": 2.9786
+      "start": 2.8476,
+      "end": 2.9905
     },
     {
       "text": "gesto",
-      "start": 2.9905,
-      "end": 3.2642
+      "start": 3.0024,
+      "end": 3.2762
     },
     {
       "text": "de",
-      "start": 3.3119,
-      "end": 3.3595
+      "start": 3.3238,
+      "end": 3.3714
     },
     {
       "text": "tensión",
-      "start": 3.4071,
-      "end": 3.8595
+      "start": 3.419,
+      "end": 3.8714
     },
     {
-      "text": "iluminado",
-      "start": 3.9786,
-      "end": 4.4667
+      "text": "realizando",
+      "start": 4.1214,
+      "end": 4.6571
     },
     {
-      "text": "por",
-      "start": 4.5381,
-      "end": 4.6333
+      "text": "una",
+      "start": 4.6929,
+      "end": 4.8238
     },
     {
-      "text": "un",
-      "start": 4.6452,
-      "end": 4.7286
-    },
-    {
-      "text": "resplandor",
-      "start": 4.7524,
-      "end": 5.1928
-    },
-    {
-      "text": "cálido",
-      "start": 5.2643,
-      "end": 5.5976
-    },
-    {
-      "text": "y",
-      "start": 5.6452,
-      "end": 5.6929
-    },
-    {
-      "text": "chispas",
-      "start": 5.7405,
-      "end": 6.1214
-    },
-    {
-      "text": "en",
-      "start": 6.1571,
-      "end": 6.2405
-    },
-    {
-      "text": "un",
-      "start": 6.2643,
-      "end": 6.3476
-    },
-    {
-      "text": "ambiente",
-      "start": 6.3714,
-      "end": 6.7405
-    },
-    {
-      "text": "oscuro",
-      "start": 6.7524,
-      "end": 7.1333
+      "text": "soldadura",
+      "start": 4.8357,
+      "end": 5.3952
     }
   ],
   "pg037_n0003": [
@@ -144981,132 +144941,72 @@
     {
       "text": "oscuro",
       "start": 1.1095,
-      "end": 1.4905
+      "end": 1.4786
     },
     {
       "text": "en",
-      "start": 1.4905,
-      "end": 1.55
+      "start": 1.4786,
+      "end": 1.5381
     },
     {
       "text": "un",
-      "start": 1.5738,
-      "end": 1.6452
+      "start": 1.5619,
+      "end": 1.6333
     },
     {
       "text": "altillo",
-      "start": 1.669,
-      "end": 2.0381
+      "start": 1.6571,
+      "end": 2.0262
     },
     {
       "text": "desordenado",
-      "start": 2.0619,
-      "end": 2.7286
+      "start": 2.05,
+      "end": 2.7167
     },
     {
       "text": "con",
-      "start": 2.9905,
-      "end": 3.1452
+      "start": 2.9786,
+      "end": 3.0976
     },
     {
       "text": "papeles",
-      "start": 3.1571,
-      "end": 3.5381
+      "start": 3.1333,
+      "end": 3.5143
     },
     {
       "text": "en",
-      "start": 3.5381,
-      "end": 3.5857
+      "start": 3.5143,
+      "end": 3.5619
     },
     {
       "text": "las",
-      "start": 3.5976,
-      "end": 3.7167
+      "start": 3.5738,
+      "end": 3.6928
     },
     {
       "text": "manos",
-      "start": 3.7405,
-      "end": 4.0381
+      "start": 3.7167,
+      "end": 4.0143
     },
     {
       "text": "y",
-      "start": 4.0857,
+      "start": 4.0738,
       "end": 4.1333
     },
     {
       "text": "gesto",
       "start": 4.1571,
-      "end": 4.4309
+      "end": 4.4428
     },
     {
       "text": "de",
-      "start": 4.4667,
-      "end": 4.5262
+      "start": 4.4905,
+      "end": 4.55
     },
     {
       "text": "sorpresa",
-      "start": 4.5381,
-      "end": 5.0738
-    },
-    {
-      "text": "mientras",
-      "start": 5.3357,
-      "end": 5.681
-    },
-    {
-      "text": "un",
-      "start": 5.7047,
-      "end": 5.7643
-    },
-    {
-      "text": "gato",
-      "start": 5.8119,
-      "end": 6.0619
-    },
-    {
-      "text": "se",
-      "start": 6.0738,
-      "end": 6.1452
-    },
-    {
-      "text": "asoma",
-      "start": 6.1452,
-      "end": 6.4548
-    },
-    {
-      "text": "desde",
-      "start": 6.5024,
-      "end": 6.681
-    },
-    {
-      "text": "una",
-      "start": 6.7167,
-      "end": 6.8714
-    },
-    {
-      "text": "caja",
-      "start": 6.931,
-      "end": 7.169
-    },
-    {
-      "text": "entre",
-      "start": 7.169,
-      "end": 7.3476
-    },
-    {
-      "text": "pilas",
-      "start": 7.431,
-      "end": 7.6572
-    },
-    {
-      "text": "de",
-      "start": 7.669,
-      "end": 7.7167
-    },
-    {
-      "text": "documentos",
-      "start": 7.7524,
-      "end": 8.419
+      "start": 4.5619,
+      "end": 5.0857
     }
   ],
   "pg058059_im004": [
@@ -145122,123 +145022,290 @@
     },
     {
       "text": "pelo",
-      "start": 0.6452,
-      "end": 0.8119
+      "start": 0.6333,
+      "end": 0.8
     },
     {
       "text": "claro",
-      "start": 0.8833,
-      "end": 1.1214
+      "start": 0.8714,
+      "end": 1.1095
     },
     {
       "text": "gesticula",
-      "start": 1.1333,
-      "end": 1.6333
+      "start": 1.1214,
+      "end": 1.6214
     },
     {
       "text": "mientras",
-      "start": 1.669,
-      "end": 2.05
+      "start": 1.6571,
+      "end": 2.0262
     },
     {
       "text": "habla",
-      "start": 2.05,
-      "end": 2.2405
+      "start": 2.0262,
+      "end": 2.2167
     },
     {
       "text": "en",
-      "start": 2.2524,
-      "end": 2.3
+      "start": 2.2286,
+      "end": 2.2643
     },
     {
       "text": "un",
-      "start": 2.3238,
-      "end": 2.3952
+      "start": 2.2881,
+      "end": 2.3595
     },
     {
       "text": "altillo",
-      "start": 2.419,
-      "end": 2.8
+      "start": 2.3833,
+      "end": 2.7643
     },
     {
       "text": "con",
-      "start": 2.8595,
-      "end": 2.9667
+      "start": 2.8238,
+      "end": 2.9309
     },
     {
       "text": "estanterías",
-      "start": 2.9786,
-      "end": 3.7048
+      "start": 2.9429,
+      "end": 3.6691
     },
     {
       "text": "cajas",
-      "start": 3.9667,
-      "end": 4.3119
+      "start": 3.9548,
+      "end": 4.2881
     },
     {
       "text": "y",
-      "start": 4.3595,
-      "end": 4.4429
+      "start": 4.3357,
+      "end": 4.431
     },
     {
       "text": "un",
-      "start": 4.4667,
-      "end": 4.5857
+      "start": 4.4547,
+      "end": 4.5619
     },
     {
       "text": "tablero",
-      "start": 4.5976,
-      "end": 4.8952
+      "start": 4.5738,
+      "end": 4.8714
     },
     {
       "text": "con",
-      "start": 4.9547,
-      "end": 5.0976
+      "start": 4.931,
+      "end": 5.0738
     },
     {
       "text": "fotos",
-      "start": 5.0976,
-      "end": 5.4072
+      "start": 5.0857,
+      "end": 5.3952
     },
     {
       "text": "unidas",
-      "start": 5.431,
-      "end": 5.7047
+      "start": 5.419,
+      "end": 5.681
     },
     {
       "text": "por",
-      "start": 5.7643,
+      "start": 5.7524,
       "end": 5.8476
     },
     {
       "text": "líneas",
       "start": 5.8714,
-      "end": 6.3119
+      "end": 6.3595
+    }
+  ],
+  "pg058059_cover_combined": [
+    {
+      "text": "Adolescente",
+      "start": 0.0976,
+      "end": 0.7286
     },
     {
-      "text": "iluminada",
-      "start": 6.431,
-      "end": 6.9429
+      "text": "de",
+      "start": 0.7643,
+      "end": 0.8357
+    },
+    {
+      "text": "pelo",
+      "start": 0.919,
+      "end": 1.0976
+    },
+    {
+      "text": "oscuro",
+      "start": 1.1095,
+      "end": 1.4786
+    },
+    {
+      "text": "en",
+      "start": 1.4786,
+      "end": 1.5381
+    },
+    {
+      "text": "un",
+      "start": 1.5619,
+      "end": 1.6333
+    },
+    {
+      "text": "altillo",
+      "start": 1.6571,
+      "end": 2.0262
+    },
+    {
+      "text": "desordenado",
+      "start": 2.05,
+      "end": 2.7167
+    },
+    {
+      "text": "con",
+      "start": 2.9786,
+      "end": 3.0976
+    },
+    {
+      "text": "papeles",
+      "start": 3.1333,
+      "end": 3.5143
+    },
+    {
+      "text": "en",
+      "start": 3.5143,
+      "end": 3.5619
+    },
+    {
+      "text": "las",
+      "start": 3.5738,
+      "end": 3.6928
+    },
+    {
+      "text": "manos",
+      "start": 3.7167,
+      "end": 4.0143
+    },
+    {
+      "text": "y",
+      "start": 4.0738,
+      "end": 4.1333
+    },
+    {
+      "text": "gesto",
+      "start": 4.1571,
+      "end": 4.4428
+    },
+    {
+      "text": "de",
+      "start": 4.4905,
+      "end": 4.55
+    },
+    {
+      "text": "sorpresa",
+      "start": 4.5619,
+      "end": 5.0857
+    },
+    {
+      "text": "Joven",
+      "start": 5.9643,
+      "end": 6.3095
+    },
+    {
+      "text": "de",
+      "start": 6.3571,
+      "end": 6.4285
+    },
+    {
+      "text": "pelo",
+      "start": 6.5,
+      "end": 6.6667
+    },
+    {
+      "text": "claro",
+      "start": 6.7381,
+      "end": 6.9762
+    },
+    {
+      "text": "gesticula",
+      "start": 6.9881,
+      "end": 7.4881
+    },
+    {
+      "text": "mientras",
+      "start": 7.5238,
+      "end": 7.8928
+    },
+    {
+      "text": "habla",
+      "start": 7.8929,
+      "end": 8.0833
+    },
+    {
+      "text": "en",
+      "start": 8.0953,
+      "end": 8.131
+    },
+    {
+      "text": "un",
+      "start": 8.1547,
+      "end": 8.2262
+    },
+    {
+      "text": "altillo",
+      "start": 8.25,
+      "end": 8.631
+    },
+    {
+      "text": "con",
+      "start": 8.6905,
+      "end": 8.7976
+    },
+    {
+      "text": "estanterías",
+      "start": 8.8095,
+      "end": 9.5357
+    },
+    {
+      "text": "cajas",
+      "start": 9.8214,
+      "end": 10.1547
+    },
+    {
+      "text": "y",
+      "start": 10.2024,
+      "end": 10.2976
+    },
+    {
+      "text": "un",
+      "start": 10.3214,
+      "end": 10.4285
+    },
+    {
+      "text": "tablero",
+      "start": 10.4405,
+      "end": 10.7381
+    },
+    {
+      "text": "con",
+      "start": 10.7976,
+      "end": 10.9405
+    },
+    {
+      "text": "fotos",
+      "start": 10.9524,
+      "end": 11.2619
+    },
+    {
+      "text": "unidas",
+      "start": 11.2857,
+      "end": 11.5476
     },
     {
       "text": "por",
-      "start": 7.0143,
-      "end": 7.1095
+      "start": 11.619,
+      "end": 11.7143
     },
     {
-      "text": "una",
-      "start": 7.1095,
-      "end": 7.2524
-    },
-    {
-      "text": "lámpara",
-      "start": 7.2762,
-      "end": 7.5738
-    },
-    {
-      "text": "cálida",
-      "start": 7.6333,
-      "end": 7.9786
+      "text": "líneas",
+      "start": 11.7381,
+      "end": 12.2262
     }
   ],
   "pg058059_n0002": [
@@ -193747,6 +193814,338 @@
       "text": "persona",
       "start": 8.3953,
       "end": 8.8
+    }
+  ],
+  "pg080081_cover_combined": [
+    {
+      "text": "Sombra",
+      "start": 0.0976,
+      "end": 0.4667
+    },
+    {
+      "text": "de",
+      "start": 0.5024,
+      "end": 0.5619
+    },
+    {
+      "text": "una",
+      "start": 0.5976,
+      "end": 0.7047
+    },
+    {
+      "text": "persona",
+      "start": 0.7643,
+      "end": 1.0857
+    },
+    {
+      "text": "sobre",
+      "start": 1.0976,
+      "end": 1.3
+    },
+    {
+      "text": "la",
+      "start": 1.3238,
+      "end": 1.4071
+    },
+    {
+      "text": "tapa",
+      "start": 1.4786,
+      "end": 1.669
+    },
+    {
+      "text": "de",
+      "start": 1.7047,
+      "end": 1.7643
+    },
+    {
+      "text": "una",
+      "start": 1.8,
+      "end": 1.931
+    },
+    {
+      "text": "caja",
+      "start": 1.9905,
+      "end": 2.2047
+    },
+    {
+      "text": "fuerte",
+      "start": 2.2286,
+      "end": 2.5738
+    },
+    {
+      "text": "o",
+      "start": 2.5976,
+      "end": 2.6333
+    },
+    {
+      "text": "mesa",
+      "start": 2.6571,
+      "end": 2.8833
+    },
+    {
+      "text": "oscura",
+      "start": 2.919,
+      "end": 3.3476
+    },
+    {
+      "text": "junto",
+      "start": 3.6214,
+      "end": 3.919
+    },
+    {
+      "text": "a",
+      "start": 3.919,
+      "end": 3.9428
+    },
+    {
+      "text": "una",
+      "start": 3.9905,
+      "end": 4.0976
+    },
+    {
+      "text": "pequeña",
+      "start": 4.169,
+      "end": 4.4786
+    },
+    {
+      "text": "manija",
+      "start": 4.5024,
+      "end": 4.8238
+    },
+    {
+      "text": "metálica",
+      "start": 4.8476,
+      "end": 5.3476
+    },
+    {
+      "text": "y",
+      "start": 5.3714,
+      "end": 5.419
+    },
+    {
+      "text": "parte",
+      "start": 5.4905,
+      "end": 5.7167
+    },
+    {
+      "text": "de",
+      "start": 5.7524,
+      "end": 5.8
+    },
+    {
+      "text": "un",
+      "start": 5.8238,
+      "end": 5.8833
+    },
+    {
+      "text": "dial",
+      "start": 5.931,
+      "end": 6.2405
+    },
+    {
+      "text": "con",
+      "start": 6.5262,
+      "end": 6.6572
+    },
+    {
+      "text": "un",
+      "start": 6.669,
+      "end": 6.7762
+    },
+    {
+      "text": "cuadro",
+      "start": 6.8,
+      "end": 7.0738
+    },
+    {
+      "text": "enmarcado",
+      "start": 7.0738,
+      "end": 7.5262
+    },
+    {
+      "text": "a",
+      "start": 7.5262,
+      "end": 7.5381
+    },
+    {
+      "text": "un",
+      "start": 7.5619,
+      "end": 7.681
+    },
+    {
+      "text": "costado",
+      "start": 7.681,
+      "end": 8.1095
+    },
+    {
+      "text": "Lapicera",
+      "start": 8.9881,
+      "end": 9.5357
+    },
+    {
+      "text": "negra",
+      "start": 9.5714,
+      "end": 9.8095
+    },
+    {
+      "text": "con",
+      "start": 9.869,
+      "end": 9.9881
+    },
+    {
+      "text": "adornos",
+      "start": 10.0119,
+      "end": 10.3452
+    },
+    {
+      "text": "dorados",
+      "start": 10.381,
+      "end": 10.7143
+    },
+    {
+      "text": "sobre",
+      "start": 10.7143,
+      "end": 10.9524
+    },
+    {
+      "text": "una",
+      "start": 10.9762,
+      "end": 11.0952
+    },
+    {
+      "text": "superficie",
+      "start": 11.1071,
+      "end": 11.6309
+    },
+    {
+      "text": "oscura",
+      "start": 11.6667,
+      "end": 12.0357
+    },
+    {
+      "text": "junto",
+      "start": 12.0476,
+      "end": 12.3214
+    },
+    {
+      "text": "a",
+      "start": 12.3214,
+      "end": 12.3571
+    },
+    {
+      "text": "parte",
+      "start": 12.4286,
+      "end": 12.6548
+    },
+    {
+      "text": "del",
+      "start": 12.6786,
+      "end": 12.7738
+    },
+    {
+      "text": "dial",
+      "start": 12.8453,
+      "end": 13.0476
+    },
+    {
+      "text": "de",
+      "start": 13.0953,
+      "end": 13.1548
+    },
+    {
+      "text": "una",
+      "start": 13.1905,
+      "end": 13.3214
+    },
+    {
+      "text": "caja",
+      "start": 13.369,
+      "end": 13.5714
+    },
+    {
+      "text": "fuerte",
+      "start": 13.5953,
+      "end": 14.0
+    },
+    {
+      "text": "al",
+      "start": 14.2381,
+      "end": 14.3452
+    },
+    {
+      "text": "fondo",
+      "start": 14.369,
+      "end": 14.6786
+    },
+    {
+      "text": "se",
+      "start": 14.6905,
+      "end": 14.8095
+    },
+    {
+      "text": "ve",
+      "start": 14.8453,
+      "end": 14.9286
+    },
+    {
+      "text": "una",
+      "start": 14.9643,
+      "end": 15.1072
+    },
+    {
+      "text": "rueda",
+      "start": 15.131,
+      "end": 15.3929
+    },
+    {
+      "text": "similar",
+      "start": 15.4047,
+      "end": 15.7976
+    },
+    {
+      "text": "a",
+      "start": 15.869,
+      "end": 15.9286
+    },
+    {
+      "text": "un",
+      "start": 15.9524,
+      "end": 16.0714
+    },
+    {
+      "text": "timón",
+      "start": 16.0953,
+      "end": 16.3929
+    },
+    {
+      "text": "y",
+      "start": 16.4524,
+      "end": 16.5357
+    },
+    {
+      "text": "la",
+      "start": 16.5595,
+      "end": 16.6548
+    },
+    {
+      "text": "sombra",
+      "start": 16.6667,
+      "end": 16.9643
+    },
+    {
+      "text": "de",
+      "start": 17.0,
+      "end": 17.0595
+    },
+    {
+      "text": "una",
+      "start": 17.0953,
+      "end": 17.2262
+    },
+    {
+      "text": "persona",
+      "start": 17.2857,
+      "end": 17.6905
     }
   ],
   "pg080081_n0003": [
@@ -242855,6 +243254,273 @@
       "end": 7.2881
     }
   ],
+  "pg104105_cover_combined": [
+    {
+      "text": "Una",
+      "start": 0.0976,
+      "end": 0.3
+    },
+    {
+      "text": "joven",
+      "start": 0.3119,
+      "end": 0.55
+    },
+    {
+      "text": "asoma",
+      "start": 0.5619,
+      "end": 0.8833
+    },
+    {
+      "text": "desde",
+      "start": 0.919,
+      "end": 1.1214
+    },
+    {
+      "text": "una",
+      "start": 1.1571,
+      "end": 1.3
+    },
+    {
+      "text": "puerta",
+      "start": 1.3833,
+      "end": 1.6214
+    },
+    {
+      "text": "con",
+      "start": 1.681,
+      "end": 1.8238
+    },
+    {
+      "text": "gesto",
+      "start": 1.8357,
+      "end": 2.1214
+    },
+    {
+      "text": "de",
+      "start": 2.1571,
+      "end": 2.2167
+    },
+    {
+      "text": "alarma",
+      "start": 2.2167,
+      "end": 2.5976
+    },
+    {
+      "text": "mientras",
+      "start": 2.8476,
+      "end": 3.1929
+    },
+    {
+      "text": "un",
+      "start": 3.2167,
+      "end": 3.2643
+    },
+    {
+      "text": "muchacho",
+      "start": 3.2643,
+      "end": 3.6929
+    },
+    {
+      "text": "con",
+      "start": 3.7524,
+      "end": 3.8595
+    },
+    {
+      "text": "gorra",
+      "start": 3.919,
+      "end": 4.1333
+    },
+    {
+      "text": "la",
+      "start": 4.1571,
+      "end": 4.2524
+    },
+    {
+      "text": "mira",
+      "start": 4.2881,
+      "end": 4.4785
+    },
+    {
+      "text": "sobresaltado",
+      "start": 4.4905,
+      "end": 5.2167
+    },
+    {
+      "text": "y",
+      "start": 5.3,
+      "end": 5.3714
+    },
+    {
+      "text": "levanta",
+      "start": 5.3952,
+      "end": 5.7405
+    },
+    {
+      "text": "las",
+      "start": 5.7643,
+      "end": 5.8714
+    },
+    {
+      "text": "manos",
+      "start": 5.8952,
+      "end": 6.2047
+    },
+    {
+      "text": "en",
+      "start": 6.2047,
+      "end": 6.2762
+    },
+    {
+      "text": "un",
+      "start": 6.3,
+      "end": 6.4071
+    },
+    {
+      "text": "camarote",
+      "start": 6.431,
+      "end": 6.8119
+    },
+    {
+      "text": "en",
+      "start": 6.8119,
+      "end": 6.9072
+    },
+    {
+      "text": "penumbra",
+      "start": 6.919,
+      "end": 7.3119
+    },
+    {
+      "text": "Un",
+      "start": 8.1786,
+      "end": 8.3333
+    },
+    {
+      "text": "hombre",
+      "start": 8.3571,
+      "end": 8.5595
+    },
+    {
+      "text": "de",
+      "start": 8.5953,
+      "end": 8.6667
+    },
+    {
+      "text": "bigote",
+      "start": 8.6905,
+      "end": 9.0476
+    },
+    {
+      "text": "y",
+      "start": 9.0476,
+      "end": 9.0833
+    },
+    {
+      "text": "sombrero",
+      "start": 9.0953,
+      "end": 9.5
+    },
+    {
+      "text": "pide",
+      "start": 9.5833,
+      "end": 9.7619
+    },
+    {
+      "text": "silencio",
+      "start": 9.7738,
+      "end": 10.2262
+    },
+    {
+      "text": "con",
+      "start": 10.2857,
+      "end": 10.3928
+    },
+    {
+      "text": "un",
+      "start": 10.4167,
+      "end": 10.5
+    },
+    {
+      "text": "dedo",
+      "start": 10.5476,
+      "end": 10.75
+    },
+    {
+      "text": "sobre",
+      "start": 10.7619,
+      "end": 10.9762
+    },
+    {
+      "text": "los",
+      "start": 11.0,
+      "end": 11.119
+    },
+    {
+      "text": "labios",
+      "start": 11.131,
+      "end": 11.5833
+    },
+    {
+      "text": "mientras",
+      "start": 11.9047,
+      "end": 12.25
+    },
+    {
+      "text": "otro",
+      "start": 12.25,
+      "end": 12.4286
+    },
+    {
+      "text": "joven",
+      "start": 12.4405,
+      "end": 12.75
+    },
+    {
+      "text": "con",
+      "start": 12.7738,
+      "end": 12.8809
+    },
+    {
+      "text": "boina",
+      "start": 12.9524,
+      "end": 13.1905
+    },
+    {
+      "text": "mira",
+      "start": 13.2262,
+      "end": 13.4762
+    },
+    {
+      "text": "hacia",
+      "start": 13.5357,
+      "end": 13.7857
+    },
+    {
+      "text": "un",
+      "start": 13.8095,
+      "end": 13.9048
+    },
+    {
+      "text": "costado",
+      "start": 13.9167,
+      "end": 14.2857
+    },
+    {
+      "text": "con",
+      "start": 14.3453,
+      "end": 14.4524
+    },
+    {
+      "text": "expresión",
+      "start": 14.4643,
+      "end": 14.9047
+    },
+    {
+      "text": "inquieta",
+      "start": 14.9167,
+      "end": 15.369
+    }
+  ],
   "pg104105_n0002": [
     {
       "text": "CAPÍTULO",
@@ -250064,153 +250730,118 @@
   "pg110_im002": [
     {
       "text": "Javier",
-      "start": 0.0982,
-      "end": 0.5625
+      "start": 0.0976,
+      "end": 0.5619
     },
     {
       "text": "con",
-      "start": 0.8244,
-      "end": 0.9435
+      "start": 0.8238,
+      "end": 0.9428
     },
     {
       "text": "buzo",
-      "start": 0.9911,
-      "end": 1.2411
+      "start": 0.9905,
+      "end": 1.2405
     },
     {
       "text": "negro",
-      "start": 1.2768,
-      "end": 1.5268
+      "start": 1.2762,
+      "end": 1.5262
     },
     {
       "text": "y",
-      "start": 1.5625,
-      "end": 1.5982
+      "start": 1.55,
+      "end": 1.5857
     },
     {
       "text": "detalles",
-      "start": 1.622,
-      "end": 2.0863
+      "start": 1.6095,
+      "end": 2.0738
     },
     {
       "text": "amarillos",
-      "start": 2.0863,
-      "end": 2.6577
+      "start": 2.0738,
+      "end": 2.6452
     },
     {
       "text": "saluda",
-      "start": 2.8125,
-      "end": 3.1815
+      "start": 2.8,
+      "end": 3.1929
     },
     {
       "text": "con",
-      "start": 3.2411,
-      "end": 3.3363
+      "start": 3.2524,
+      "end": 3.3476
     },
     {
       "text": "la",
-      "start": 3.3482,
-      "end": 3.4315
+      "start": 3.3595,
+      "end": 3.4429
     },
     {
       "text": "mano",
-      "start": 3.4672,
-      "end": 3.6577
+      "start": 3.4786,
+      "end": 3.7167
     },
     {
       "text": "a",
-      "start": 3.6578,
-      "end": 3.6978
+      "start": 3.7167,
+      "end": 3.7643
     },
     {
-      "text": "una",
-      "start": 3.7054,
-      "end": 3.8244
-    },
-    {
-      "text": "adolescente",
-      "start": 3.8244,
-      "end": 4.384
-    },
-    {
-      "text": "de",
-      "start": 4.4315,
-      "end": 4.503
-    },
-    {
-      "text": "pelo",
-      "start": 4.5863,
-      "end": 4.7767
-    },
-    {
-      "text": "azul",
-      "start": 4.7768,
-      "end": 5.0863
-    },
-    {
-      "text": "y",
-      "start": 5.0982,
-      "end": 5.1458
-    },
-    {
-      "text": "campera",
-      "start": 5.2054,
-      "end": 5.5149
-    },
-    {
-      "text": "amarilla",
-      "start": 5.5149,
-      "end": 5.9196
+      "text": "Federica",
+      "start": 3.7881,
+      "end": 4.2643
     },
     {
       "text": "que",
-      "start": 5.9792,
-      "end": 6.0387
+      "start": 4.3238,
+      "end": 4.3833
     },
     {
       "text": "le",
-      "start": 6.0625,
-      "end": 6.1339
+      "start": 4.419,
+      "end": 4.4905
     },
     {
       "text": "responde",
-      "start": 6.1696,
-      "end": 6.5625
+      "start": 4.5143,
+      "end": 4.8952
     },
     {
       "text": "sonriente",
-      "start": 6.5744,
-      "end": 7.0744
+      "start": 4.919,
+      "end": 5.419
     },
     {
       "text": "en",
-      "start": 7.0744,
-      "end": 7.1101
+      "start": 5.419,
+      "end": 5.4667
     },
     {
       "text": "la",
-      "start": 7.122,
-      "end": 7.2173
+      "start": 5.4667,
+      "end": 5.5738
     },
     {
       "text": "puerta",
-      "start": 7.2887,
-      "end": 7.5149
+      "start": 5.6452,
+      "end": 5.8715
     },
     {
       "text": "de",
-      "start": 7.5506,
-      "end": 7.5982
+      "start": 5.9071,
+      "end": 5.9547
     },
     {
       "text": "una",
-      "start": 7.6339,
-      "end": 7.7649
+      "start": 5.9905,
+      "end": 6.1214
     },
     {
       "text": "casa",
-      "start": 7.8125,
-      "end": 8.1101
+      "start": 6.181,
+      "end": 6.4905
     }
   ],
   "pg110_n0002": [
@@ -277021,6 +277652,328 @@
       "text": "inclinada",
       "start": 8.1929,
       "end": 8.7167
+    }
+  ],
+  "pg122123_cover_combined": [
+    {
+      "text": "Silueta",
+      "start": 0.0976,
+      "end": 0.5381
+    },
+    {
+      "text": "de",
+      "start": 0.5738,
+      "end": 0.6452
+    },
+    {
+      "text": "una",
+      "start": 0.681,
+      "end": 0.8
+    },
+    {
+      "text": "persona",
+      "start": 0.8595,
+      "end": 1.1929
+    },
+    {
+      "text": "flotando",
+      "start": 1.2167,
+      "end": 1.6333
+    },
+    {
+      "text": "o",
+      "start": 1.6571,
+      "end": 1.6571
+    },
+    {
+      "text": "cayendo",
+      "start": 1.7167,
+      "end": 2.0857
+    },
+    {
+      "text": "en",
+      "start": 2.0857,
+      "end": 2.1452
+    },
+    {
+      "text": "un",
+      "start": 2.169,
+      "end": 2.2643
+    },
+    {
+      "text": "remolino",
+      "start": 2.2881,
+      "end": 2.681
+    },
+    {
+      "text": "violeta",
+      "start": 2.7167,
+      "end": 3.181
+    },
+    {
+      "text": "rodeada",
+      "start": 3.5143,
+      "end": 3.931
+    },
+    {
+      "text": "de",
+      "start": 3.9786,
+      "end": 4.0619
+    },
+    {
+      "text": "fotos",
+      "start": 4.0738,
+      "end": 4.3714
+    },
+    {
+      "text": "antiguas",
+      "start": 4.3714,
+      "end": 4.9785
+    },
+    {
+      "text": "dos",
+      "start": 5.2167,
+      "end": 5.3238
+    },
+    {
+      "text": "jóvenes",
+      "start": 5.3357,
+      "end": 5.669
+    },
+    {
+      "text": "de",
+      "start": 5.7047,
+      "end": 5.7762
+    },
+    {
+      "text": "pie",
+      "start": 5.8476,
+      "end": 6.0262
+    },
+    {
+      "text": "una",
+      "start": 6.3119,
+      "end": 6.4667
+    },
+    {
+      "text": "mujer",
+      "start": 6.4905,
+      "end": 6.7405
+    },
+    {
+      "text": "sonriente",
+      "start": 6.7643,
+      "end": 7.3476
+    },
+    {
+      "text": "un",
+      "start": 7.6571,
+      "end": 7.7642
+    },
+    {
+      "text": "retrato",
+      "start": 7.7881,
+      "end": 8.1452
+    },
+    {
+      "text": "pequeño",
+      "start": 8.2167,
+      "end": 8.5738
+    },
+    {
+      "text": "y",
+      "start": 8.6214,
+      "end": 8.681
+    },
+    {
+      "text": "el",
+      "start": 8.681,
+      "end": 8.8
+    },
+    {
+      "text": "rostro",
+      "start": 8.8238,
+      "end": 9.1809
+    },
+    {
+      "text": "de",
+      "start": 9.2048,
+      "end": 9.2762
+    },
+    {
+      "text": "un",
+      "start": 9.3,
+      "end": 9.3714
+    },
+    {
+      "text": "hombre",
+      "start": 9.3953,
+      "end": 9.6095
+    },
+    {
+      "text": "en",
+      "start": 9.6095,
+      "end": 9.7048
+    },
+    {
+      "text": "sepia",
+      "start": 9.7167,
+      "end": 10.0857
+    },
+    {
+      "text": "Silueta",
+      "start": 10.9643,
+      "end": 11.4047
+    },
+    {
+      "text": "de",
+      "start": 11.4405,
+      "end": 11.5119
+    },
+    {
+      "text": "una",
+      "start": 11.5476,
+      "end": 11.6667
+    },
+    {
+      "text": "persona",
+      "start": 11.7262,
+      "end": 12.0595
+    },
+    {
+      "text": "en",
+      "start": 12.0595,
+      "end": 12.1072
+    },
+    {
+      "text": "un",
+      "start": 12.131,
+      "end": 12.2262
+    },
+    {
+      "text": "remolino",
+      "start": 12.25,
+      "end": 12.6429
+    },
+    {
+      "text": "violeta",
+      "start": 12.6786,
+      "end": 13.131
+    },
+    {
+      "text": "junto",
+      "start": 13.4047,
+      "end": 13.7024
+    },
+    {
+      "text": "a",
+      "start": 13.7024,
+      "end": 13.7381
+    },
+    {
+      "text": "dos",
+      "start": 13.7857,
+      "end": 13.8928
+    },
+    {
+      "text": "retratos",
+      "start": 13.9286,
+      "end": 14.369
+    },
+    {
+      "text": "antiguos",
+      "start": 14.369,
+      "end": 14.7738
+    },
+    {
+      "text": "de",
+      "start": 14.8095,
+      "end": 14.881
+    },
+    {
+      "text": "hombres",
+      "start": 14.9167,
+      "end": 15.3095
+    },
+    {
+      "text": "uno",
+      "start": 15.5595,
+      "end": 15.7262
+    },
+    {
+      "text": "con",
+      "start": 15.7857,
+      "end": 15.8928
+    },
+    {
+      "text": "gorra",
+      "start": 15.9524,
+      "end": 16.1667
+    },
+    {
+      "text": "de",
+      "start": 16.2024,
+      "end": 16.2619
+    },
+    {
+      "text": "uniforme",
+      "start": 16.2738,
+      "end": 16.6905
+    },
+    {
+      "text": "y",
+      "start": 16.6905,
+      "end": 16.7142
+    },
+    {
+      "text": "bigote",
+      "start": 16.75,
+      "end": 17.1905
+    },
+    {
+      "text": "y",
+      "start": 17.3571,
+      "end": 17.4285
+    },
+    {
+      "text": "otro",
+      "start": 17.4405,
+      "end": 17.6667
+    },
+    {
+      "text": "de",
+      "start": 17.6905,
+      "end": 17.7262
+    },
+    {
+      "text": "expresión",
+      "start": 17.7381,
+      "end": 18.2143
+    },
+    {
+      "text": "severa",
+      "start": 18.2262,
+      "end": 18.5833
+    },
+    {
+      "text": "en",
+      "start": 18.5833,
+      "end": 18.631
+    },
+    {
+      "text": "una",
+      "start": 18.6547,
+      "end": 18.8095
+    },
+    {
+      "text": "foto",
+      "start": 18.8333,
+      "end": 19.0595
+    },
+    {
+      "text": "inclinada",
+      "start": 19.0595,
+      "end": 19.5833
     }
   ],
   "pg122123_n0003": [
@@ -324977,6 +325930,258 @@
       "text": "opresivo",
       "start": 6.181,
       "end": 6.681
+    }
+  ],
+  "pg144145_cover_combined": [
+    {
+      "text": "Hombre",
+      "start": 0.0976,
+      "end": 0.3833
+    },
+    {
+      "text": "de",
+      "start": 0.419,
+      "end": 0.5024
+    },
+    {
+      "text": "mirada",
+      "start": 0.5262,
+      "end": 0.8476
+    },
+    {
+      "text": "amenazante",
+      "start": 0.8476,
+      "end": 1.431
+    },
+    {
+      "text": "se",
+      "start": 1.4429,
+      "end": 1.55
+    },
+    {
+      "text": "inclina",
+      "start": 1.55,
+      "end": 1.931
+    },
+    {
+      "text": "sobre",
+      "start": 1.9429,
+      "end": 2.1691
+    },
+    {
+      "text": "la",
+      "start": 2.1929,
+      "end": 2.2762
+    },
+    {
+      "text": "mesa",
+      "start": 2.3119,
+      "end": 2.6095
+    },
+    {
+      "text": "y",
+      "start": 2.6333,
+      "end": 2.681
+    },
+    {
+      "text": "sujeta",
+      "start": 2.6929,
+      "end": 3.0976
+    },
+    {
+      "text": "el",
+      "start": 3.0976,
+      "end": 3.1572
+    },
+    {
+      "text": "respaldo",
+      "start": 3.169,
+      "end": 3.5619
+    },
+    {
+      "text": "de",
+      "start": 3.5976,
+      "end": 3.6452
+    },
+    {
+      "text": "la",
+      "start": 3.669,
+      "end": 3.7643
+    },
+    {
+      "text": "silla",
+      "start": 3.7762,
+      "end": 4.0619
+    },
+    {
+      "text": "de",
+      "start": 4.0976,
+      "end": 4.1572
+    },
+    {
+      "text": "un",
+      "start": 4.181,
+      "end": 4.2524
+    },
+    {
+      "text": "hombre",
+      "start": 4.2762,
+      "end": 4.4905
+    },
+    {
+      "text": "corpulento",
+      "start": 4.55,
+      "end": 5.0262
+    },
+    {
+      "text": "sentado",
+      "start": 5.0381,
+      "end": 5.5262
+    },
+    {
+      "text": "en",
+      "start": 5.8714,
+      "end": 5.9667
+    },
+    {
+      "text": "una",
+      "start": 5.9786,
+      "end": 6.1452
+    },
+    {
+      "text": "sala",
+      "start": 6.1571,
+      "end": 6.3714
+    },
+    {
+      "text": "oscura",
+      "start": 6.3833,
+      "end": 6.7167
+    },
+    {
+      "text": "de",
+      "start": 6.7524,
+      "end": 6.8357
+    },
+    {
+      "text": "tono",
+      "start": 6.8952,
+      "end": 7.0738
+    },
+    {
+      "text": "rojizo",
+      "start": 7.0976,
+      "end": 7.5262
+    },
+    {
+      "text": "Junto",
+      "start": 8.4167,
+      "end": 8.7857
+    },
+    {
+      "text": "al",
+      "start": 8.7857,
+      "end": 8.869
+    },
+    {
+      "text": "hombre",
+      "start": 8.8929,
+      "end": 9.1072
+    },
+    {
+      "text": "corpulento",
+      "start": 9.1667,
+      "end": 9.6429
+    },
+    {
+      "text": "sentado",
+      "start": 9.6547,
+      "end": 10.1667
+    },
+    {
+      "text": "un",
+      "start": 10.3214,
+      "end": 10.4285
+    },
+    {
+      "text": "hombre",
+      "start": 10.4524,
+      "end": 10.6667
+    },
+    {
+      "text": "pelirrojo",
+      "start": 10.7381,
+      "end": 11.2024
+    },
+    {
+      "text": "se",
+      "start": 11.2262,
+      "end": 11.3214
+    },
+    {
+      "text": "inclina",
+      "start": 11.3214,
+      "end": 11.7024
+    },
+    {
+      "text": "sobre",
+      "start": 11.7143,
+      "end": 11.9286
+    },
+    {
+      "text": "la",
+      "start": 11.9524,
+      "end": 12.0357
+    },
+    {
+      "text": "mesa",
+      "start": 12.0714,
+      "end": 12.2857
+    },
+    {
+      "text": "con",
+      "start": 12.3333,
+      "end": 12.4286
+    },
+    {
+      "text": "expresión",
+      "start": 12.4524,
+      "end": 12.9047
+    },
+    {
+      "text": "hostil",
+      "start": 12.9286,
+      "end": 13.3095
+    },
+    {
+      "text": "en",
+      "start": 13.4762,
+      "end": 13.5595
+    },
+    {
+      "text": "un",
+      "start": 13.5833,
+      "end": 13.7024
+    },
+    {
+      "text": "cuarto",
+      "start": 13.7381,
+      "end": 14.0238
+    },
+    {
+      "text": "oscuro",
+      "start": 14.0238,
+      "end": 14.4047
+    },
+    {
+      "text": "y",
+      "start": 14.4405,
+      "end": 14.4881
+    },
+    {
+      "text": "opresivo",
+      "start": 14.5,
+      "end": 15.0
     }
   ],
   "pg144145_n0003": [
@@ -395601,6 +396806,443 @@
       "text": "salvo",
       "start": 13.6453,
       "end": 13.9905
+    }
+  ],
+  "pg176177_cover_combined": [
+    {
+      "text": "Panel",
+      "start": 0.0976,
+      "end": 0.3833
+    },
+    {
+      "text": "de",
+      "start": 0.4071,
+      "end": 0.4785
+    },
+    {
+      "text": "corcho",
+      "start": 0.5381,
+      "end": 0.8238
+    },
+    {
+      "text": "con",
+      "start": 0.8833,
+      "end": 0.9905
+    },
+    {
+      "text": "hilos",
+      "start": 1.0143,
+      "end": 1.2047
+    },
+    {
+      "text": "rojos",
+      "start": 1.2167,
+      "end": 1.5262
+    },
+    {
+      "text": "que",
+      "start": 1.5738,
+      "end": 1.6452
+    },
+    {
+      "text": "conectan",
+      "start": 1.6929,
+      "end": 2.0619
+    },
+    {
+      "text": "un",
+      "start": 2.0857,
+      "end": 2.169
+    },
+    {
+      "text": "retrato",
+      "start": 2.1929,
+      "end": 2.5976
+    },
+    {
+      "text": "de",
+      "start": 2.6333,
+      "end": 2.7047
+    },
+    {
+      "text": "Tomassino",
+      "start": 2.7524,
+      "end": 3.2405
+    },
+    {
+      "text": "Ambrosini",
+      "start": 3.2405,
+      "end": 3.6809
+    },
+    {
+      "text": "Brunetto",
+      "start": 3.7167,
+      "end": 4.2047
+    },
+    {
+      "text": "la",
+      "start": 4.5143,
+      "end": 4.6333
+    },
+    {
+      "text": "ficha",
+      "start": 4.6571,
+      "end": 4.9071
+    },
+    {
+      "text": "de",
+      "start": 4.931,
+      "end": 5.0024
+    },
+    {
+      "text": "Leda",
+      "start": 5.0262,
+      "end": 5.2167
+    },
+    {
+      "text": "Brunetto",
+      "start": 5.2524,
+      "end": 5.7405
+    },
+    {
+      "text": "una",
+      "start": 6.0024,
+      "end": 6.181
+    },
+    {
+      "text": "foto",
+      "start": 6.2047,
+      "end": 6.4667
+    },
+    {
+      "text": "de",
+      "start": 6.5024,
+      "end": 6.5619
+    },
+    {
+      "text": "una",
+      "start": 6.5976,
+      "end": 6.7167
+    },
+    {
+      "text": "persona",
+      "start": 6.7762,
+      "end": 7.1095
+    },
+    {
+      "text": "sola",
+      "start": 7.1214,
+      "end": 7.3833
+    },
+    {
+      "text": "en",
+      "start": 7.3833,
+      "end": 7.419
+    },
+    {
+      "text": "la",
+      "start": 7.431,
+      "end": 7.5262
+    },
+    {
+      "text": "cubierta",
+      "start": 7.5857,
+      "end": 7.9547
+    },
+    {
+      "text": "de",
+      "start": 7.9905,
+      "end": 8.0381
+    },
+    {
+      "text": "un",
+      "start": 8.0619,
+      "end": 8.1215
+    },
+    {
+      "text": "barco",
+      "start": 8.181,
+      "end": 8.5143
+    },
+    {
+      "text": "otra",
+      "start": 8.7048,
+      "end": 8.931
+    },
+    {
+      "text": "del",
+      "start": 8.9667,
+      "end": 9.0738
+    },
+    {
+      "text": "barco",
+      "start": 9.1095,
+      "end": 9.431
+    },
+    {
+      "text": "y",
+      "start": 9.4667,
+      "end": 9.5619
+    },
+    {
+      "text": "una",
+      "start": 9.5976,
+      "end": 9.7286
+    },
+    {
+      "text": "nota",
+      "start": 9.7643,
+      "end": 9.9786
+    },
+    {
+      "text": "que",
+      "start": 10.0381,
+      "end": 10.1095
+    },
+    {
+      "text": "dice",
+      "start": 10.1333,
+      "end": 10.4429
+    },
+    {
+      "text": "Instituto",
+      "start": 10.5381,
+      "end": 11.0381
+    },
+    {
+      "text": "para",
+      "start": 11.0976,
+      "end": 11.2048
+    },
+    {
+      "text": "el",
+      "start": 11.2048,
+      "end": 11.2762
+    },
+    {
+      "text": "futuro",
+      "start": 11.3,
+      "end": 11.6929
+    },
+    {
+      "text": "Panel",
+      "start": 12.5714,
+      "end": 12.869
+    },
+    {
+      "text": "de",
+      "start": 12.8929,
+      "end": 12.9762
+    },
+    {
+      "text": "corcho",
+      "start": 13.0357,
+      "end": 13.3095
+    },
+    {
+      "text": "con",
+      "start": 13.369,
+      "end": 13.4524
+    },
+    {
+      "text": "el",
+      "start": 13.4762,
+      "end": 13.5715
+    },
+    {
+      "text": "retrato",
+      "start": 13.5833,
+      "end": 14.0
+    },
+    {
+      "text": "de",
+      "start": 14.0238,
+      "end": 14.0833
+    },
+    {
+      "text": "Antonella",
+      "start": 14.0833,
+      "end": 14.5
+    },
+    {
+      "text": "Ambrosini",
+      "start": 14.5,
+      "end": 14.9524
+    },
+    {
+      "text": "Brunetto",
+      "start": 14.9881,
+      "end": 15.3571
+    },
+    {
+      "text": "conectado",
+      "start": 15.4167,
+      "end": 15.8571
+    },
+    {
+      "text": "por",
+      "start": 15.9286,
+      "end": 16.0357
+    },
+    {
+      "text": "hilos",
+      "start": 16.0476,
+      "end": 16.2262
+    },
+    {
+      "text": "rojos",
+      "start": 16.25,
+      "end": 16.6429
+    },
+    {
+      "text": "a",
+      "start": 16.6429,
+      "end": 16.6786
+    },
+    {
+      "text": "la",
+      "start": 16.7024,
+      "end": 16.7738
+    },
+    {
+      "text": "foto",
+      "start": 16.7976,
+      "end": 17.0476
+    },
+    {
+      "text": "de",
+      "start": 17.0833,
+      "end": 17.1547
+    },
+    {
+      "text": "Giuseppe",
+      "start": 17.1667,
+      "end": 17.5952
+    },
+    {
+      "text": "Ambrosini",
+      "start": 17.5953,
+      "end": 18.119
+    },
+    {
+      "text": "y",
+      "start": 18.131,
+      "end": 18.2143
+    },
+    {
+      "text": "a",
+      "start": 18.2381,
+      "end": 18.2976
+    },
+    {
+      "text": "varias",
+      "start": 18.3214,
+      "end": 18.5714
+    },
+    {
+      "text": "notas",
+      "start": 18.6071,
+      "end": 19.0595
+    },
+    {
+      "text": "Pinerolo",
+      "start": 19.3095,
+      "end": 19.7024
+    },
+    {
+      "text": "=",
+      "start": 19.7024,
+      "end": 19.9762
+    },
+    {
+      "text": "Peñarol",
+      "start": 20.0357,
+      "end": 20.4762
+    },
+    {
+      "text": "Encontrarán",
+      "start": 20.6905,
+      "end": 21.2262
+    },
+    {
+      "text": "teléfono",
+      "start": 21.2738,
+      "end": 21.6547
+    },
+    {
+      "text": "celular",
+      "start": 21.6667,
+      "end": 22.0
+    },
+    {
+      "text": "de",
+      "start": 22.0357,
+      "end": 22.119
+    },
+    {
+      "text": "1930",
+      "start": 22.1547,
+      "end": 23.2738
+    },
+    {
+      "text": "El",
+      "start": 23.5,
+      "end": 23.619
+    },
+    {
+      "text": "campeonato",
+      "start": 23.631,
+      "end": 24.1786
+    },
+    {
+      "text": "ya",
+      "start": 24.2024,
+      "end": 24.3214
+    },
+    {
+      "text": "está",
+      "start": 24.3214,
+      "end": 24.4643
+    },
+    {
+      "text": "a",
+      "start": 24.4643,
+      "end": 24.5
+    },
+    {
+      "text": "salvo",
+      "start": 24.5238,
+      "end": 24.8809
+    },
+    {
+      "text": "y",
+      "start": 25.0595,
+      "end": 25.1905
+    },
+    {
+      "text": "El",
+      "start": 25.381,
+      "end": 25.4762
+    },
+    {
+      "text": "futuro",
+      "start": 25.5,
+      "end": 25.881
+    },
+    {
+      "text": "está",
+      "start": 25.881,
+      "end": 26.0476
+    },
+    {
+      "text": "a",
+      "start": 26.0476,
+      "end": 26.0953
+    },
+    {
+      "text": "salvo",
+      "start": 26.119,
+      "end": 26.4643
     }
   ],
   "pg176177_n0003": [

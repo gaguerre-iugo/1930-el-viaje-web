@@ -584,7 +584,7 @@
 
       var data = await response.clone().json();
       if (isConfig) {
-        data.bundleVersion = "57-activity-progress";
+        data.bundleVersion = "59-alt-fixes-img";
         data.features.showNavigationControls = false;
       } else if (isAudios) {
         /* El runtime solo agrega a su cola de narracion los elementos cuyo id
@@ -3441,7 +3441,7 @@
 
   /* Etiqueta de cache de los catalogos por voz. La usan tanto su carga normal
      como el adaptador de datos, para que la descarga se reutilice. */
-  var ttsVoiceCatalogVersion = "49-full-book-134-remove-printed-contents";
+  var ttsVoiceCatalogVersion = "51-alt-fixes-img";
 
   function ttsVoiceCatalogUrl(voiceKey, file) {
     return "./content/i18n/es-UY/voices/" + voiceKey + "/" + file +
@@ -7755,6 +7755,19 @@
           pg144145_sec001: "pg144145_cover_integrated.jpg",
           pg176177_sec001: "pg176177_cover_integrated.jpg"
         };
+        /* La portada compuesta es UNA imagen: conservar solo el id de la mitad
+           izquierda dejaba la descripcion de la mitad derecha sin narrar. Cada
+           portada compuesta tiene en el catalogo un id propio cuya locucion es
+           la suma de las dos mitades; los ids por mitad siguen vigentes para
+           cuando la pagina se abre suelta y las imagenes no se componen. */
+        var coverCompositeNarrationMap = {
+          pg058059_sec001: "pg058059_cover_combined",
+          pg080081_sec001: "pg080081_cover_combined",
+          pg104105_sec001: "pg104105_cover_combined",
+          pg122123_sec001: "pg122123_cover_combined",
+          pg144145_sec001: "pg144145_cover_combined",
+          pg176177_sec001: "pg176177_cover_combined"
+        };
         var compositeFilename = coverCompositeMap[section.dataset.sectionId];
         if (compositeFilename && visibleImages.length) {
           var compositeImage = document.createElement("img");
@@ -7763,7 +7776,11 @@
           compositeImage.alt = visibleImages.map(function (image) {
             return image.alt || "";
           }).filter(Boolean).join(" ");
-          if (visibleImages[0].dataset.id) {
+          var compositeNarrationId =
+            coverCompositeNarrationMap[section.dataset.sectionId];
+          if (compositeNarrationId) {
+            compositeImage.dataset.id = compositeNarrationId;
+          } else if (visibleImages[0].dataset.id) {
             compositeImage.dataset.id = visibleImages[0].dataset.id;
           }
           artBox.appendChild(compositeImage);
