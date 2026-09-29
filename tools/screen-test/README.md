@@ -84,3 +84,53 @@ Se recorren páginas de portada, prosa, ilustradas, cierre y cuestionario
 - **Capa 3 — Dispositivo real**: panel de 65" o tablet Android grande en Chrome
   horizontal, para validar 2 lápices simultáneos, uso colectivo, legibilidad a
   distancia de aula y escaneo de QR.
+
+---
+
+# Testeo en teléfonos y tablets Android (Chrome móvil)
+
+Además del arnés de pantallas grandes, `mobile-audit.mjs` audita el lector en
+perfiles Android reales (viewport móvil, `hasTouch`, `devicePixelRatio` y
+`userAgent` de Android) y mide lo que rompe la experiencia en un teléfono:
+
+```powershell
+cd tools\screen-test
+
+# Los 4 perfiles (412x915 vertical, 360x640 chico, 915x412 horizontal, 800x1280 tablet)
+node mobile-audit.mjs
+
+# Menos muestreo = más rápido
+node mobile-audit.mjs --pages 3
+
+# Un solo perfil, o contra el servidor local
+node mobile-audit.mjs --device pixel7-landscape
+node mobile-audit.mjs --url http://127.0.0.1:5599/index.html
+```
+
+Qué informa por perfil y por vista:
+
+| Métrica | Por qué importa |
+|---|---|
+| **Usabilidad** (ms) | Cuándo el contenido es visible y, sobre todo, cuándo la barra de navegación queda **usable** (opacidad y toques activos). El lector la mantiene oculta mientras arranca el runtime: es la métrica que decide si el libro parece colgado |
+| Errores de consola / red | Excepciones, promesas rechazadas, 404 y HTTP ≥ 400. En el sitio publicado hoy: 0 |
+| Unidades de viewport | Valor real de `vh`, `dvh`, `svh`, `lvh` y de `--reflow-page-height` |
+| Barra de direcciones | Se simula su retracción con `setViewportSize` y se detecta si el libro se **re-pagina** (columna que cambia de alto) |
+| Geometría | Texto bajo el pliegue visible, solapamiento barra/texto, elementos que cruzan los bordes |
+| Imágenes | Rotas, deformadas y **encogidas por `contain`** (caja desproporcionada, con el tamaño realmente pintado) |
+| Objetivos táctiles | Área táctil **efectiva** (el `<label>` que envuelve), no el `<input>` desnudo |
+
+Genera capturas y `report-mobile/mobile-summary.json`.
+
+Complementos:
+
+```powershell
+node mobile-boot-timeline.mjs     # hitos del arranque: cuándo queda usable el lector
+node verify-published.mjs         # ¿lo publicado en GitHub Pages es igual a este repo?
+```
+
+El diagnóstico completo, con magnitudes y causas, está en
+`docs/auditorias/AUDITORIA-MOVIL-ANDROID.md`.
+
+Para ver los errores **en el teléfono real**, el libro acepta `?diag=1` en la URL
+(ver `assets/mobile-diagnostics.js`): dibuja un panel con los errores capturados y
+las medidas del dispositivo, con botón "Copiar informe".
