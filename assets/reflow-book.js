@@ -295,6 +295,10 @@
     primaryToolbarDeadline: 0,
     primaryToolbarFallbackTimer: 0,
     primaryToolbarRuntimeWatched: false,
+    /* Últimos valores escritos/observados, para no repetir trabajo idempotente
+       durante el arranque (ver syncToolbarReserve y observeIllustratedAlignment). */
+    primaryToolbarHeight: 0,
+    illustratedAlignmentSignature: "",
     resizeTimer: 0,
     layoutObserverTimer: 0,
     layoutObserver: null,
@@ -2870,6 +2874,19 @@
     });
   }
 
+  /* Una sola liquidación de reserva por cuadro: los eventos de resize, el
+     ResizeObserver y los cambios del reproductor llamaban a syncToolbarReserve
+     muchas veces en el mismo cuadro, y cada llamada fuerza un cálculo de estilo
+     y de layout del documento completo (medido: 750 ms de CPU en el arranque). */
+  var toolbarReserveFrame = 0;
+  function scheduleToolbarReserve() {
+    if (toolbarReserveFrame) return;
+    toolbarReserveFrame = window.requestAnimationFrame(function () {
+      toolbarReserveFrame = 0;
+      syncToolbarReserve();
+    });
+  }
+
   function syncToolbarReserve() {
     var pagination = document.getElementById("reflow-pagination");
     if (!pagination) return;
@@ -2884,10 +2901,18 @@
     }
     if (!playerLane) playerLane = 72;
     var reserve = toolbarHeight + playerLane;
-    document.documentElement.style.setProperty(
-      "--reflow-primary-toolbar-height",
-      toolbarHeight + "px"
-    );
+    /* Escribir en el elemento raíz invalida el estilo de todo el documento, así
+       que solo se escribe cuando el valor cambia de verdad. Durante el arranque
+       el ResizeObserver y los cambios de paginación llaman a esta función
+       decenas de veces con la misma altura, y cada escritura forzaba un
+       recálculo completo (medido: 750 ms de CPU solo acá). */
+    if (state.primaryToolbarHeight !== toolbarHeight) {
+      state.primaryToolbarHeight = toolbarHeight;
+      document.documentElement.style.setProperty(
+        "--reflow-primary-toolbar-height",
+        toolbarHeight + "px"
+      );
+    }
     if (reserve <= 0 || reserve === state.ttsPlayerReserve) return;
     state.ttsPlayerReserve = reserve;
     document.documentElement.style.setProperty(
@@ -3258,13 +3283,13 @@
 
     syncToolbarReserve();
     if (typeof ResizeObserver === "function") {
-      var toolbarResizeObserver = new ResizeObserver(syncToolbarReserve);
+      var toolbarResizeObserver = new ResizeObserver(scheduleToolbarReserve);
       toolbarResizeObserver.observe(pagination);
       toolbarResizeObserver.observe(ttsPlayer);
     }
-    window.addEventListener("resize", syncToolbarReserve);
+    window.addEventListener("resize", scheduleToolbarReserve);
     if (window.visualViewport) {
-      window.visualViewport.addEventListener("resize", syncToolbarReserve);
+      window.visualViewport.addEventListener("resize", scheduleToolbarReserve);
     }
 
     previousButton = document.getElementById("reflow-previous");
@@ -7199,7 +7224,15 @@
   function settleAllIllustratedPages() {
     /* Use the final, measured image height and move only complete sentence
        units. This keeps the largest prefix that really fits beside every
-       illustration instead of relying on character-count heuristics. */
+       illustration instead of relying on character-count heuristics.
+       NOTA: los pases repetidos de esta función (rAF, 140 ms, 650 ms, el
+       observador de contenido, cada paginación) NO son redundantes. Se probó
+       evitar los pases cuyos insumos no cambiaron (tipografía, Lectura fácil,
+       geometría de la columna, cantidad de páginas, imágenes cargadas) y el
+       resultado final CAMBIA: Chromium termina de repartir el multicolumna
+       entre cuadros, así que cada pase mide una geometría más asentada y mueve
+       una unidad más si hace falta. Con la guarda, pg099 quedaba una columna
+       antes y pg110/pg150 dejaban un párrafo más en el overflow. */
     rebalanceIllustratedPage();
     rebalanceChapterTwoIllustrations();
     rebalanceAtticIllustration();
@@ -7216,6 +7249,13 @@
        this avoids another full repagination and keeps all six reading modes
        visually aligned. */
     if (!("ResizeObserver" in window)) return;
+    /* La consulta de cuatro selectores recorre todo el documento y este pase se
+       repite varias veces por arranque. El conjunto observado solo puede cambiar
+       cuando cambia la estructura del contenido o la cantidad de páginas, así
+       que se firma con esos dos datos y se evita la consulta cuando no cambió. */
+    var signature = content.childElementCount + ":" + state.total;
+    if (state.illustratedAlignmentSignature === signature) return;
+    state.illustratedAlignmentSignature = signature;
     if (!state.illustratedAlignmentObserver) {
       state.illustratedAlignmentObserver = new ResizeObserver(function (entries) {
         var affectedPages = [];
@@ -7287,6 +7327,18 @@
     var copy = content.querySelector('[data-section-id="pg025_sec001"] .illustrated-copy');
     var overflow = content.querySelector('[data-section-id="pg025_sec001"] .illustrated-overflow');
     if (!copy || !overflow) return;
+    var illustratedPage = copy.closest(".illustrated-page");
+    if (!illustratedPage) return;
+    /* La clave de balance se calcula antes de buscar los párrafos móviles: esas
+       ocho búsquedas recorren todo el documento y este pase se repite varias
+       veces por arranque, casi siempre sin cambios que hacer. */
+    var balanceKey = [
+      state.fontSize,
+      document.body.classList.contains("reflow-easy-read") ? "easy" : "standard",
+      content.clientWidth,
+      illustratedPage.clientHeight
+    ].join(":");
+    if (illustratedPage.dataset.reflowBalanceKey === balanceKey) return;
     var movable = [
       "pg025_n0002",
       "pg025_n0003",
@@ -7299,15 +7351,7 @@
     ].map(function (id) {
       return content.querySelector('[data-id="' + id + '"]');
     }).filter(Boolean);
-    var illustratedPage = copy.closest(".illustrated-page");
-    if (!illustratedPage || !movable.length) return;
-    var balanceKey = [
-      state.fontSize,
-      document.body.classList.contains("reflow-easy-read") ? "easy" : "standard",
-      content.clientWidth,
-      illustratedPage.clientHeight
-    ].join(":");
-    if (illustratedPage.dataset.reflowBalanceKey === balanceKey) return;
+    if (!movable.length) return;
 
     /* Restore source order, then move only the minimum trailing passage
        needed to make the live rendered copy fit beside the illustration.
@@ -7344,8 +7388,10 @@
     illustratedPage.dataset.reflowBalanceKey = balanceKey;
   }
 
-  function rebalanceChapterTwoIllustration(sectionId) {
-    var section = content.querySelector('[data-section-id="' + sectionId + '"]');
+  function rebalanceChapterTwoIllustration(sectionId, sectionElement) {
+    var section = sectionElement && sectionElement.isConnected
+      ? sectionElement
+      : content.querySelector('[data-section-id="' + sectionId + '"]');
     var illustratedPage = section && section.querySelector(":scope > .illustrated-page");
     var copy = illustratedPage && illustratedPage.querySelector(":scope > .illustrated-copy");
     var image = illustratedPage && illustratedPage.querySelector(":scope > img");
@@ -7633,15 +7679,29 @@
       "pg099_sec001", "pg110_sec001", "pg113_sec001", "pg132_sec001",
       "pg142_sec001", "pg150_sec001", "pg173_sec001", "pg190_sec001"
     ];
-    Array.prototype.slice.call(
+    var sections = Array.prototype.slice.call(
       content.querySelectorAll("section.reflow-later-illustrated[data-section-id]")
-    ).forEach(function (section) {
+    );
+    /* Cada rebalanceo buscaba su sección con una consulta a todo el documento.
+       Con una docena de secciones y varios pases de liquidación por arranque eso
+       es una búsqueda completa por sección y por pase: se resuelve una sola vez
+       acá, con la consulta que ya se hacía, y se pasa el elemento. */
+    var sectionsById = Object.create(null);
+    sections.forEach(function (section) {
+      var id = section.getAttribute("data-section-id");
+      if (id && !sectionsById[id]) sectionsById[id] = section;
+    });
+    sections.forEach(function (section) {
       var sectionId = section.getAttribute("data-section-id");
       if (sectionId && sectionIds.indexOf(sectionId) === -1) {
         sectionIds.push(sectionId);
       }
     });
-    sectionIds.forEach(rebalanceChapterTwoIllustration);
+    sectionIds.forEach(function (sectionId) {
+      var section = sectionsById[sectionId] ||
+        content.querySelector('[data-section-id="' + sectionId + '"]');
+      if (section) rebalanceChapterTwoIllustration(sectionId, section);
+    });
   }
 
   function rebalanceAtticIllustration() {
@@ -10888,6 +10948,15 @@
     document.body.appendChild(script);
   }
 
+  /* Espera dos cuadros: el primero encola el trabajo de estilo y el segundo
+     confirma que el layout ya se aplicó. Se usa como liquidación barata cuando
+     no hay activos pendientes que esperar. */
+  function nextLayoutFrame() {
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () { requestAnimationFrame(resolve); });
+    });
+  }
+
   async function waitForLayout() {
     function settleWithin(promise, timeout) {
       return Promise.race([
@@ -10917,9 +10986,7 @@
        not hold the complete interface hostage; late assets are handled by
        the existing layout observers after the first usable render. */
     await settleWithin(imageSettlements, 4000);
-    await new Promise(function (resolve) {
-      requestAnimationFrame(function () { requestAnimationFrame(resolve); });
-    });
+    await nextLayoutFrame();
   }
 
   /* The browser automation API evaluates JavaScript in an isolated world,
@@ -11278,6 +11345,13 @@
       loadedSections.forEach(function (section) {
         content.appendChild(section);
       });
+      /* La decodificación de las imágenes de todas las páginas competía con el
+         trabajo de medición del motor en el hilo principal. Con `decoding:
+         async` el navegador las decodifica fuera de ese hilo; el tamaño
+         renderizado no cambia, así que la paginación no se altera. */
+      Array.prototype.slice.call(content.querySelectorAll("img")).forEach(function (image) {
+        if (image.decoding !== "async") image.decoding = "async";
+      });
       composePreliminaryTitle();
       composeChapterCover();
       composeChapterTwoCover();
@@ -11325,7 +11399,10 @@
       settleAllIllustratedPages();
       repairParagraphMarkers();
       updateReadingBlockSizing();
-      await waitForLayout();
+      /* Las fuentes y las imágenes ya se esperaron un paso antes: volver a
+         esperarlas acá solo alargaba el arranque. Alcanza con vaciar el layout
+         antes de medir el margen de la portada y paginar. */
+      await nextLayoutFrame();
       balanceCoverMargins();
 
       recalculate({
@@ -11390,6 +11467,8 @@
           updateEasyReadClass();
           normalizeLaterBookStructure();
           fitChapterFiveChat();
+          /* Una mutación de contenido puede cambiar el texto que se reparte al
+             lado de las ilustraciones. */
           settleAllIllustratedPages();
           repairParagraphMarkers();
           /* Locale reconciliation may move an inserted whitespace node to
