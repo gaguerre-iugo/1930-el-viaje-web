@@ -158,6 +158,15 @@
         docAncho: de.clientWidth,
         docAlto: de.clientHeight,
         visual: vv ? Math.round(vv.width) + "x" + Math.round(vv.height) + " escala " + vv.scale : "sin visualViewport",
+        /* El área realmente visible, en las mismas coordenadas que
+           getBoundingClientRect(): sirve tanto si la página está a escala 1
+           como si el navegador la escaló o infló el viewport de layout. */
+        referenciaAlto: vv ? Math.round(vv.height) : de.clientHeight,
+        referenciaAncho: vv ? Math.round(vv.width) : de.clientWidth,
+        coherencia:
+          Math.abs(window.innerWidth / Math.max(1, de.clientWidth) - 1) < 0.02
+            ? "ok"
+            : "INFLADO x" + (window.innerWidth / Math.max(1, de.clientWidth)).toFixed(2),
         dpr: window.devicePixelRatio,
         orientacion: window.innerWidth > window.innerHeight ? "horizontal" : "vertical",
         pantalla: window.screen.width + "x" + window.screen.height,
@@ -193,22 +202,31 @@
     var out = [];
     var v = s.viewport;
     var l = s.lector;
-    var altoColumna = parseInt((l.contenido.match(/x(\d+)/) || [])[1], 10);
-    var reserva = 0;
+    var altoVisible = v.referenciaAlto;
+    var anchoVisible = v.referenciaAncho;
 
+    if (v.coherencia !== "ok")
+      out.push(
+        "El viewport está " + v.coherencia + ": Chrome reporta " + v.ancho + "x" + v.alto +
+          " pero el layout mide " + v.docAncho + "x" + v.docAlto +
+          ". Con eso, todo lo que es position: fixed (la barra de navegación, los paneles) cae fuera de la pantalla."
+      );
     if (v.alto < 500) out.push("Viewport muy bajo (" + v.alto + "px): el libro queda con muy pocas líneas por página.");
     if (v.ancho > v.alto && v.alto < 500) out.push("Modo horizontal en un teléfono: revisar portada y páginas ilustradas.");
 
     var m = l.tokenAltoPagina.match(/=>\s*(\d+)px/);
     if (m) {
       var ph = parseInt(m[1], 10);
-      if (ph > v.docAlto) out.push("La columna de lectura (" + ph + "px) es más alta que el área visible (" + v.docAlto + "px): se puede cortar la última línea.");
+      if (ph > altoVisible) out.push("La columna de lectura (" + ph + "px) es más alta que el área visible (" + altoVisible + "px): se puede cortar la última línea.");
       if (ph < 200) out.push("La columna de lectura queda en " + ph + "px: apenas unas líneas por página.");
     }
     if (l.barraInferior && l.barraInferior.indexOf("OCULTA") === -1) {
       var bottom = parseInt((l.barraInferior.match(/bottom (-?\d+)/) || [])[1], 10);
-      if (bottom > v.docAlto + 1)
-        out.push("La barra de navegación termina en " + bottom + "px, por debajo del área visible (" + v.docAlto + "px).");
+      var left = parseInt((l.barraInferior.match(/left (-?\d+)/) || [])[1], 10);
+      if (bottom > altoVisible + 1)
+        out.push("La barra de navegación termina en " + bottom + "px y el área visible termina en " + altoVisible + "px: queda fuera de la pantalla.");
+      if (isFinite(left) && left >= anchoVisible - 1)
+        out.push("La barra de navegación arranca en x=" + left + " y el área visible termina en " + anchoVisible + "px: está fuera por la derecha.");
     }
     if (l.barraInferior && l.barraInferior.indexOf("OCULTA") !== -1)
       out.push("La barra de navegación sigue oculta: si no reaparece en unos segundos, no se pueden pasar páginas.");
@@ -233,12 +251,14 @@
   function build() {
     host = el(
       "div",
-      "position:fixed;left:0;right:0;bottom:0;z-index:2147483000;pointer-events:none;" +
+      /* Arriba y no abajo: abajo está justamente la barra de navegación que el
+         panel tiene que ayudar a diagnosticar. */
+      "position:fixed;left:0;right:0;top:0;z-index:2147483000;pointer-events:none;" +
         "font:12px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0b1020;"
     );
     var panel = el(
       "div",
-      "pointer-events:auto;margin:6px;max-height:78vh;overflow:auto;background:#fffffff7;" +
+      "pointer-events:auto;margin:6px;max-height:60vh;overflow:auto;background:#fffffff7;" +
         "border:2px solid #00635d;border-radius:10px;box-shadow:0 6px 22px #0006;padding:8px 10px;"
     );
 
@@ -281,7 +301,7 @@
       panel.style.display = "none";
       var show = el(
         "button",
-        "pointer-events:auto;position:fixed;right:8px;bottom:8px;z-index:2147483001;background:#00635d;color:#fff;" +
+        "pointer-events:auto;position:fixed;right:8px;top:8px;z-index:2147483001;background:#00635d;color:#fff;" +
           "border:0;border-radius:999px;padding:10px 14px;font:700 12px system-ui",
         "Diagnóstico"
       );
@@ -359,8 +379,9 @@
       alertsEl.style.color = a.length ? "#7f1d1d" : "#065f46";
       dataEl.textContent =
         "viewport   " + s.viewport.ancho + "x" + s.viewport.alto + " · dpr " + s.viewport.dpr +
-        " · " + s.viewport.orientacion + " · " + s.viewport.unidades + "\n" +
-        "visual     " + s.viewport.visual + "\n" +
+        " · " + s.viewport.orientacion + " · pantalla " + s.viewport.pantalla + "\n" +
+        "layout     " + s.viewport.docAncho + "x" + s.viewport.docAlto + " · coherencia " + s.viewport.coherencia + "\n" +
+        "visual     " + s.viewport.visual + " · unidades " + s.viewport.unidades + "\n" +
         "columna    " + s.lector.contenido + " · " + s.lector.columnas + "\n" +
         "alto pág.  " + s.lector.tokenAltoPagina + "\n" +
         "barras     nav " + s.lector.navHeight + " · reserva " + s.lector.reservaBarras + " · " + s.lector.barraInferior + "\n" +

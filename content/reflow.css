@@ -172,6 +172,19 @@ body.reflow-book #content {
   column-width: calc(100vw - (2 * var(--reflow-gutter)));
   column-gap: calc(2 * var(--reflow-gutter));
   column-fill: auto;
+  /* Since this is a page-based reader, the whole book is one horizontal strip
+     of columns: `#content` is hundreds of thousands of pixels wide. That
+     overflow is clipped and scrolled here, but Chromium still counts it as the
+     document's layout overflow, and on mobile it then inflates the INITIAL
+     CONTAINING BLOCK to the minimum page scale (measured: exactly 4x on a
+     1067x480 CSS viewport, i.e. `window.innerWidth/innerHeight` reported
+     4268x1920 while the layout viewport stayed 1067x480). Anything
+     `position: fixed` -- the navigation toolbar, the TTS player, the panels --
+     is positioned against that inflated box, so the bottom toolbar lands at
+     y=1920 on a 480px-tall screen and the reader sees no controls at all.
+     Paint containment removes this subtree from the ancestor's overflow
+     without touching the column layout or the strip's own scrolling. */
+  contain: paint;
   /* Navigation is page-based. Native smooth/horizontal scrolling must not
      compete with the discrete paginator, especially during trackpad inertia. */
   scroll-behavior: auto;
@@ -5026,6 +5039,12 @@ body.reflow-book.reflow-quiz-repaginating #content > :not(.reflow-quiz-repaginat
   visibility: visible !important;
 }
 
+/* El overlay congelado cuelga de `body` (fuera del fragmentador multicolumna y
+   fuera de `#content`, que tiene `contain: paint`): así su caja `fixed` se mide
+   contra el viewport y las coordenadas de la tarjeta congelada --tomadas con
+   `getBoundingClientRect()` -- coinciden exactamente. El selector incluye las
+   dos ubicaciones para no romper ninguna variante del montaje. */
+body.reflow-book > .reflow-quiz-repagination-overlay,
 body.reflow-book #content > .reflow-quiz-repagination-overlay {
   position: fixed !important;
   inset: 0 !important;

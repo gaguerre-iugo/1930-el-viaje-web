@@ -2541,7 +2541,13 @@
     frozenCard.classList.add("reflow-quiz-repagination-card");
     stripRepaginationCloneSemantics(frozenCard);
     overlay.appendChild(frozenCard);
-    content.appendChild(overlay);
+    /* El overlay se cuelga de `body` y no de `#content` porque `#content` tiene
+       `contain: paint` (ver content/reflow.css): dentro de una caja con
+       contención de pintado, un `position: fixed` se posiciona contra ella y no
+       contra el viewport, y como la tira de columnas se desplaza cientos de
+       miles de píxeles, el overlay congelado aparecería fuera de lugar. El CSS
+       ya contempla `body.reflow-book > .reflow-quiz-repagination-overlay`. */
+    document.body.appendChild(overlay);
     state.quizRepaginationOverlay = overlay;
     document.body.classList.add("reflow-quiz-repaginating");
     return state.quizRepaginationAnchorId;
