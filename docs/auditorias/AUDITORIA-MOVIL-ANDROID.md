@@ -510,28 +510,114 @@ geométrica, no solo con el cronómetro.
 Ninguno de los cambios que quedaron mejora el cronómetro en localhost (±1 %), pero
 todos hacen estrictamente menos trabajo con el mismo resultado (huella idéntica).
 
-### 9.3 Los tres caminos que sí pueden bajar el tiempo de carga
+### 9.3 Los caminos que quedan para bajar el tiempo de carga
 
 Por orden de relación beneficio/riesgo, con lo medido:
 
-1. **Peso de las imágenes (el más prometedor, 1,5-2 MB de 2,2 MB).** Las
-   ilustraciones se sirven a 740-1484 px de ancho y se pintan a ~551 px (y la
-   portada a 274 px); el libro descarga todas al arrancar. Reencodeadas a WebP o
-   redimensionadas por breakpoint, el arranque bajaría a ~0,5-0,8 MB. **Requiere un
-   paso de build sobre las imágenes** y verificar que las proporciones no cambien
-   (la paginación usa `naturalWidth/naturalHeight` para la relación de aspecto,
-   así que hay que preservarla). No toca el motor.
-2. **`loading="lazy"` con dimensiones explícitas.** Hoy no es seguro: el motor mide
-   el alto renderizado de cada ilustración para paginar y balancear, así que una
-   imagen sin cargar cambia la geometría. La variante segura es agregar
-   `width`/`height` a los 206 fragmentos en el build y acotar `waitForLayout` a las
-   imágenes de las primeras secciones. Hay que revisar antes si la alineación
-   óptica depende de los píxeles (inset transparente) o solo del layout.
-3. **Bundles de fragmentos.** 206 pedidos por HTTP/2 se multiplexan, pero cada uno
-   paga su latencia. Agrupar los fragmentos en unos pocos archivos (como ya hace el
-   precargador offline) recortaría la cola del arranque en redes móviles. Es un
-   cambio en el contrato de exportación → lector.
+1. ✅ **Peso de las imágenes — hecho, ver §10.** Las imágenes que el lector
+   descarga antes de quedar usable bajaron de 5,40 MB a 3,58 MB (−33,6 %).
+2. ⏳ **Los 206 fragmentos HTML (1,2 MB) y el JS/CSS (0,88 MB).** Después de las
+   imágenes, es lo más pesado del arranque: 206 pedidos de ~6 KB cada uno, cada
+   uno con su latencia, y el runtime de 709 KB. Agrupar los fragmentos en unos
+   pocos archivos (como ya hace el precargador offline) recortaría la cola del
+   arranque en redes móviles; es un cambio en el contrato exportación → lector.
+3. ⏳ **`loading="lazy"` con dimensiones explícitas.** Sigue sin ser seguro:
+   el motor mide el alto renderizado de cada ilustración para paginar, así que
+   una imagen sin cargar cambia la geometría. La variante segura es agregar
+   `width`/`height` a los fragmentos en el build y acotar `waitForLayout` a las
+   imágenes de las primeras secciones.
 
 Lo que **no** conviene: seguir exprimiendo el balance de ilustraciones (es el 40 %
-del CPU pero su redundancia es funcional) ni agregar preloads que compitan con los
-206 fragmentos en HTTP/1.1.
+del CPU pero su redundancia es funcional, §9.2) ni agregar preloads que compitan
+con los 206 fragmentos en HTTP/1.1.
+
+## 10. Imágenes: conversión a WebP (hecho)
+
+Objetivo: bajar los bytes que el lector descarga al abrir el libro sin cambiar una
+sola página. Los JPEG del repositorio ya estaban comprimidos, así que
+recodificarlos a JPEG no gana nada (a q85 incluso engordan); WebP sí.
+
+### 10.1 Inventario y decisión de formato
+
+`tools/inventory_images.py` encuentra las imágenes que el libro usa de verdad
+(60 archivos, 4,56 MB) y distingue las 21 variantes históricas que nadie pide
+(9,09 MB que solo inflan el ZIP/SCORM, no la carga).
+
+`tools/measure_image_encodings.py` comparó formatos antes de tocar nada:
+
+| Codificación | Peso total | Diferencia |
+|---|---|---|
+| Actual (JPEG/PNG) | 3,91 MB | — |
+| JPEG q85 progresivo | 4,11 MB | **+5 %** (los originales ya están comprimidos) |
+| JPEG q80 progresivo | 3,77 MB | −3 % |
+| WebP q85 | 3,24 MB | −17 % |
+| **WebP q80-q82** | **2,64 MB** | **−33 %** |
+| WebP q75 | 2,17 MB | −44 % |
+
+`tools/compare_image_quality.py` genera tiras de comparación al ancho en que el
+libro pinta cada imagen (~551 px) y un recorte al 100 %. A q82 y a q78 no se
+distingue del original ni en el recorte; a q75 aparece un suavizado leve en las
+texturas oscuras.
+
+### 10.2 Qué se hizo
+
+`tools/optimize_images_webp.py`, por imagen y sin cambiar las dimensiones en
+píxeles (la relación de aspecto es lo que la paginación mide):
+
+- Sin transparencia: WebP con pérdida a **q82**.
+- Con transparencia y >40 KB: se prueban sin pérdida y con pérdida+alfa; gana el
+  sin pérdida si queda a menos del 25 % del otro (calidad primero).
+- Con transparencia y chica: WebP sin pérdida.
+- Si el WebP no gana al menos 10 %, **se deja el archivo como está** y no se toca
+  la referencia.
+
+Resultado: **59 de las 60 imágenes referenciadas pasaron a WebP**; queda una
+(`pg176177_im002.jpg`) porque a q82 el WebP salía más grande.
+
+| Medición | Antes | Después |
+|---|---|---|
+| Imágenes referenciadas por el libro | 4,56 MB | **3,65 MB** (−20 %) |
+| **Imágenes que el lector descarga hasta quedar usable** | **5,40 MB** | **3,58 MB (−33,6 %, −1,82 MB)** |
+| Peso de red total del arranque | 3,69 MB | ver §10.4 |
+
+Las 6 portadas integradas (`*_cover_integrated`) eran las más pesadas del libro
+(1,81 MB entre las seis) y bajan a 0,91 MB (−49,9 %).
+
+### 10.3 Dos hallazgos del camino
+
+1. **Imágenes referenciadas por nombre suelto.** Las 6 portadas integradas se
+   referencian así en `assets/reflow-book.js`:
+   `pg058059_sec001: "pg058059_cover_integrated.jpg"` y luego
+   `compositeImage.src = "images/" + compositeFilename`. La primera pasada del
+   inventario no las vio (buscaba `images/...` literales) y son justamente las que
+   más pesan y las que el arranque descarga. El inventario ahora también detecta
+   nombres sueltos que existan en `images/`.
+2. **El arranque pide sobre todo las imágenes que ya venían comprimidas.** Las 9
+   que el criterio del 10 % dejaba en JPEG son las primeras de la lista de
+   descargas (0,23 bytes por píxel, ya muy comprimidas). Se convirtieron aparte a
+   **q78** (−18 % en ese grupo, −162 KB) porque la comparación al 100 % sigue
+   siendo indistinguible; en cambio `pg176177_im002.jpg` se dejó intacta: ganar
+   9 % no justifica una segunda generación de compresión.
+
+### 10.4 Verificación
+
+- **Huella geométrica idéntica**: mismas 622 páginas, mismo `scrollWidth` y los
+  mismos rectángulos en las 22 secciones ilustradas y la portada. Las dimensiones
+  en píxeles no cambiaron, así que la paginación no se altera.
+- **Cero referencias rotas** en HTML, JS del lector y `imsmanifest.xml`.
+- **Auditoría móvil**: 0 errores de consola, 0 pedidos fallidos y ninguna imagen
+  rota en los 5 perfiles.
+- **Arnés de pantallas grandes**: `táctil<44px = 0`, contadores iguales.
+- `assets/offline-preloader.js` regenerado (`node tools/sync_offline_preloader.js`
+  ahora refresca **todo** el catálogo INLINE desde el disco, no una lista fija, así
+  que el modo `file://` no queda pidiendo archivos que ya no existen).
+- Los originales borrados siguen en el historial de git; `imsmanifest.xml` quedó
+  apuntando a los `.webp`.
+
+### 10.5 Pendiente en imágenes
+
+- **9,09 MB de variantes históricas** que el lector no pide nunca
+  (`pg001_cover_art_clean*.png`, `_repaired`, `pg001_im001.jpg`, `pg016017_*`…).
+  No afectan la carga; sí el tamaño del ZIP y del paquete SCORM. Borrarlas es una
+  decisión de curaduría, no técnica.
+- Reexportar `Export/sitio/` y el ZIP: quedaron con las referencias viejas.
