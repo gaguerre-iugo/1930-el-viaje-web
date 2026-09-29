@@ -6173,7 +6173,7 @@
 
     var composite = document.createElement("img");
     composite.className = "chapter-cover-composite";
-    composite.src = "images/chapter1_cover.jpg";
+    composite.src = "images/chapter1_cover.webp";
     composite.alt = "";
     composite.setAttribute("aria-hidden", "true");
     cover.appendChild(composite);
@@ -6220,7 +6220,7 @@
 
     var composite = document.createElement("img");
     composite.className = "chapter-cover-composite";
-    composite.src = "images/chapter2_cover.jpg";
+    composite.src = "images/chapter2_cover.webp";
     composite.alt = "";
     composite.setAttribute("aria-hidden", "true");
     cover.appendChild(composite);
@@ -7888,12 +7888,12 @@
           function (image) { return !image.classList.contains("hidden"); }
         );
         var coverCompositeMap = {
-          pg058059_sec001: "pg058059_cover_integrated.jpg",
-          pg080081_sec001: "pg080081_cover_integrated.jpg",
-          pg104105_sec001: "pg104105_cover_integrated.jpg",
-          pg122123_sec001: "pg122123_cover_integrated.jpg",
-          pg144145_sec001: "pg144145_cover_integrated.jpg",
-          pg176177_sec001: "pg176177_cover_integrated.jpg"
+          pg058059_sec001: "pg058059_cover_integrated.webp",
+          pg080081_sec001: "pg080081_cover_integrated.webp",
+          pg104105_sec001: "pg104105_cover_integrated.webp",
+          pg122123_sec001: "pg122123_cover_integrated.webp",
+          pg144145_sec001: "pg144145_cover_integrated.webp",
+          pg176177_sec001: "pg176177_cover_integrated.webp"
         };
         /* La portada compuesta es UNA imagen: conservar solo el id de la mitad
            izquierda dejaba la descripcion de la mitad derecha sin narrar. Cada
@@ -7949,7 +7949,7 @@
     if (montage) {
       var montageImage = montage.querySelector('[data-id="pg216217_im002"]');
       if (montageImage) {
-        montageImage.src = "images/pg216217_spread_integrated_v4.jpg?v=47-montage-spread-4";
+        montageImage.src = "images/pg216217_spread_integrated_v4.webp?v=47-montage-spread-4";
         montageImage.alt = "Montaje final a doble página: personajes de la historia y el transatlántico Conte Verde sobre el mar.";
       }
     }
@@ -8038,7 +8038,7 @@
       collaboratorsTitle.dataset.reflowAnchorId = "pg224_collaborators";
       collaboratorsTitle.textContent = "Instituciones colaboradoras";
       var collaboratorsImage = document.createElement("img");
-      collaboratorsImage.src = "images/pg224_collaborators_black.png?v=47-back-cover-1";
+      collaboratorsImage.src = "images/pg224_collaborators_black.webp?v=47-back-cover-1";
       collaboratorsImage.alt =
         "Logos de ANEP, Ministerio de Educación y Cultura, UTEC, Secretaría Nacional del Deporte y Ceibal.";
       collaboratorsPage.appendChild(collaboratorsTitle);
@@ -8414,7 +8414,7 @@
       var image = document.createElement("img");
       image.className = "chapter5-chat-source-image";
       image.dataset.reflowSourceId = id;
-      image.src = "images/pg117_im002.png";
+      image.src = "images/pg117_im002.webp";
       image.alt = "";
       image.setAttribute("aria-hidden", "true");
       return image;
