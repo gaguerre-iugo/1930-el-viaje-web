@@ -440,3 +440,98 @@ barra de navegación queda fuera del área visible o si el viewport está inflad
 El panel `?diag=1` también se ancló **arriba** (antes tapaba justamente la barra que
 tiene que diagnosticar) y muestra `layout`, `pantalla` y una línea `coherencia ok /
 INFLADO x4`.
+
+## 9. Perfilado del arranque: dónde se va el tiempo
+
+Con el viewport ya sano, se perfiló el arranque para responder "¿se puede cargar
+más rápido?". Herramientas nuevas (permanentes):
+
+```powershell
+node mobile-boot-profile.mjs --device tablet-landscape-1067x480 [--throttle 4g]
+node mobile-cpu-profile.mjs  --device tablet-landscape-1067x480 [--throttle 4g]
+node mobile-ab-compare.mjs --a <url-antes> --b <url-despues> --runs 4 [--throttle 4g]
+node mobile-geometry-fingerprint.mjs --out report-mobile/huella.json
+```
+
+La **huella geométrica** es la red de seguridad: guarda, para las 22 secciones
+ilustradas y la portada, la página, los rectángulos de imagen y copia y los conteos
+de overflow. Antes/después de cualquier optimización tiene que ser idéntica.
+
+### 9.1 Presupuesto medido (perfil del reporte, local sin límite)
+
+| Fase | Momento |
+|---|---|
+| `init` | 15 ms |
+| Peticiones de los 206 fragmentos lanzadas | 80 ms |
+| DOM listo | 117 ms |
+| Bloque de composición del libro (compose/normalize/install) | 117 ms → ~3,5 s |
+| `loadRuntime`: descarga del bundle (709 KB) | 3,5 s → 3,7 s (183 ms) |
+| Reescritura + compilación + evaluación del runtime | 3,7 s → 3,9 s (196 ms) |
+| Barra creada | 3,6-4,1 s |
+| `waitForLayout` (fuentes + **todas** las imágenes, topes 2,5 s y 4 s) | ~0 ms en local |
+| Paginación terminada (622 páginas) | 6,2-6,7 s |
+| Barra usable | 6,4-7,1 s |
+
+CPU (perfil de CPU, publicado): 6,7 s de tiempo propio en `reflow-book.js`, 2,65 s
+en `querySelectorAll`, 1,15 s en `(program)`, 0,59 s en el runtime React. Las
+funciones más caras: `rebalanceChapterTwoIllustration` (2,3 s),
+`syncToolbarReserve` (0,75 s), `rebalanceIllustratedPage` (0,71 s),
+`illustratedTargetHeight` (0,54 s), `primaryFragmentRect` (0,41 s).
+
+En red: 250 pedidos / 2,2 MB, de los cuales **1,5-2 MB son imágenes** (33-44
+imágenes, todas sin `loading="lazy"`), 206 fragmentos HTML (1,23 MB) y el runtime
+empaquetado (0,52 MB con gzip). El primer byte de GitHub Pages tarda ~2,7 s.
+
+Con 4G emulado el arranque completo sube a ~22 s, pero esa medición local está
+distorsionada por el servidor HTTP/1.1 del arnés (206 pedidos compitiendo por 6
+conexiones); GitHub Pages sirve HTTP/2 y multiplexa.
+
+### 9.2 Qué se probó y qué pasó
+
+| Cambio | Resultado medido |
+|---|---|
+| `syncToolbarReserve` solo escribe la variable cuando cambia + una liquidación por cuadro | Neutro en localhost; elimina invalidaciones de estilo repetidas |
+| `rebalanceIllustratedPage` calcula la clave antes de las 8 consultas globales | Neutro (las consultas son baratas: 30.184 consultas = 2,1 s en total) |
+| `rebalanceChapterTwoIllustrations` pasa el elemento en vez de buscar la sección por id | Neutro |
+| `observeIllustratedAlignment` salta si la firma (secciones, páginas) no cambió | Neutro |
+| El segundo `waitForLayout()` se reemplaza por un vaciado de layout (2 rAF) | Neutro en localhost; evita volver a esperar fuentes e imágenes ya esperadas (hasta 6,5 s con activos lentos) |
+| `decoding="async"` en todas las imágenes | Neutro; saca la decodificación del hilo principal |
+| `<link rel="preload">` del bundle del runtime | **Empeora**: en HTTP/1.1 compite por las 6 conexiones. Revertido |
+| Salida temprana por ancho en `rebalanceChapterTwoIllustration` | **Empeora**: convertía el trabajo inmediato en un bucle de reintentos a 80 ms. Revertido |
+| Guarda global de los pases de liquidación de ilustraciones | **Rompe el resultado**: pg099 quedaba una columna antes y pg110/pg150 dejaban un párrafo más en el overflow. Revertido |
+
+**Lección del último punto**: los pases repetidos de `settleAllIllustratedPages`
+(rAF, 140 ms, 650 ms, observador de contenido, cada paginación) **no son
+desperdicio**: Chromium termina de repartir el multicolumna entre cuadros, así que
+cada pase mide una geometría más asentada. Evitar los "pases idénticos" cambia el
+layout final. Cualquier optimización de esa zona tiene que validarse con la huella
+geométrica, no solo con el cronómetro.
+
+Ninguno de los cambios que quedaron mejora el cronómetro en localhost (±1 %), pero
+todos hacen estrictamente menos trabajo con el mismo resultado (huella idéntica).
+
+### 9.3 Los tres caminos que sí pueden bajar el tiempo de carga
+
+Por orden de relación beneficio/riesgo, con lo medido:
+
+1. **Peso de las imágenes (el más prometedor, 1,5-2 MB de 2,2 MB).** Las
+   ilustraciones se sirven a 740-1484 px de ancho y se pintan a ~551 px (y la
+   portada a 274 px); el libro descarga todas al arrancar. Reencodeadas a WebP o
+   redimensionadas por breakpoint, el arranque bajaría a ~0,5-0,8 MB. **Requiere un
+   paso de build sobre las imágenes** y verificar que las proporciones no cambien
+   (la paginación usa `naturalWidth/naturalHeight` para la relación de aspecto,
+   así que hay que preservarla). No toca el motor.
+2. **`loading="lazy"` con dimensiones explícitas.** Hoy no es seguro: el motor mide
+   el alto renderizado de cada ilustración para paginar y balancear, así que una
+   imagen sin cargar cambia la geometría. La variante segura es agregar
+   `width`/`height` a los 206 fragmentos en el build y acotar `waitForLayout` a las
+   imágenes de las primeras secciones. Hay que revisar antes si la alineación
+   óptica depende de los píxeles (inset transparente) o solo del layout.
+3. **Bundles de fragmentos.** 206 pedidos por HTTP/2 se multiplexan, pero cada uno
+   paga su latencia. Agrupar los fragmentos en unos pocos archivos (como ya hace el
+   precargador offline) recortaría la cola del arranque en redes móviles. Es un
+   cambio en el contrato de exportación → lector.
+
+Lo que **no** conviene: seguir exprimiendo el balance de ilustraciones (es el 40 %
+del CPU pero su redundancia es funcional) ni agregar preloads que compitan con los
+206 fragmentos en HTTP/1.1.
