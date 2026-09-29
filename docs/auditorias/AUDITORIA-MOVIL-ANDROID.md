@@ -294,8 +294,20 @@ En `syncPrimaryToolbar`:
 | Errores de consola | 0 | 0 |
 | Índice | invisible (no se podía tocar) | se habilita cuando el runtime está listo y abre el panel (`aria-expanded=true`) |
 
+**Verificación sobre el sitio publicado** (GitHub Pages, `?v=135-barra-sin-espera`,
+dos corridas independientes):
+
+| Medición | Antes | Después |
+|---|---|---|
+| Barra usable | 19,6 – 29,4 s | **11,6 – 13,1 s**, junto con el contenido |
+| Contenido visible | 10,2 – 12,1 s | 10,9 – 12,1 s (no cambia: es el arranque del runtime) |
+| Toque inmediato en "Siguiente" al aparecer la barra | imposible (barra oculta) | **página 1 → 2, OK** |
+| Errores de consola / pedidos fallidos | 0 | 0 |
+
 En los cuatro perfiles Android la barra quedó usable **al mismo tiempo que el
-contenido** (antes llegaba 9–18 s después).
+contenido** (antes llegaba 9–18 s después). El tiempo que queda —entre 6,5 s para
+crear la barra y ~12 s para terminar de paginar— es el costo de arranque del
+runtime y del motor, que es el punto 8 de §4 y no lo toca esta corrección.
 
 ### 7.2 `content/reflow.css` — `100svh` en lugar de `100dvh`
 
@@ -326,6 +338,10 @@ inlina `index.html`. La única entrada que cambió es `./index.html`
 ### 7.4 Qué queda pendiente
 
 Los puntos 3 a 8 de §4, en especial la reserva de barras proporcional al alto
-(es lo que hace inservible el modo horizontal del teléfono) y el peso del arranque.
-También hay que **publicar** estos cambios: hasta que se suban a GitHub Pages, el
-sitio sigue sirviendo `reflow-book.js?v=134` y el problema 1 sigue presente.
+(es lo que hace inservible el modo horizontal del teléfono) y el peso del arranque,
+que es la otra mitad del síntoma: entre 6,5 s (creación de la barra) y ~12 s
+(paginación terminada) con 22 s de bloqueo acumulado del hilo principal.
+
+Los cambios ya están publicados: GitHub Pages sirve
+`reflow-book.js?v=135-barra-sin-espera`, `reflow.css?v=93-svh-estable` y el panel
+`?diag=1`.
