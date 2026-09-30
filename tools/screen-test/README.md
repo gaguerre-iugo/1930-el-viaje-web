@@ -126,6 +126,14 @@ Complementos:
 ```powershell
 node mobile-boot-timeline.mjs     # hitos del arranque: cuándo queda usable el lector
 node verify-published.mjs         # ¿lo publicado en GitHub Pages es igual a este repo?
+
+# Reglas del panel de Configuración (menú Herramientas) y de los atajos:
+# tres bloques (Leer, Escuchar, Pantalla), filas de audio sólo con la lectura en
+# voz alta encendida, reproducción automática debajo del interruptor, panel sin
+# scroll con la voz apagada y atajos Alt+I/H/G/A sin letras sueltas.
+# Necesita el libro servido por HTTP (node tools/serve-local.js).
+node verify-tools-panel.mjs --url http://127.0.0.1:5599/index.html
+node verify-tools-panel.mjs --url http://127.0.0.1:5599/index.html --viewport 1920x1080
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

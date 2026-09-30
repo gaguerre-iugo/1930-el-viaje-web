@@ -3771,8 +3771,13 @@
   }
 
   function updateTtsVoiceControls() {
-    var selector = document.getElementById("reflow-tts-voice-setting");
-    if (selector) selector.hidden = false;
+    /* La fila de voz sólo se ve con la lectura en voz alta activada, así que no
+       se fuerza visible acá: la visibilidad la decide el sincronizador que
+       sigue al interruptor (y que este mismo cambio de estado vuelve a
+       disparar a través del observador del panel). */
+    if (window.__adtReflowSyncHighlightAvailability) {
+      window.__adtReflowSyncHighlightAvailability();
+    }
     var loadingVoice = "";
     var failedVoice = "";
     Array.prototype.slice.call(document.querySelectorAll("[data-reflow-tts-voice]")).forEach(
@@ -4111,8 +4116,64 @@
       );
     }
 
+    function settingsRow(readingCard, className, pattern) {
+      var tagged = readingCard && readingCard.querySelector("." + className);
+      return tagged || directSettingRow(readingCard, pattern);
+    }
+
+    /* Resaltado, Voz, Velocidad y Reproducción automática sólo funcionan con la
+       lectura en voz alta activada. Se ocultan en lugar de quedar
+       deshabilitados: así la sección de lectura no muestra controles que no
+       hacen nada. La visibilidad la sincroniza el mismo ciclo que ya sigue al
+       interruptor (ver installTtsSpeedHighlightRestriction). */
+    function readAloudDependentRows(readingCard) {
+      if (!readingCard) return [];
+      return [
+        settingsRow(readingCard, "reflow-setting-highlight", /^Resaltado$/i),
+        document.getElementById("reflow-tts-voice-setting"),
+        document.getElementById("reflow-tts-speed-setting"),
+        settingsRow(
+          readingCard,
+          "reflow-setting-autoplay",
+          /^Reproducción automática$/i
+        )
+      ].filter(Boolean);
+    }
+
+    function syncReadAloudDependentRows(readingCard) {
+      var enabled = readAloudSettingIsEnabled();
+      var rows = readAloudDependentRows(readingCard);
+      /* Leer el foco antes de ocultar: al pasar a display:none el navegador ya
+         lo devuelve al body y se perdería el rastro de dónde estaba. */
+      var focusInsideHiddenRow = rows.some(function (row) {
+        return row.contains(document.activeElement);
+      });
+      rows.forEach(function (row) {
+        row.classList.add("reflow-setting-tts-only");
+        row.classList.toggle("reflow-setting-tts-hidden", !enabled);
+        if (row.hidden !== !enabled) row.hidden = !enabled;
+      });
+      if (!enabled && focusInsideHiddenRow) {
+        var readAloudRow = settingsRow(
+          readingCard,
+          "reflow-setting-read-aloud",
+          /^(Lectura en voz alta|Activar lectura en voz alta)$/i
+        );
+        var switchControl = readAloudRow && readAloudRow.querySelector('[role="switch"]');
+        if (switchControl && typeof switchControl.focus === "function") {
+          switchControl.focus();
+        }
+      }
+      return enabled;
+    }
+
     function syncHighlightAvailability(readingCard) {
-      var highlightRow = directSettingRow(readingCard, /^Resaltado$/i);
+      var enabled = syncReadAloudDependentRows(readingCard);
+      var highlightRow = settingsRow(
+        readingCard,
+        "reflow-setting-highlight",
+        /^Resaltado$/i
+      );
       if (!highlightRow) return;
       var group = highlightRow.matches('[role="group"]')
         ? highlightRow
@@ -4127,7 +4188,6 @@
           "Active Lectura en voz alta para utilizar el resaltado.";
         highlightRow.appendChild(description);
       }
-      var enabled = readAloudSettingIsEnabled();
       var radios = group.querySelectorAll('[role="radio"]');
       setAttributeIfChanged(group, "aria-disabled", !enabled);
       if (enabled) {
@@ -4163,6 +4223,50 @@
         )
       );
     };
+
+    /* Los tres bloques del panel. Las filas las renderiza el runtime y no se
+       mueven: cada una se ubica dentro de su bloque con `order` desde la hoja
+       de estilos. Acá solo se insertan los títulos y el enlace de ayuda, que
+       son nodos propios. */
+    var settingsBlocks = [
+      { id: "leer", title: "Leer" },
+      { id: "escuchar", title: "Escuchar" },
+      { id: "pantalla", title: "Pantalla" }
+    ];
+
+    function ensureSettingsBlockTitles(settingsTab) {
+      if (!settingsTab) return;
+      settingsBlocks.forEach(function (block) {
+        var id = "reflow-settings-block-" + block.id;
+        var title = document.getElementById(id);
+        if (!title) {
+          title = document.createElement("h3");
+          title.id = id;
+          title.className = "reflow-settings-block-title";
+          title.textContent = block.title;
+        }
+        title.setAttribute("data-reflow-block-title", block.id);
+        if (title.parentElement !== settingsTab) settingsTab.appendChild(title);
+      });
+    }
+
+    function ensureShortcutsLink(settingsTab) {
+      if (!settingsTab) return;
+      var link = document.getElementById("reflow-shortcuts-link");
+      if (!link) {
+        link = document.createElement("button");
+        link.type = "button";
+        link.id = "reflow-shortcuts-link";
+        link.className = "reflow-shortcuts-link";
+        link.innerHTML = "<span>Atajos de teclado</span><kbd>Alt+A</kbd>";
+        link.addEventListener("click", function () {
+          if (typeof window.__adtReflowToggleShortcutsHelp === "function") {
+            window.__adtReflowToggleShortcutsHelp(true);
+          }
+        });
+      }
+      if (link.parentElement !== settingsTab) settingsTab.appendChild(link);
+    }
 
     function organizeSettingsPanel(settingsTab, readingSection, readingCard) {
       settingsTab.classList.add("reflow-settings-organized");
@@ -4212,13 +4316,6 @@
             );
           }
         }
-        var audioHeading = document.getElementById("reflow-audio-settings-heading");
-        if (!audioHeading) {
-          audioHeading = document.createElement("h4");
-          audioHeading.id = "reflow-audio-settings-heading";
-          audioHeading.textContent = "Audio y voz";
-          readingCard.appendChild(audioHeading);
-        }
         var voiceRow = document.getElementById("reflow-tts-voice-setting");
         var speedRow = document.getElementById("reflow-tts-speed-setting");
         if (voiceRow) voiceRow.classList.add("reflow-setting-row");
@@ -4257,6 +4354,10 @@
       );
       var referenceSection = document.getElementById("reflow-reference-tools");
       if (referenceSection) referenceSection.classList.add("reflow-settings-section-tools");
+      /* Los títulos y el enlace se reinsertan en cada montaje: el runtime puede
+         volver a renderizar el contenedor y llevarse los nodos propios. */
+      ensureSettingsBlockTitles(settingsTab);
+      ensureShortcutsLink(settingsTab);
     }
 
     document.addEventListener("click", function (event) {
@@ -4388,7 +4489,7 @@
         referenceSection.innerHTML =
           '<header><h3>Herramientas</h3></header>' +
           '<div class="reflow-reference-tools-card">' +
-            '<button id="reflow-open-glossary" type="button" aria-keyshortcuts="G">' +
+            '<button id="reflow-open-glossary" type="button" aria-keyshortcuts="Alt+G">' +
               '<span aria-hidden="true">⌕</span><span>Glosario</span>' +
             '</button>' +
           '</div>';
@@ -4622,6 +4723,168 @@
       attributeFilter: ["aria-label", "aria-checked"]
     });
     sync();
+  }
+
+  /* -------------------------------------------------------------------------
+     Atajos de teclado
+
+     WCAG 2.1.4 (Character Key Shortcuts): ningún atajo del libro puede depender
+     de una tecla de carácter sola. Acá todos usan Alt, y las letras sueltas que
+     registraba el runtime (X para el índice, A para Herramientas) se anulan en
+     fase de captura sobre window, que corre antes que sus manejadores. La lista
+     completa vive en una ayuda propia (Alt+A) y ya no dentro del panel.
+     ---------------------------------------------------------------------- */
+  var shortcutBlockedLetters = ["a", "g", "h", "i", "l", "x"];
+  var keyboardShortcuts = [
+    { combo: "Alt+I", label: "Abrir el índice", panels: ["Menú principal", "Main Menu"] },
+    { combo: "Alt+H", label: "Abrir Herramientas", panels: ["Configuración", "Settings"] },
+    { combo: "Alt+G", label: "Abrir el glosario", panels: ["Glosario", "Glossary"] },
+    { combo: "Alt+A", label: "Mostrar u ocultar esta ayuda" },
+    { combo: "Esc", label: "Cerrar el panel abierto" }
+  ];
+
+  function isTypingContext(target) {
+    return Boolean(target && target.closest && target.closest(
+      "input, textarea, select, [contenteditable='true']"
+    ));
+  }
+
+  function installKeyboardShortcuts() {
+    var help = null;
+    var helpReturnFocus = null;
+
+    function buildHelp() {
+      if (help) return help;
+      help = document.createElement("div");
+      help.id = "reflow-shortcuts-help";
+      help.className = "reflow-shortcuts-help";
+      help.setAttribute("role", "dialog");
+      help.setAttribute("aria-modal", "true");
+      help.setAttribute("aria-labelledby", "reflow-shortcuts-title");
+      help.hidden = true;
+      help.innerHTML =
+        '<div class="reflow-shortcuts-card">' +
+          '<div class="reflow-shortcuts-head">' +
+            '<h2 id="reflow-shortcuts-title">Atajos de teclado</h2>' +
+            '<button type="button" id="reflow-shortcuts-close" ' +
+              'class="reflow-shortcuts-close" ' +
+              'aria-label="Cerrar la ayuda de atajos">✕</button>' +
+          '</div>' +
+          '<ul class="reflow-shortcuts-list">' +
+            keyboardShortcuts.map(function (item) {
+              return '<li class="reflow-shortcuts-row"><kbd>' + item.combo +
+                '</kbd><span>' + item.label + '</span></li>';
+            }).join("") +
+          '</ul>' +
+        '</div>';
+      document.body.appendChild(help);
+
+      help.addEventListener("click", function (event) {
+        if (event.target === help) closeHelp();
+      });
+      var close = help.querySelector("#reflow-shortcuts-close");
+      if (close) {
+        close.addEventListener("click", function () {
+          closeHelp();
+        });
+      }
+      help.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          closeHelp();
+          return;
+        }
+        if (event.key !== "Tab") return;
+        var focusables = Array.prototype.slice.call(help.querySelectorAll(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+        )).filter(function (element) {
+          return element.getClientRects().length;
+        });
+        if (!focusables.length) return;
+        var first = focusables[0];
+        var last = focusables[focusables.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+      return help;
+    }
+
+    function openHelp() {
+      var dialog = buildHelp();
+      if (!dialog.hidden) return;
+      helpReturnFocus = document.activeElement;
+      dialog.hidden = false;
+      document.body.dataset.reflowShortcutsHelp = "open";
+      var close = dialog.querySelector("#reflow-shortcuts-close");
+      if (close) close.focus({ preventScroll: true });
+    }
+
+    function closeHelp() {
+      if (!help || help.hidden) return;
+      help.hidden = true;
+      delete document.body.dataset.reflowShortcutsHelp;
+      if (
+        helpReturnFocus && helpReturnFocus.isConnected &&
+        typeof helpReturnFocus.focus === "function"
+      ) {
+        helpReturnFocus.focus({ preventScroll: true });
+      }
+      helpReturnFocus = null;
+    }
+
+    function toggleHelp(force) {
+      if (force === true) openHelp();
+      else if (force === false) closeHelp();
+      else if (help && !help.hidden) closeHelp();
+      else openHelp();
+    }
+
+    window.__adtReflowToggleShortcutsHelp = toggleHelp;
+
+    /* 1) Letras sueltas: inertes. El runtime registra sus atajos de una letra en
+       fase de burbuja sobre el documento, así que la captura sobre window llega
+       primero y los deja sin efecto (y sin efecto tampoco las letras nuevas). */
+    window.addEventListener("keydown", function (event) {
+      if (event.defaultPrevented || event.repeat) return;
+      if (event.ctrlKey || event.altKey || event.metaKey) return;
+      var key = String(event.key || "");
+      if (key.length !== 1) return;
+      if (isTypingContext(event.target)) return;
+      if (shortcutBlockedLetters.indexOf(key.toLocaleLowerCase("es")) < 0) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }, true);
+
+    /* 2) Atajos con Alt. Se leen por `code` para que funcionen igual en
+       cualquier distribución de teclado. */
+    document.addEventListener("keydown", function (event) {
+      if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (isTypingContext(event.target)) return;
+      var code = String(event.code || "");
+      var panels = null;
+      if (code === "KeyI") panels = ["Menú principal", "Main Menu"];
+      else if (code === "KeyH") panels = ["Configuración", "Settings"];
+      else if (code === "KeyG") panels = ["Glosario", "Glossary"];
+      if (code === "KeyA") {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        toggleHelp();
+        return;
+      }
+      if (!panels) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      openRuntimePanel(panels);
+    }, true);
+
+    /* La ayuda abierta se cierra también al cerrar el panel o al navegar. */
+    window.addEventListener("blur", closeHelp);
   }
 
   function installCompactRuntimePanels() {
@@ -11387,6 +11650,7 @@
       installTtsSpeedHighlightRestriction();
       installCompactRuntimePanels();
       installRuntimeMenuAdapter();
+      installKeyboardShortcuts();
       wireNavigation();
       await waitForLayout();
 

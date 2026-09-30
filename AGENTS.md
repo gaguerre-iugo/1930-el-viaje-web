@@ -67,6 +67,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── normalize_voice_timecodes.py  ← Normalización de timecodes
 │   ├── report_voice_mismatches.py ← Reporte de discrepancias de voz
 │   ├── validate_v46.py            ← Validador de la v46
+│   ├── audit_charset.py           ← Caracteres fuera del español y de los emojis
 │   ├── validate_paragraph_geometry.py ← Validación geométrica de párrafos
 │   ├── add_chapter_quizzes.py     ← Generador de cuestionarios
 │   ├── composite_cover_edit.py    ← Edición de portada compuesta
@@ -160,6 +161,10 @@ python3 tools/validate_paragraph_geometry.py
 
 # Reportar discrepancias entre voces TTS
 python3 tools/report_voice_mismatches.py
+
+# Buscar caracteres fuera del español y del rango de emojis (todo el libro)
+python3 tools/audit_charset.py
+python3 tools/audit_charset.py --repo      # incluye docs/ y tools/
 ```
 
 ### Tests visuales (Playwright)
