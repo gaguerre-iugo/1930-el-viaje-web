@@ -109,40 +109,64 @@ if (estilo) {
 await page.screenshot({ path: path.join(outDir, "glosario-subrayado.png") });
 
 /* ------------------------------------------- la definición se abre al tocar */
-const palabra = await page.evaluate(() => {
-  const term = [...document.querySelectorAll("#content .glossary-term")].find((candidato) => {
-    const rect = candidato.getBoundingClientRect();
-    return rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth + 1;
+/* Se prueban varias páginas: si el diccionario del runtime no estuviera cargado
+   para algún capítulo, el globo no abriría y hay que verlo acá. */
+const primeraVisible = () =>
+  page.evaluate(() => {
+    const term = [...document.querySelectorAll("#content .glossary-term")].find((candidato) => {
+      const rect = candidato.getBoundingClientRect();
+      return rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth + 1;
+    });
+    if (!term) return null;
+    term.scrollIntoView({ block: "center" });
+    const rect = term.getBoundingClientRect();
+    return { texto: term.textContent, clave: term.dataset.glossaryKey, x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
   });
-  if (!term) return null;
-  term.scrollIntoView({ block: "center" });
-  const rect = term.getBoundingClientRect();
-  return { texto: term.textContent, x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
-});
-if (!palabra) {
-  fail("no se pudo tocar una palabra: no hay ninguna a la vista");
-} else {
-  await page.mouse.click(palabra.x, palabra.y);
-  await page.waitForTimeout(1200);
+
+const globoAbierto = () =>
+  page.evaluate(() => {
+    const dialogo = [...document.querySelectorAll('[role="dialog"]')].find(
+      (candidato) =>
+        candidato.getClientRects().length &&
+        /definition|definici/i.test(candidato.getAttribute("aria-label") || "")
+    );
+    return dialogo
+      ? {
+          etiqueta: dialogo.getAttribute("aria-label"),
+          texto: dialogo.textContent.replace(/\s+/g, " ").trim().slice(0, 60),
+        }
+      : null;
+  });
+
+console.log("\n=== Definición al tocar la palabra ===");
+let probadas = 0;
+let abiertas = 0;
+for (let intento = 0; intento < 12 && probadas < 3; intento += 1) {
+  const palabra = await primeraVisible();
+  if (palabra) {
+    probadas += 1;
+    await page.mouse.click(palabra.x, palabra.y);
+    await page.waitForTimeout(1000);
+    const globo = await globoAbierto();
+    if (globo) {
+      abiertas += 1;
+      console.log(`  "${palabra.texto}" (${palabra.clave}) → ${globo.etiqueta} · ${globo.texto}`);
+      if (probadas === 1) {
+        await page.screenshot({ path: path.join(outDir, "glosario-globo.png") });
+      }
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(500);
+    } else {
+      console.log(`  "${palabra.texto}" (${palabra.clave}) → no abrió`);
+    }
+  }
+  await page.click("#reflow-next");
+  await page.waitForTimeout(800);
 }
-const globo = await page.evaluate(() => {
-  const dialogo = [...document.querySelectorAll('[role="dialog"]')].find(
-    (candidato) =>
-      candidato.getClientRects().length &&
-      /definition|definici/i.test(candidato.getAttribute("aria-label") || "")
-  );
-  return {
-    visible: Boolean(dialogo),
-    etiqueta: dialogo ? dialogo.getAttribute("aria-label") : null,
-    texto: dialogo ? dialogo.textContent.replace(/\s+/g, " ").trim().slice(0, 70) : null,
-  };
-});
-console.log(`\n=== Definición al tocar "${palabra ? palabra.texto : "-"}" ===`);
-console.log(`  globo: ${globo.visible} · ${globo.etiqueta} · ${globo.texto}`);
-if (!globo.visible) fail("tocar la palabra no abrió su definición");
-await page.screenshot({ path: path.join(outDir, "glosario-globo.png") });
-await page.keyboard.press("Escape");
-await page.waitForTimeout(600);
+console.log(`  abrieron ${abiertas} de ${probadas} palabras probadas en páginas distintas`);
+if (abiertas < probadas || probadas === 0) {
+  fail(`el globo con la definición no abrió en todas las palabras probadas (${abiertas}/${probadas})`);
+}
 
 /* --------------------------------------------------- el switch dice la verdad */
 await page.click("#reflow-glossary");
