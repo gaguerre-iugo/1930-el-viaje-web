@@ -4593,7 +4593,7 @@
         description.id = "reflow-highlight-requirement";
         description.className = "reflow-setting-description";
         description.textContent =
-          "Active Lectura en voz alta para utilizar el resaltado.";
+          "Activá Lectura en voz alta para utilizar el resaltado.";
         highlightRow.appendChild(description);
       }
       var radios = group.querySelectorAll('[role="radio"]');
@@ -4711,7 +4711,7 @@
             description.id = "reflow-read-aloud-description";
             description.className = "reflow-setting-description";
             description.textContent =
-              "Habilita el modo. Use Reproducir para comenzar.";
+              "Habilitá el modo. Usá Reproducir para comenzar.";
             var labelContainer = readAloudRow.querySelector("label");
             if (labelContainer) labelContainer.appendChild(description);
           }

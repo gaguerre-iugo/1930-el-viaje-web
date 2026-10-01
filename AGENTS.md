@@ -72,6 +72,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── audit_charset.py           ← Caracteres fuera del español y de los emojis
 │   ├── extract_quiz_answers.py    ← Clave de corrección fuera del HTML
 │   ├── standardize_quiz_feedback.py ← Devoluciones de las actividades unificadas
+│   ├── inventory_interface_texts.py ← Textos de interfaz y voseo
 │   ├── complete_pages_index.py    ← Completa el índice con lo que el libro monta
 │   ├── validate_paragraph_geometry.py ← Validación geométrica de párrafos
 │   ├── add_chapter_quizzes.py     ← Generador de cuestionarios
@@ -178,6 +179,10 @@ python3 tools/extract_quiz_answers.py --check
 # Verificar que content/pages.json liste todo lo que el libro monta
 # (el motor arma el orden con `var sections = [...]` en assets/reflow-book.js)
 python3 tools/complete_pages_index.py
+
+# Inventario de textos de interfaz y control de voseo (punto 7)
+python3 tools/inventory_interface_texts.py
+python3 tools/inventory_interface_texts.py --check
 ```
 
 ### Tests visuales (Playwright)

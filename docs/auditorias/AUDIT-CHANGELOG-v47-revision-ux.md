@@ -74,6 +74,37 @@ contador conserva el capítulo y que los diez bloques son **idénticos** a los d
 > se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
 > datos a un archivo con versión propia.
 
+## Punto 7 · Voseo en la interfaz — RESUELTO
+
+**Inventario**: `tools/inventory_interface_texts.py` (nuevo) junta las **144
+claves** de `assets/interface_translations/es-UY/interface_translations.json` —el
+catálogo que resuelve el runtime, no sólo nuestros textos— y los literales del
+motor, y clasifica cada uno como voseo, tuteo o usted con listas explícitas de
+verbos (para no marcar palabras del relato por parecido).
+
+**Resultado**: 2 textos en usted (los dos del motor) y 9 en tuteo (del catálogo).
+Se corrigieron 7:
+
+| Dónde | Antes | Ahora |
+|---|---|---|
+| `reflow-book.js` | «Active Lectura en voz alta para utilizar el resaltado.» | «**Activá** Lectura en voz alta para utilizar el resaltado.» |
+| `reflow-book.js` | «Habilita el modo. **Use** Reproducir para comenzar.» | «**Habilitá** el modo. **Usá** Reproducir para comenzar.» |
+| `eli5-content-lang` | «Toca cualquier cosa para que me la explique.» | «**Tocá**…» |
+| `notepad-placeholder` | «Escribe tus notas aquí...» | «**Escribí** tus notas aquí...» |
+| `success-try-next-activity` | «¡Buen trabajo! ¡Intenta la siguiente actividad!» | «¡**Intentá** la siguiente actividad!» |
+| `validation-check-spelling` | «Verifica tu ortografía» | «**Verificá** tu ortografía» |
+| `reduce-motion-description` | «Desactiva las animaciones y transiciones del lector.» | «**Desactivá** las animaciones…» |
+
+Los **4 del tutorial** quedan como están, por la decisión editorial de no tocar
+esa parte; el verificador los informa aparte para que no se pierdan de vista.
+
+`--check` falla si vuelve a aparecer un texto sin voseo (excluido el tutorial):
+hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
+
+**Nota de caché**: el runtime pide el catálogo con una URL que puede quedar en
+caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
+la recarga. El precargador offline se regeneró con el catálogo nuevo.
+
 ## Punto 24 · Jerarquía tipográfica de la interfaz — IMPLEMENTADO (valores a confirmar)
 
 - Cuatro niveles centralizados en variables de `content/reflow.css`
