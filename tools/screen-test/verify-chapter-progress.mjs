@@ -44,8 +44,26 @@ page.on("console", (message) => {
 page.on("pageerror", (error) => consoleErrors.push(String(error)));
 
 await page.goto(target, { waitUntil: "load" });
+
+/* Regresión: durante el arranque el libro se repagina varias veces y las
+   mediciones pueden volver cero. El contador nunca debe caer al formato global
+   ("pág. 24 de 317") mientras existan bloques. */
+const fallbacksDuringStartup = [];
+for (let i = 0; i < 25; i += 1) {
+  await page.waitForTimeout(100);
+  const snapshot = await page.evaluate(() => {
+    const api = window.__adtReflowChapterProgress;
+    const long = document.getElementById("reflow-progress-long");
+    if (!api || !long) return null;
+    return { text: long.textContent, blocks: api.blocks().length };
+  });
+  if (snapshot && snapshot.blocks > 0 && /^pág\. \d+ de \d+$/.test(snapshot.text)) {
+    fallbacksDuringStartup.push(`${(i + 1) * 100}ms: ${snapshot.text}`);
+  }
+}
+
 await page.waitForSelector("#reflow-page-status", { timeout: 30000 });
-await page.waitForTimeout(2500);
+await page.waitForTimeout(1500);
 
 /* ---------------------------------------------------------------- unitario */
 console.log("\n=== Unitario: chapterProgressAt con bloques sintéticos ===");
@@ -92,6 +110,37 @@ if (unit.missing) {
 
 /* ------------------------------------------------------------ integración */
 console.log("\n=== Integración: contador real del libro ===");
+if (fallbacksDuringStartup.length) {
+  console.log(`  contador en formato global durante el arranque: ${fallbacksDuringStartup.join(" · ")}`);
+  fail(`el contador perdió el capítulo ${fallbacksDuringStartup.length} veces al arrancar`);
+} else {
+  console.log("  durante el arranque nunca perdió el capítulo");
+}
+
+const cobertura = await page.evaluate(() => {
+  const api = window.__adtReflowChapterProgress;
+  const blocks = api.blocks();
+  const total = blocks.length ? blocks[blocks.length - 1].endPage + 1 : 0;
+  const huecos = [];
+  for (let index = 1; index < blocks.length; index += 1) {
+    if (blocks[index].startPage !== blocks[index - 1].endPage + 1) {
+      huecos.push(`${blocks[index - 1].key}→${blocks[index].key}`);
+    }
+  }
+  let sinBloque = 0;
+  for (let page = 0; page < total; page += 1) {
+    if (!api.at(blocks, page)) sinBloque += 1;
+  }
+  return { total, huecos, sinBloque, arrancaEn: blocks.length ? blocks[0].startPage : null };
+});
+console.log(
+  `  cobertura: ${cobertura.total} páginas · arranca en ${cobertura.arrancaEn} · ` +
+    `huecos ${cobertura.huecos.length} · páginas sin bloque ${cobertura.sinBloque}`
+);
+if (cobertura.arrancaEn !== 0) fail(`los bloques no arrancan en la página 0 (arrancan en ${cobertura.arrancaEn})`);
+if (cobertura.huecos.length) fail(`los bloques tienen huecos: ${cobertura.huecos.join(", ")}`);
+if (cobertura.sinBloque) fail(`${cobertura.sinBloque} páginas no caen en ningún bloque`);
+
 const real = await page.evaluate(() => {
   const toc = window.__adtReflowTocEntries || [];
   const status = document.getElementById("reflow-page-status");
@@ -165,6 +214,24 @@ if (!/, página 5 de \d+$/.test(afterNavigation.aria || "")) {
 }
 
 await page.screenshot({ path: path.join(outDir, "contador-capitulo.png") });
+
+// Abrir y cerrar el panel de Herramientas no debe romper el contador.
+await page.click("#reflow-tools");
+await page.waitForTimeout(1500);
+const conPanel = await page.evaluate(() => ({
+  texto: document.getElementById("reflow-progress-long").textContent,
+  bloques: window.__adtReflowChapterProgress.blocks().length,
+}));
+await page.keyboard.press("Escape");
+await page.waitForTimeout(800);
+const sinPanel = await page.evaluate(() => document.getElementById("reflow-progress-long").textContent);
+console.log(`  con el panel abierto: ${conPanel.texto} · al cerrarlo: ${sinPanel}`);
+if (/^pág\. \d+ de \d+$/.test(conPanel.texto)) {
+  fail(`el contador perdió el capítulo al abrir el panel: ${conPanel.texto}`);
+}
+if (/^pág\. \d+ de \d+$/.test(sinPanel)) {
+  fail(`el contador perdió el capítulo al cerrar el panel: ${sinPanel}`);
+}
 
 // Repaginación por tamaño de letra: el total del capítulo puede cambiar.
 const beforeResize = await page.evaluate(() => document.getElementById("reflow-progress-long").textContent);

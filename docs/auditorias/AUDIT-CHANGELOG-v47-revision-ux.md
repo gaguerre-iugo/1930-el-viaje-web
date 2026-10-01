@@ -17,6 +17,35 @@ implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 - El **enlace de Figma** del sistema de diseño no se pudo leer (HTTP 403: hace
   falta sesión), así que los valores salen de la lámina exportada.
 
+### Corrección posterior (reportada en uso)
+
+Con el libro abierto el contador mostraba el capítulo y **enseguida pasaba al
+formato global** («pág. 24 de 317»), y ahí quedaba. Causa: durante el arranque
+—y mientras el runtime reacomoda el contenido— las mediciones de página pueden
+volver cero o desordenarse. Los bloques quedaban con rangos colapsados, la página
+actual caía fuera de todos y el contador usaba el formato de reserva; además ese
+resultado inválido **se guardaba en la caché**, así que el error persistía hasta
+la próxima repaginación.
+
+Tres cambios:
+
+1. Los rangos se **reparan** al construirlos: el primero arranca en 0 y cada uno
+   sigue al anterior, así los bloques cubren el libro de punta a punta y ninguna
+   página puede quedar afuera.
+2. Los bloques **sólo se guardan cuando la medición es confiable** (arrancan en 0
+   y avanzan). Si no, se devuelven reparados pero sin fijar, para reintentar en la
+   próxima consulta. La firma de caché ahora incluye la geometría
+   (`scrollWidth`, cantidad de hijos y ancho de página), no sólo el total.
+3. El contador se reescribe en el **mismo ciclo que sigue los cambios de DOM**
+   (el que ya usaba el resaltado), así abrir o cerrar el panel no lo deja con un
+   valor viejo. Si la página no cae en los bloques guardados, se reconstruyen una
+   vez antes de resignar el capítulo.
+
+Regresión agregada a `verify-chapter-progress.mjs`: muestreo del contador cada
+100 ms durante el arranque (no puede aparecer el formato global mientras haya
+bloques), cobertura completa (arranca en 0, sin huecos y con las 286 páginas
+mapeadas a un bloque) y apertura/cierre del panel.
+
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 
 **Problema:** los botones del índice llevaban `focus:outline-none` en su clase:

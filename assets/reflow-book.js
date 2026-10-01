@@ -1859,27 +1859,59 @@
       });
     });
 
+    /* Los rangos se reparan para que siempre cubran el libro de punta a punta.
+       En el arranque, o mientras el runtime reacomoda el contenido, las
+       mediciones pueden volver 0 o desordenarse; sin esta reparación quedaban
+       bloques con rangos colapsados, la página actual caía fuera de todos y el
+       contador mostraba el formato global ("pág. 24 de 317") en lugar del
+       capítulo. */
+    var cursor = 0;
+    blocks.forEach(function (block) {
+      block.startPage = Math.max(block.startPage, cursor);
+      block.endPage = block.startPage;
+      cursor = block.startPage + 1;
+    });
     blocks.forEach(function (block, index) {
-      var end = index + 1 < blocks.length ? blocks[index + 1].startPage - 1 : state.total - 1;
+      var nextStart = index + 1 < blocks.length ? blocks[index + 1].startPage : null;
+      var end = nextStart === null ? Math.max(state.total - 1, block.startPage) : nextStart - 1;
       block.endPage = Math.max(block.startPage, end);
       block.pages = block.endPage - block.startPage + 1;
     });
     return blocks;
   }
 
-  function chapterProgressBlocks() {
-    var signature = [
+  /* Los bloques sólo se guardan cuando la medición es confiable (arrancan en la
+     página 0 y avanzan). Si no, se devuelven igual —reparados, así el contador
+     nunca pierde el capítulo— pero sin fijarlos, para reintentar en la próxima
+     consulta. La firma incluye la geometría: cualquier repaginación la cambia. */
+  function chapterProgressBlocksValid(blocks) {
+    if (!blocks || !blocks.length) return false;
+    if (blocks[0].startPage !== 0) return false;
+    for (var index = 1; index < blocks.length; index += 1) {
+      if (blocks[index].startPage <= blocks[index - 1].startPage) return false;
+    }
+    return true;
+  }
+
+  function chapterProgressSignature() {
+    return [
       state.total,
       state.ttsLayoutRevision,
-      (window.__adtReflowTocEntries || []).length
+      (window.__adtReflowTocEntries || []).length,
+      content ? content.scrollWidth : 0,
+      content ? content.childElementCount : 0,
+      Math.round(pageWidth())
     ].join(":");
-    if (chapterProgressCache.signature !== signature) {
-      chapterProgressCache = {
-        signature: signature,
-        blocks: buildChapterProgressBlocks()
-      };
+  }
+
+  function chapterProgressBlocks() {
+    var signature = chapterProgressSignature();
+    if (chapterProgressCache.signature === signature) return chapterProgressCache.blocks;
+    var built = buildChapterProgressBlocks();
+    if (chapterProgressBlocksValid(built)) {
+      chapterProgressCache = { signature: signature, blocks: built };
     }
-    return chapterProgressCache.blocks;
+    return built;
   }
 
   /* Función pura: recibe los bloques y la página, y devuelve los textos. Se
@@ -1914,20 +1946,32 @@
   function chapterProgressText(pageIndex) {
     var progress = chapterProgressAt(chapterProgressBlocks(), pageIndex);
     if (progress) return progress;
+    /* Si la página no cae en los bloques guardados, la medición quedó vieja:
+       se reconstruye una vez antes de resignar el capítulo. */
+    var page = Math.max(0, Math.min(state.total - 1, pageIndex));
+    var fresh = buildChapterProgressBlocks();
+    if (chapterProgressBlocksValid(fresh)) {
+      chapterProgressCache = { signature: chapterProgressSignature(), blocks: fresh };
+      var retried = chapterProgressAt(fresh, page);
+      if (retried) return retried;
+    } else {
+      var padded = chapterProgressAt(fresh, page);
+      if (padded) return padded;
+    }
     return {
       block: null,
-      page: pageIndex + 1,
+      page: page + 1,
       pages: state.total,
-      long: "pág. " + (pageIndex + 1) + " de " + state.total,
-      short: (pageIndex + 1) + "/" + state.total,
-      minimal: (pageIndex + 1) + "/" + state.total,
-      spoken: "Página " + (pageIndex + 1) + " de " + state.total
+      long: "pág. " + (page + 1) + " de " + state.total,
+      short: (page + 1) + "/" + state.total,
+      minimal: (page + 1) + "/" + state.total,
+      spoken: "Página " + (page + 1) + " de " + state.total
     };
   }
 
-  function updateControls(announce) {
-    previousButton.disabled = state.current <= 0;
-    nextButton.disabled = state.current >= state.total - 1;
+  /* El contador se reescribe sin tocar el resto de los controles: lo llaman
+     tanto updateControls() como el ciclo que sigue los cambios del panel. */
+  function writePageStatus() {
     var progress = chapterProgressText(state.current);
     if (pageStatusLong && pageStatusLong.textContent !== progress.long) {
       pageStatusLong.textContent = progress.long;
@@ -1941,6 +1985,15 @@
     if (pageStatusOutput) {
       pageStatusOutput.setAttribute("aria-label", progress.spoken);
     }
+    return progress;
+  }
+
+  window.__adtReflowRefreshPageStatus = writePageStatus;
+
+  function updateControls(announce) {
+    previousButton.disabled = state.current <= 0;
+    nextButton.disabled = state.current >= state.total - 1;
+    var progress = writePageStatus();
     syncPrimaryToolbar();
     updateQuizPageBackground();
     updateBackMatterPageBackground();
@@ -4815,6 +4868,12 @@
       });
       if (window.__adtReflowSyncHighlightAvailability) {
         window.__adtReflowSyncHighlightAvailability();
+      }
+      /* El contador depende de mediciones de paginación: se reescribe en el
+         mismo ciclo que sigue los cambios de DOM (abrir o cerrar el panel, por
+         ejemplo) para no quedar mostrando un valor viejo. */
+      if (window.__adtReflowRefreshPageStatus) {
+        window.__adtReflowRefreshPageStatus();
       }
 
       if (restricted && lastRestricted !== true && window.__adtReflowSetWordHighlight) {
