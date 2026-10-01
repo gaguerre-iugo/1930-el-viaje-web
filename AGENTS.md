@@ -36,6 +36,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── font-validation.js     ← Validación de carga de fuentes
 │   ├── libs/fontawesome/      ← Iconos FontAwesome
 │   ├── symbols/               ← Símbolos gráficos (ecosistema, biomas, etc.)
+│   ├── icons/                 ← Íconos de interfaz (flechas de EVA, glosario)
 │   ├── sounds/                ← Efectos de sonido (quiz, navegación)
 │   ├── favicon_io/            ← Favicons multiplataforma
 │   ├── interface_translations/← Traducciones de la interfaz

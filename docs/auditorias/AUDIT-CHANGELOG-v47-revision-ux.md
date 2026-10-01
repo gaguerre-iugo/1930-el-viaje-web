@@ -3,6 +3,20 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Preparación
+
+- **Tokens de EVA**: la paleta institucional y la de grises quedó transcripta de
+  la lámina `Color.png` en `docs/arquitectura/EVA-TOKENS.md`, con los valores que
+  necesita el tema claro (puntos 18 y 24).
+- **Íconos**: `assets/icons/eva-arrow-right.svg` y `eva-arrow-left.svg`
+  reproducen la flecha de EVA (derivada del export de 100 px que pasó la
+  revisión) y `glossary-book.svg` es el libro abierto con «Aa» que pidió el
+  documento, dibujado para el libro porque no existe un equivalente en el set de
+  EVA. `tools/screen-test/verify-icons.mjs` compara la flecha contra el export:
+  caja con 1 px de diferencia, área al 100,7 % y espejo exacto entre las dos.
+- El **enlace de Figma** del sistema de diseño no se pudo leer (HTTP 403: hace
+  falta sesión), así que los valores salen de la lámina exportada.
+
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 
 **Problema:** los botones del índice llevaban `focus:outline-none` en su clase:
