@@ -168,6 +168,52 @@ decisión 5; 5 debe hacerse antes de publicar cualquier versión con actividades
 - **Versión de caché**: subir `?v=` en `index.html` en cada cambio de CSS o JS.
   Sin eso, quien ya abrió el libro sigue viendo la versión vieja.
 
+## Material y decisiones pendientes del equipo
+
+Estado al 21 de los commits locales de esta revisión. Nada de esto bloquea lo que
+ya está hecho; son las piezas que faltan para cerrar los puntos abiertos.
+
+### Material
+
+| Qué | Para qué punto | Estado |
+|---|---|---|
+| **Logo de Ceibal (SVG)** | 21 · texto de carga | **Pedido.** El cargador ya tiene el hueco `#reflow-loading .reflow-loading-logo`: cuando llegue el archivo se aplica como `background-image` en esa regla, sin tocar JavaScript. Mientras esté vacío no ocupa lugar. |
+| **Íconos de EVA** (lista abajo) | 18 · tema claro y 19 · íconos | **Pedido.** Hoy la interfaz usa caracteres de texto para menú, herramientas, cerrar, reproducir, pausa, detener, anterior y siguiente; las flechas de la barra ya son SVG derivados del export de EVA. |
+| **Chevrons de EVA** (si existen) | 19 | Opcional: hoy el «volver» de los paneles usa la flecha larga de EVA. Un chevron quedaría mejor en ese contexto. |
+
+Formatos útiles: **SVG** con `viewBox="0 0 24 24"`, trazo `currentColor` (así
+heredan el color del botón) y uso a 24 px, que es lo que fija el punto 24. Si sólo
+hay PNG, alcanza con el tamaño mayor (100 px): se derivan midiendo, como se hizo
+con las flechas (ver `docs/arquitectura/EVA-TOKENS.md` y
+`tools/screen-test/verify-icons.mjs`).
+
+Íconos que la interfaz necesita hoy, con dónde se usan:
+
+| Ícono | Dónde | Hoy |
+|---|---|---|
+| Menú (hamburguesa) | barra · «Índice» | carácter `☰` |
+| Herramientas (engranaje) | barra · «Herramientas» y reproductor de voz · «Voz y velocidad» | carácter `⚙` |
+| Cerrar | encabezado de los paneles | carácter `×` |
+| Reproducir | reproductor de voz | carácter `▶` |
+| Pausa | reproductor de voz (estado encendido) | texto «Pausa» |
+| Detener | reproductor de voz | carácter `■` |
+| Audio anterior | reproductor de voz | carácter `⏮` |
+| Audio siguiente | reproductor de voz | carácter `⏭` |
+| Flecha izquierda | barra · «Anterior» y paneles · «Volver a Herramientas» | ▲ ya es SVG de EVA |
+| Flecha derecha | barra · «Siguiente» | ▲ ya es SVG de EVA |
+| Libro con «Aa» | barra · «Glosario» | ▲ dibujado para el libro (no existe en EVA) |
+
+### Decisiones
+
+- **Cuerpo del texto: 20 px o 18 px** (punto 20). El documento propone 20; hoy son
+  18 y cada página muestra menos texto. Es la única decisión que cambia la
+  paginación de todo el libro.
+- **`bundleVersion`** (release). Subirlo invalida las cachés de `content/toc.json`,
+  del catálogo de traducciones y de los catálogos de voz (~9 MB por voz). Sin
+  subirlo, un lector que ya abrió el libro puede seguir viendo textos viejos:
+  pasó con el contador por capítulo y con los textos de interfaz.
+- **Prueba con estudiantes** (3 a 5) y validación con Comunicación y CAI.
+
 ## Qué NO entra en este plan
 
 - La prueba con 3 a 5 estudiantes y la validación con Comunicación y CAI (punto
