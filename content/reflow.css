@@ -2607,10 +2607,10 @@ body.reflow-book #content .quiz-explanation-bank {
   flex-direction: column;
   gap: var(--ceibal-space-3);
   padding: var(--ceibal-space-3);
-  border: 1px solid rgb(255 255 255 / 10%);
+  border: 1px solid var(--ui-border);
   border-radius: var(--ceibal-radius-lg);
-  color: #f8fafc;
-  background: rgb(0 0 0 / 44%);
+  color: var(--ui-text);
+  background: var(--ui-surface-sunken);
 }
 
 #reflow-font-settings-label {
@@ -2624,7 +2624,7 @@ body.reflow-book #content .quiz-explanation-bank {
   gap: var(--ceibal-space-1);
   padding: var(--ceibal-space-1);
   border-radius: var(--ceibal-radius-md);
-  background: rgb(255 255 255 / 7%);
+  background: var(--ui-surface);
 }
 
 .reflow-font-settings-options button {
@@ -2632,7 +2632,7 @@ body.reflow-book #content .quiz-explanation-bank {
   padding: var(--ceibal-space-2) var(--ceibal-space-1);
   border: 1px solid transparent;
   border-radius: var(--ceibal-radius-sm);
-  color: rgb(255 255 255 / 72%);
+  color: var(--ui-text);
   background: transparent;
   font-size: 1.125rem;
   font-weight: 700;
@@ -2640,14 +2640,14 @@ body.reflow-book #content .quiz-explanation-bank {
 }
 
 .reflow-font-settings-options button[aria-pressed="true"] {
-  border-color: rgb(255 255 255 / 20%);
-  color: #fff;
-  background: var(--ceibal-institutional-500);
+  border-color: transparent;
+  color: var(--ui-on-accent);
+  background: var(--ui-accent);
   box-shadow: var(--ceibal-shadow-button);
 }
 
 .reflow-font-settings-options button:focus-visible {
-  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline: var(--ceibal-border-focus) solid var(--ui-focus);
   outline-offset: 2px;
   box-shadow: var(--ceibal-shadow-focus);
 }
@@ -6588,4 +6588,36 @@ body.reflow-book .reflow-reader-panel :is(nav, ul, ol) :is(li > *, a, li > * > *
 /* Resultados y estados dentro del panel (puntajes, avisos). */
 body.reflow-book .reflow-reader-panel :is([role="status"], [role="alert"]) {
   color: var(--ui-text) !important;
+}
+
+/* Controles propios del panel de configuración (marcado de este repositorio, no
+   del runtime): el selector de tamaño de letra y su tarjeta conservaban el texto
+   casi blanco del tema oscuro. Estas reglas tienen más especificidad que las
+   duplicadas de versiones anteriores, así que las reemplazan. */
+body.reflow-book .reflow-reader-panel .reflow-font-settings-card,
+body.reflow-book .reflow-reader-panel #reflow-font-settings-label,
+body.reflow-book .reflow-reader-panel .reflow-font-settings-options button,
+body.reflow-book .reflow-reader-panel .reflow-setting-row,
+body.reflow-book .reflow-reader-panel .reflow-setting-row > * {
+  color: var(--ui-text) !important;
+}
+body.reflow-book .reflow-reader-panel .reflow-font-settings-card {
+  background: var(--ui-surface-sunken) !important;
+  border-color: var(--ui-border) !important;
+}
+body.reflow-book .reflow-reader-panel .reflow-font-settings-options {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+body.reflow-book .reflow-reader-panel .reflow-font-settings-options button {
+  background: transparent !important;
+}
+body.reflow-book .reflow-reader-panel .reflow-font-settings-options button[aria-pressed="true"],
+body.reflow-book .reflow-reader-panel .reflow-font-settings-options button[aria-checked="true"] {
+  color: var(--ui-on-accent) !important;
+  background: var(--ui-accent) !important;
+  border-color: transparent !important;
+}
+body.reflow-book .reflow-reader-panel .reflow-setting-description {
+  color: var(--ui-n4-color) !important;
 }

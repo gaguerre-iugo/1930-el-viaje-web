@@ -105,6 +105,22 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
+**Piezas propias del panel de configuración**: el selector de tamaño de letra, la
+tarjeta de preferencias y las descripciones son marcado de este repositorio (no del
+runtime) y conservaban los colores del tema oscuro. Se pasaron a los tokens
+(`.reflow-font-settings-card`, `.reflow-font-settings-options`,
+`.reflow-setting-description` → N4) y se sumó al pase inline el estado del selector
+de tamaño (`[data-reflow-font-size]`: elegido en institucional con texto blanco).
+Medido en el panel de Herramientas: de 4 elementos ilegibles a 1.
+
+**PENDIENTE · los interruptores**: en las filas de preferencias, la **pista y la
+perilla del interruptor** quedan casi invisibles sobre blanco (el runtime las pinta
+con los valores del tema oscuro) y las etiquetas de las filas deshabilitadas se
+lavan por la **opacidad** reducida que aplica el runtime. Ojo: esto **no lo detecta
+la medición de color del script**, porque mira el color calculado e ignora la
+opacidad y los pseudo-elementos de la pista; hay que medirlo sobre los **píxeles
+renderizados** (o comprobar la captura). Es el paso siguiente de esta etapa.
+
 ## Punto 18 · Tema claro — ETAPA 2: paneles
 
 - Los tres paneles (**Herramientas**, **Índice** y **Glosario**) pasaron a

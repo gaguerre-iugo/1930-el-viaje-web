@@ -1273,6 +1273,25 @@
         control.style.setProperty("border-color", "var(--ui-border-strong)", "important");
       }
     }
+    /* Selector de tamaño de letra: son botones propios con reglas duplicadas del
+       tema oscuro; el elegido va relleno de institucional con texto blanco. */
+    var tamanos = raiz.querySelectorAll("[data-reflow-font-size]");
+    for (var t = 0; t < tamanos.length; t++) {
+      var botonTamano = tamanos[t];
+      var elegido =
+        botonTamano.getAttribute("aria-pressed") === "true" ||
+        botonTamano.getAttribute("aria-checked") === "true";
+      botonTamano.style.setProperty(
+        "color",
+        elegido ? "var(--ui-on-accent)" : "var(--ui-text)",
+        "important"
+      );
+      botonTamano.style.setProperty(
+        "background-color",
+        elegido ? "var(--ui-accent)" : "transparent",
+        "important"
+      );
+    }
     var filas = raiz.querySelectorAll("li > button, li > a, [role='tab'], [data-state]");
     for (var i = 0; i < filas.length; i++) {
       var fila = filas[i];
@@ -1284,12 +1303,83 @@
     }
   }
 
+  /* Contraste real de cada texto del panel: el runtime usa clases que no se
+     pueden enumerar, así que se mide y se corrige con el color del tema. */
+  function panelRgb(valor) {
+    var numeros = String(valor).match(/[\d.]+/g) || [];
+    return {
+      r: Number(numeros[0] || 0),
+      g: Number(numeros[1] || 0),
+      b: Number(numeros[2] || 0),
+      a: numeros.length > 3 ? Number(numeros[3]) : 1,
+    };
+  }
+
+  function panelLuminance(color) {
+    var canal = function (valor) {
+      var proporcion = valor / 255;
+      return proporcion <= 0.03928
+        ? proporcion / 12.92
+        : Math.pow((proporcion + 0.055) / 1.055, 2.4);
+    };
+    return 0.2126 * canal(color.r) + 0.7152 * canal(color.g) + 0.0722 * canal(color.b);
+  }
+
+  function panelContrast(uno, otro) {
+    var a = panelLuminance(uno);
+    var b = panelLuminance(otro);
+    return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+  }
+
+  function panelEffectiveBackground(elemento) {
+    var nodo = elemento;
+    while (nodo && nodo !== document.documentElement) {
+      var fondo = panelRgb(window.getComputedStyle(nodo).backgroundColor);
+      if (fondo.a > 0.4) return fondo;
+      nodo = nodo.parentElement;
+    }
+    return { r: 255, g: 255, b: 255, a: 1 };
+  }
+
+  function repairPanelContrast(raiz) {
+    var elementos = raiz.querySelectorAll("*");
+    for (var i = 0; i < elementos.length; i++) {
+      var elemento = elementos[i];
+      var propio = "";
+      for (var n = 0; n < elemento.childNodes.length; n++) {
+        var hijo = elemento.childNodes[n];
+        if (hijo.nodeType === 3) propio += hijo.textContent;
+      }
+      if (!propio.trim()) continue;
+      var estilo = window.getComputedStyle(elemento);
+      if (estilo.display === "none" || estilo.visibility === "hidden") continue;
+      var fondo = panelEffectiveBackground(elemento);
+      if (panelContrast(panelRgb(estilo.color), fondo) >= 4.5) continue;
+      var elegido;
+      if (panelLuminance(fondo) < 0.5) {
+        elegido = "#ffffff";
+      } else if (/^H[1-4]$/.test(elemento.tagName)) {
+        elegido = "var(--ui-n1-color)";
+      } else if (parseFloat(estilo.fontSize) <= 15) {
+        elegido = "var(--ui-n4-color)";
+      } else {
+        elegido = "var(--ui-n3-color)";
+      }
+      if (elemento.style.getPropertyValue("color") !== elegido) {
+        elemento.style.setProperty("color", elegido, "important");
+      }
+    }
+  }
+
   var panelInlineObserver = null;
   function watchPanelInlineTheme() {
     if (typeof MutationObserver !== "function") return;
     var aplicar = function () {
       var paneles = document.querySelectorAll(".reflow-reader-panel");
-      for (var i = 0; i < paneles.length; i++) applyPanelInlineTheme(paneles[i]);
+      for (var i = 0; i < paneles.length; i++) {
+        applyPanelInlineTheme(paneles[i]);
+        repairPanelContrast(paneles[i]);
+      }
     };
     var pendiente = false;
     var programar = function () {
@@ -1308,7 +1398,10 @@
         childList: true,
         subtree: true,
         attributes: true,
-        attributeFilter: ["aria-current", "aria-selected", "data-state"],
+        /* Se observa "style" porque el runtime reescribe colores inline al
+           re-renderizar; la guarda de "no escribir si ya está bien" evita el
+           ciclo. */
+        attributeFilter: ["aria-current", "aria-selected", "data-state", "style"],
       });
     }
     aplicar();
