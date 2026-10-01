@@ -40,6 +40,28 @@
   --ui-n2-color: var(--ceibal-institutional-600);
   --ui-n3-color: var(--ceibal-gray-900);
   --ui-n4-color: var(--ceibal-gray-600);
+
+  /* Colores semánticos de la interfaz (punto 18), tomados de los tokens de EVA.
+     La barra, el reproductor de voz y los paneles son claros: superficies casi
+     blancas, texto grey-900 y el institucional para lo accionable. */
+  --ui-surface: #ffffff;
+  --ui-surface-sunken: var(--ceibal-gray-50);
+  --ui-surface-hover: var(--ceibal-gray-100);
+  --ui-surface-selected: var(--ceibal-institutional-100);
+  --ui-border: var(--ceibal-gray-200);
+  --ui-border-strong: var(--ceibal-gray-300);
+  --ui-text: var(--ceibal-gray-900);
+  --ui-text-muted: var(--ceibal-gray-600);
+  --ui-text-selected: var(--ceibal-institutional-700);
+  --ui-accent: var(--ceibal-institutional-600);
+  --ui-accent-hover: var(--ceibal-institutional-700);
+  --ui-accent-soft: var(--ceibal-institutional-100);
+  --ui-on-accent: #ffffff;
+  --ui-disabled-surface: var(--ceibal-gray-100);
+  --ui-disabled-text: var(--ceibal-gray-600);
+  --ui-focus: var(--ceibal-institutional-600);
+  --ui-shadow: 0 -.25rem 1rem rgb(21 23 26 / 12%);
+  --ui-shadow-raised: 0 .25rem 1rem rgb(21 23 26 / 12%);
   --ui-weight-bold: 700;
   --ui-weight-regular: 400;
   --ui-icon-size: 1.5rem;     /* 24 px */
@@ -1241,13 +1263,12 @@ body.reflow-book .tts-image-highlight-overlay {
   width: min(100vw, 68rem);
   min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
   padding: .375rem .5rem calc(.375rem + env(safe-area-inset-bottom, 0px));
-  border: 1px solid var(--ceibal-gray-700);
+  border: 1px solid var(--ui-border);
   border-bottom: 0;
   border-radius: var(--ceibal-radius-lg) var(--ceibal-radius-lg) 0 0;
-  color: #f8fafc;
-  background: rgb(24 24 24 / 96%);
-  box-shadow: 0 -.25rem 1rem rgb(0 0 0 / 18%);
-  backdrop-filter: blur(.75rem);
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow);
   transition: opacity .2s ease, transform .2s ease;
 }
 
@@ -1269,14 +1290,14 @@ body.reflow-book .tts-image-highlight-overlay {
   padding: .75rem 1.25rem;
   border: var(--ceibal-border-default) solid transparent;
   border-radius: var(--ceibal-radius-md);
-  color: #f8fafc;
-  background: rgb(255 255 255 / 8%);
+  color: var(--ui-text);
+  background: transparent;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.15;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--ceibal-shadow-button);
+  box-shadow: none;
   transition: background-color 120ms ease, border-color 120ms ease,
     box-shadow 120ms ease;
 }
@@ -1316,7 +1337,7 @@ body.reflow-book
   padding-inline: .5rem;
 }
 
-#reflow-pagination button:hover:not(:disabled) { background: rgb(255 255 255 / 16%); }
+#reflow-pagination button:hover:not(:disabled) { background: var(--ui-surface-hover); }
 
 /* Anterior y Siguiente son la acción principal de la barra (punto 3): más
    altas que el resto (56 px), más anchas que Índice y Herramientas, y en el
@@ -1347,20 +1368,22 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
 
 #reflow-pagination button[aria-expanded="true"],
 #reflow-pagination button[aria-pressed="true"] {
-  background: var(--ceibal-institutional-500);
+  color: var(--ui-text-selected);
+  background: var(--ui-surface-selected);
 }
 #reflow-pagination button:active:not(:disabled) {
-  background: var(--ceibal-institutional-600);
+  color: var(--ui-on-accent);
+  background: var(--ui-accent);
 }
 #reflow-pagination button:focus-visible {
-  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline: var(--ceibal-border-focus) solid var(--ui-focus);
   outline-offset: 2px;
   box-shadow: var(--ceibal-shadow-focus);
 }
 #reflow-pagination button:disabled {
-  border-color: var(--ceibal-gray-600);
-  color: var(--ceibal-gray-300);
-  background: var(--ceibal-gray-800);
+  border-color: transparent;
+  color: var(--ui-disabled-text);
+  background: var(--ui-disabled-surface);
   box-shadow: none;
   opacity: 1;
   cursor: not-allowed;
@@ -1389,6 +1412,7 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
 #reflow-page-status {
   min-width: 5rem;
   text-align: center;
+  color: var(--ui-n4-color);
   font-size: var(--ui-n4-size);
   font-weight: var(--ui-weight-regular);
   font-variant-numeric: tabular-nums;
@@ -1421,11 +1445,11 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
   width: min(calc(100vw - 1rem), 44rem);
   min-height: 3.5rem;
   padding: var(--ceibal-space-1);
-  border: var(--ceibal-border-default) solid var(--ceibal-gray-700);
+  border: var(--ceibal-border-default) solid var(--ui-border);
   border-radius: var(--ceibal-radius-lg);
-  color: #f8fafc;
-  background: rgb(24 24 24 / 98%);
-  box-shadow: 0 -.25rem 1rem rgb(0 0 0 / 18%);
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-raised);
 }
 
 #reflow-tts-player[hidden] {
@@ -1443,39 +1467,44 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
   padding: var(--ceibal-space-3) var(--ceibal-space-4);
   border: var(--ceibal-border-default) solid transparent;
   border-radius: var(--ceibal-radius-md);
-  color: #f8fafc;
-  background: rgb(255 255 255 / 8%);
+  color: var(--ui-text);
+  background: transparent;
   font-family: "Atkinson Hyperlegible", sans-serif;
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.15;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--ceibal-shadow-button);
+  box-shadow: none;
 }
 
 #reflow-tts-player button:hover:not(:disabled) {
-  background: rgb(255 255 255 / 16%);
+  background: var(--ui-surface-hover);
 }
 
 #reflow-tts-player button[aria-pressed="true"] {
-  background: var(--ceibal-institutional-500);
+  color: var(--ui-text-selected);
+  background: var(--ui-surface-selected);
 }
 
 #reflow-tts-player button:active:not(:disabled) {
-  background: var(--ceibal-institutional-600);
+  color: var(--ui-on-accent);
+  background: var(--ui-accent);
 }
 
 #reflow-tts-player button:focus-visible {
-  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
+  outline: var(--ceibal-border-focus) solid var(--ui-focus);
   outline-offset: 2px;
   box-shadow: var(--ceibal-shadow-focus);
 }
 
-#reflow-tts-player button:disabled {
-  border-color: var(--ceibal-gray-700);
-  color: var(--ceibal-gray-400);
-  background: #20242a;
+/* El estado deshabilitado del reproductor lo pintaba una regla del runtime con
+   grey-500, que sobre la superficie clara quedaba en 4,32:1. Se fija con los
+   tokens del tema. */
+body.reflow-book #reflow-tts-player button:disabled {
+  border-color: transparent !important;
+  color: var(--ui-disabled-text) !important;
+  background: var(--ui-disabled-surface) !important;
   box-shadow: none;
   opacity: 1;
   cursor: not-allowed;

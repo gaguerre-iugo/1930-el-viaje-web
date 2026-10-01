@@ -105,6 +105,46 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
+## Punto 18 · Tema claro — ETAPA 1: barra y reproductor de voz
+
+El punto se hace por etapas (barra → reproductor → paneles), porque la mayor
+parte del color de los paneles viene de clases de Tailwind del runtime.
+
+- Se definieron los **colores semánticos** de la interfaz en variables
+  (`--ui-surface`, `--ui-surface-hover`, `--ui-surface-selected`, `--ui-border`,
+  `--ui-text`, `--ui-text-muted`, `--ui-accent`, `--ui-on-accent`,
+  `--ui-disabled-surface`, `--ui-disabled-text`, `--ui-focus`, sombras) sobre los
+  tokens de EVA, y se aplicaron a **la barra** y al **reproductor de voz**.
+- La barra pasó de la superficie oscura (`rgb(24 24 24 / 96%)`) a **blanca** con
+  texto grey-900. Los botones secundarios van sin relleno, con hover grey-100;
+  el estado abierto o encendido usa institutional-100 con texto
+  institutional-700, y el pulsado se rellena de institucional.
+- El estado deshabilitado de los secundarios pasó a grey-100 con texto grey-600 y
+  **sin borde**. Las flechas conservan el 40 % de opacidad que pide el punto 3.
+- El **anillo de foco** sobre superficie clara usa institutional-600 (antes
+  institutional-400, pensado para fondo oscuro).
+- El reproductor de voz quedó con superficie blanca, borde grey-200 y texto
+  grey-900. Su estado deshabilitado lo pintaba una regla del runtime con grey-500,
+  que sobre claro daba 4,32:1; ahora usa los tokens del tema.
+
+**Verificación**: `tools/screen-test/verify-light-theme.mjs` (nuevo) mide el color
+real de cada superficie y **calcula el contraste con la fórmula de WCAG**:
+
+| Elemento | Fondo | Texto | Contraste |
+|---|---|---|---|
+| barra | `#FFFFFF` | grey-900 | **17,73:1** |
+| contador | barra | grey-600 | **4,83:1** |
+| Siguiente | institutional-600 | blanco | **7,14:1** |
+| reproductor de voz | `#FFFFFF` | grey-900 | **17,73:1** |
+
+Exige luminancia ≥ 0,5 en las superficies, contraste ≥ 4,5:1 en todo lo que se
+lee y que el foco sea institutional-600. Los **controles inactivos** se miden y se
+informan, pero se eximen del mínimo: WCAG 1.4.3 los exceptúa.
+
+**Falta la etapa 2**: los paneles del runtime (Herramientas, Índice, Glosario) y
+los pop-ups, donde se aplican además los colores por nivel (N1 grey-900, N2
+institutional-600, N3 grey-900, N4 grey-600) que ya están en variables.
+
 ## Punto 19 · Íconos SVG de EVA en la interfaz — RESUELTO
 
 - **Los cinco que llegaron como PNG** (menú, engranaje, cerrar, reproducir y
