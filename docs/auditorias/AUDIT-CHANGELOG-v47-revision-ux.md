@@ -105,34 +105,37 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
-## Punto 24 · Jerarquía tipográfica de la interfaz — IMPLEMENTADO (valores a confirmar)
+## Punto 24 · Jerarquía tipográfica de la interfaz — RESUELTO
 
-- Cuatro niveles centralizados en variables de `content/reflow.css`
-  (`--ui-n1-size` … `--ui-n4-size`, `--ui-weight-bold/regular`,
-  `--ui-icon-size`, `--ui-letter-spacing-*`):
+Cuatro niveles, con los nombres del sistema de EVA y los valores de la tabla del
+documento, centralizados en variables de `content/reflow.css`:
 
-  | Nivel | Dónde | Tamaño | Peso |
-  |---|---|---|---|
-  | N1 | título del panel (Herramientas, Índice, Glosario) | 20 px | 700 |
-  | N2 | título de bloque (Leer, Escuchar, Pantalla) | 16 px | 700 |
-  | N3 | etiquetas, filas y opciones | 16 px | 400 |
-  | N4 | ayudas, estados y contador | 15 px | 400 |
+| Nivel | Dónde se usa | Estilo EVA | Tamaño / peso | Color (llega con el punto 18) |
+|---|---|---|---|---|
+| N1 · Título de panel | «Índice», «Herramientas», «Glosario» | `eva-text-body-bold-lg` | 20 px / 700 | grey-900 `#15171A` |
+| N2 · Título de grupo | «Leer», «Escuchar», «Pantalla»; capítulos del índice | `eva-text-body-bold-md` | 17 px / 700 | institucional-600 `#00635D` |
+| N3 · Etiqueta de control | «Lectura fácil», «Voz del narrador», secciones del índice, barra | `eva-text-body-regular-md` | 17 px / 400 | grey-900 `#15171A` |
+| N4 · Ayuda o descripción | «Usá Reproducir para comenzar», estados, contador | `eva-text-body-regular-sm` | 15 px / 400 | grey-600 `#565B66` |
 
-- **La negrita quedó sólo en tres lugares**: N1, N2 y la acción principal de la
-  barra. Antes iban en negrita las etiquetas de fila, las opciones segmentadas
-  («Normal / Grande / Extra grande / Máximo») y el contador. Los chips de tecla
-  («Alt+A») conservan la negrita porque es parte del símbolo.
-- **Íconos de interfaz a 24 px** (`--ui-icon-size`) en la barra y en las filas del
-  índice y del glosario. El panel de Herramientas no tiene íconos: sus controles
-  son texto.
-- Verificación: `tools/screen-test/verify-ui-typography.mjs` (nuevo) mide los
-  tamaños y pesos reales, exige que ninguna etiqueta de fila quede en negrita y
-  que los íconos midan 24 × 24. El panel sigue entrando sin scroll (termina en
-  823 de 900 px) y las suites de barra y panel siguen en verde.
-- **Pendiente de confirmación**: los números de la tabla N1–N4 del documento. Al
-  estar en variables, ajustarlos es un renglón por nivel. Quedan ~10 reglas de los
-  paneles del runtime con 18 px sin barrer, para no cambiar la escala sin la
-  confirmación.
+- **La negrita quedó en tres lugares**: N1, N2 y la acción principal de la barra.
+  Antes también iban en negrita las etiquetas de fila, las opciones del tamaño de
+  letra y el contador. Los chips de tecla («Alt+A») la conservan porque es parte
+  del símbolo.
+- **Íconos de interfaz a 24 px** en la barra y en las filas del índice y del
+  glosario. El panel de Herramientas no tiene íconos: sus controles son texto.
+- Los **colores** de cada nivel quedan declarados en las variables
+  (`--ui-n1-color` … `--ui-n4-color`) pero se aplican con el tema claro
+  (punto 18): sobre la barra oscura actual el grey-900 no se leería.
+- Al pasar N3 de 16 a 17 px, la barra volvió a recortar «Herramientas» a 1024 px;
+  se amplió la columna correspondiente (9 → 9,75 rem) y el barrido de ocho anchos
+  vuelve a pasar sin recortes ni desborde.
+
+**Verificación**: `tools/screen-test/verify-ui-typography.mjs` (nuevo) mide los
+tamaños y pesos reales, exige que ninguna etiqueta de fila quede en negrita
+—salvo los chips de tecla— y que los íconos midan 24 × 24. El panel sigue sin
+scroll (termina en 823 de 900 px).
+
+## Punto 7 · Voseo en la interfaz — RESUELTO
 
 ## Puntos 15, 16 y 17 · Actividades — RESUELTOS
 

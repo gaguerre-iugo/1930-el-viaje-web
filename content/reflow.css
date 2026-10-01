@@ -15,16 +15,31 @@
     ) - var(--reflow-controls-height)
   );
 
-  /* Jerarquía tipográfica de la interfaz (punto 24 de la revisión UX). Cuatro
-     niveles: N1 títulos de panel, N2 títulos de bloque, N3 etiquetas y filas de
-     control, N4 texto secundario (ayudas, estados, contador). La negrita se usa
-     sólo en N1, N2 y la acción principal de la barra: el resto va en redonda
-     para que la jerarquía no dependa del peso. Los íconos de la interfaz miden
-     24 px en todos los contextos. */
-  --ui-n1-size: 1.25rem;      /* 20 px */
-  --ui-n2-size: 1rem;         /* 16 px */
-  --ui-n3-size: 1rem;         /* 16 px */
-  --ui-n4-size: .9375rem;     /* 15 px */
+  /* Jerarquía tipográfica de la interfaz (punto 24 de la revisión UX), con los
+     nombres del sistema de EVA. Cuatro niveles:
+
+       N1 · título de panel      eva-text-body-bold-lg      20 px / 700
+       N2 · título de grupo      eva-text-body-bold-md      17 px / 700
+       N3 · etiqueta de control  eva-text-body-regular-md   17 px / 400
+       N4 · ayuda o descripción  eva-text-body-regular-sm   15 px / 400
+
+     La negrita se usa sólo en N1, N2 y la acción principal de la barra. Los
+     tamaños están en variables para que un ajuste de la tabla sea un renglón.
+     El color de cada nivel (grey-900, institucional-600, grey-600) llega con el
+     tema claro del punto 18: sobre la barra oscura actual no se leería. */
+  --eva-text-body-bold-lg: 1.25rem;      /* 20 px */
+  --eva-text-body-bold-md: 1.0625rem;    /* 17 px */
+  --eva-text-body-regular-md: 1.0625rem; /* 17 px */
+  --eva-text-body-regular-sm: .9375rem;  /* 15 px */
+
+  --ui-n1-size: var(--eva-text-body-bold-lg);
+  --ui-n2-size: var(--eva-text-body-bold-md);
+  --ui-n3-size: var(--eva-text-body-regular-md);
+  --ui-n4-size: var(--eva-text-body-regular-sm);
+  --ui-n1-color: var(--ceibal-gray-900);
+  --ui-n2-color: var(--ceibal-institutional-600);
+  --ui-n3-color: var(--ceibal-gray-900);
+  --ui-n4-color: var(--ceibal-gray-600);
   --ui-weight-bold: 700;
   --ui-weight-regular: 400;
   --ui-icon-size: 1.5rem;     /* 24 px */
@@ -1210,7 +1225,7 @@ body.reflow-book .tts-image-highlight-overlay {
     minmax(5rem, auto)
     minmax(7.25rem, 1.15fr)
     minmax(6.75rem, 1fr)
-    minmax(9rem, 1.05fr);
+    minmax(9.75rem, 1.05fr);
   align-items: center;
   gap: .25rem;
   width: min(100vw, 68rem);
@@ -1595,8 +1610,8 @@ body.reflow-book .reflow-upstream-dock {
   }
 
   #reflow-pagination .reflow-toolbar-primary .reflow-toolbar-label {
-    font-size: .7rem;
-    font-weight: 700;
+    font-size: .7rem !important;
+    font-weight: var(--ui-weight-bold) !important;
     line-height: 1.1;
   }
 
@@ -3112,9 +3127,9 @@ body.reflow-book .reflow-panel-control-header button {
   line-height: 1;
 }
 
-/* N1 · título del panel (Herramientas, Índice, Glosario) y N4 · ayudas y
-   estados: la negrita queda reservada a N1, N2 y la acción principal de la
-   barra (punto 24). */
+/* Escala N1–N4 aplicada a barra, paneles, índice y glosario (punto 24). La
+   negrita queda en N1 y N2; N3 y N4 van en redonda. Los colores de cada nivel
+   se aplican con el tema claro (punto 18). */
 body.reflow-book .reflow-panel-control-header :is(h1, h2, h3, h4),
 body.reflow-book .reflow-panel-native-header > :is(h1, h2, h3, h4) {
   font-size: var(--ui-n1-size) !important;
@@ -3122,15 +3137,18 @@ body.reflow-book .reflow-panel-native-header > :is(h1, h2, h3, h4) {
   letter-spacing: var(--ui-letter-spacing-title) !important;
 }
 
-body.reflow-book .reflow-panel :is(.text-sm, .text-muted-foreground),
-body.reflow-book .reflow-control-status {
-  font-size: var(--ui-n4-size) !important;
-  font-weight: var(--ui-weight-regular) !important;
+/* N2 · títulos de grupo: bloques del panel y capítulos del índice. */
+body.reflow-book .reflow-settings-organized .reflow-settings-block-title,
+body.reflow-book .reflow-navigation-panel .reflow-index-group,
+body.reflow-book .reflow-navigation-panel [data-reflow-toc-level="1"],
+body.reflow-book .reflow-glossary-panel .reflow-index-group {
+  font-size: var(--ui-n2-size) !important;
+  font-weight: var(--ui-weight-bold) !important;
 }
 
-/* N3 · etiquetas, filas y opciones en redonda: la negrita queda sólo para los
-   títulos (punto 24). El texto del panel es uniforme en 16 px y el secundario
-   en 15 px, sin importar qué clase traiga el runtime. */
+/* N3 · etiquetas de control: barra, filas y opciones del panel, índice y
+   glosario. */
+body.reflow-book #reflow-pagination .reflow-toolbar-label,
 body.reflow-book .reflow-accessibility-panel .reflow-setting-row :is(span, label, strong, b),
 body.reflow-book .reflow-accessibility-panel [role="radio"],
 body.reflow-book .reflow-accessibility-panel [role="switch"] + :is(span, label),
@@ -3138,9 +3156,28 @@ body.reflow-book .reflow-font-settings-options button,
 body.reflow-book .reflow-shortcuts-link,
 body.reflow-book .reflow-font-settings-card :is(label, span),
 body.reflow-book .reflow-reduce-motion-setting :is(label, span),
-body.reflow-book .reflow-settings-organized .reflow-setting-row button {
-  font-size: var(--ui-n3-size);
+body.reflow-book .reflow-panel-control-header button,
+body.reflow-book .reflow-navigation-panel [role="tab"],
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button,
+body.reflow-book .reflow-glossary-panel [role="tab"],
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button,
+body.reflow-book .reflow-panel-native-header > p,
+body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"])) button {
+  font-size: var(--ui-n3-size) !important;
   font-weight: var(--ui-weight-regular) !important;
+}
+
+/* N4 · ayudas, descripciones, estados y contador. */
+body.reflow-book .reflow-setting-description,
+body.reflow-book .reflow-panel :is(.text-sm, .text-muted-foreground),
+body.reflow-book .reflow-control-status {
+  font-size: var(--ui-n4-size) !important;
+  font-weight: var(--ui-weight-regular) !important;
+}
+
+/* Tercer uso permitido de la negrita: la acción principal de la barra. */
+body.reflow-book #reflow-pagination .reflow-toolbar-primary .reflow-toolbar-label {
+  font-weight: var(--ui-weight-bold) !important;
 }
 
 /* Íconos de la interfaz a 24 px en todos los contextos (punto 24). */

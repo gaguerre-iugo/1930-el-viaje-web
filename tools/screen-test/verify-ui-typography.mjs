@@ -107,12 +107,13 @@ for (const negrita of panel.negritas.slice(0, 12)) {
 }
 
 /* --------------------------------------------------------------- controles */
+/* Escala del documento (punto 24): N1 20/700 · N2 17/700 · N3 17/400 · N4 15/400. */
 const esperado = [
-  ["barra secundaria", barra.barraSecundaria, 16, 400],
-  ["barra principal", barra.barraPrincipal, 16, 700],
-  ["contador", barra.contador, 15, 400],
-  ["título de panel", panel.titulo, 20, 700],
-  ["título de bloque", panel.bloque, 16, 700],
+  ["barra secundaria (N3)", barra.barraSecundaria, 17, 400],
+  ["barra principal (N3 + negrita)", barra.barraPrincipal, 17, 700],
+  ["contador (N4)", barra.contador, 15, 400],
+  ["título de panel (N1)", panel.titulo, 20, 700],
+  ["título de bloque (N2)", panel.bloque, 17, 700],
 ];
 for (const [nombre, valor, px, peso] of esperado) {
   if (!valor) {
