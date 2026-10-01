@@ -108,6 +108,40 @@ if (estilo) {
 }
 await page.screenshot({ path: path.join(outDir, "glosario-subrayado.png") });
 
+/* ------------------------------------------------- el subrayado no parpadea */
+/* El reproductor reaplica por su cuenta el resaltado de libro completo (630
+   palabras de una vez) y pisaba el paginado: el subrayado aparecía, se iba y
+   volvía. Se observa la cantidad de palabras durante unos segundos en una
+   página con texto. */
+const estabilidad = await page.evaluate(async () => {
+  const content = document.getElementById("content");
+  const leer = () => {
+    const spans = content.querySelectorAll(".glossary-term");
+    return {
+      total: spans.length,
+      runtime: [...spans].filter((span) => /bg-emerald/.test(span.className)).length,
+    };
+  };
+  const muestras = [];
+  for (let i = 0; i < 14; i += 1) {
+    muestras.push(leer());
+    await new Promise((resolve) => window.setTimeout(resolve, 400));
+  }
+  return {
+    cantidades: [...new Set(muestras.map((muestra) => muestra.total))],
+    runtime: muestras.reduce((maximo, muestra) => Math.max(maximo, muestra.runtime), 0),
+  };
+});
+console.log(
+  `\n=== Estabilidad del subrayado ===\n  cantidades observadas: ${estabilidad.cantidades.join(", ")} · palabras del reproductor: ${estabilidad.runtime}`
+);
+if (estabilidad.cantidades.length > 1) {
+  fail(`el subrayado parpadea: la cantidad de palabras cambió (${estabilidad.cantidades.join(" → ")})`);
+}
+if (estabilidad.runtime > 0) {
+  fail(`el reproductor volvió a aplicar su resaltado de libro completo (${estabilidad.runtime} palabras)`);
+}
+
 /* ------------------------------------------- la definición se abre al tocar */
 /* Se prueban varias páginas: si el diccionario del runtime no estuviera cargado
    para algún capítulo, el globo no abriría y hay que verlo acá. */

@@ -11464,6 +11464,15 @@
        del panel queda encendido y coherente con lo que se ve en la página. */
     var glossaryModeDefaultMarker = '("glossaryMode",!1)';
     var glossaryModeDefaultReplacement = '("glossaryMode",!0)';
+    /* Con el modo glosario encendido, el reproductor vuelve a aplicar su propio
+       resaltado —el de libro completo, 630 palabras de una vez, que además
+       pisaba el paginado y hacía parpadear el subrayado—. Ese tramo se delega en
+       el motor, que resalta sólo la página visible. Se deja como parche blando:
+       si el bundle no lo trae, el libro sigue cargando. */
+    var glossaryFullBookMarker = 'If(),Object.keys(r).length>0&&Oy(r)';
+    var glossaryFullBookReplacement =
+      'window.__adtReflowSetGlossaryHighlight&&' +
+      'window.__adtReflowSetGlossaryHighlight(!0,r)';
     var glossaryCloseFocusMarker =
       'p=(0,ja.useCallback)(()=>{i(null),s.current=null},[])';
     var glossaryCloseFocusReplacement =
@@ -11565,6 +11574,7 @@
       .replace(quizPauseMarker, quizPauseReplacement)
       .replace(glossaryHighlightEffectMarker, glossaryHighlightEffectReplacement)
       .replace(glossaryModeDefaultMarker, glossaryModeDefaultReplacement)
+      .replace(glossaryFullBookMarker, glossaryFullBookReplacement)
       .replace(glossaryCloseFocusMarker, glossaryCloseFocusReplacement)
       .replace(glossarySkipMarker, glossarySkipReplacement)
       .replace(glossaryBoundaryMarker, glossaryBoundaryReplacement)
