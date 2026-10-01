@@ -45,11 +45,47 @@ Los SVG viven en `assets/icons/`. El libro los usa **embebidos** en
 `reflow-book.js` (así heredan `currentColor` y no suman pedidos), y los archivos
 quedan como pieza de diseño para revisión o reemplazo.
 
+### Tamaños del set de EVA
+
+El export trae cada ícono en ocho tamaños con nombre propio (`eva-icon-size-…`),
+que es también la escala en la que se piden los que faltan:
+
+| Token | Lado |
+|---|---|
+| `eva-icon-size-xs` | 12 px |
+| `eva-icon-size-sm` | 16 px |
+| `eva-icon-size-xmd` | 18 px |
+| **`eva-icon-size-md`** | **24 px** ← el que usa la interfaz (punto 24) |
+| `eva-icon-size-lg` | 32 px |
+| `eva-icon-size-xl` | 48 px |
+| `eva-icon-size-xxl` | 64 px |
+| `eva-icon-size-0-99` | 100 px ← el que se usa para trazar el SVG |
+
 | Archivo | Qué es | Origen |
 |---|---|---|
 | `eva-arrow-right.svg` | flecha siguiente | derivada del export de EVA (`size=eva-icon-size-0-99.png`, 100 px) midiendo su geometría: caja 11–88 × 27–73, asta de 13 px, remates de la cabeza en (69, 33,5) y (69, 66,5), punta en (81,5, 50) |
 | `eva-arrow-left.svg` | flecha anterior | espejo exacto de la derecha |
 | `glossary-book.svg` | libro abierto con «Aa» | dibujado para el libro: no existe un ícono equivalente en el set de EVA. Sigue la propuesta del documento de revisión (libro abierto con «Aa» encima) |
+
+### Íconos pedidos al equipo (puntos 18 y 19)
+
+La interfaz todavía usa caracteres de texto para estos ocho. Se piden en dos
+tamaños: **`md` (24 px)**, que es el tamaño de uso y sirve de referencia para la
+prueba visual, y **`0-99` (100 px)**, que es el que se mide para trazar el SVG.
+
+| Ícono | Dónde se usa | Hoy es |
+|---|---|---|
+| Menú (hamburguesa) | barra · «Índice» | `☰` |
+| Herramientas (engranaje) | barra · «Herramientas» y reproductor de voz | `⚙` |
+| Cerrar | encabezado de los paneles | `×` |
+| Reproducir | reproductor de voz | `▶` |
+| Pausa | reproductor de voz (encendido) | texto «Pausa» |
+| Detener | reproductor de voz | `■` |
+| Audio anterior | reproductor de voz | `⏮` |
+| Audio siguiente | reproductor de voz | `⏭` |
+
+Opcionales: chevron izquierdo y derecho (para el «volver» de los paneles),
+altavoz (botón «Voz y velocidad») y lupa (buscador del glosario).
 
 ### Verificación de la flecha
 
