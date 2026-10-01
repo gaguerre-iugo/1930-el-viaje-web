@@ -127,14 +127,17 @@ la recarga. El precargador offline se regeneró con el catálogo nuevo.
 se mide su superficie, el contraste del texto (17,73:1 en los tres), el título
 (20 px / 700, N1) y la fila.
 
-**PENDIENTE de la etapa 2**: las **filas de capítulo** del índice y del glosario
-(el `li > button`) siguen con texto blanco sobre blanco. La causa está
-identificada: el runtime las pinta desde una **capa de Tailwind**, y una
+**El pase inline (resuelto)**: las **filas de capítulo** del índice quedaban con
+texto blanco sobre blanco, y el **buscador** del panel, oscuro. La causa estaba
+identificada: el runtime los pinta desde una **capa de Tailwind**, y una
 declaración `!important` dentro de una capa gana sobre otra sin capa, así que el
-`!important` de `reflow.css` no alcanza. Se resuelve con un **pase inline desde el
-motor** (con `style.setProperty(..., "important")` y un `MutationObserver` que lo
-repite cuando el runtime vuelve a renderizar el panel). La prueba lo informa como
-`PENDIENTE` en su salida.
+`!important` de `reflow.css` no alcanzaba. Se agregó al motor un **pase inline**
+(`applyPanelInlineTheme` + `watchPanelInlineTheme` en `reflow-book.js`) que fija el
+color con `style.setProperty(..., "important")` —lo único que gana— sobre las
+filas, las pestañas y los controles de formulario de cada panel, con un
+`MutationObserver` que lo repite cuando el runtime vuelve a renderizar. El
+observador **no** observa `style` para no reaccionar a lo que escribe él mismo.
+Medido: la fila del índice pasó de **1:1 a 17,73:1**.
 
 ## Punto 18 · Tema claro — ETAPA 1: barra y reproductor de voz
 

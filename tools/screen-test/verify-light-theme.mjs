@@ -206,14 +206,10 @@ for (const [selector, nombre] of paneles) {
     fallar(`panel de ${nombre}: el título mide ${panel.titulo.tamano}/${panel.titulo.peso} y N1 pide 20px/700`);
   }
   if (panel.fila && panel.fila.contraste < 4.5) {
-    /* PENDIENTE de la etapa 2: las filas de capítulo del índice y del glosario
-       las pinta el runtime dentro de una capa de Tailwind, y una declaración
-       !important dentro de una capa gana sobre otra sin capa, así que mi
-       !important no alcanza. Se resuelve con un pase inline desde el motor
-       (documentado en el changelog). Se informa pero no falla. */
-    console.log(
-      `    PENDIENTE · fila de ${nombre}: texto ${panel.fila.color} sobre blanco (contraste ${panel.fila.contraste}) — necesita el pase inline`
-    );
+    /* El pase inline del motor (reflow-book.js) fija el color de las filas con
+       prioridad inline, porque el runtime las pinta desde una capa de Tailwind.
+       Si esto falla, el pase no corrió. */
+    fallar(`panel de ${nombre}: la fila queda en ${panel.fila.contraste} (¿no corrió el pase inline?)`);
   }
   await page.keyboard.press("Escape");
   await page.waitForTimeout(700);

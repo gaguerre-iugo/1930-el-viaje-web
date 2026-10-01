@@ -1247,7 +1247,75 @@
     } catch (error) {}
   }
 
+  /* Punto 18 (etapa 2) · Pase inline del tema claro de los paneles.
+     El runtime pinta los paneles desde una capa de Tailwind, y una declaración
+     !important dentro de una capa gana sobre otra sin capa; el !important de
+     reflow.css no alcanza para las filas de capítulo, que quedaban con texto
+     blanco sobre blanco. Se fija el color con prioridad inline —lo único que
+     gana— y se repite cuando el runtime vuelve a renderizar el panel. */
+  function panelInlineColor(elemento, activo) {
+    var deseado = activo ? "var(--ui-text-selected)" : "var(--ui-n3-color)";
+    if (elemento.style.getPropertyValue("color") !== deseado) {
+      elemento.style.setProperty("color", deseado, "important");
+    }
+  }
+
+  function applyPanelInlineTheme(raiz) {
+    if (!raiz || !raiz.querySelectorAll) return;
+    /* Controles de formulario: el runtime los pinta oscuros dentro de la misma
+       capa, así que también van con prioridad inline. */
+    var controles = raiz.querySelectorAll("input, select, textarea");
+    for (var c = 0; c < controles.length; c++) {
+      var control = controles[c];
+      if (control.style.getPropertyValue("color") !== "var(--ui-text)") {
+        control.style.setProperty("color", "var(--ui-text)", "important");
+        control.style.setProperty("background-color", "var(--ui-surface)", "important");
+        control.style.setProperty("border-color", "var(--ui-border-strong)", "important");
+      }
+    }
+    var filas = raiz.querySelectorAll("li > button, li > a, [role='tab'], [data-state]");
+    for (var i = 0; i < filas.length; i++) {
+      var fila = filas[i];
+      var activo =
+        fila.getAttribute("aria-current") === "true" ||
+        fila.getAttribute("aria-selected") === "true" ||
+        fila.getAttribute("data-state") === "active";
+      panelInlineColor(fila, activo);
+    }
+  }
+
+  var panelInlineObserver = null;
+  function watchPanelInlineTheme() {
+    if (typeof MutationObserver !== "function") return;
+    var aplicar = function () {
+      var paneles = document.querySelectorAll(".reflow-reader-panel");
+      for (var i = 0; i < paneles.length; i++) applyPanelInlineTheme(paneles[i]);
+    };
+    var pendiente = false;
+    var programar = function () {
+      if (pendiente) return;
+      pendiente = true;
+      window.requestAnimationFrame(function () {
+        pendiente = false;
+        aplicar();
+      });
+    };
+    if (!panelInlineObserver) {
+      panelInlineObserver = new MutationObserver(programar);
+      /* No se observa "style" para no reaccionar a lo que escribe este mismo
+         pase (sería un ciclo). */
+      panelInlineObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ["aria-current", "aria-selected", "data-state"],
+      });
+    }
+    aplicar();
+  }
+
   primeGlossaryModeStorage();
+  watchPanelInlineTheme();
 
   /* El switch del panel es del runtime: se le refleja el valor efectivo para que
      no muestre "apagado" mientras las palabras están subrayadas. */
