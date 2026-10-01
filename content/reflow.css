@@ -15,6 +15,22 @@
     ) - var(--reflow-controls-height)
   );
 
+  /* Jerarquía tipográfica de la interfaz (punto 24 de la revisión UX). Cuatro
+     niveles: N1 títulos de panel, N2 títulos de bloque, N3 etiquetas y filas de
+     control, N4 texto secundario (ayudas, estados, contador). La negrita se usa
+     sólo en N1, N2 y la acción principal de la barra: el resto va en redonda
+     para que la jerarquía no dependa del peso. Los íconos de la interfaz miden
+     24 px en todos los contextos. */
+  --ui-n1-size: 1.25rem;      /* 20 px */
+  --ui-n2-size: 1rem;         /* 16 px */
+  --ui-n3-size: 1rem;         /* 16 px */
+  --ui-n4-size: .9375rem;     /* 15 px */
+  --ui-weight-bold: 700;
+  --ui-weight-regular: 400;
+  --ui-icon-size: 1.5rem;     /* 24 px */
+  --ui-letter-spacing-title: .01em;
+  --ui-letter-spacing-label: .04em;
+
   /* EVA Ceibal interface tokens, extracted from the supplied design-system
      references. They intentionally apply to reader chrome and activities,
      never to the book artwork or editorial content. */
@@ -1259,6 +1275,9 @@ body.reflow-book .tts-image-highlight-overlay {
 #reflow-pagination .reflow-toolbar-label {
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: var(--ui-n3-size);
+  font-weight: var(--ui-weight-regular);
+  letter-spacing: var(--ui-letter-spacing-label);
 }
 
 /* Las acciones secundarias dan su relleno horizontal para que las seis
@@ -1343,8 +1362,8 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
 #reflow-page-status {
   min-width: 5rem;
   text-align: center;
-  font-size: .95rem;
-  font-weight: 700;
+  font-size: var(--ui-n4-size);
+  font-weight: var(--ui-weight-regular);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2642,9 +2661,9 @@ body.reflow-book .reflow-settings-organized .reflow-settings-section-shortcuts {
 body.reflow-book .reflow-settings-organized .reflow-settings-block-title {
   margin: .75rem 0 .25rem !important;
   color: var(--ceibal-gray-300);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: .04em;
+  font-size: var(--ui-n2-size);
+  font-weight: var(--ui-weight-bold);
+  letter-spacing: var(--ui-letter-spacing-label);
   line-height: 1.25;
 }
 
@@ -3088,9 +3107,49 @@ body.reflow-book .reflow-panel-control-header button {
   border-radius: var(--ceibal-radius-md);
   color: var(--ceibal-gray-50);
   background: rgb(255 255 255 / 8%);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--ui-n3-size);
+  font-weight: var(--ui-weight-regular);
   line-height: 1;
+}
+
+/* N1 · título del panel (Herramientas, Índice, Glosario) y N4 · ayudas y
+   estados: la negrita queda reservada a N1, N2 y la acción principal de la
+   barra (punto 24). */
+body.reflow-book .reflow-panel-control-header :is(h1, h2, h3, h4),
+body.reflow-book .reflow-panel-native-header > :is(h1, h2, h3, h4) {
+  font-size: var(--ui-n1-size) !important;
+  font-weight: var(--ui-weight-bold) !important;
+  letter-spacing: var(--ui-letter-spacing-title) !important;
+}
+
+body.reflow-book .reflow-panel :is(.text-sm, .text-muted-foreground),
+body.reflow-book .reflow-control-status {
+  font-size: var(--ui-n4-size) !important;
+  font-weight: var(--ui-weight-regular) !important;
+}
+
+/* N3 · etiquetas, filas y opciones en redonda: la negrita queda sólo para los
+   títulos (punto 24). El texto del panel es uniforme en 16 px y el secundario
+   en 15 px, sin importar qué clase traiga el runtime. */
+body.reflow-book .reflow-accessibility-panel .reflow-setting-row :is(span, label, strong, b),
+body.reflow-book .reflow-accessibility-panel [role="radio"],
+body.reflow-book .reflow-accessibility-panel [role="switch"] + :is(span, label),
+body.reflow-book .reflow-font-settings-options button,
+body.reflow-book .reflow-shortcuts-link,
+body.reflow-book .reflow-font-settings-card :is(label, span),
+body.reflow-book .reflow-reduce-motion-setting :is(label, span),
+body.reflow-book .reflow-settings-organized .reflow-setting-row button {
+  font-size: var(--ui-n3-size);
+  font-weight: var(--ui-weight-regular) !important;
+}
+
+/* Íconos de la interfaz a 24 px en todos los contextos (punto 24). */
+body.reflow-book .reflow-panel-control-header svg,
+body.reflow-book .reflow-panel-control-header img,
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button > svg,
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button > svg {
+  width: var(--ui-icon-size) !important;
+  height: var(--ui-icon-size) !important;
 }
 
 body.reflow-book .reflow-panel-control-header button:hover {
@@ -3334,8 +3393,8 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button {
   border-radius: .625rem !important;
   color: var(--ceibal-gray-100) !important;
   background: rgb(255 255 255 / 4%) !important;
-  font-size: 1.125rem !important;
-  font-weight: 700 !important;
+  font-size: var(--ui-n3-size) !important;
+  font-weight: var(--ui-weight-regular) !important;
   line-height: 1.35 !important;
   text-align: left !important;
 }

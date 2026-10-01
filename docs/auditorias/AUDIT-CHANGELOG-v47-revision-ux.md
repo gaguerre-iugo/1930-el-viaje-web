@@ -74,6 +74,35 @@ contador conserva el capítulo y que los diez bloques son **idénticos** a los d
 > se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
 > datos a un archivo con versión propia.
 
+## Punto 24 · Jerarquía tipográfica de la interfaz — IMPLEMENTADO (valores a confirmar)
+
+- Cuatro niveles centralizados en variables de `content/reflow.css`
+  (`--ui-n1-size` … `--ui-n4-size`, `--ui-weight-bold/regular`,
+  `--ui-icon-size`, `--ui-letter-spacing-*`):
+
+  | Nivel | Dónde | Tamaño | Peso |
+  |---|---|---|---|
+  | N1 | título del panel (Herramientas, Índice, Glosario) | 20 px | 700 |
+  | N2 | título de bloque (Leer, Escuchar, Pantalla) | 16 px | 700 |
+  | N3 | etiquetas, filas y opciones | 16 px | 400 |
+  | N4 | ayudas, estados y contador | 15 px | 400 |
+
+- **La negrita quedó sólo en tres lugares**: N1, N2 y la acción principal de la
+  barra. Antes iban en negrita las etiquetas de fila, las opciones segmentadas
+  («Normal / Grande / Extra grande / Máximo») y el contador. Los chips de tecla
+  («Alt+A») conservan la negrita porque es parte del símbolo.
+- **Íconos de interfaz a 24 px** (`--ui-icon-size`) en la barra y en las filas del
+  índice y del glosario. El panel de Herramientas no tiene íconos: sus controles
+  son texto.
+- Verificación: `tools/screen-test/verify-ui-typography.mjs` (nuevo) mide los
+  tamaños y pesos reales, exige que ninguna etiqueta de fila quede en negrita y
+  que los íconos midan 24 × 24. El panel sigue entrando sin scroll (termina en
+  823 de 900 px) y las suites de barra y panel siguen en verde.
+- **Pendiente de confirmación**: los números de la tabla N1–N4 del documento. Al
+  estar en variables, ajustarlos es un renglón por nivel. Quedan ~10 reglas de los
+  paneles del runtime con 18 px sin barrer, para no cambiar la escala sin la
+  confirmación.
+
 ## Puntos 15, 16 y 17 · Actividades — RESUELTOS
 
 **Punto 17 · «Pregunta 1 de 3» y cierre de la secuencia**
