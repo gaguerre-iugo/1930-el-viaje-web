@@ -1191,7 +1191,7 @@ body.reflow-book .tts-image-highlight-overlay {
   grid-template-columns:
     minmax(7rem, 1.15fr)
     minmax(6.5rem, 1fr)
-    5.25rem
+    minmax(5.25rem, auto)
     minmax(6.5rem, 1fr)
     minmax(8.5rem, 1.2fr);
   align-items: center;
@@ -1308,12 +1308,22 @@ body.reflow-book .tts-image-highlight-overlay {
   box-shadow: none;
 }
 
+/* El contador muestra bloque y avance ("Cap. 1 · pág. 3 de 18"). Tiene tres
+   formas y el CSS elige una según el ancho: larga, corta ("Cap. 1 · 3/18") y
+   mínima ("3/18", para teléfonos angostos). Ver updateControls() en
+   reflow-book.js. */
 #reflow-page-status {
   min-width: 5.25rem;
   text-align: center;
   font-size: 1rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+#reflow-page-status #reflow-progress-short,
+#reflow-page-status #reflow-progress-minimal {
+  display: none;
 }
 
 /* Read-aloud is a persistent session rather than a primary navigation action.
@@ -1432,7 +1442,7 @@ body.reflow-book .reflow-upstream-dock {
 
 @media (max-width: 47.999rem) {
   #reflow-pagination {
-    grid-template-columns: 2.75rem 2.75rem minmax(3.75rem, 1fr) 2.75rem 2.75rem;
+    grid-template-columns: 2.75rem 2.75rem minmax(6.5rem, 1.4fr) 2.75rem 2.75rem;
     gap: .125rem;
     width: 100vw;
     padding: .375rem;
@@ -1466,6 +1476,13 @@ body.reflow-book .reflow-upstream-dock {
     min-width: 3.75rem;
   }
 
+  #reflow-page-status #reflow-progress-long {
+    display: none;
+  }
+
+  #reflow-page-status #reflow-progress-short {
+    display: inline;
+  }
   #reflow-tts-player {
     grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
     gap: .125rem;
@@ -1501,7 +1518,7 @@ body.reflow-book .reflow-upstream-dock {
     grid-template-columns:
       minmax(5.25rem, 1fr)
       2.75rem
-      minmax(3.75rem, .75fr)
+      minmax(6.5rem, 1.4fr)
       2.75rem
       minmax(5.75rem, 1.05fr);
   }
@@ -1540,7 +1557,7 @@ body.reflow-book .reflow-upstream-dock {
     grid-template-columns:
       minmax(6.75rem, 1fr)
       2.75rem
-      minmax(4rem, .75fr)
+      minmax(6.5rem, 1.4fr)
       2.75rem
       minmax(8.25rem, 1.1fr);
   }
@@ -1551,6 +1568,18 @@ body.reflow-book .reflow-upstream-dock {
 
   #reflow-tools .reflow-toolbar-label::after {
     content: none;
+  }
+}
+
+/* Teléfonos angostos: el contador pierde la etiqueta del bloque y queda sólo el
+   avance, que es lo único que entra sin empujar los botones. */
+@media (max-width: 22rem) {
+  #reflow-page-status #reflow-progress-short {
+    display: none;
+  }
+
+  #reflow-page-status #reflow-progress-minimal {
+    display: inline;
   }
 }
 

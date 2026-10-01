@@ -28,6 +28,8 @@
 |---|---|
 | `auditorias/AUDITORIA-GENERAL.md` | Auditoría medida del repositorio: tamaño, performance, carga, archivos sin uso e higiene. |
 | `auditorias/AUDITORIA-MOVIL-ANDROID.md` | Auditoría medida de Chrome en Android (teléfono y tablet): tiempos de arranque, barra de navegación, modo horizontal, ilustraciones y objetivos táctiles. Incluye el panel `?diag=1` para ver errores en el dispositivo. |
+| `auditorias/PLAN-REVISION-UX-msuarez.md` | Plan de trabajo para los 25 puntos de la revisión UX (`Revision_UX_1930_msuarez.docx`): interpretación, alcance técnico por punto, fases, decisiones pendientes y riesgos. |
+| `auditorias/AUDIT-CHANGELOG-v47-revision-ux.md` | Registro de avance de los 25 puntos de la revisión UX, con lo verificado en cada uno. |
 | `auditorias/AUDIT-CHANGELOG-v47-panel-bloques.md` | Reorganización del panel de Configuración en tres bloques (Leer, Escuchar, Pantalla), reproducción automática debajo del interruptor, atajos con `Alt` en una ayuda propia (WCAG 2.1.4) y panel sin scroll con la voz apagada. |
 | `auditorias/AUDIT-CHANGELOG-v47-menu-herramientas.md` | Ajuste del panel de Configuración: Resaltado, Voz, Velocidad y Reproducción automática se muestran sólo con la lectura en voz alta encendida. |
 | `auditorias/AUDIT-CHANGELOG-v47-glosario-caracteres.md` | Revisión de caracteres ajenos al español (letras armenias y un ideograma en campos `emoji` del glosario), la herramienta `audit_charset.py` y lo que queda pendiente en los timecodes heredados. |

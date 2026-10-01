@@ -420,8 +420,10 @@
   var content;
   var previousButton;
   var nextButton;
-  var currentOutput;
-  var totalOutput;
+  var pageStatusOutput;
+  var pageStatusLong;
+  var pageStatusShort;
+  var pageStatusMinimal;
   var indexButton;
   var toolsButton;
   var ttsPlayer;
@@ -1801,15 +1803,144 @@
     if (document.title !== nextTitle) document.title = nextTitle;
   }
 
+  /* -------------------------------------------------------------------------
+     Contador por capítulo (revisión UX, punto 4)
+
+     El libro no tiene páginas fijas: su total cambia con el ancho de pantalla y
+     con el tamaño de letra, así que "14 / 395" no sirve para que un docente
+     mande a la misma página. En su lugar, el contador muestra el bloque de
+     lectura y el avance dentro de él: "Cap. 1 · pág. 3 de 18".
+
+     Cada entrada del índice marcada con `group` abre un bloque; los capítulos
+     se numeran en orden de lectura y las actividades no abren bloque, de modo
+     que caen dentro del capítulo al que pertenecen.
+     ---------------------------------------------------------------------- */
+  var chapterProgressCache = { signature: "", blocks: [] };
+
+  function buildChapterProgressBlocks() {
+    var toc = window.__adtReflowTocEntries || [];
+    var marked = toc.map(function (entry) {
+      var group = entry && entry.group;
+      if (group !== "antes" && group !== "chapter" && group !== "sobre") return null;
+      var heading = entry.chapter_id
+        ? content.querySelector('[data-id="' + entry.chapter_id + '"]')
+        : null;
+      var headingPages = heading ? pagesForElement(heading) : [];
+      var pageIndex = headingPages.length
+        ? headingPages[0]
+        : visiblePageForSection(entry.section_id);
+      return pageIndex === null ? null : { entry: entry, pageIndex: pageIndex };
+    }).filter(Boolean).sort(function (left, right) {
+      return left.pageIndex - right.pageIndex;
+    });
+
+    var blocks = [];
+    var chapterNumber = 0;
+    marked.forEach(function (item) {
+      var group = item.entry.group;
+      var key = group;
+      if (group === "chapter") {
+        chapterNumber += 1;
+        key = "chapter-" + chapterNumber;
+      }
+      var previous = blocks[blocks.length - 1];
+      if (previous && previous.key === key) return;
+      blocks.push({
+        key: key,
+        group: group,
+        chapter: group === "chapter" ? chapterNumber : 0,
+        label: group === "chapter"
+          ? "Cap. " + chapterNumber
+          : group === "antes" ? "Antes de empezar" : "Sobre el libro",
+        spoken: group === "chapter"
+          ? "Capítulo " + chapterNumber
+          : group === "antes" ? "Antes de empezar" : "Sobre el libro",
+        startPage: item.pageIndex
+      });
+    });
+
+    blocks.forEach(function (block, index) {
+      var end = index + 1 < blocks.length ? blocks[index + 1].startPage - 1 : state.total - 1;
+      block.endPage = Math.max(block.startPage, end);
+      block.pages = block.endPage - block.startPage + 1;
+    });
+    return blocks;
+  }
+
+  function chapterProgressBlocks() {
+    var signature = [
+      state.total,
+      state.ttsLayoutRevision,
+      (window.__adtReflowTocEntries || []).length
+    ].join(":");
+    if (chapterProgressCache.signature !== signature) {
+      chapterProgressCache = {
+        signature: signature,
+        blocks: buildChapterProgressBlocks()
+      };
+    }
+    return chapterProgressCache.blocks;
+  }
+
+  /* Función pura: recibe los bloques y la página, y devuelve los textos. Se
+     prueba con bloques sintéticos desde
+     tools/screen-test/verify-chapter-progress.mjs */
+  function chapterProgressAt(blocks, pageIndex) {
+    if (!blocks || !blocks.length) return null;
+    for (var index = 0; index < blocks.length; index += 1) {
+      var block = blocks[index];
+      if (pageIndex < block.startPage || pageIndex > block.endPage) continue;
+      var page = pageIndex - block.startPage + 1;
+      return {
+        block: block,
+        page: page,
+        pages: block.pages,
+        long: block.label + " · pág. " + page + " de " + block.pages,
+        short: block.label + " · " + page + "/" + block.pages,
+        minimal: page + "/" + block.pages,
+        spoken: block.spoken + ", página " + page + " de " + block.pages
+      };
+    }
+    return null;
+  }
+
+  /* Se expone para la verificación automatizada (unitarios de `chapterProgressAt`
+     y lectura del contador real). */
+  window.__adtReflowChapterProgress = {
+    blocks: chapterProgressBlocks,
+    at: chapterProgressAt
+  };
+
+  function chapterProgressText(pageIndex) {
+    var progress = chapterProgressAt(chapterProgressBlocks(), pageIndex);
+    if (progress) return progress;
+    return {
+      block: null,
+      page: pageIndex + 1,
+      pages: state.total,
+      long: "pág. " + (pageIndex + 1) + " de " + state.total,
+      short: (pageIndex + 1) + "/" + state.total,
+      minimal: (pageIndex + 1) + "/" + state.total,
+      spoken: "Página " + (pageIndex + 1) + " de " + state.total
+    };
+  }
+
   function updateControls(announce) {
     previousButton.disabled = state.current <= 0;
     nextButton.disabled = state.current >= state.total - 1;
-    currentOutput.textContent = String(state.current + 1);
-    totalOutput.textContent = String(state.total);
-    currentOutput.parentElement.setAttribute(
-      "aria-label",
-      "Página " + (state.current + 1) + " de " + state.total
-    );
+    var progress = chapterProgressText(state.current);
+    if (pageStatusLong && pageStatusLong.textContent !== progress.long) {
+      pageStatusLong.textContent = progress.long;
+    }
+    if (pageStatusShort && pageStatusShort.textContent !== progress.short) {
+      pageStatusShort.textContent = progress.short;
+    }
+    if (pageStatusMinimal && pageStatusMinimal.textContent !== progress.minimal) {
+      pageStatusMinimal.textContent = progress.minimal;
+    }
+    if (pageStatusOutput) {
+      pageStatusOutput.setAttribute("aria-label", progress.spoken);
+    }
     syncPrimaryToolbar();
     updateQuizPageBackground();
     updateBackMatterPageBackground();
@@ -1820,7 +1951,7 @@
     if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
 
     if (announce) {
-      announcer.textContent = "Página " + (state.current + 1) + " de " + state.total;
+      announcer.textContent = progress.spoken;
     }
   }
 
@@ -3230,7 +3361,9 @@
         '<span class="reflow-toolbar-label">Anterior</span>' +
       '</button>' +
       '<output id="reflow-page-status" aria-live="off" aria-label="Página 1 de 1">' +
-        '<span id="reflow-current-page">1</span> / <span id="reflow-total-pages">1</span>' +
+        '<span id="reflow-progress-long">pág. 1 de 1</span>' +
+        '<span id="reflow-progress-short">1/1</span>' +
+        '<span id="reflow-progress-minimal">1/1</span>' +
       '</output>' +
       '<button id="reflow-next" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Página siguiente" aria-keyshortcuts="ArrowRight PageDown">' +
@@ -3294,8 +3427,10 @@
 
     previousButton = document.getElementById("reflow-previous");
     nextButton = document.getElementById("reflow-next");
-    currentOutput = document.getElementById("reflow-current-page");
-    totalOutput = document.getElementById("reflow-total-pages");
+    pageStatusOutput = document.getElementById("reflow-page-status");
+    pageStatusLong = document.getElementById("reflow-progress-long");
+    pageStatusShort = document.getElementById("reflow-progress-short");
+    pageStatusMinimal = document.getElementById("reflow-progress-minimal");
     indexButton = document.getElementById("reflow-index");
     toolsButton = document.getElementById("reflow-tools");
     ttsPlayerPreviousButton = document.getElementById("reflow-tts-previous");

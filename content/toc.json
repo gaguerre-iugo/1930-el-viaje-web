@@ -4,35 +4,40 @@
     "href": "index.html#pg001_sec001",
     "title": "1930: El viaje",
     "chapter_id": "pg001_n0002",
-    "level": 1
+    "level": 1,
+    "group": "antes"
   },
   {
     "section_id": "pg009_sec001",
     "href": "index.html#pg009_sec001",
     "title": "La historia que nos une",
     "chapter_id": "pg009_n0002",
-    "level": 2
+    "level": 2,
+    "group": "antes"
   },
   {
     "section_id": "pg013_sec001",
     "href": "index.html#pg013_sec001",
     "title": "Una mezcla perfecta",
     "chapter_id": "pg013_n0002",
-    "level": 2
+    "level": 2,
+    "group": "antes"
   },
   {
     "section_id": "pg224_sec001",
     "href": "index.html#pg224_sec001",
     "title": "Sinopsis",
     "chapter_id": "pg224_n0002",
-    "level": 1
+    "level": 1,
+    "group": "antes"
   },
   {
     "section_id": "pg017_sec001",
     "href": "index.html#pg017_sec001",
     "title": "Hay algo extraño en esa foto",
     "chapter_id": "pg017_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "quiz_final",
@@ -45,7 +50,8 @@
     "href": "index.html#pg037_sec001",
     "title": "El Conte Verde debe zarpar",
     "chapter_id": "pg037_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz007",
@@ -58,7 +64,8 @@
     "href": "index.html#pg058059_sec001",
     "title": "Un secreto para Fede",
     "chapter_id": "pg058059_n0002",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz010",
@@ -71,7 +78,8 @@
     "href": "index.html#pg080081_sec001",
     "title": "Lo que esconde la caja fuerte",
     "chapter_id": "pg080081_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz013",
@@ -84,7 +92,8 @@
     "href": "index.html#pg104105_sec001",
     "title": "Una conspiración a bordo",
     "chapter_id": "pg104105_n0002",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz016",
@@ -97,7 +106,8 @@
     "href": "index.html#pg122123_sec001",
     "title": "Otra viajera del tiempo",
     "chapter_id": "pg122123_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz019",
@@ -110,7 +120,8 @@
     "href": "index.html#pg144145_sec001",
     "title": "Josephine está en peligro",
     "chapter_id": "pg144145_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz022",
@@ -123,7 +134,8 @@
     "href": "index.html#pg176177_sec001",
     "title": "Dos mundiales, un mismo destino",
     "chapter_id": "pg176177_n0003",
-    "level": 1
+    "level": 1,
+    "group": "chapter"
   },
   {
     "section_id": "qz025",
@@ -136,13 +148,15 @@
     "href": "index.html#pg215_sec001",
     "title": "Fin",
     "chapter_id": "pg215_n0023",
-    "level": 1
+    "level": 1,
+    "group": "sobre"
   },
   {
     "section_id": "pg221_sec001",
     "href": "index.html#pg221_sec001",
     "title": "Ana Solari",
     "chapter_id": "pg221_n0002",
-    "level": 1
+    "level": 1,
+    "group": "sobre"
   }
 ]
