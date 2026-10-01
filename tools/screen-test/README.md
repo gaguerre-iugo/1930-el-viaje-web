@@ -185,6 +185,10 @@ node verify-eva-icons.mjs
 # Interfaz con los íconos SVG de EVA (punto 19): barra, reproductor de voz y
 # encabezados de panel, todos de 24 × 24 y sin caracteres de texto.
 node verify-ui-icons.mjs --url http://127.0.0.1:5599/index.html
+
+# Tema claro de barra y reproductor (punto 18, etapa 1): superficies claras y
+# contraste WCAG medido (barra 17,73:1 · contador 4,83:1 · flechas 7,14:1).
+node verify-light-theme.mjs --url http://127.0.0.1:5599/index.html
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en
