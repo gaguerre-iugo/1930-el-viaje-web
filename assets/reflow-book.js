@@ -1224,7 +1224,30 @@
         enabled ? "true" : "false"
       );
     } catch (error) {}
+    /* El globo con la definición lo instala el reproductor sólo si su store
+       `glossaryMode` está encendido, así que la elección del lector se refleja
+       también ahí: si no, quedarían las palabras subrayadas y el clic muerto. */
+    try {
+      window.localStorage.setItem("glossaryMode", enabled ? "true" : "false");
+    } catch (error) {}
   }
+
+  /* El store `glossaryMode` se lee de localStorage al arrancar. Un perfil con el
+     valor viejo en "false" —de antes de esta revisión— dejaba las palabras
+     subrayadas por el valor por defecto del motor pero sin el globo con la
+     definición. Acá se alinea con la preferencia del lector antes de que el
+     reproductor lo lea. */
+  function primeGlossaryModeStorage() {
+    try {
+      var stored = readGlossaryHighlightPreference();
+      var wanted = stored === false ? "false" : "true";
+      if (window.localStorage.getItem("glossaryMode") !== wanted) {
+        window.localStorage.setItem("glossaryMode", wanted);
+      }
+    } catch (error) {}
+  }
+
+  primeGlossaryModeStorage();
 
   /* El switch del panel es del runtime: se le refleja el valor efectivo para que
      no muestre "apagado" mientras las palabras están subrayadas. */
@@ -1288,6 +1311,15 @@
       syncGlossaryHighlightSwitch();
       return function () {
         if (generation !== state.glossaryHighlightGeneration) return;
+        /* El efecto del reproductor se vuelve a ejecutar cada vez que cambian
+           sus dependencias. Si el lector quiere el subrayado encendido, limpiar
+           acá hacía parpadear las palabras (se iban y volvían). */
+        if (
+          window.__adtReflowGlossaryHighlightEffective &&
+          window.__adtReflowGlossaryHighlightEffective()
+        ) {
+          return;
+        }
         state.glossaryHighlightEnabled = false;
         state.glossaryEntries = null;
         clearReflowGlossaryHighlights();
@@ -2101,6 +2133,23 @@
   }
 
   window.__adtReflowRefreshPageStatus = writePageStatus;
+
+  /* Estado del subrayado del glosario, para diagnóstico en el navegador del
+     lector: `__adtReflowGlossaryState()` en la consola. */
+  window.__adtReflowGlossaryState = function () {
+    var stored = null;
+    try {
+      stored = window.localStorage.getItem("glossaryMode");
+    } catch (error) {}
+    return {
+      efectoEncendido: state.glossaryHighlightEnabled,
+      preferenciaDelLector: readGlossaryHighlightPreference(),
+      glossaryModePersistido: stored,
+      palabrasSubrayadas: content ? content.querySelectorAll(".glossary-term").length : 0,
+      paginaVisible: visiblePageIndex(),
+      totalPaginas: state.total
+    };
+  };
 
   function updateControls(announce) {
     previousButton.disabled = state.current <= 0;
@@ -5041,6 +5090,17 @@
       /* El switch del glosario es del runtime y se vuelve a pintar en cada
          renderizado: se le reafirma el valor efectivo en el mismo ciclo. */
       syncGlossaryHighlightSwitch();
+      /* Si algo externo borra las palabras mientras el subrayado está pedido, se
+         vuelve a aplicar en el acto: es lo que evita el "se va y vuelve". */
+      if (
+        state.glossaryHighlightEnabled &&
+        state.glossaryHighlightedCount > 0 &&
+        state.glossaryHighlightedPage === visiblePageIndex() &&
+        content &&
+        !content.querySelector(".glossary-term")
+      ) {
+        scheduleGlossaryPageHighlight();
+      }
 
       if (restricted && lastRestricted !== true && window.__adtReflowSetWordHighlight) {
         var wasWordHighlight = wordHighlightActive();

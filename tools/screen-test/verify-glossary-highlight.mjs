@@ -236,6 +236,75 @@ console.log(
 if (trasRecarga.visibles > 0) fail("con la preferencia apagada el resaltado volvió");
 await context.close();
 
+/* --------------- perfil con el modo glosario viejo guardado en "false" ------ */
+/* Es el caso real que reportó el lector: el subrayado andaba (lo pone el motor)
+   pero el globo no abría, porque el reproductor instala su escucha sólo si su
+   store `glossaryMode` está encendido y el valor persistido mandaba sobre el
+   valor por defecto. */
+const viejo = await browser.newContext({ viewport: { width: 1366, height: 900 } });
+await viejo.addInitScript(() => {
+  try {
+    localStorage.setItem("glossaryMode", "false");
+  } catch (error) {}
+});
+const paginaVieja = await viejo.newPage();
+paginaVieja.on("pageerror", (error) => consoleErrors.push(String(error)));
+await paginaVieja.goto(target, { waitUntil: "load" });
+await paginaVieja.waitForSelector("#reflow-next", { timeout: 30000 });
+await paginaVieja.waitForTimeout(4000);
+for (let paso = 0; paso < 10; paso += 1) {
+  const visible = await paginaVieja.evaluate(
+    () =>
+      [...document.querySelectorAll("#content .glossary-term")].filter((term) => {
+        const rect = term.getBoundingClientRect();
+        return rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth + 1;
+      }).length
+  );
+  if (visible > 0) break;
+  await paginaVieja.click("#reflow-next");
+  await paginaVieja.waitForTimeout(1000);
+}
+const conViejo = await paginaVieja.evaluate(async () => {
+  const term = [...document.querySelectorAll("#content .glossary-term")].find((candidato) => {
+    const rect = candidato.getBoundingClientRect();
+    return rect.width > 0 && rect.left >= 0 && rect.right <= window.innerWidth + 1;
+  });
+  const cantidades = new Set();
+  for (let i = 0; i < 16; i += 1) {
+    cantidades.add(document.querySelectorAll("#content .glossary-term").length);
+    await new Promise((resolve) => window.setTimeout(resolve, 300));
+  }
+  if (!term) return { palabras: 0, globo: false, cantidades: [...cantidades] };
+  term.scrollIntoView({ block: "center" });
+  const rect = term.getBoundingClientRect();
+  return {
+    palabras: document.querySelectorAll("#content .glossary-term").length,
+    x: rect.x + rect.width / 2,
+    y: rect.y + rect.height / 2,
+    cantidades: [...cantidades],
+  };
+});
+if (conViejo.x !== undefined) {
+  await paginaVieja.mouse.click(conViejo.x, conViejo.y);
+  await paginaVieja.waitForTimeout(1100);
+}
+const globoViejo = await paginaVieja.evaluate(() =>
+  [...document.querySelectorAll('[role="dialog"]')].some(
+    (dialogo) =>
+      dialogo.getClientRects().length &&
+      /definition|definici/i.test(dialogo.getAttribute("aria-label") || "")
+  )
+);
+console.log("\n=== Perfil con el modo glosario viejo en \"false\" ===");
+console.log(
+  `  palabras ${conViejo.palabras} · cantidades observadas ${conViejo.cantidades.join(", ")} · globo ${globoViejo}`
+);
+if (!globoViejo) fail("con el valor viejo en \"false\" el globo no abrió");
+if (conViejo.cantidades.length > 1) {
+  fail(`con el valor viejo el subrayado parpadea (${conViejo.cantidades.join(" → ")})`);
+}
+await viejo.close();
+
 await fs.mkdir(outDir, { recursive: true });
 console.log(`\nURL: ${target}`);
 console.log("consola:", consoleErrors.length ? consoleErrors.slice(0, 5) : "sin errores");
