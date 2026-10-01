@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <!-- Audio siguiente. Derivado del ícono de reproducir del set de EVA
+       (size=eva-icon-size-0-4.png): el mismo triángulo —(14, 14), (14, 86),
+       (85, 50) con esquinas redondeadas— reducido al 78 % para que entre la
+       barra, y una barra del grosor de las de pausa (8 sobre 100) separada por
+       el mismo espacio que usa el set. Se dibuja con stroke del mismo color y
+       stroke-linejoin="round" para redondear las esquinas como el original; el
+       trazado va encogido por el radio del trazo. -->
+  <path stroke="currentColor" stroke-width="2.64" stroke-linejoin="round" stroke-linecap="round"
+        d="M4.68 6.6v10.77L15.24 12Z"/>
+  <rect x="18.24" y="5.28" width="1.92" height="13.44" rx="0.4"/>
+</svg>

@@ -178,7 +178,7 @@ ya está hecho; son las piezas que faltan para cerrar los puntos abiertos.
 | Qué | Para qué punto | Estado |
 |---|---|---|
 | **Logo de Ceibal** | 21 · texto de carga | ✅ **Recibido y aplicado**: `assets/icons/ceibal-logo.png` (export @2x del SVG, fondo transparente) en el cargador, a 12 rem, con el texto debajo. Si llega el SVG original, reemplaza al PNG en la misma regla. |
-| **Íconos de EVA** | 18 · tema claro y 19 · íconos | ⏳ **Parcial**: llegaron menú, herramientas, cerrar, reproducir (dos variantes) y pausa. **Faltan detener, audio anterior y audio siguiente.** |
+| **Íconos de EVA** | 18 · tema claro y 19 · íconos | ⏳ **Casi completo**: llegaron menú, herramientas, cerrar, reproducir (dos variantes) y pausa. Los tres que faltaban —**detener, audio anterior y audio siguiente**— se generaron a partir de la pausa y de reproducir, con los mismos componentes, y se verifican con `verify-icons-generated.mjs`. Si Comunicación tiene los originales, reemplazan a los generados. |
 | **Chevrons de EVA** (si existen) | 19 | Opcional: hoy el «volver» de los paneles usa la flecha larga de EVA. Un chevron quedaría mejor en ese contexto. |
 
 Formatos útiles: **SVG** con `viewBox="0 0 24 24"`, trazo `currentColor` (así

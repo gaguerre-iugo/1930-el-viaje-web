@@ -176,6 +176,11 @@ node verify-opening.mjs --url http://127.0.0.1:5599/index.html
 # Jerarquía tipográfica de la interfaz (punto 24): N1 20/700, N2 17/700,
 # N3 17/400, N4 15/400, íconos de 24 px y negrita sólo en los títulos.
 node verify-ui-typography.mjs --url http://127.0.0.1:5599/index.html
+
+# Íconos generados para el reproductor (detener, audio anterior y siguiente):
+# que reproduzcan los componentes del set de EVA. Necesita la carpeta con los
+# originales de EVA en el escritorio (ver el script).
+node verify-icons-generated.mjs
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

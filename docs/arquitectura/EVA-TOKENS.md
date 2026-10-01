@@ -66,6 +66,20 @@ que es también la escala en la que se piden los que faltan:
 | `eva-arrow-right.svg` | flecha siguiente | derivada del export de EVA (`size=eva-icon-size-0-99.png`, 100 px) midiendo su geometría: caja 11–88 × 27–73, asta de 13 px, remates de la cabeza en (69, 33,5) y (69, 66,5), punta en (81,5, 50) |
 | `eva-arrow-left.svg` | flecha anterior | espejo exacto de la derecha |
 | `glossary-book.svg` | libro abierto con «Aa» | dibujado para el libro: no existe un ícono equivalente en el set de EVA. Sigue la propuesta del documento de revisión (libro abierto con «Aa» encima) |
+| `eva-stop.svg` | detener | **generado** a partir de la pausa del set (`…-0-41.png`): el mismo círculo —centro (50, 50), radio 35 sobre la grilla de 100— con un cuadrado calado del lado de las barras de pausa (34), en lugar de las dos barras |
+| `eva-next.svg` | audio siguiente | **generado** a partir de reproducir (`…-0-4.png`): el mismo triángulo reducido al 78 % para que entre la barra, más una barra del grosor de las de pausa (8) separada por el mismo espacio que usa el set |
+| `eva-prev.svg` | audio anterior | espejo exacto de `eva-next.svg`, como el par de flechas |
+
+### Verificación de los íconos generados
+
+`tools/screen-test/verify-icons-generated.mjs` rasteriza a 100 px y comprueba que
+los generados reproduzcan los componentes del set:
+
+- **detener**: caja 15–84 × 15–84, idéntica a la de pausa (70 × 70), y calado de
+  **34 px**, igual al alto de las barras de pausa;
+- **anterior** contra **siguiente** reflejado: **100 % de coincidencia** (espejo
+  exacto);
+- los tres centrados en la grilla y dentro de la caja óptica del set (11–89).
 
 ### Íconos pedidos al equipo (puntos 18 y 19)
 
