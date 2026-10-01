@@ -134,6 +134,39 @@ nada (14 en la segunda página), que el subrayado es `dotted` de 1 px en
 definición, que el switch dice «encendido», que al apagarlo no queda ninguna
 palabra subrayada y que la preferencia sobrevive a la recarga.
 
+### Correcciones posteriores (reportadas en uso)
+
+**1. El subrayado parpadeaba** («subraya punteado, se va, vuelve a puntear»). Con
+el modo glosario encendido, el reproductor volvía a aplicar su propio resaltado:
+su función de arranque limpiaba las palabras y envolvía **630 de una sola vez en
+todo el libro**, con su clase verde de fábrica, pisando el resaltado paginado del
+motor. Medido con un observador de mutaciones: había dos cambios de cantidad y a
+los 17 s aparecían 630 palabras del reproductor. Ese tramo ahora **delega en el
+motor** (parche blando: si un bundle no trae el marcador, el libro sigue
+cargando), y además la limpieza que el motor le devuelve al efecto del
+reproductor ya no borra las palabras mientras el subrayado esté pedido, con
+reaplicación inmediata si algo externo las borra. Después: una sola cantidad
+observada y 0 palabras del reproductor.
+
+**2. El globo no abría** (reportado ya sin parpadeo). No era el código: el store
+`glossaryMode` del reproductor se lee de `localStorage` al arrancar y el efecto
+que instala la escucha del clic **sale antes si está apagado**. Un perfil con el
+valor viejo en `false` dejaba las palabras subrayadas (por el valor por defecto
+del motor) y el clic muerto. Reproducido a voluntad:
+
+| `glossaryMode` | palabras subrayadas | globo |
+|---|---|---|
+| `false` | 14 | ninguno |
+| `true` | 14 | «Definition for trayecto» |
+
+Arreglo: al arrancar, el motor **alinea el valor persistido con la preferencia
+del lector** antes de que el reproductor lo lea (si nunca eligió, queda
+encendido), y al tocar el switch escribe las dos claves para que el subrayado y
+el globo no se separen. La suite incorpora ese caso como regresión: contexto con
+`glossaryMode` en `false`, donde exige globo abierto y cantidad estable (14
+palabras, una sola cantidad observada). Para diagnóstico en el navegador del
+lector queda `__adtReflowGlossaryState()` en la consola.
+
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 
 **Problema:** los botones del índice llevaban `focus:outline-none` en su clase:
