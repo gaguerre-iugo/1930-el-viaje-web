@@ -6442,3 +6442,150 @@ body.reflow-book #content#content section[data-section-type="boxed_text"] div:ha
     margin-top: 0 !important;
   }
 }
+
+/* ==========================================================================
+   Punto 18 · Tema claro de los paneles (etapa 2)
+   --------------------------------------------------------------------------
+   Los paneles los arma el runtime con utilidades de Tailwind, que se inyectan
+   después de este archivo; por eso acá sí hace falta !important. Los colores
+   salen de los tokens semánticos (--ui-*) y de la escala tipográfica N1–N4.
+   ========================================================================== */
+
+/* Superficie y textos base de cualquier panel del libro. */
+body.reflow-book .reflow-reader-panel,
+body.reflow-book .reflow-reader-panel[role="dialog"],
+body.reflow-book [role="dialog"].reflow-reader-panel {
+  color: var(--ui-text) !important;
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+
+/* El contenedor interno (el dock) y las pestañas no pintan fondo propio. */
+body.reflow-book .reflow-reader-panel > div,
+body.reflow-book .reflow-reader-panel [role="tabpanel"],
+body.reflow-book .reflow-reader-panel [role="tablist"] {
+  color: var(--ui-text) !important;
+  background: transparent !important;
+}
+
+/* N1 · título del panel. */
+body.reflow-book .reflow-panel-control-title,
+body.reflow-book .reflow-panel-native-title,
+body.reflow-book .reflow-panel-native-header > :is(h1, h2, h3, h4),
+body.reflow-book .reflow-reader-panel :is(h1, h2, h3, h4) {
+  color: var(--ui-n1-color) !important;
+}
+
+/* N2 · bloques con título dentro del panel (Leer, Escuchar, Pantalla). */
+body.reflow-book .reflow-reader-panel :is(h5, h6) {
+  color: var(--ui-n2-color) !important;
+}
+
+/* Encabezado del panel con su línea divisoria. */
+body.reflow-book .reflow-panel-control-header,
+body.reflow-book .reflow-panel-native-header {
+  color: var(--ui-text) !important;
+  border-bottom-color: var(--ui-border) !important;
+}
+
+/* N3 · filas, etiquetas y botones del panel. */
+body.reflow-book .reflow-reader-panel :is(button, label, li, legend, summary, dt, th) {
+  color: var(--ui-n3-color) !important;
+}
+
+/* N4 · descripciones, estados y ayudas. */
+body.reflow-book .reflow-reader-panel :is(p, small, dd, figcaption, .reflow-panel-hint) {
+  color: var(--ui-n4-color) !important;
+}
+
+/* Botones de panel: sin relleno, hover gris, selección institucional. */
+body.reflow-book .reflow-reader-panel button {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+body.reflow-book .reflow-reader-panel button:hover:not(:disabled) {
+  background: var(--ui-surface-hover) !important;
+}
+body.reflow-book .reflow-reader-panel button[aria-pressed="true"],
+body.reflow-book .reflow-reader-panel button[aria-selected="true"],
+body.reflow-book .reflow-reader-panel button[aria-expanded="true"],
+body.reflow-book .reflow-reader-panel [aria-current="true"] {
+  color: var(--ui-text-selected) !important;
+  background: var(--ui-surface-selected) !important;
+}
+body.reflow-book .reflow-reader-panel button:disabled {
+  color: var(--ui-disabled-text) !important;
+  background: var(--ui-disabled-surface) !important;
+}
+body.reflow-book .reflow-reader-panel :is(button, a, input, select, summary):focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ui-focus) !important;
+  outline-offset: 2px;
+}
+
+/* Controles de formulario del runtime (interruptores, casillas, selects). */
+body.reflow-book .reflow-reader-panel :is(input, select, textarea) {
+  color: var(--ui-text) !important;
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border-strong) !important;
+  accent-color: var(--ui-accent);
+}
+body.reflow-book .reflow-reader-panel :is(input, textarea)::placeholder {
+  color: var(--ui-text-muted) !important;
+}
+
+/* Enlaces, separadores y tarjetas internas. */
+body.reflow-book .reflow-reader-panel a {
+  color: var(--ui-accent) !important;
+}
+body.reflow-book .reflow-reader-panel :is(hr, [role="separator"]) {
+  border-color: var(--ui-border) !important;
+  background: var(--ui-border) !important;
+}
+body.reflow-book .reflow-reader-panel :is(section, article, form) {
+  border-color: var(--ui-border) !important;
+}
+
+/* El índice y el glosario comparten la superficie del panel. */
+body.reflow-book .reflow-reader-panel.reflow-glossary-panel,
+body.reflow-book .reflow-reader-panel.reflow-index-panel {
+  color: var(--ui-text) !important;
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+body.reflow-book .reflow-glossary-panel > div:first-child {
+  background: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button,
+body.reflow-book .reflow-index-group,
+body.reflow-book .reflow-index-page-button {
+  color: var(--ui-n3-color) !important;
+}
+
+/* Pestañas del panel (shadcn/radix: role=tab o data-state) y filas del índice y
+   del glosario: el runtime las pinta con texto blanco o grey-400, que sobre la
+   superficie clara queda invisible. */
+body.reflow-book .reflow-reader-panel :is([role="tablist"], .group\\/tabs-list) button,
+body.reflow-book .reflow-reader-panel [role="tab"],
+body.reflow-book .reflow-reader-panel [data-state] {
+  color: var(--ui-text) !important;
+  background: transparent !important;
+}
+body.reflow-book .reflow-reader-panel [role="tab"][aria-selected="true"],
+body.reflow-book .reflow-reader-panel [role="tab"][data-state="active"],
+body.reflow-book .reflow-reader-panel [role="tablist"] button[aria-selected="true"],
+body.reflow-book .reflow-reader-panel [data-state="active"] {
+  color: var(--ui-text-selected) !important;
+  background: var(--ui-surface-selected) !important;
+}
+body.reflow-book .reflow-reader-panel :is(nav, ul, ol) :is(li, li > *, a, li > * > *) {
+  color: var(--ui-n3-color) !important;
+}
+body.reflow-book .reflow-reader-panel :is(nav, ul, ol) :is(li > *, a, li > * > *):hover {
+  background: var(--ui-surface-hover) !important;
+}
+
+/* Resultados y estados dentro del panel (puntajes, avisos). */
+body.reflow-book .reflow-reader-panel :is([role="status"], [role="alert"]) {
+  color: var(--ui-text) !important;
+}

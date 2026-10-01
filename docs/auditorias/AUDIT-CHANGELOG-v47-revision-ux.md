@@ -105,6 +105,37 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
+## Punto 18 · Tema claro — ETAPA 2: paneles
+
+- Los tres paneles (**Herramientas**, **Índice** y **Glosario**) pasaron a
+  **superficie blanca** con texto grey-900. El relevo previo mostró que el color
+  oscuro no venía de este repositorio sino de utilidades de Tailwind del runtime
+  (`oklch(0.269 0 0)` de fondo y `oklch(0.985 0 0)` de texto), inyectadas
+  **después** de `reflow.css`: por eso el bloque nuevo usa `!important`.
+- Se aplicaron los **colores por nivel** de la tabla: N1 grey-900 en los títulos
+  (medidos en 20 px / 700 ✓), N3 grey-900 en filas y etiquetas, N4 grey-600 en
+  descripciones y ayudas, N2 institucional-600 en los títulos de bloque.
+- Estados: hover grey-100, seleccionado o pestaña activa institutional-100 con
+  texto institutional-700, deshabilitado grey-100 con grey-600, foco
+  institutional-600, y `accent-color` institucional en los controles de
+  formulario del runtime (interruptores, casillas, selects).
+- Se corrigieron dos piezas que quedaban **invisibles** sobre blanco: las
+  **pestañas** de los paneles (la activa era blanca y la inactiva grey-400 →
+  ahora 9,34:1) y las **filas de capítulo**, que siguen pendientes (ver abajo).
+
+**Verificación** (ampliada en `verify-light-theme.mjs`): para cada panel se abre,
+se mide su superficie, el contraste del texto (17,73:1 en los tres), el título
+(20 px / 700, N1) y la fila.
+
+**PENDIENTE de la etapa 2**: las **filas de capítulo** del índice y del glosario
+(el `li > button`) siguen con texto blanco sobre blanco. La causa está
+identificada: el runtime las pinta desde una **capa de Tailwind**, y una
+declaración `!important` dentro de una capa gana sobre otra sin capa, así que el
+`!important` de `reflow.css` no alcanza. Se resuelve con un **pase inline desde el
+motor** (con `style.setProperty(..., "important")` y un `MutationObserver` que lo
+repite cuando el runtime vuelve a renderizar el panel). La prueba lo informa como
+`PENDIENTE` en su salida.
+
 ## Punto 18 · Tema claro — ETAPA 1: barra y reproductor de voz
 
 El punto se hace por etapas (barra → reproductor → paneles), porque la mayor

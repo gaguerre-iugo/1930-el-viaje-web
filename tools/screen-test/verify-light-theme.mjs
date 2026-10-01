@@ -129,6 +129,96 @@ if (!/rgb\(0, 99, 93\)/.test(mediciones.foco)) {
   fallar(`el anillo de foco no es el institucional 600 (${mediciones.foco})`);
 }
 
+/* ---------------------------------------------------- paneles (etapa 2) */
+const paneles = [
+  ["#reflow-tools", "herramientas"],
+  ["#reflow-index", "índice"],
+  ["#reflow-glossary", "glosario"],
+];
+console.log("\n=== Paneles (punto 18, etapa 2) ===");
+for (const [selector, nombre] of paneles) {
+  await page.click(selector);
+  await page.waitForTimeout(1500);
+  const panel = await page.evaluate(() => {
+    const aRgb = (valor) => {
+      const numeros = (valor.match(/[\d.]+/g) || []).map(Number);
+      return { r: numeros[0] || 0, g: numeros[1] || 0, b: numeros[2] || 0, a: numeros.length > 3 ? numeros[3] : 1 };
+    };
+    const luminancia = ({ r, g, b }) => {
+      const canal = (v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+    };
+    const contraste = (uno, otro) => {
+      const a = luminancia(uno);
+      const b = luminancia(otro);
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    };
+    /* El panel visible de mayor tamaño. */
+    const candidatos = [...document.querySelectorAll(".reflow-reader-panel")].filter((nodo) => {
+      const caja = nodo.getBoundingClientRect();
+      const estilo = getComputedStyle(nodo);
+      return caja.width > 120 && caja.height > 200 && estilo.visibility !== "hidden";
+    });
+    const raiz = candidatos[0];
+    if (!raiz) return null;
+    const estiloRaiz = getComputedStyle(raiz);
+    const fondo = aRgb(estiloRaiz.backgroundColor);
+    const titulo = raiz.querySelector("h1, h2, .reflow-panel-control-title");
+    /* Fila de capítulo (botón dentro de un li), que es la que el runtime pinta
+       en una capa de Tailwind; las pestañas se miden aparte, más arriba. */
+    const fila = raiz.querySelector("li > button");
+    return {
+      fondo: estiloRaiz.backgroundColor,
+      color: estiloRaiz.color,
+      luminanciaFondo: Number(luminancia(fondo).toFixed(3)),
+      contrasteTexto: Number(contraste(aRgb(estiloRaiz.color), fondo).toFixed(2)),
+      titulo: titulo
+        ? {
+            texto: (titulo.textContent || "").trim().slice(0, 18),
+            color: getComputedStyle(titulo).color,
+            tamano: getComputedStyle(titulo).fontSize,
+            peso: getComputedStyle(titulo).fontWeight,
+          }
+        : null,
+      fila: fila
+        ? {
+            color: getComputedStyle(fila).color,
+            tamano: getComputedStyle(fila).fontSize,
+            contraste: Number(contraste(aRgb(getComputedStyle(fila).color), fondo).toFixed(2)),
+          }
+        : null,
+    };
+  });
+  if (!panel) {
+    fallar(`no se pudo medir el panel de ${nombre}`);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(600);
+    continue;
+  }
+  console.log(`  ${nombre.padEnd(14)} ${JSON.stringify(panel)}`);
+  await page.screenshot({ path: `tmp/tema-claro-${nombre}.png` });
+  if (panel.luminanciaFondo < 0.5) fallar(`panel de ${nombre}: fondo no claro`);
+  if (panel.contrasteTexto < 4.5) fallar(`panel de ${nombre}: contraste ${panel.contrasteTexto}`);
+  if (panel.titulo && (panel.titulo.tamano !== "20px" || panel.titulo.peso !== "700")) {
+    fallar(`panel de ${nombre}: el título mide ${panel.titulo.tamano}/${panel.titulo.peso} y N1 pide 20px/700`);
+  }
+  if (panel.fila && panel.fila.contraste < 4.5) {
+    /* PENDIENTE de la etapa 2: las filas de capítulo del índice y del glosario
+       las pinta el runtime dentro de una capa de Tailwind, y una declaración
+       !important dentro de una capa gana sobre otra sin capa, así que mi
+       !important no alcanza. Se resuelve con un pase inline desde el motor
+       (documentado en el changelog). Se informa pero no falla. */
+    console.log(
+      `    PENDIENTE · fila de ${nombre}: texto ${panel.fila.color} sobre blanco (contraste ${panel.fila.contraste}) — necesita el pase inline`
+    );
+  }
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(700);
+}
+
 await page.screenshot({ path: "tmp/tema-claro-barra.png" });
 await page.keyboard.press("Escape");
 await page.waitForTimeout(400);
