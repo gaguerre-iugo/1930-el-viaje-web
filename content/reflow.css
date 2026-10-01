@@ -123,20 +123,30 @@
   left: 0;
   z-index: 1000;
   transform: translateY(-120%);
-  margin: 0.5rem;
+  /* Sin margen ni sombra en reposo: eran los que dejaban ver un filo oscuro en
+     el borde superior al abrir el libro (punto 22). Sigue siendo enfocable con
+     el teclado, así que no se usa `visibility: hidden`. */
+  margin: 0;
   padding: 0.75rem 1rem;
   background: var(--ceibal-institutional-600);
   color: #ffffff;
   font-weight: 700;
   text-decoration: none;
   border-radius: 0.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-  transition: transform 0.15s ease-in-out;
+  box-shadow: none;
+  opacity: 0;
+  /* Sin transición a propósito: el motor consume muchos cuadros al paginar y la
+     animación dejaba el enlace a mitad de camino justo cuando el lector lo
+     enfoca con el teclado. Aparece de golpe, que es lo que se espera. */
+  transition: none;
 }
 
 .reflow-skip-link:focus,
 .reflow-skip-link:focus-visible {
   transform: translateY(0);
+  margin: 0.5rem;
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
   outline: 3px solid var(--ceibal-institutional-400);
   outline-offset: 2px;
 }
@@ -1652,10 +1662,27 @@ body.reflow-book [aria-label="dock-label"]:has(button[title="Enviar"]) {
   z-index: 70;
   inset: 0;
   display: grid;
+  grid-auto-flow: row;
   place-items: center;
-  color: #111827;
+  gap: 1rem;
+  color: var(--ceibal-institutional-600);
   background: #fff;
-  font-size: 1rem;
+  font-size: var(--ui-n2-size);
+  font-weight: var(--ui-weight-bold);
+}
+
+/* Hueco del logo institucional (punto 21). Sin archivo no ocupa lugar. */
+#reflow-loading .reflow-loading-logo {
+  display: block;
+  width: 9rem;
+  height: 3rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+#reflow-loading .reflow-loading-logo:empty {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

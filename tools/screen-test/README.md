@@ -167,6 +167,15 @@ node verify-quiz-answers.mjs --url http://127.0.0.1:5599/index.html
 # oculta, la incorrecta que sigue marcada al reintentar, «Siguiente pregunta» y
 # cierre de la secuencia al responder las tres.
 node verify-quiz-retry.mjs --url http://127.0.0.1:5599/index.html
+
+# Apertura (puntos 21 y 22): texto de carga «Abriendo 1930: El viaje…» y el
+# enlace «saltar al contenido» invisible en reposo (sin el filo de su sombra)
+# pero visible al enfocarlo con el teclado.
+node verify-opening.mjs --url http://127.0.0.1:5599/index.html
+
+# Jerarquía tipográfica de la interfaz (punto 24): N1 20/700, N2 17/700,
+# N3 17/400, N4 15/400, íconos de 24 px y negrita sólo en los títulos.
+node verify-ui-typography.mjs --url http://127.0.0.1:5599/index.html
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

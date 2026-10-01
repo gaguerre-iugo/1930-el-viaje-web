@@ -12124,7 +12124,17 @@
     var loading = document.createElement("div");
     loading.id = "reflow-loading";
     loading.setAttribute("role", "status");
-    loading.textContent = "Preparando el libro reflowable…";
+    /* El logo institucional entra en este hueco cuando esté el SVG oficial:
+       `#reflow-loading .reflow-loading-logo` en content/reflow.css. Mientras no
+       haya archivo, el hueco no ocupa lugar (ver `:empty`). */
+    var loadingLogo = document.createElement("span");
+    loadingLogo.className = "reflow-loading-logo";
+    loadingLogo.setAttribute("aria-hidden", "true");
+    var loadingText = document.createElement("span");
+    loadingText.className = "reflow-loading-text";
+    loadingText.textContent = "Abriendo 1930: El viaje…";
+    loading.appendChild(loadingLogo);
+    loading.appendChild(loadingText);
     document.body.appendChild(loading);
 
     try {

@@ -105,6 +105,36 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
+## Puntos 21 y 22 · Apertura — RESUELTOS
+
+**Punto 21 · Texto de carga**
+
+- «Preparando el libro reflowable…» → «**Abriendo 1930: El viaje…**», con
+  `role="status"`, en institucional-600 y con N2 (17 px / 700) de la escala del
+  punto 24.
+- El cargador quedó estructurado con un **hueco para el logo de Ceibal**
+  (`#reflow-loading .reflow-loading-logo`), que no ocupa lugar mientras esté
+  vacío. **Falta el SVG oficial**: no hay ninguno en el repositorio. Cuando
+  llegue, se aplica como `background-image` en esa regla, sin tocar JavaScript.
+- El mensaje de error del cargador («No fue posible preparar el libro
+  reflowable.») sigue con `role="alert"`.
+
+**Punto 22 · Nada debe asomar en la apertura**
+
+- El enlace «Saltar al contenido principal» dejaba ver un **filo oscuro** en el
+  borde superior: su `box-shadow` y su `margin: .5rem` asomaban aunque estuviera
+  desplazado hacia arriba. Ahora en reposo va sin margen, sin sombra y con
+  opacidad 0 —sigue siendo enfocable, no se usa `visibility: hidden`— y al
+  enfocarlo aparece completo con su contorno.
+- **Sin transición a propósito**: el motor consume cuadros mientras pagina y la
+  animación dejaba el enlace a mitad de camino justo al enfocarlo. Ahora aparece
+  de golpe, que es lo que el lector espera al tabular.
+
+**Verificación**: `tools/screen-test/verify-opening.mjs` (nuevo) mira el cargador
+apenas arranca la navegación (texto exacto y `role`) y comprueba que el enlace no
+se vea en reposo —opacidad 0, sin sombra, fuera de pantalla— y que sí se vea, con
+contorno, al enfocarlo con el teclado.
+
 ## Punto 24 · Jerarquía tipográfica de la interfaz — RESUELTO
 
 Cuatro niveles, con los nombres del sistema de EVA y los valores de la tabla del
