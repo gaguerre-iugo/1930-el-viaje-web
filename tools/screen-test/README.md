@@ -180,7 +180,11 @@ node verify-ui-typography.mjs --url http://127.0.0.1:5599/index.html
 # Íconos generados para el reproductor (detener, audio anterior y siguiente):
 # que reproduzcan los componentes del set de EVA. Necesita la carpeta con los
 # originales de EVA en el escritorio (ver el script).
-node verify-icons-generated.mjs
+node verify-eva-icons.mjs
+
+# Interfaz con los íconos SVG de EVA (punto 19): barra, reproductor de voz y
+# encabezados de panel, todos de 24 × 24 y sin caracteres de texto.
+node verify-ui-icons.mjs --url http://127.0.0.1:5599/index.html
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

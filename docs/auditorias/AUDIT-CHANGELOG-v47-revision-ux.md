@@ -105,6 +105,37 @@ hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar
 la recarga. El precargador offline se regeneró con el catálogo nuevo.
 
+## Punto 19 · Íconos SVG de EVA en la interfaz — RESUELTO
+
+- **Los cinco que llegaron como PNG** (menú, engranaje, cerrar, reproducir y
+  pausa) se convirtieron a SVG trazando su geometría con
+  `tools/trace_eva_icons.py`: potracer sobre el export de 100 px, normalizado al
+  `viewBox` de 24 que usa la interfaz. Medido contra su PNG de origen, la
+  coincidencia va del **97,5 % al 98,8 %**.
+  - Dato del trazador: potracer toma como figura los valores **bajos** de la
+    máscara, así que el alfa va invertido. Con la máscara directa la coincidencia
+    era del 0,4 %.
+- **Los tres que faltaban** (detener, audio anterior y siguiente) ya se habían
+  generado a partir de pausa y reproducir, y están verificados aparte.
+- El motor **embebe los ocho trazados** en un bloque delimitado por marcadores
+  (`/* eva-icons:start … end */`) que reescribe
+  `tools/trace_eva_icons.py --inyectar`: regenerar un ícono no exige editar
+  código a mano.
+- Se reemplazaron **todos los caracteres** de ícono: barra (`☰`, `⚙`),
+  reproductor de voz (`⏮`, `▶`, `⏭`, `⚙`, `■` y el `❚❚` de pausa) y encabezados
+  de panel (`←`, `×`). No queda ninguno en el marcado.
+- El botón de reproducir **cambia al ícono de pausa** al encender la lectura
+  (antes cambiaba a un `❚❚` de texto).
+- Los SVG miden **24 px** en todos los contextos (`--ui-icon-size`, punto 24) y
+  heredan `currentColor`, que es lo que va a permitir el tema claro del punto 18.
+
+**Verificación**: `tools/screen-test/verify-ui-icons.mjs` (nuevo) comprueba que
+los nueve controles de barra y reproductor usen SVG de 24 × 24 —el reproductor
+vive oculto hasta que hay sesión, así que ahí vale el tamaño calculado— y que no
+queden caracteres; además exige que el trazado de pausa sea distinto del de
+reproducir y que el botón arranque con el de reproducir.
+`tools/screen-test/verify-eva-icons.mjs` cubre los ocho contra el set de EVA.
+
 ## Puntos 21 y 22 · Apertura — RESUELTOS
 
 **Punto 21 · Texto de carga**

@@ -3283,7 +3283,7 @@
     setAttributeIfChanged(ttsPlayerToggleButton, "aria-pressed", playing);
     var playIcon = ttsPlayerToggleButton.querySelector(".reflow-tts-player-icon");
     var playText = ttsPlayerToggleButton.querySelector(".reflow-tts-player-label");
-    if (playIcon) playIcon.textContent = playing ? "❚❚" : "▶";
+    if (playIcon) playIcon.innerHTML = playing ? uiIconFilled("pause") : uiIconFilled("play");
     if (playText) playText.textContent = playLabel;
 
     var api = window.__adtReflowAudio;
@@ -3577,6 +3577,39 @@
     'stroke="currentColor" stroke-width="3.2" stroke-linecap="round" ' +
     'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
     '<path d="M19.8 12H7.1"/><path d="M7.44 8.04 4.44 12l3 3.96"/></svg>';
+
+  /* eva-icons:start — bloque generado por tools/trace_eva_icons.py --inyectar.
+     No editar a mano: los trazados salen de los SVG de assets/icons/ y se
+     verifican con tools/screen-test/verify-eva-icons.mjs. */
+  var uiFilledIcons = {
+    menu:
+      "M3.037 20.441 C2.484 19.830 2.542 19.056 3.173 18.614 C3.631 18.293 4.888 18.240 12.053 18.240 C20.080 18.240 20.418 18.258 20.880 18.720 C21.509 19.349 21.489 20.043 20.827 20.506 C20.368 20.827 19.105 20.880 11.864 20.880 C4.002 20.880 3.408 20.850 3.037 20.441 Z M3.120 12.960 C2.491 12.331 2.511 11.637 3.173 11.174 C3.632 10.853 4.895 10.800 12.136 10.800 C19.998 10.800 20.592 10.830 20.963 11.239 C21.516 11.850 21.458 12.624 20.827 13.066 C20.369 13.387 19.112 13.440 11.947 13.440 C3.920 13.440 3.582 13.422 3.120 12.960 Z M2.890 5.299 C2.529 4.625 2.580 4.208 3.079 3.757 C3.470 3.403 4.447 3.360 12.042 3.360 C20.303 3.360 20.579 3.375 21.007 3.847 C21.356 4.233 21.400 4.470 21.218 4.987 L20.989 5.640 L12.064 5.703 C3.434 5.764 3.132 5.750 2.890 5.299 Z",
+    gear:
+      "M10.859 21.060 C10.727 20.895 10.551 20.544 10.468 20.280 C10.371 19.972 9.804 19.603 8.886 19.250 C7.534 18.731 7.420 18.722 6.849 19.096 C6.259 19.483 6.223 19.471 5.376 18.624 C4.523 17.771 4.515 17.745 4.912 17.138 C5.300 16.546 5.290 16.456 4.663 14.980 C4.218 13.934 3.875 13.440 3.593 13.440 C2.944 13.440 2.602 12.836 2.685 11.837 C2.747 11.083 2.888 10.863 3.480 10.601 C4.029 10.357 4.330 9.946 4.750 8.868 C5.269 7.533 5.278 7.420 4.904 6.849 C4.517 6.259 4.529 6.223 5.376 5.376 C6.229 4.523 6.255 4.515 6.862 4.912 C7.454 5.300 7.544 5.290 9.020 4.663 C10.066 4.218 10.560 3.875 10.560 3.593 C10.560 2.944 11.164 2.602 12.163 2.685 C12.917 2.747 13.137 2.888 13.399 3.480 C13.643 4.029 14.054 4.330 15.132 4.750 C16.467 5.269 16.580 5.278 17.151 4.904 C17.741 4.517 17.777 4.529 18.624 5.376 C19.477 6.229 19.485 6.255 19.088 6.862 C18.700 7.454 18.710 7.544 19.337 9.020 C19.782 10.066 20.125 10.560 20.407 10.560 C21.056 10.560 21.398 11.164 21.315 12.163 C21.253 12.917 21.112 13.137 20.520 13.399 C19.971 13.643 19.670 14.054 19.250 15.132 C18.731 16.467 18.722 16.580 19.096 17.151 C19.483 17.741 19.471 17.777 18.624 18.624 C17.771 19.477 17.745 19.485 17.138 19.088 C16.546 18.700 16.456 18.710 14.980 19.337 C13.973 19.765 13.440 20.129 13.440 20.388 C13.440 20.606 13.310 20.914 13.152 21.072 C12.773 21.451 11.165 21.443 10.859 21.060 Z M14.107 15.316 C15.250 14.613 15.921 13.164 15.780 11.700 C15.581 9.634 13.986 8.160 11.949 8.160 C9.390 8.160 7.655 10.119 8.026 12.590 C8.442 15.364 11.673 16.812 14.107 15.316 Z",
+    close:
+      "M5.946 18.826 C5.172 18.406 4.800 17.788 4.800 16.920 C4.800 15.982 5.168 15.409 6.921 13.620 L8.507 12.000 L6.921 10.380 C5.172 8.594 4.800 8.017 4.800 7.087 C4.800 5.726 6.277 4.582 7.615 4.907 C7.981 4.996 9.114 5.894 10.134 6.903 L11.988 8.737 L14.005 6.768 C16.170 4.655 16.651 4.462 18.005 5.162 C18.880 5.615 19.200 6.198 19.200 7.340 C19.200 8.137 18.996 8.433 17.267 10.136 L15.335 12.040 L16.916 13.490 C18.537 14.975 19.200 15.929 19.200 16.777 C19.200 17.588 18.660 18.499 17.965 18.858 C16.697 19.514 16.203 19.316 14.003 17.273 L11.928 15.345 L9.953 17.273 C7.831 19.344 7.288 19.554 5.946 18.826 Z",
+    play:
+      "M4.629 20.215 C3.493 19.327 3.359 18.457 3.374 12.068 C3.383 8.110 3.483 5.847 3.674 5.302 C4.041 4.252 5.060 3.497 6.061 3.532 C6.529 3.549 9.397 4.806 13.244 6.681 C20.224 10.083 20.400 10.219 20.400 12.196 C20.400 13.817 19.863 14.211 13.110 17.551 C6.547 20.796 5.710 21.059 4.629 20.215 Z",
+    pause:
+      "M9.669 20.066 C7.188 19.256 5.446 17.719 4.344 15.371 C3.825 14.264 3.720 13.696 3.720 11.995 C3.720 10.171 3.805 9.778 4.502 8.361 C5.413 6.511 6.714 5.242 8.611 4.352 C9.737 3.825 10.297 3.720 12.000 3.720 C13.703 3.720 14.263 3.825 15.389 4.352 C17.286 5.242 18.587 6.511 19.498 8.361 C20.195 9.778 20.280 10.171 20.280 11.995 C20.280 13.703 20.176 14.262 19.648 15.389 C18.254 18.360 15.605 20.164 12.413 20.315 C11.369 20.364 10.278 20.265 9.669 20.066 Z M11.129 15.540 C11.317 14.838 11.317 9.162 11.129 8.460 C10.924 7.697 9.716 7.697 9.511 8.460 C9.323 9.162 9.323 14.838 9.511 15.540 C9.617 15.935 9.834 16.080 10.320 16.080 C10.806 16.080 11.023 15.935 11.129 15.540 Z M14.489 15.540 C14.677 14.838 14.677 9.162 14.489 8.460 C14.284 7.697 13.076 7.697 12.871 8.460 C12.683 9.162 12.683 14.838 12.871 15.540 C12.977 15.935 13.194 16.080 13.680 16.080 C14.166 16.080 14.383 15.935 14.489 15.540 Z",
+    stop:
+      "M12 3.6a8.4 8.4 0 1 0 0 16.8 8.4 8.4 0 0 0 0-16.8Zm-4.08 4.32h8.16v8.16H7.92Z",
+    prev:
+      "M20.64 5.28 L7.44 12 L20.64 18.72 Z M3.84 5.28 H5.76 V18.72 H3.84 Z",
+    next:
+      "M3.36 5.28 L16.56 12 L3.36 18.72 Z M18.24 5.28 H20.16 V18.72 H18.24 Z",
+  };
+  function uiIconFilled(name) {
+    var path = uiFilledIcons[name] || "";
+    return (
+      '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="currentColor" ' +
+      'aria-hidden="true" focusable="false">' +
+      '<path fill-rule="evenodd" d="' + path + '"/></svg>'
+    );
+  }
+  /* Para la verificación automatizada (verify-ui-icons.mjs). */
+  window.__adtReflowIconPaths = uiFilledIcons;
+/* eva-icons:end */
   var uiIconGlossary =
     '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
     'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" ' +
@@ -3597,7 +3630,7 @@
     pagination.innerHTML =
       '<button id="reflow-index" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Índice" aria-haspopup="dialog" aria-expanded="false">' +
-        '<span class="reflow-toolbar-icon" aria-hidden="true">☰</span>' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconFilled("menu") + '</span>' +
         '<span class="reflow-toolbar-label">Índice</span>' +
       '</button>' +
       '<button id="reflow-previous" class="reflow-toolbar-action reflow-toolbar-primary" type="button" ' +
@@ -3623,7 +3656,7 @@
       '</button>' +
       '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
-        '<span class="reflow-toolbar-icon" aria-hidden="true">⚙</span>' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconFilled("gear") + '</span>' +
         '<span class="reflow-toolbar-label">Herramientas</span>' +
       '</button>';
 
@@ -3635,24 +3668,24 @@
     ttsPlayer.hidden = true;
     ttsPlayer.innerHTML =
       '<button id="reflow-tts-previous" type="button" aria-label="Audio anterior">' +
-        '<span class="reflow-tts-player-icon" aria-hidden="true">⏮</span>' +
+        uiIconFilled("prev") +
         '<span class="reflow-tts-player-label">Anterior</span>' +
       '</button>' +
       '<button id="reflow-tts-toggle" type="button" aria-label="Reproducir" aria-pressed="false">' +
-        '<span class="reflow-tts-player-icon" aria-hidden="true">▶</span>' +
+        uiIconFilled("play") +
         '<span class="reflow-tts-player-label">Reproducir</span>' +
       '</button>' +
       '<button id="reflow-tts-next" type="button" aria-label="Audio siguiente">' +
-        '<span class="reflow-tts-player-icon" aria-hidden="true">⏭</span>' +
+        uiIconFilled("next") +
         '<span class="reflow-tts-player-label">Siguiente</span>' +
       '</button>' +
       '<button id="reflow-tts-settings" type="button" aria-label="Voz y velocidad" ' +
         'aria-haspopup="dialog" aria-expanded="false">' +
-        '<span class="reflow-tts-player-icon" aria-hidden="true">⚙</span>' +
+        uiIconFilled("gear") +
         '<span class="reflow-tts-player-label">Voz y velocidad</span>' +
       '</button>' +
       '<button id="reflow-tts-stop" type="button" aria-label="Detener">' +
-        '<span class="reflow-tts-player-icon" aria-hidden="true">■</span>' +
+        uiIconFilled("stop") +
         '<span class="reflow-tts-player-label">Detener</span>' +
       '</button>';
 
@@ -5396,11 +5429,11 @@
         header.innerHTML =
           (isGlossary
             ? '<button type="button" class="reflow-panel-back" aria-label="Volver a Herramientas">' +
-                '<span aria-hidden="true">←</span><span>Herramientas</span></button>'
+                '<span aria-hidden="true">' + uiIconArrowLeft + '</span><span>Herramientas</span></button>'
             : "") +
           '<h2 class="reflow-panel-control-title"></h2>' +
           '<button type="button" class="reflow-panel-close" aria-keyshortcuts="Escape">' +
-            '<span aria-hidden="true">×</span><span class="sr-only">Cerrar</span></button>';
+            '<span aria-hidden="true">' + uiIconFilled("close") + '</span><span class="sr-only">Cerrar</span></button>';
         var title = header.querySelector(".reflow-panel-control-title");
         title.id = "reflow-panel-title-" + (isNavigation ? "index" : isGlossary ? "glossary" : "tools");
         title.textContent = label;

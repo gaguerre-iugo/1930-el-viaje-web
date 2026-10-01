@@ -73,6 +73,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── extract_quiz_answers.py    ← Clave de corrección fuera del HTML
 │   ├── standardize_quiz_feedback.py ← Devoluciones de las actividades unificadas
 │   ├── inventory_interface_texts.py ← Textos de interfaz y voseo
+│   ├── trace_eva_icons.py         ← PNG del set de EVA a SVG embebido
 │   ├── complete_pages_index.py    ← Completa el índice con lo que el libro monta
 │   ├── validate_paragraph_geometry.py ← Validación geométrica de párrafos
 │   ├── add_chapter_quizzes.py     ← Generador de cuestionarios

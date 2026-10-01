@@ -1290,11 +1290,13 @@ body.reflow-book .tts-image-highlight-overlay {
 }
 
 /* Los íconos SVG heredan el color del botón y miden 24 px (punto 24). */
-#reflow-pagination .reflow-toolbar-svg {
+/* Los íconos SVG de la interfaz (barra, reproductor de voz y encabezados de
+   panel) miden 24 px (punto 24). */
+body.reflow-book .reflow-toolbar-svg {
   display: block;
   flex: 0 0 auto;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--ui-icon-size);
+  height: var(--ui-icon-size);
 }
 
 #reflow-pagination .reflow-toolbar-label {

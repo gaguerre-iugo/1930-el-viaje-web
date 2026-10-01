@@ -186,10 +186,31 @@ for (const [nombre, t] of [
   }
 }
 
+/* 4 · íconos trazados: coincidencia con su PNG de origen del set */
+console.log("\níconos trazados del set:");
+const trazados = [
+  ["eva-menu.svg", "size=eva-icon-size-0-112.png"],
+  ["eva-gear.svg", "size=eva-icon-size-0-91.png"],
+  ["eva-close.svg", "size=eva-icon-size-0-2.png"],
+  ["eva-play.svg", "size=eva-icon-size-0-4.png"],
+  ["eva-pause.svg", "size=eva-icon-size-0-41.png"],
+];
+for (const [svg, fuente] of trazados) {
+  const generado = await trama(svg, { svg: true });
+  const original = await trama(fuente);
+  const coincidencia = iou(generado.bits, original.bits);
+  console.log(
+    `  ${svg.padEnd(16)} contra ${fuente.padEnd(28)} ${(coincidencia * 100).toFixed(1)} %`
+  );
+  if (coincidencia < 0.9) {
+    fallar(`${svg} no reproduce ${fuente} (${(coincidencia * 100).toFixed(1)} %)`);
+  }
+}
+
 console.log(
   fallas.length
     ? `FALLAS:\n - ${fallas.join("\n - ")}`
-    : "OK: los tres íconos generados reproducen los componentes del set de EVA"
+    : "OK: los íconos derivados del set de EVA reproducen sus originales"
 );
 await browser.close();
 process.exit(fallas.length ? 1 : 0);
