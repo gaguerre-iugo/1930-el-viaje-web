@@ -107,11 +107,14 @@ altavoz (botón «Voz y velocidad») y lupa (buscador del glosario).
 
 ### Logo de Ceibal
 
-`assets/icons/ceibal-logo.png` es el export a @2x de `logotipo-ceibal-color.svg`
-(380 × 127, relación 2,99, fondo transparente). El cargador lo muestra a 12 rem de
-ancho —su tamaño 1x— con el texto «Abriendo 1930: El viaje…» debajo. Está declarado
-en `imsmanifest.xml` porque el CSS lo referencia. Si más adelante llega el SVG
-original, reemplaza al PNG en la misma regla.
+`assets/icons/ceibal-logo.svg` es el **original vectorial** (`logotipo-ceibal-color.svg`):
+`viewBox="0 0 190 64"`, siete trazados, el símbolo en el institucional-400
+`#00A096` y la palabra en negro. El cargador lo muestra a 12 rem de ancho —su
+tamaño natural— con el texto «Abriendo 1930: El viaje…» debajo. Está declarado en
+`imsmanifest.xml` porque el CSS lo referencia.
+
+Antes se usó el export a @2x en PNG (380 × 127); el SVG lo reemplazó y el PNG se
+retiró del repositorio.
 
 ### Verificación de la flecha
 

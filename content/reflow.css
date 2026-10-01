@@ -1672,14 +1672,14 @@ body.reflow-book [aria-label="dock-label"]:has(button[title="Enviar"]) {
   font-weight: var(--ui-weight-bold);
 }
 
-/* Logo institucional en el cargador (punto 21). El archivo es el export de
-   `logotipo-ceibal-color.svg` a @2x (380 × 127, relación 2,99), así que se
-   muestra a 12 rem de ancho para que quede nítido: es su tamaño 1x. */
+/* Logo institucional en el cargador (punto 21). Es el SVG original
+   (`logotipo-ceibal-color.svg`), que mide 190 × 64: se muestra a 12 rem de ancho,
+   su tamaño natural, así queda nítido en cualquier pantalla. */
 #reflow-loading .reflow-loading-logo {
   display: block;
   width: 12rem;
   height: 4rem;
-  background-image: url("../assets/icons/ceibal-logo.png");
+  background-image: url("../assets/icons/ceibal-logo.svg");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
