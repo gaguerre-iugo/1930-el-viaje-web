@@ -162,6 +162,11 @@ node verify-icons.mjs
 # archivo content/i18n/es-UY/quiz-answers.json cubra las 14 actividades y que el
 # motor reproduzca esa clave en el DOM (72 opciones) corrigiendo bien y mal.
 node verify-quiz-answers.mjs --url http://127.0.0.1:5599/index.html
+
+# Actividades (puntos 15 y 17): kicker «Pregunta N de 3» visible, dimensión
+# oculta, la incorrecta que sigue marcada al reintentar, «Siguiente pregunta» y
+# cierre de la secuencia al responder las tres.
+node verify-quiz-retry.mjs --url http://127.0.0.1:5599/index.html
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

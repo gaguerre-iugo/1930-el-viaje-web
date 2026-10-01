@@ -2181,7 +2181,9 @@ body.reflow-book #content .quiz-confetti > i:nth-child(4n) {
   }
 }
 
-body.reflow-book #content .quiz-kicker,
+/* La dimensión de lectura (recuperación / interpretación / reflexión) queda
+   oculta: es información para el equipo, no para el lector. El kicker
+   («Comprensión lectora · Pregunta 1 de 3») sí se muestra (punto 17). */
 body.reflow-book #content .quiz-dimension {
   display: none !important;
 }
@@ -2200,12 +2202,59 @@ body.reflow-book #content .quiz-dimension {
   font-weight: 700;
 }
 
+/* Cierre de la secuencia de tres preguntas y salto a la siguiente (puntos 15
+   y 17). El cierre aparece cuando las tres quedaron respondidas y avisa que las
+   que quedaron mal se pueden reintentar. */
+body.reflow-book .quiz-next-question {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: .375rem;
+  margin-top: .75rem;
+  padding: .5rem 1rem;
+  border: 0;
+  border-radius: var(--ceibal-radius-md);
+  color: #fff;
+  background: var(--ceibal-institutional-600);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
+}
+
+body.reflow-book .quiz-next-question:hover {
+  background: var(--ceibal-institutional-700);
+}
+
+body.reflow-book .quiz-next-question:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-light);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+
+body.reflow-book .quiz-sequence-closing {
+  margin: 1rem 0 0;
+  padding: .75rem 1rem;
+  border-left: 4px solid var(--ceibal-institutional-500);
+  border-radius: var(--ceibal-radius-md);
+  color: var(--ceibal-gray-700);
+  background: rgb(0 99 93 / 6%);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+body.reflow-book .quiz-sequence-closing .quiz-sequence-closing-note {
+  display: block;
+  margin-top: .25rem;
+  font-weight: 400;
+}
+
 body.reflow-book #content .quiz-question {
   margin: 0 auto;
   text-align: center;
   font-size: calc(clamp(1.15rem, 2vw, 1.45rem) * var(--reflow-font-scale)) !important;
-  line-height: 1.35 !important;
-  font-weight: 700;
+  line-height: 1.35 !important;  font-weight: 700;
 }
 
 body.reflow-book #content .quiz-options {

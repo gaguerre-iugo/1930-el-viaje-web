@@ -74,6 +74,55 @@ contador conserva el capítulo y que los diez bloques son **idénticos** a los d
 > se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
 > datos a un archivo con versión propia.
 
+## Puntos 15, 16 y 17 · Actividades — RESUELTOS
+
+**Punto 17 · «Pregunta 1 de 3» y cierre de la secuencia**
+
+- El kicker («Comprensión lectora · Pregunta 1 de 3») ya estaba en las ocho
+  secuencias y lo ocultaba una regla que compartía con la dimensión de lectura.
+  Ahora sólo se oculta la dimensión: es información para el equipo, no para el
+  lector.
+- Al responder las tres preguntas aparece el cierre, con `role="status"`:
+  «Terminaste las 3 preguntas de este capítulo.» y, según cómo haya salido, la
+  nota «Las que quedaron marcadas se pueden volver a intentar: elegí otra opción
+  y volvé a enviar.» o «Las respondiste todas bien.»
+
+**Punto 15 · Reintento señalizado, incorrecta marcada y «Siguiente pregunta»**
+
+- La opción que se probó y estaba mal **sigue marcada** al elegir otra: antes,
+  cada intento borraba todas las marcas y el lector perdía la referencia de lo
+  que ya había probado.
+- Cada devolución ofrece un botón **«Siguiente pregunta»** —salvo en la última—
+  que lleva a la pregunta siguiente y enfoca su primera opción, respetando
+  `prefers-reduced-motion`.
+- El texto de la devolución señala el reintento (ver punto 16).
+
+**Punto 16 · Devoluciones unificadas y audio en las dos voces**
+
+- Criterio único para las 72 devoluciones: la incorrecta dice «Todavía no.
+  <explicación> Elegí otra opción y volvé a enviar.»; la correcta, «Correcto.
+  <explicación>». Sin emojis: **lo que se ve es lo que se narra** (antes el HTML
+  decía «No.» y el catálogo de narración «❌ No.»).
+- `tools/standardize_quiz_feedback.py` (nuevo) aplica el criterio en el HTML y en
+  `content/i18n/es-UY/texts.json`, retira las devoluciones de las actividades que
+  ya no están en el paquete (9) y verifica con `--check`. 48 devoluciones
+  incorrectas cambiaron; el catálogo quedó en 72.
+- **Audio regenerado en las dos voces**: 96 mp3 (48 devoluciones × Valentina y
+  Mateo) con `edge-tts`, junto con los límites de palabra de cada archivo, que el
+  generador obtiene del propio servicio. La versión de caché se subió **sólo en
+  esas 48 entradas por voz**: 20.064 entradas de los dos catálogos conservaron la
+  suya. Verificación del cambio: `qz007_o0_exp` pasó de 40,5 KB a 60,3 KB en
+  Valentina y de 38,7 KB a 56,7 KB en Mateo, consistente con el texto más largo.
+- El precargador offline se regeneró.
+- Nota: el audio base (`content/i18n/es-UY/audios.json`) sigue siendo un catálogo
+  legado cuyos mp3 no existen —hallazgo previo de `validate_v46.py`—; el lector
+  reproduce desde los catálogos de voz, que están completos.
+
+**Verificación**: `tools/screen-test/verify-quiz-retry.mjs` (nuevo) comprueba el
+kicker visible, la dimensión oculta, la marca conservada, «Siguiente pregunta» (y
+su ausencia en la última pregunta) y el cierre de la secuencia. Las seis suites
+anteriores siguen en verde y sin errores de consola.
+
 ## Punto 5 · Las respuestas viajaban en el HTML — RESUELTO
 
 **Problema:** cada actividad llevaba su clave de corrección en el propio HTML:

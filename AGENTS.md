@@ -71,6 +71,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── validate_v46.py            ← Validador de la v46
 │   ├── audit_charset.py           ← Caracteres fuera del español y de los emojis
 │   ├── extract_quiz_answers.py    ← Clave de corrección fuera del HTML
+│   ├── standardize_quiz_feedback.py ← Devoluciones de las actividades unificadas
 │   ├── complete_pages_index.py    ← Completa el índice con lo que el libro monta
 │   ├── validate_paragraph_geometry.py ← Validación geométrica de párrafos
 │   ├── add_chapter_quizzes.py     ← Generador de cuestionarios
