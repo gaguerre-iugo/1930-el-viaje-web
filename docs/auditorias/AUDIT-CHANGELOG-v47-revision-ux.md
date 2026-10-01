@@ -46,6 +46,34 @@ Regresión agregada a `verify-chapter-progress.mjs`: muestreo del contador cada
 bloques), cobertura completa (arranca en 0, sin huecos y con las 286 páginas
 mapeadas a un bloque) y apertura/cierre del panel.
 
+### Segunda corrección: la caché del índice (el caso real)
+
+La corrección anterior no alcanzaba. En un Chrome con uso previo el contador
+seguía cayendo al formato global **sin errores de consola**, y la causa era otra:
+`content/toc.json` se pide con **versión fija** (`?v=10-activities-index` desde
+`reflow-book.js` y `?v=<bundleVersion>` desde el runtime) y el servidor sirve las
+URL versionadas como inmutables. Un lector que ya había abierto el libro tenía el
+índice viejo, **sin el campo `group`**, así que no había ningún bloque que armar
+y el contador mostraba el total del libro. Las pruebas no lo veían porque corren
+en contextos nuevos, sin caché.
+
+Arreglo: el contador ya no depende de que el índice traiga los grupos. La tabla
+de grupos vive también en `reflow-book.js` (que sí se versiona) y se usa **sólo
+cuando el índice llega sin grupos**; si el índice los trae, manda el índice. El
+fetch propio del índice pasó a `?v=11-toc-groups` para que un lector nuevo pida
+el archivo agrupado.
+
+Regresión agregada: `verify-chapter-progress.mjs` intercepta
+`**/content/toc.json*` y responde la versión **sin** `group`, que es lo que tiene
+un navegador con caché. Comprueba que el índice queda con 0 grupos, que el
+contador conserva el capítulo y que los diez bloques son **idénticos** a los del
+índice agrupado.
+
+> **Consecuencia para el punto 13**: los cambios de `content/toc.json` (nombres
+> del índice y agrupación) no llegan a un lector que ya abrió el libro hasta que
+> se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
+> datos a un archivo con versión propia.
+
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 
 **Problema:** los botones del índice llevaban `focus:outline-none` en su clase:

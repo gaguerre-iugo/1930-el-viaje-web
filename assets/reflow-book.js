@@ -766,7 +766,7 @@
 
   async function loadIndexMetadata() {
     try {
-      var response = await fetch("./content/toc.json?v=10-activities-index");
+      var response = await fetch("./content/toc.json?v=11-toc-groups");
       if (!response.ok) throw new Error("No se pudo cargar el índice editorial.");
       var entries = await response.json();
       if (Array.isArray(entries)) window.__adtReflowTocEntries = entries;
@@ -1817,10 +1817,38 @@
      ---------------------------------------------------------------------- */
   var chapterProgressCache = { signature: "", blocks: [] };
 
+  /* Respaldo de los grupos del contador. El índice los trae en `group`
+     (content/toc.json), pero ese archivo se sirve con caché inmutable y una
+     copia vieja —sin el campo— dejaba el contador sin capítulos y en formato
+     global. Esta tabla vive en el propio JS, que sí se versiona, y se usa sólo
+     cuando el índice llega sin grupos: así una caché vieja no rompe el contador.
+     El orden de los capítulos sale del orden de lectura, no de esta tabla. */
+  var chapterProgressGroupFallback = {
+    pg001_sec001: "antes",
+    pg009_sec001: "antes",
+    pg013_sec001: "antes",
+    pg224_sec001: "antes",
+    pg017_sec001: "chapter",
+    pg037_sec001: "chapter",
+    pg058059_sec001: "chapter",
+    pg080081_sec001: "chapter",
+    pg104105_sec001: "chapter",
+    pg122123_sec001: "chapter",
+    pg144145_sec001: "chapter",
+    pg176177_sec001: "chapter",
+    pg215_sec001: "sobre",
+    pg221_sec001: "sobre"
+  };
+
   function buildChapterProgressBlocks() {
     var toc = window.__adtReflowTocEntries || [];
+    var tocHasGroups = toc.some(function (entry) {
+      return entry && entry.group;
+    });
     var marked = toc.map(function (entry) {
-      var group = entry && entry.group;
+      var group = tocHasGroups
+        ? entry && entry.group
+        : chapterProgressGroupFallback[entry && entry.section_id];
       if (group !== "antes" && group !== "chapter" && group !== "sobre") return null;
       var heading = entry.chapter_id
         ? content.querySelector('[data-id="' + entry.chapter_id + '"]')
@@ -1829,7 +1857,9 @@
       var pageIndex = headingPages.length
         ? headingPages[0]
         : visiblePageForSection(entry.section_id);
-      return pageIndex === null ? null : { entry: entry, pageIndex: pageIndex };
+      return pageIndex === null
+        ? null
+        : { entry: entry, group: group, pageIndex: pageIndex };
     }).filter(Boolean).sort(function (left, right) {
       return left.pageIndex - right.pageIndex;
     });
@@ -1837,7 +1867,7 @@
     var blocks = [];
     var chapterNumber = 0;
     marked.forEach(function (item) {
-      var group = item.entry.group;
+      var group = item.group;
       var key = group;
       if (group === "chapter") {
         chapterNumber += 1;
@@ -1940,7 +1970,11 @@
      y lectura del contador real). */
   window.__adtReflowChapterProgress = {
     blocks: chapterProgressBlocks,
-    at: chapterProgressAt
+    at: chapterProgressAt,
+    groups: chapterProgressGroupFallback,
+    toc: function () {
+      return window.__adtReflowTocEntries || [];
+    }
   };
 
   function chapterProgressText(pageIndex) {

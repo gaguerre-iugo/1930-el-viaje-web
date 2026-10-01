@@ -306,6 +306,56 @@ for (const [width, expected] of [
   await page.screenshot({ path: path.join(outDir, `contador-capitulo-${width}.png`) });
 }
 
+/* Regresión de caché: los navegadores guardan `content/toc.json` con caché
+   inmutable (se pide con versión fija), así que un lector puede tener una copia
+   sin el campo `group`. El contador tiene que armar los mismos bloques igual,
+   porque el respaldo vive en reflow-book.js, que sí se versiona. */
+const freshToc = JSON.parse(
+  await fs.readFile(path.resolve(here, "..", "..", "content/toc.json"), "utf8")
+);
+const staleToc = freshToc.map((entry) => {
+  const { group, ...rest } = entry;
+  return rest;
+});
+const staleBrowser = await chromium.launch();
+try {
+  const stalePage = await staleBrowser.newPage({ viewport: { width: 1366, height: 900 } });
+  await stalePage.route("**/content/toc.json*", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(staleToc),
+    })
+  );
+  await stalePage.goto(target, { waitUntil: "load" });
+  await stalePage.waitForSelector("#reflow-page-status", { timeout: 30000 });
+  await stalePage.waitForTimeout(2500);
+  const stale = await stalePage.evaluate(() => {
+    const api = window.__adtReflowChapterProgress;
+    const blocks = api.blocks();
+    return {
+      texto: document.getElementById("reflow-progress-long").textContent,
+      gruposEnElIndice: api.toc().filter((entry) => entry && entry.group).length,
+      rangos: blocks.map((block) => `${block.key}:${block.startPage}-${block.endPage}`),
+    };
+  });
+  const esperados = real.blocks.map((block) => `${block.key}:${block.start}-${block.end}`);
+  console.log(`\n=== Integración: toc.json cacheado sin grupos ===`);
+  console.log(`  grupos en el índice: ${stale.gruposEnElIndice} · contador: ${stale.texto}`);
+  console.log(`  bloques: ${stale.rangos.join(" · ")}`);
+  if (stale.gruposEnElIndice !== 0) {
+    fail("la simulación no logró quitar los grupos del índice");
+  }
+  if (/^pág\. \d+ de \d+$/.test(stale.texto)) {
+    fail(`con el índice cacheado el contador perdió el capítulo: ${stale.texto}`);
+  }
+  if (stale.rangos.join("|") !== esperados.join("|")) {
+    fail("los bloques con el índice cacheado no coinciden con los del índice agrupado");
+  }
+} finally {
+  await staleBrowser.close();
+}
+
 console.log(`\nURL: ${target}`);
 console.log("consola:", consoleErrors.length ? consoleErrors.slice(0, 6) : "sin errores");
 if (consoleErrors.length) fail(`errores de consola: ${consoleErrors.slice(0, 3).join(" | ")}`);
