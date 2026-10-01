@@ -1661,28 +1661,28 @@ body.reflow-book [aria-label="dock-label"]:has(button[title="Enviar"]) {
   position: fixed;
   z-index: 70;
   inset: 0;
-  display: grid;
-  grid-auto-flow: row;
-  place-items: center;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
   color: var(--ceibal-institutional-600);
   background: #fff;
   font-size: var(--ui-n2-size);
   font-weight: var(--ui-weight-bold);
 }
 
-/* Hueco del logo institucional (punto 21). Sin archivo no ocupa lugar. */
+/* Logo institucional en el cargador (punto 21). El archivo es el export de
+   `logotipo-ceibal-color.svg` a @2x (380 × 127, relación 2,99), así que se
+   muestra a 12 rem de ancho para que quede nítido: es su tamaño 1x. */
 #reflow-loading .reflow-loading-logo {
   display: block;
-  width: 9rem;
-  height: 3rem;
+  width: 12rem;
+  height: 4rem;
+  background-image: url("../assets/icons/ceibal-logo.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-}
-
-#reflow-loading .reflow-loading-logo:empty {
-  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

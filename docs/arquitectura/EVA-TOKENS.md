@@ -73,19 +73,31 @@ La interfaz todavía usa caracteres de texto para estos ocho. Se piden en dos
 tamaños: **`md` (24 px)**, que es el tamaño de uso y sirve de referencia para la
 prueba visual, y **`0-99` (100 px)**, que es el que se mide para trazar el SVG.
 
-| Ícono | Dónde se usa | Hoy es |
-|---|---|---|
-| Menú (hamburguesa) | barra · «Índice» | `☰` |
-| Herramientas (engranaje) | barra · «Herramientas» y reproductor de voz | `⚙` |
-| Cerrar | encabezado de los paneles | `×` |
-| Reproducir | reproductor de voz | `▶` |
-| Pausa | reproductor de voz (encendido) | texto «Pausa» |
-| Detener | reproductor de voz | `■` |
-| Audio anterior | reproductor de voz | `⏮` |
-| Audio siguiente | reproductor de voz | `⏭` |
+| Ícono | Dónde se usa | Hoy es | Recibido |
+|---|---|---|---|
+| Menú (hamburguesa) | barra · «Índice» | `☰` | ✅ `size=eva-icon-size-0-112.png` |
+| Herramientas (engranaje) | barra · «Herramientas» y reproductor de voz | `⚙` | ✅ `size=eva-icon-size-0-91.png`, `…-md-89.png` |
+| Cerrar | encabezado de los paneles | `×` | ✅ `size=eva-icon-size-0-2.png`, `…-md-2.png` |
+| Reproducir | reproductor de voz | `▶` | ✅ dos variantes: `…-0-11.png` (52 % del lienzo) y `…-0-4.png` (72 %) |
+| Pausa | reproductor de voz (encendido) | texto «Pausa» | ✅ `size=eva-icon-size-0-41.png`, `…-md@2x.png` |
+| Detener | reproductor de voz | `■` | ✗ falta |
+| Audio anterior | reproductor de voz | `⏮` | ✗ falta |
+| Audio siguiente | reproductor de voz | `⏭` | ✗ falta |
+
+Los recibidos son **relleno negro puro sobre transparente** (a diferencia de la
+flecha, que era de trazo), así que se vectorizan como `currentColor` para que
+hereden el color del botón.
 
 Opcionales: chevron izquierdo y derecho (para el «volver» de los paneles),
 altavoz (botón «Voz y velocidad») y lupa (buscador del glosario).
+
+### Logo de Ceibal
+
+`assets/icons/ceibal-logo.png` es el export a @2x de `logotipo-ceibal-color.svg`
+(380 × 127, relación 2,99, fondo transparente). El cargador lo muestra a 12 rem de
+ancho —su tamaño 1x— con el texto «Abriendo 1930: El viaje…» debajo. Está declarado
+en `imsmanifest.xml` porque el CSS lo referencia. Si más adelante llega el SVG
+original, reemplaza al PNG en la misma regla.
 
 ### Verificación de la flecha
 

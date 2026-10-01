@@ -49,6 +49,36 @@ if (!cargador) {
   }
   if (cargador.rol !== "status") fail(`el cargador anuncia rol «${cargador.rol}»`);
 }
+/* Logo institucional del cargador (punto 21). Se espera a que la imagen esté
+   disponible antes de la captura: el cargador vive pocos milisegundos. */
+const logo = await page.evaluate(async () => {
+  const nodo = document.querySelector("#reflow-loading .reflow-loading-logo");
+  if (!nodo) return null;
+  const estilo = getComputedStyle(nodo);
+  const url = (estilo.backgroundImage.match(/url\("?([^")]+)"?\)/) || [])[1] || null;
+  if (url) {
+    await new Promise((resolve) => {
+      const imagen = new Image();
+      imagen.onload = imagen.onerror = () => resolve();
+      imagen.src = url;
+    });
+  }
+  const caja = nodo.getBoundingClientRect();
+  return {
+    tieneImagen: estilo.backgroundImage !== "none",
+    url,
+    ancho: Math.round(caja.width),
+    alto: Math.round(caja.height),
+  };
+});
+console.log(`  logo: ${JSON.stringify(logo)}`);
+if (!logo || !logo.tieneImagen) fail("el cargador no tiene el logo de Ceibal");
+if (logo && logo.tieneImagen && !/ceibal-logo/.test(logo.url || "")) {
+  fail(`el logo apunta a ${logo.url}`);
+}
+if (logo && (logo.ancho < 100 || logo.alto < 30)) {
+  fail(`el hueco del logo mide ${logo.ancho}×${logo.alto}`);
+}
 await page.screenshot({ path: "tmp/apertura-cargando.png" });
 
 await page.waitForSelector("#reflow-pagination button", { timeout: 40000 });
