@@ -1346,8 +1346,42 @@
 
   /* Contraste real de cada texto del panel: el runtime usa clases que no se
      pueden enumerar, así que se mide y se corrige con el color del tema. */
+  var panelColorCanvas = null;
   function panelRgb(valor) {
-    var numeros = String(valor).match(/[\d.]+/g) || [];
+    var texto = String(valor);
+    /* Tailwind v4 escribe en oklch y otras notaciones: el canvas las normaliza a
+       #rrggbb, que es lo único que se puede interpretar con seguridad. */
+    if (texto.indexOf("rgb") !== 0 && texto.charAt(0) !== "#") {
+      try {
+        if (!panelColorCanvas) {
+          panelColorCanvas = document.createElement("canvas").getContext("2d");
+        }
+        panelColorCanvas.fillStyle = "#000000";
+        panelColorCanvas.fillStyle = texto;
+        texto = panelColorCanvas.fillStyle;
+      } catch (error) {}
+    }
+    if (texto.charAt(0) === "#") {
+      var hex = texto.slice(1);
+      if (hex.length === 3) {
+        hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+      }
+      return {
+        r: parseInt(hex.slice(0, 2), 16) || 0,
+        g: parseInt(hex.slice(2, 4), 16) || 0,
+        b: parseInt(hex.slice(4, 6), 16) || 0,
+        a: 1,
+      };
+    }
+    /* oklch(L C H): L es la luminosidad perceptual (0 a 1) y alcanza para decidir
+       si el texto se lee sobre el fondo. Se usa como gris equivalente. */
+    var oklch = texto.match(/^oklch\(\s*([\d.]+)/);
+    if (oklch) {
+      var luz = Math.max(0, Math.min(1, Number(oklch[1])));
+      var gris = Math.round(luz * 255);
+      return { r: gris, g: gris, b: gris, a: 1 };
+    }
+    var numeros = texto.match(/[\d.]+/g) || [];
     return {
       r: Number(numeros[0] || 0),
       g: Number(numeros[1] || 0),

@@ -136,13 +136,19 @@ Dos cosas que salieron de esta medición y conviene recordar:
   `--ui-text-muted`, que sí existe. Vale para cualquier valor nuevo: verificar el
   token antes de usarlo.
 
-**Etiquetas lavadas**: además de los interruptores, en esas filas las **etiquetas**
-se ven pálidas. Se intentó devolverles la opacidad (donde la opacidad calculada es
-menor que 1) y **no tuvo efecto**, así que la causa no es `opacity` en el texto.
-Queda como paso siguiente **medir** el caso concreto —`getComputedStyle` del color
-y la opacidad de la etiqueta y de sus ancestros— antes de tocar nada: sospecha un
-color con **alfa** (el runtime usa blancos translúcidos que sobre el tema oscuro se
-veían bien) o la opacidad en un contenedor más alto.
+**Etiquetas lavadas (resuelto, con causa raíz)**: las etiquetas de esas filas
+—«Lectura fácil», «Descripción de imágenes», «Activar lectura en voz alta»— se veían
+casi blancas. El color calculado era `oklch(0.985 0 0)`: **Tailwind v4 escribe los
+colores en oklch**, y el medidor de contraste del pase inline extraía los números del
+texto y los interpretaba como r/g/b, así que un casi blanco se leía como un rojo
+oscuro (contraste 21:1) y la reparación no corregía nada. Ahora `panelRgb` lee
+`oklch(L C H)` por su **luminosidad perceptual** (el primer número, que alcanza para
+decidir si el texto se lee sobre el fondo).
+
+Medido sobre los píxeles de la etiqueta: **`(18, 24, 38)` con 17,73:1** (antes, casi
+blanco). La lección sirve para todo el tema: **cualquier medición de color sobre este
+runtime tiene que contemplar oklch**; el truco de normalizar con el canvas **no**
+funciona acá (devolvía el valor previo y el color quedaba como negro, que es peor).
 
 ## Punto 18 · Tema claro — ETAPA 2: paneles
 
