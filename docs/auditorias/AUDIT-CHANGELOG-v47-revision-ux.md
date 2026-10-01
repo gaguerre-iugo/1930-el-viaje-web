@@ -113,13 +113,36 @@ runtime) y conservaban los colores del tema oscuro. Se pasaron a los tokens
 de tamaño (`[data-reflow-font-size]`: elegido en institucional con texto blanco).
 Medido en el panel de Herramientas: de 4 elementos ilegibles a 1.
 
-**PENDIENTE · los interruptores**: en las filas de preferencias, la **pista y la
-perilla del interruptor** quedan casi invisibles sobre blanco (el runtime las pinta
-con los valores del tema oscuro) y las etiquetas de las filas deshabilitadas se
-lavan por la **opacidad** reducida que aplica el runtime. Ojo: esto **no lo detecta
-la medición de color del script**, porque mira el color calculado e ignora la
-opacidad y los pseudo-elementos de la pista; hay que medirlo sobre los **píxeles
-renderizados** (o comprobar la captura). Es el paso siguiente de esta etapa.
+**Interruptores (resuelto)**: la pista y la perilla se pintaban con los valores del
+tema oscuro y sobre blanco desaparecían, y las filas deshabilitadas se lavaban por
+la **opacidad** que aplica el runtime (el tema pide color, no transparencia). El
+pase inline ahora fija: pista encendida en institucional-600, apagada en
+`--ui-text-muted` (grey-600, 5,5:1), perilla blanca con sombra, y `opacity: 1` en
+las filas deshabilitadas.
+
+Se midió sobre los **píxeles renderizados** (no sobre el color calculado, que
+ignora la opacidad y los pseudo-elementos): `tmp/mide_interruptores.py` recorta la
+caja de cada interruptor de la captura y comprueba que la pista se distinga del
+fondo. Resultado: **5 de 5 en OK** (antes, 5 de 5 apenas visibles).
+
+Dos cosas que salieron de esta medición y conviene recordar:
+
+- La primera métrica era mala: medía la proporción de píxeles con color sobre toda
+  la **caja de toque** (48 × 48, que incluye relleno), por lo que una pista
+  correcta y chica daba «apenas visible». Ahora se exige que la pista exista y que
+  no sea un píxel suelto.
+- `--ceibal-gray-500` **no existe** en la paleta del proyecto: usarlo dejaba el
+  `var()` inválido y el fondo terminaba **transparente** (peor que antes). Se usa
+  `--ui-text-muted`, que sí existe. Vale para cualquier valor nuevo: verificar el
+  token antes de usarlo.
+
+**Etiquetas lavadas**: además de los interruptores, en esas filas las **etiquetas**
+se ven pálidas. Se intentó devolverles la opacidad (donde la opacidad calculada es
+menor que 1) y **no tuvo efecto**, así que la causa no es `opacity` en el texto.
+Queda como paso siguiente **medir** el caso concreto —`getComputedStyle` del color
+y la opacidad de la etiqueta y de sus ancestros— antes de tocar nada: sospecha un
+color con **alfa** (el runtime usa blancos translúcidos que sobre el tema oscuro se
+veían bien) o la opacidad en un contenedor más alto.
 
 ## Punto 18 · Tema claro — ETAPA 2: paneles
 

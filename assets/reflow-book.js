@@ -1273,6 +1273,47 @@
         control.style.setProperty("border-color", "var(--ui-border-strong)", "important");
       }
     }
+    /* Interruptores del runtime: pista y perilla se pintan con los valores del
+       tema oscuro y sobre la superficie blanca desaparecen. Se fijan por estado:
+       encendido en institucional, apagado en el gris de borde fuerte. */
+    var interruptores = raiz.querySelectorAll("[role='switch'], input[type='checkbox']");
+    for (var s = 0; s < interruptores.length; s++) {
+      var interruptor = interruptores[s];
+      var encendido =
+        interruptor.getAttribute("aria-checked") === "true" || interruptor.checked === true;
+      interruptor.style.setProperty(
+        "background-color",
+        encendido ? "var(--ui-accent)" : "var(--ui-text-muted)",
+        "important"
+      );
+      var perilla = interruptor.querySelector("span, div");
+      if (perilla) {
+        perilla.style.setProperty("background-color", "#ffffff", "important");
+        perilla.style.setProperty("box-shadow", "0 1px 2px rgb(21 23 26 / 24%)", "important");
+      }
+    }
+    /* Las filas deshabilitadas se lavan por opacidad: el tema pide color, no
+       transparencia (grey-100 de fondo con grey-600 de texto). */
+    var lavadas = raiz.querySelectorAll("[aria-disabled='true'], [disabled]");
+    for (var d = 0; d < lavadas.length; d++) {
+      lavadas[d].style.setProperty("opacity", "1", "important");
+    }
+    /* Etiquetas lavadas: el color es el correcto pero un contenedor las deja
+       translúcidas. Se corrige sólo donde la opacidad está reducida. */
+    var translucidos = raiz.querySelectorAll("*");
+    for (var o = 0; o < translucidos.length; o++) {
+      var translucido = translucidos[o];
+      if (parseFloat(window.getComputedStyle(translucido).opacity) >= 1) continue;
+      var tieneTexto = false;
+      for (var h = 0; h < translucido.childNodes.length; h++) {
+        if (translucido.childNodes[h].nodeType === 3 && translucido.childNodes[h].textContent.trim()) {
+          tieneTexto = true;
+          break;
+        }
+      }
+      if (!tieneTexto) continue;
+      translucido.style.setProperty("opacity", "1", "important");
+    }
     /* Selector de tamaño de letra: son botones propios con reglas duplicadas del
        tema oscuro; el elegido va relleno de institucional con texto blanco. */
     var tamanos = raiz.querySelectorAll("[data-reflow-font-size]");
