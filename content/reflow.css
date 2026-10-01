@@ -3370,6 +3370,15 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:focus-vi
   background: rgb(102 198 192 / 16%) !important;
 }
 
+/* El índice traía `focus:outline-none` en la clase de sus botones: con teclado
+   el foco sólo se notaba por el cambio de fondo. Ahora usa el mismo anillo
+   turquesa que los botones de la barra. */
+body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-current] {
   border-color: var(--ceibal-institutional-400) !important;
   color: #fff !important;

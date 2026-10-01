@@ -3,6 +3,25 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 14 · Sin indicador de foco en el índice — RESUELTO
+
+**Problema:** los botones del índice llevaban `focus:outline-none` en su clase:
+con teclado, el foco sólo se notaba por un cambio de fondo leve.
+
+**Solución:** se quitó `focus:outline-none` (y el anillo genérico de Tailwind) de
+la clase de los botones de página en `reflow-book.js`, y `reflow.css` les da el
+mismo anillo turquesa que la barra: contorno de
+`var(--ceibal-border-focus)` con `--ceibal-focus-on-dark` y la sombra de foco.
+
+**Verificación:** `tools/screen-test/verify-focus-visible.mjs` (nuevo) enfoca uno
+por uno los controles de la barra y de los tres paneles y comprueba dos cosas: que
+el foco cambie alguna señal visual y que el control enfocado tenga **contorno**
+real (no alcanza con el cambio de fondo). Resultado: barra 3/3 controles con
+contorno, índice 24/24. Quedan como pendientes del runtime 4 controles del panel
+Herramientas y 1 del glosario, que no muestran contorno al enfocarse: se revisan
+junto con la jerarquía tipográfica (punto 24) y el tema claro (punto 18), que
+tocan esos mismos componentes.
+
 ## Punto 4 · El número de página cambia según la pantalla — RESUELTO
 
 **Problema:** el total de páginas depende del ancho y del tamaño de letra (395 a
