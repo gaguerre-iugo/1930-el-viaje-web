@@ -295,7 +295,13 @@ def main() -> int:
 
     text_ids = set(texts)
     known_content_ids = text_ids | set(images) | set(section_ids)
+    # Páginas que no se narran (créditos, agradecimientos y colofón del final):
+    # sus párrafos no tienen entradas de texto ni de audio, así que sus data-id
+    # no pueden estar en los catálogos.
+    paginas_sin_narracion = {"pg225_sec001", "pg226_sec001", "pg227_sec001"}
     for section_id, path in section_files.items():
+        if section_id in paginas_sin_narracion:
+            continue
         unknown_ids = sorted(
             set(DATA_ID_RE.findall(path.read_text(encoding="utf-8")))
             - known_content_ids

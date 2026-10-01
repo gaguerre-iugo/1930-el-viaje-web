@@ -112,12 +112,38 @@ corrección siga funcionando: elegir la opción correcta da «correcto» en las
 actividades probadas y elegir una incorrecta da «incorrecto» —sin esta última
 prueba, un motor que marcara todo como correcto pasaría inadvertido.
 
-**Decisión pendiente (contenido)**: los archivos `qz001.html` a `qz006.html` no
-están en el orden de lectura ni los enlaza nadie; sólo los lista
-`imsmanifest.xml`. Contienen las preguntas qz001–qz003 (que también viven dentro
-de `quiz_final`, con las mismas claves pero respuestas distintas) y **qz004,
-qz005 y qz006, que no existen en ningún otro lado**. Hay que decidir si se
-integran al libro, se dejan como están o se retiran del paquete.
+### Revisión del final del libro y limpieza del paquete
+
+**Lo que estaba mal era el índice, no el libro.** Los créditos y agradecimientos
+sí se ven: `pg225_sec001` es «Sobre el libro · pág. 8 de 11» (créditos: dirección,
+autoría, equipo) y `pg226_sec001` es «pág. 10 de 11» (agradecimientos). El motor
+arma el orden con su propia lista (`var sections = [...]` en `reflow-book.js`,
+207 secciones), que incluía esas páginas; `content/pages.json`, el índice que leen
+el runtime y las herramientas, tenía 204 y no las listaba. Eso explicaba el
+hallazgo previo de `validate_v46.py` («Runtime section order/files differ from
+content/pages.json»), que ahora queda resuelto.
+
+- `tools/complete_pages_index.py` (nuevo) completa el índice con las tres
+  secciones que faltaban, al final y en el orden real. `pages.json` pasa de 204 a
+  **207** entradas, igual que la lista del motor. No se agrega
+  `pg224_collaborators`: esa página la construye el motor en tiempo de ejecución
+  y no tiene archivo de origen.
+- **`pg227` revisado**: no duplica a `pg226`. Es el colofón («FIN · 1930 El viaje
+  · Novela educativa transmedia · Ceibal - 2025»), once palabras que caen en la
+  misma página visual que el final de los agradecimientos. Se queda.
+- **Retirados del paquete** (decisión editorial): `qz001.html` a `qz006.html`
+  —actividades que el libro no monta, y cuyas qz001–qz003 duplicaban preguntas ya
+  presentes en `quiz_final` con otra clave de corrección— y `pg003_sec001.html` /
+  `pg005_sec001.html`, variantes de portada. Se quitaron los 8 archivos, sus 8
+  líneas del manifiesto SCORM y sus 6 entradas del archivo de respuestas (queda en
+  8 actividades y 72 opciones). El contenido sigue disponible en el historial de
+  git.
+- `validate_v46.py` ya no marca los `data-id` de los créditos, los agradecimientos
+  y el colofón: son páginas que no se narran, así que sus párrafos no tienen
+  entradas en los catálogos de texto ni de audio. La excepción quedó explícita en
+  el validador.
+- El precargador offline se regeneró (207 secciones y el índice nuevo): pasó de
+  233 a 225 claves.
 
 ## Punto 3 · Las flechas pesaban menos que los botones de al lado — RESUELTO
 

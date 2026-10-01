@@ -10,36 +10,6 @@
     "qz003_o1": false,
     "qz003_o2": false
   },
-  "qz001": {
-    "qz001_o0": false,
-    "qz001_o1": false,
-    "qz001_o2": true
-  },
-  "qz002": {
-    "qz002_o0": true,
-    "qz002_o1": false,
-    "qz002_o2": false
-  },
-  "qz003": {
-    "qz003_o0": false,
-    "qz003_o1": true,
-    "qz003_o2": false
-  },
-  "qz004": {
-    "qz004_o0": true,
-    "qz004_o1": false,
-    "qz004_o2": false
-  },
-  "qz005": {
-    "qz005_o0": false,
-    "qz005_o1": true,
-    "qz005_o2": false
-  },
-  "qz006": {
-    "qz006_o0": true,
-    "qz006_o1": false,
-    "qz006_o2": false
-  },
   "qz007": {
     "qz007_o0": false,
     "qz007_o1": true,
