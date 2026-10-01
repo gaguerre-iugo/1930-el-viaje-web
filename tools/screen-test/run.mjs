@@ -203,9 +203,11 @@ async function openPanelStates(page, vp) {
     await page.waitForTimeout(500);
     states.push(await capture(page, vp, "panel-tools"));
 
-    // Glosario (desde Herramientas)
+    // Glosario: se abre desde la barra (punto 1 de la revisión UX)
     try {
-      const g = await page.waitForSelector("#reflow-open-glossary", { timeout: 2000 });
+      await page.keyboard.press("Escape");
+      await page.waitForTimeout(300);
+      const g = await page.waitForSelector("#reflow-glossary", { timeout: 2000 });
       await g.click();
       await page.waitForTimeout(500);
       states.push(await capture(page, vp, "panel-glossary"));

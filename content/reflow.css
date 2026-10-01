@@ -1189,14 +1189,15 @@ body.reflow-book .tts-image-highlight-overlay {
   transform: translateX(-50%);
   display: grid;
   grid-template-columns:
-    minmax(7rem, 1.15fr)
-    minmax(6.5rem, 1fr)
-    minmax(5.25rem, auto)
-    minmax(6.5rem, 1fr)
-    minmax(8.5rem, 1.2fr);
+    minmax(6rem, 1fr)
+    minmax(7.25rem, 1.15fr)
+    minmax(5rem, auto)
+    minmax(7.25rem, 1.15fr)
+    minmax(6.75rem, 1fr)
+    minmax(9rem, 1.05fr);
   align-items: center;
   gap: .25rem;
-  width: min(100vw, 62rem);
+  width: min(100vw, 68rem);
   min-height: calc(4rem + env(safe-area-inset-bottom, 0px));
   padding: .375rem .5rem calc(.375rem + env(safe-area-inset-bottom, 0px));
   border: 1px solid var(--ceibal-gray-700);
@@ -1247,32 +1248,55 @@ body.reflow-book .tts-image-highlight-overlay {
   text-align: center;
 }
 
+/* Los íconos SVG heredan el color del botón y miden 24 px (punto 24). */
+#reflow-pagination .reflow-toolbar-svg {
+  display: block;
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
 #reflow-pagination .reflow-toolbar-label {
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+/* Las acciones secundarias dan su relleno horizontal para que las seis
+   columnas entren con la etiqueta completa (sin puntos suspensivos). */
+body.reflow-book
+  #reflow-pagination
+  .reflow-toolbar-action:not(.reflow-toolbar-primary) {
+  gap: .375rem;
+  padding-inline: .5rem;
+}
+
 #reflow-pagination button:hover:not(:disabled) { background: rgb(255 255 255 / 16%); }
 
-/* Previous and Next are the primary navigation actions. Their 48 px target,
-   border and stronger surface distinguish them from the toolbar container. */
-#reflow-pagination #reflow-previous,
-#reflow-pagination #reflow-next {
-  min-height: 3rem;
-  border-color: var(--ceibal-gray-400);
-  background: #66707e;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
+/* Anterior y Siguiente son la acción principal de la barra (punto 3): más
+   altas que el resto (56 px), más anchas que Índice y Herramientas, y en el
+   color institucional con texto blanco (7,1:1 según la tabla de EVA). El
+   !important sostiene los 56 px frente a la regla de 48 px que el arnés aplica
+   a todos los botrones de la barra en pantallas grandes. */
+body.reflow-book #reflow-pagination .reflow-toolbar-primary {
+  min-height: 3.5rem !important;
+  border-color: transparent;
+  color: #fff;
+  background: var(--ceibal-institutional-600);
+  box-shadow: var(--ceibal-shadow-button);
 }
 
-#reflow-pagination #reflow-previous:hover:not(:disabled),
-#reflow-pagination #reflow-next:hover:not(:disabled) {
-  border-color: var(--ceibal-gray-300);
-  background: var(--ceibal-gray-600);
+#reflow-pagination .reflow-toolbar-primary:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--ceibal-institutional-700);
 }
 
-#reflow-previous .reflow-toolbar-icon,
-#reflow-next .reflow-toolbar-icon {
-  font-size: 1.5rem;
+#reflow-pagination .reflow-toolbar-primary:active:not(:disabled) {
+  background: var(--ceibal-institutional-800);
+}
+
+#reflow-previous .reflow-toolbar-label,
+#reflow-next .reflow-toolbar-label {
+  font-weight: 700;
 }
 
 #reflow-pagination button[aria-expanded="true"],
@@ -1296,16 +1320,20 @@ body.reflow-book .tts-image-highlight-overlay {
   cursor: not-allowed;
 }
 
-/* Disabled navigation remains legible and differs through surface, border and
-   icon color; opacity is deliberately not its only state indicator. */
+/* El estado deshabilitado se distingue por opacidad y por la ausencia de borde
+   (punto 3): al 40 % la flecha se lee sin confundirse con la habilitada. */
+#reflow-pagination .reflow-toolbar-primary:disabled {
+  opacity: .4;
+  border-color: transparent;
+  color: #fff;
+  background: var(--ceibal-institutional-600);
+  box-shadow: none;
+}
+
 #reflow-pagination #reflow-previous:disabled,
 #reflow-pagination #reflow-next:disabled {
-  opacity: 1;
-  border-color: var(--ceibal-gray-400);
-  border-style: dashed;
-  color: var(--ceibal-gray-300);
-  background: var(--ceibal-gray-800);
-  box-shadow: none;
+  opacity: .4;
+  border-color: transparent;
 }
 
 /* El contador muestra bloque y avance ("Cap. 1 · pág. 3 de 18"). Tiene tres
@@ -1313,9 +1341,9 @@ body.reflow-book .tts-image-highlight-overlay {
    mínima ("3/18", para teléfonos angostos). Ver updateControls() en
    reflow-book.js. */
 #reflow-page-status {
-  min-width: 5.25rem;
+  min-width: 5rem;
   text-align: center;
-  font-size: 1rem;
+  font-size: .95rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -1440,9 +1468,46 @@ body.reflow-book .reflow-upstream-dock {
   transform: none !important;
 }
 
+/* Con las seis columnas y todas las etiquetas visibles la barra necesita unos
+   832 px: por debajo, Índice, Glosario y Herramientas pasan a ícono (conservan
+   su nombre accesible) y el contador usa la forma corta. Las flechas nunca
+   pierden su etiqueta. */
+@media (max-width: 51.999rem) {
+  #reflow-pagination {
+    grid-template-columns:
+      2.75rem
+      minmax(5.5rem, 1fr)
+      minmax(9rem, 1.4fr)
+      minmax(5.5rem, 1fr)
+      2.75rem
+      2.75rem;
+  }
+
+  #reflow-pagination
+    .reflow-toolbar-action:not(.reflow-toolbar-primary)
+    .reflow-toolbar-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  #reflow-page-status #reflow-progress-long {
+    display: none;
+  }
+
+  #reflow-page-status #reflow-progress-short {
+    display: inline;
+  }
+}
+
 @media (max-width: 47.999rem) {
   #reflow-pagination {
-    grid-template-columns: 2.75rem 2.75rem minmax(6.5rem, 1.4fr) 2.75rem 2.75rem;
     gap: .125rem;
     width: 100vw;
     padding: .375rem;
@@ -1455,33 +1520,12 @@ body.reflow-book .reflow-upstream-dock {
     padding: .25rem;
   }
 
-  #reflow-previous,
-  #reflow-next {
-    min-height: 2.75rem;
-  }
-
-  #reflow-pagination .reflow-toolbar-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+  #reflow-pagination .reflow-toolbar-primary {
+    min-height: 3.5rem !important;
   }
 
   #reflow-page-status {
     min-width: 3.75rem;
-  }
-
-  #reflow-page-status #reflow-progress-long {
-    display: none;
-  }
-
-  #reflow-page-status #reflow-progress-short {
-    display: inline;
   }
   #reflow-tts-player {
     grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
@@ -1509,71 +1553,39 @@ body.reflow-book .reflow-upstream-dock {
   }
 }
 
-/* Mobile labels degrade progressively instead of disappearing at the tablet
-   breakpoint. Index and Tools keep text whenever the five fixed controls fit;
-   Tools uses a visual abbreviation before both actions become icon-only. The
-   buttons retain their complete aria-labels at every width. */
-@media (min-width: 22rem) and (max-width: 47.999rem) {
+/* Por debajo de 32 rem no entran a la vez la forma corta del contador ("Antes
+   de empezar · 3/12", unos 181 px) y las flechas con su etiqueta al costado. Se
+   resuelve apilando las flechas —ícono arriba, texto abajo, como pide el
+   documento para cuando falta espacio— y dejando el contador sólo con el
+   avance. Los botones conservan sus nombres accesibles completos. */
+@media (max-width: 32rem) {
   #reflow-pagination {
     grid-template-columns:
-      minmax(5.25rem, 1fr)
       2.75rem
-      minmax(6.5rem, 1.4fr)
+      minmax(3.25rem, .9fr)
+      minmax(3.75rem, 1.1fr)
+      minmax(3.25rem, .9fr)
       2.75rem
-      minmax(5.75rem, 1.05fr);
+      2.75rem;
   }
 
-  #reflow-index,
-  #reflow-tools {
-    gap: .35rem;
+  #reflow-pagination .reflow-toolbar-primary {
+    flex-direction: column;
+    gap: .125rem;
+    padding: .25rem .125rem;
   }
 
-  #reflow-index .reflow-toolbar-label,
-  #reflow-tools .reflow-toolbar-label {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
-    clip: auto;
-    white-space: nowrap;
-    border: 0;
-    text-overflow: ellipsis;
+  #reflow-pagination .reflow-toolbar-primary .reflow-toolbar-label {
+    font-size: .7rem;
+    font-weight: 700;
+    line-height: 1.1;
   }
 
-  #reflow-tools .reflow-toolbar-label {
-    font-size: 0;
+  #reflow-pagination .reflow-toolbar-primary .reflow-toolbar-svg {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
-  #reflow-tools .reflow-toolbar-label::after {
-    content: attr(data-compact-label);
-    font-size: 1rem;
-  }
-}
-
-@media (min-width: 30rem) and (max-width: 47.999rem) {
-  #reflow-pagination {
-    grid-template-columns:
-      minmax(6.75rem, 1fr)
-      2.75rem
-      minmax(6.5rem, 1.4fr)
-      2.75rem
-      minmax(8.25rem, 1.1fr);
-  }
-
-  #reflow-tools .reflow-toolbar-label {
-    font-size: 1rem;
-  }
-
-  #reflow-tools .reflow-toolbar-label::after {
-    content: none;
-  }
-}
-
-/* Teléfonos angostos: el contador pierde la etiqueta del bloque y queda sólo el
-   avance, que es lo único que entra sin empujar los botones. */
-@media (max-width: 22rem) {
   #reflow-page-status #reflow-progress-short {
     display: none;
   }
@@ -2449,60 +2461,6 @@ body.reflow-book #content .quiz-explanation-bank {
   letter-spacing: .06em;
 }
 
-#reflow-reference-tools {
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
-  padding: 1rem 0;
-}
-
-#reflow-reference-tools > header {
-  padding: 0 0 .5rem;
-}
-
-#reflow-reference-tools h3 {
-  margin: 0;
-  color: rgb(255 255 255 / 58%);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: .06em;
-}
-
-.reflow-reference-tools-card {
-  padding: var(--ceibal-space-3);
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: var(--ceibal-radius-lg);
-  background: rgb(0 0 0 / 44%);
-}
-
-#reflow-open-glossary {
-  display: flex;
-  width: 100%;
-  min-height: 2.875rem;
-  align-items: center;
-  gap: .625rem;
-  padding: var(--ceibal-space-3) var(--ceibal-space-5);
-  border: 1px solid var(--ceibal-gray-600);
-  border-radius: var(--ceibal-radius-md);
-  color: var(--ceibal-gray-50);
-  background: rgb(255 255 255 / 7%);
-  font-size: 1.125rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--ceibal-shadow-button);
-}
-
-#reflow-open-glossary:hover {
-  border-color: var(--ceibal-institutional-300);
-  background: rgb(102 198 192 / 16%);
-}
-
-#reflow-open-glossary:focus-visible {
-  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark);
-  outline-offset: 2px;
-  box-shadow: var(--ceibal-shadow-focus);
-}
-
 .reflow-font-settings-card {
   display: flex;
   flex-direction: column;
@@ -2617,8 +2575,7 @@ body.reflow-book .reflow-settings-organized > section,
 body.reflow-book .reflow-settings-organized > section > div,
 body.reflow-book .reflow-settings-organized
   .reflow-settings-section-reading .reflow-settings-list,
-body.reflow-book .reflow-settings-organized .reflow-font-settings-card,
-body.reflow-book .reflow-settings-organized .reflow-reference-tools-card {
+body.reflow-book .reflow-settings-organized .reflow-font-settings-card {
   display: contents !important;
 }
 
@@ -2645,10 +2602,6 @@ body.reflow-book .reflow-settings-organized .reflow-settings-block-title {
 /* Leer */
 body.reflow-book .reflow-settings-organized #reflow-settings-block-leer {
   order: 10;
-}
-
-body.reflow-book .reflow-settings-organized #reflow-open-glossary {
-  order: 11;
 }
 
 body.reflow-book .reflow-settings-organized #reflow-font-settings-label {
@@ -2785,24 +2738,6 @@ body.reflow-book .reflow-settings-organized .reflow-font-settings-options button
   font-size: 1rem !important;
 }
 
-/* El botón de glosario es una fila más del bloque Leer, no una tarjeta aparte. */
-body.reflow-book .reflow-settings-organized #reflow-open-glossary {
-  min-height: 2.75rem !important;
-  justify-content: flex-start !important;
-  padding: .5rem .25rem !important;
-  border: 0 !important;
-  border-bottom: 1px solid var(--ceibal-gray-800) !important;
-  border-radius: 0 !important;
-  color: var(--ceibal-gray-100) !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  font-size: 1rem !important;
-}
-
-body.reflow-book .reflow-settings-organized #reflow-open-glossary:hover {
-  background: rgb(102 198 192 / 12%) !important;
-}
-
 body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system {
   margin: 0 .25rem .5rem !important;
 }
@@ -2923,8 +2858,7 @@ body.reflow-book .reflow-settings-organized #reflow-font-settings {
   padding-bottom: 0 !important;
 }
 
-body.reflow-book .reflow-settings-organized .reflow-font-settings-card,
-body.reflow-book .reflow-settings-organized .reflow-reference-tools-card {
+body.reflow-book .reflow-settings-organized .reflow-font-settings-card {
   padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
@@ -3009,12 +2943,6 @@ body.reflow-book .reflow-custom-switch-thumb {
 body.reflow-book .reflow-custom-switch[aria-checked="true"]
   .reflow-custom-switch-thumb {
   transform: translateX(1rem);
-}
-
-body.reflow-book .reflow-settings-organized #reflow-open-glossary {
-  min-height: 2.75rem;
-  justify-content: space-between;
-  border-radius: var(--ceibal-radius-md);
 }
 
 body.reflow-book[data-reflow-reduce-motion="true"] *,
@@ -5951,7 +5879,6 @@ body.reflow-book .reflow-reader-panel [role="tab"]:active:not(:disabled):not([ar
 body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button:active:not(:disabled),
 body.reflow-book .reflow-glossary-panel [role="tabpanel"] li > button:active:not(:disabled),
 body.reflow-book .reflow-panel-control-header button:active:not(:disabled),
-body.reflow-book #reflow-open-glossary:active:not(:disabled),
 body.reflow-book #reflow-reduce-motion-system:active:not(:disabled) {
   border-color: var(--ceibal-institutional-200) !important;
   color: #fff !important;
@@ -6261,7 +6188,6 @@ body.reflow-book #content#content section[data-section-type="boxed_text"] div:ha
   body.reflow-book .reflow-navigation-panel [role="tabpanel"]
     .reflow-index-page-button,
   body.reflow-book .reflow-panel-control-header button,
-  body.reflow-book .reflow-settings-organized #reflow-open-glossary,
   body.reflow-book .reflow-settings-organized #reflow-reduce-motion-system {
     min-height: 3rem !important;
   }

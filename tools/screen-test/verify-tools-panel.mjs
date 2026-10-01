@@ -39,7 +39,6 @@ const DEPENDENT = [
   ["Reproducción automática", ".reflow-setting-autoplay"],
 ];
 const ALWAYS = [
-  ["Glosario", "#reflow-open-glossary"],
   ["Tamaño de letra", ".reflow-font-settings-options"],
   ["Lectura fácil", ".reflow-setting-easy-read"],
   ["Descripción de imágenes", ".reflow-setting-describe-images"],

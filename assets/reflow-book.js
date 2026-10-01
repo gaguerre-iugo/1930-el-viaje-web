@@ -425,6 +425,7 @@
   var pageStatusShort;
   var pageStatusMinimal;
   var indexButton;
+  var glossaryButton;
   var toolsButton;
   var ttsPlayer;
   var ttsPlayerPreviousButton;
@@ -3056,7 +3057,9 @@
 
   function returnFromGlossaryToTools() {
     if (typeof window.__adtReflowSetDockMenu !== "function") return;
-    state.panelPendingFocusSelector = "#reflow-open-glossary";
+    /* La fila del glosario ya no está en el panel, así que el regreso apunta al
+       control principal de Herramientas. */
+    state.panelPendingFocusSelector = ".reflow-setting-read-aloud [role='switch']";
     window.__adtReflowSetDockMenu("settings");
     requestAnimationFrame(syncPrimaryToolbar);
     window.setTimeout(syncPrimaryToolbar, 120);
@@ -3266,9 +3269,15 @@
        no haría nada. Se anuncian deshabilitados en vez de quedar como un toque
        muerto. */
     if (indexButton.disabled !== !runtimeMenuReady) indexButton.disabled = !runtimeMenuReady;
+    if (glossaryButton.disabled !== !runtimeMenuReady) glossaryButton.disabled = !runtimeMenuReady;
     if (toolsButton.disabled !== !runtimeMenuReady) toolsButton.disabled = !runtimeMenuReady;
     if (!runtimeMenuReady) watchRuntimeForPrimaryToolbar();
     setAttributeIfChanged(indexButton, "aria-expanded", currentMenu === "toc");
+    setAttributeIfChanged(
+      glossaryButton,
+      "aria-expanded",
+      currentMenu === "glossary"
+    );
     setAttributeIfChanged(
       toolsButton,
       "aria-expanded",
@@ -3430,6 +3439,29 @@
     }, 650);
   }
 
+  /* Íconos de interfaz embebidos: heredan currentColor y no suman pedidos. Los
+     archivos equivalentes viven en assets/icons/ (ver EVA-TOKENS.md). */
+  var uiIconArrowRight =
+    '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="3.2" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M4.2 12h12.7"/><path d="M16.56 8.04 19.56 12l-3 3.96"/></svg>';
+  var uiIconArrowLeft =
+    '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="3.2" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M19.8 12H7.1"/><path d="M7.44 8.04 4.44 12l3 3.96"/></svg>';
+  var uiIconGlossary =
+    '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M6.4 2.4 3.5 9.7"/><path d="M6.4 2.4l2.9 7.3"/>' +
+    '<path d="M4.5 7.1h3.8"/><circle cx="16.4" cy="7.6" r="2.15"/>' +
+    '<path d="M18.55 5.45v4.3"/>' +
+    '<path d="M2.8 14.4c3-1.3 6.2-1.3 9.2 0 3-1.3 6.2-1.3 9.2 0"/>' +
+    '<path d="M12 14.4v4.6"/>' +
+    '<path d="M2.8 14.4v4.6c3-1.3 6.2-1.3 9.2 0 3-1.3 6.2-1.3 9.2 0v-4.6"/></svg>';
+
   function createPagination() {
     var pagination = document.createElement("nav");
     pagination.id = "reflow-pagination";
@@ -3442,9 +3474,9 @@
         '<span class="reflow-toolbar-icon" aria-hidden="true">☰</span>' +
         '<span class="reflow-toolbar-label">Índice</span>' +
       '</button>' +
-      '<button id="reflow-previous" class="reflow-toolbar-action" type="button" ' +
+      '<button id="reflow-previous" class="reflow-toolbar-action reflow-toolbar-primary" type="button" ' +
         'aria-label="Página anterior" aria-keyshortcuts="ArrowLeft PageUp">' +
-        '<span class="reflow-toolbar-icon" aria-hidden="true">←</span>' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconArrowLeft + '</span>' +
         '<span class="reflow-toolbar-label">Anterior</span>' +
       '</button>' +
       '<output id="reflow-page-status" aria-live="off" aria-label="Página 1 de 1">' +
@@ -3452,15 +3484,21 @@
         '<span id="reflow-progress-short">1/1</span>' +
         '<span id="reflow-progress-minimal">1/1</span>' +
       '</output>' +
-      '<button id="reflow-next" class="reflow-toolbar-action" type="button" ' +
+      '<button id="reflow-next" class="reflow-toolbar-action reflow-toolbar-primary" type="button" ' +
         'aria-label="Página siguiente" aria-keyshortcuts="ArrowRight PageDown">' +
-        '<span class="reflow-toolbar-icon" aria-hidden="true">→</span>' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconArrowRight + '</span>' +
         '<span class="reflow-toolbar-label">Siguiente</span>' +
+      '</button>' +
+      '<button id="reflow-glossary" class="reflow-toolbar-action" type="button" ' +
+        'aria-label="Glosario" aria-haspopup="dialog" aria-expanded="false" ' +
+        'aria-keyshortcuts="Alt+G">' +
+        '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconGlossary + '</span>' +
+        '<span class="reflow-toolbar-label">Glosario</span>' +
       '</button>' +
       '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
         'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">⚙</span>' +
-        '<span class="reflow-toolbar-label" data-compact-label="Herram.">Herramientas</span>' +
+        '<span class="reflow-toolbar-label">Herramientas</span>' +
       '</button>';
 
     ttsPlayer = document.createElement("section");
@@ -3519,6 +3557,7 @@
     pageStatusShort = document.getElementById("reflow-progress-short");
     pageStatusMinimal = document.getElementById("reflow-progress-minimal");
     indexButton = document.getElementById("reflow-index");
+    glossaryButton = document.getElementById("reflow-glossary");
     toolsButton = document.getElementById("reflow-tools");
     ttsPlayerPreviousButton = document.getElementById("reflow-tts-previous");
     ttsPlayerToggleButton = document.getElementById("reflow-tts-toggle");
@@ -3546,8 +3585,7 @@
         ["Configuración", "Settings", "Glosario", "Glossary"]
       );
     });
-    toolsButton.addEventListener("click", function () {
-      if (consumePrimaryPointerReleaseAction(toolsButton)) return;
+    toolsButton.addEventListener("click", function () {      if (consumePrimaryPointerReleaseAction(toolsButton)) return;
       var pointerIntent = takePrimaryPointerIntent(toolsButton);
       if (pointerIntent) {
         if (pointerIntent.shouldClose) closeRuntimePanel();
@@ -3565,6 +3603,28 @@
       switchRuntimePanel(
         ["Configuración", "Settings"],
         ["Menú principal", "Main Menu"]
+      );
+    });
+    /* El glosario dejó de estar al final del panel (puntos 1 y 9 de la
+       revisión): se abre desde la barra, junto al índice y a Herramientas. */
+    glossaryButton.addEventListener("click", function () {
+      if (consumePrimaryPointerReleaseAction(glossaryButton)) return;
+      var pointerIntent = takePrimaryPointerIntent(glossaryButton);
+      if (pointerIntent) {
+        if (pointerIntent.shouldClose) closeRuntimePanel();
+        else openRuntimePanel(["Glosario", "Glossary"]);
+        return;
+      }
+      if (
+        glossaryButton.getAttribute("aria-expanded") === "true" ||
+        visibleRuntimeMenu() === "glossary"
+      ) {
+        closeRuntimePanel();
+        return;
+      }
+      switchRuntimePanel(
+        ["Glosario", "Glossary"],
+        ["Menú principal", "Main Menu", "Configuración", "Settings"]
       );
     });
     ttsPlayerPreviousButton.addEventListener("click", function () {
@@ -4574,8 +4634,6 @@
           }
         }
       );
-      var referenceSection = document.getElementById("reflow-reference-tools");
-      if (referenceSection) referenceSection.classList.add("reflow-settings-section-tools");
       /* Los títulos y el enlace se reinsertan en cada montaje: el runtime puede
          volver a renderizar el contenedor y llevarse los nodos propios. */
       ensureSettingsBlockTitles(settingsTab);
@@ -4705,18 +4763,6 @@
           '</div>';
         readingCard.appendChild(speedRow);
       }
-      if (!document.getElementById("reflow-reference-tools")) {
-        var referenceSection = document.createElement("section");
-        referenceSection.id = "reflow-reference-tools";
-        referenceSection.innerHTML =
-          '<header><h3>Herramientas</h3></header>' +
-          '<div class="reflow-reference-tools-card">' +
-            '<button id="reflow-open-glossary" type="button" aria-keyshortcuts="Alt+G">' +
-              '<span aria-hidden="true">⌕</span><span>Glosario</span>' +
-            '</button>' +
-          '</div>';
-        settingsTab.appendChild(referenceSection);
-      }
 
       Array.prototype.slice.call(settingsTab.querySelectorAll("span")).forEach(function (label) {
         if (!/^(abrir idioma|open language)$/i.test(label.textContent.trim())) return;
@@ -4798,11 +4844,6 @@
     document.addEventListener("click", function (event) {
       if (!event.target.closest("#reflow-reduce-motion-system")) return;
       applySystemReducedMotionPreference();
-    });
-
-    document.addEventListener("click", function (event) {
-      if (!event.target.closest("#reflow-open-glossary")) return;
-      toggleRuntimePanel(["Glosario", "Glossary"]);
     });
 
     document.addEventListener("click", function (event) {
@@ -5975,7 +6016,7 @@
     function pageStablePanelInteraction(target) {
       if (!target || !target.closest) return null;
       var dockTrigger = target.closest(
-        '#reflow-index, #reflow-tools, #reflow-open-glossary, ' +
+        '#reflow-index, #reflow-tools, #reflow-glossary, ' +
         'button[aria-label="Menú principal"], button[aria-label="Glosario"], ' +
         readAloudDisabledSelector + "," + readAloudEnabledSelector + "," +
         'button[aria-label="Idioma"], button[aria-label="Configuración"]'

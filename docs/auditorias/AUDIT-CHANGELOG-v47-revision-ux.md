@@ -74,6 +74,47 @@ contador conserva el capítulo y que los diez bloques son **idénticos** a los d
 > se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
 > datos a un archivo con versión propia.
 
+## Punto 3 · Las flechas pesaban menos que los botones de al lado — RESUELTO
+
+**Qué se hizo**
+
+- **Anterior y Siguiente son la acción principal**: 56 px de alto
+  (`3.5rem !important`, porque el arnés del proyecto fuerza 48 px a todos los
+  botones de la barra desde 1152 px), más anchas que Índice y Herramientas en
+  todos los anchos medidos, y en `institucional-600` con texto blanco (7,1:1).
+- **Íconos de EVA**: las flechas de texto `←` y `→` se reemplazaron por los SVG
+  derivados del export de EVA (embebidos en `reflow-book.js` con
+  `currentColor`, 24 px). Se sumó el libro con «Aa» para el glosario.
+- **Etiquetas siempre visibles**: la barra pasó de 62 a 68 rem de ancho máximo y
+  las acciones secundarias dieron su relleno horizontal, para que las seis
+  columnas entren con el texto completo (el primer intento recortaba
+  «Índice», «Glosario» y «Herramientas» con puntos suspensivos).
+- **Por debajo de 32 rem** las flechas se apilan (ícono arriba, etiqueta abajo,
+  como pide el documento para cuando falta espacio), el contador queda sólo con
+  el avance y las tres acciones secundarias pasan a ícono con nombre accesible.
+- **Estado deshabilitado**: 40 % de opacidad y sin borde.
+
+**Verificación**: `tools/screen-test/verify-primary-toolbar.mjs` (nuevo) recorre
+ocho anchos (1920, 1366, 1024, 768, 620, 480, 400 y 340 px) y comprueba: sin
+desborde de barra, seis columnas, flechas más altas (56 px) y más anchas que
+Índice y Herramientas, etiquetas presentes y **sin recortar**, fondo
+`rgb(0, 99, 93)`, texto blanco, íconos SVG presentes, el estado deshabilitado al
+40 % sin borde y que el glosario se abra desde la barra.
+
+## Punto 1 · El glosario quedaba escondido — acceso RESUELTO
+
+**Qué se hizo**
+
+- El glosario se abre desde **la barra**, en un botón propio entre «Siguiente» y
+  «Herramientas», con el ícono de libro abierto con «Aa» que propone el
+  documento. No existe un ícono equivalente en el set de EVA, así que se dibujó
+  para el libro (ver `docs/arquitectura/EVA-TOKENS.md`).
+- Se eliminó la fila del glosario que vivía al final del panel Herramientas
+  (punto 9) junto con su CSS, y el regreso del panel de glosario ahora enfoca el
+  interruptor de lectura en voz alta en lugar de una fila que ya no existe.
+- Queda **pendiente la segunda mitad del punto 1**: activar «Resaltar palabras»
+  por defecto y cambiar el resaltado por un subrayado punteado sutil.
+
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 
 **Problema:** los botones del índice llevaban `focus:outline-none` en su clase:
