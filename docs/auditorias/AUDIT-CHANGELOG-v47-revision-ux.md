@@ -3,6 +3,40 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 23 · Detalles tipográficos del contenido — RESUELTO
+
+Se agregaron dos herramientas y se aplicaron tres arreglos.
+
+**Herramientas nuevas**
+
+- `tools/audit_typo.py` — informa comillas que no son las del libro, `--` en lugar
+  de raya, `...` en lugar de `…`, espacios dobles, espacios antes de puntuación,
+  `<br>` dentro de párrafos y espacios duros. Analiza **sólo el texto visible**: el
+  primer relevo daba 41 033 coincidencias porque contaba las comillas de los
+  atributos HTML, y 1 840 después porque reemplazaba las etiquetas por espacios
+  (`</p><p>` parecía un espacio doble). Se descartan `head`, `script` y `style`, y
+  cada etiqueta corta el texto en vez de separarlo con un espacio.
+- `tools/fix_typo_content.py` — aplica los arreglos.
+
+**Arreglos aplicados**
+
+| Qué | Cuántos | Resultado |
+|---|---|---|
+| Puntos suspensivos `...` → `…` | 3 | «En cuanto pueda…», «Ni que el bisabuelo fuera…», «…aprieta las herramientas…» |
+| Rangos de fecha con guion sin espacios | 3 | `(1877 - 1929)` y `(1916 - ?)` → convención en español |
+| Encabezado de página para lectores de pantalla | **20** | anunciaban el nombre del archivo PDF (`1930-el-viaje---PDF--1--21`) |
+| `<title>` del documento | 21 | el nombre del archivo en la pestaña del navegador |
+
+El encabezado es el hallazgo importante: en 20 páginas (pg036 a pg057) el `h1`
+oculto que leen los lectores de pantalla decía `1930-el-viaje---PDF--1--21`. Ahora
+dice el tipo de página («Separador de capítulo», «Página ilustrada», «Página del
+libro»); cuando el título del capítulo está en el índice, se usa ese.
+
+**Verificación**: `audit_typo.py` pasa de **45 coincidencias a 1**. La que queda no
+es un error de forma sino de **contenido** y necesita decisión editorial:
+`pg176177_n0009` dice «Instituto para el futuro ???». El control de charset no sumó
+avisos: los 30 hallazgos son de dos archivos con citas en otros idiomas y ya estaban.
+
 ## Preparación
 
 - **Tokens de EVA**: la paleta institucional y la de grises quedó transcripta de
