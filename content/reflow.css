@@ -6045,23 +6045,32 @@ body.reflow-book .reflow-control-status[data-state="success"]::before {
   content: "✓";
 }
 
+/* El subrayado del glosario es sutil a propósito (punto 1): línea punteada fina
+   en el institucional, sin fondo, para que el texto siga leyéndose como texto.
+   Antes era una píldora verde que competía con la lectura. */
 body.reflow-book #content .glossary-term {
+  color: inherit;
+  background: none;
+  text-decoration: underline dotted var(--ceibal-institutional-600);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
   transition: color 120ms ease, background-color 120ms ease,
-    box-shadow 120ms ease;
+    text-decoration-color 120ms ease;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
 body.reflow-book #content .glossary-term:hover {
   color: var(--ceibal-institutional-700) !important;
-  background: #c7eeeb !important;
-  box-shadow: inset 0 -3px 0 var(--ceibal-institutional-500) !important;
+  background: rgb(0 99 93 / 8%) !important;
+  text-decoration-color: var(--ceibal-institutional-700);
 }
 
 body.reflow-book #content .glossary-term:is(:active, [aria-expanded="true"]) {
   color: #fff !important;
   background: var(--ceibal-institutional-600) !important;
-  box-shadow: inset 0 0 0 2px var(--ceibal-institutional-200) !important;
+  border-radius: .25rem;
+  text-decoration-color: #fff;
 }
 
 body.reflow-book #content .quiz-feedback:focus {

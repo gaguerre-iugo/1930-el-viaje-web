@@ -134,6 +134,29 @@ node verify-published.mjs         # ¿lo publicado en GitHub Pages es igual a es
 # Necesita el libro servido por HTTP (node tools/serve-local.js).
 node verify-tools-panel.mjs --url http://127.0.0.1:5599/index.html
 node verify-tools-panel.mjs --url http://127.0.0.1:5599/index.html --viewport 1920x1080
+
+# Barra inferior (revisión UX, punto 3) y acceso al glosario: Anterior y
+# Siguiente como acción principal (56 px, más anchas que Índice y Herramientas,
+# en institucional 600), etiquetas siempre visibles y sin recortar, íconos de
+# EVA, deshabilitado al 40 % sin borde, y el glosario abriéndose desde la barra.
+# Recorre ocho anchos, de 1920 a 340 px.
+node verify-primary-toolbar.mjs --url http://127.0.0.1:5599/index.html
+
+# Contador por capítulo (punto 4): "Cap. 1 · pág. 3 de 18" con tres formas según
+# el ancho, etiqueta hablada, bloques que cubren todo el libro sin huecos y
+# resistencia a un toc.json cacheado sin grupos.
+node verify-chapter-progress.mjs --url http://127.0.0.1:5599/index.html
+
+# Resaltado del glosario (punto 1): encendido por defecto, subrayado punteado
+# sutil en el color institucional, definición al tocar la palabra y preferencia
+# del lector respetada y persistida.
+node verify-glossary-highlight.mjs --url http://127.0.0.1:5599/index.html
+
+# Foco visible con teclado en la barra y el índice (punto 14).
+node verify-focus-visible.mjs --url http://127.0.0.1:5599/index.html
+
+# Fidelidad de los íconos de interfaz contra el export de EVA (no necesita servidor).
+node verify-icons.mjs
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en

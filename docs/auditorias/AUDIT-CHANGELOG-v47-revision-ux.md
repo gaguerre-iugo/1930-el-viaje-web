@@ -101,7 +101,7 @@ desborde de barra, seis columnas, flechas más altas (56 px) y más anchas que
 `rgb(0, 99, 93)`, texto blanco, íconos SVG presentes, el estado deshabilitado al
 40 % sin borde y que el glosario se abra desde la barra.
 
-## Punto 1 · El glosario quedaba escondido — acceso RESUELTO
+## Punto 1 · El glosario quedaba escondido — RESUELTO
 
 **Qué se hizo**
 
@@ -112,8 +112,27 @@ desborde de barra, seis columnas, flechas más altas (56 px) y más anchas que
 - Se eliminó la fila del glosario que vivía al final del panel Herramientas
   (punto 9) junto con su CSS, y el regreso del panel de glosario ahora enfoca el
   interruptor de lectura en voz alta en lugar de una fila que ya no existe.
-- Queda **pendiente la segunda mitad del punto 1**: activar «Resaltar palabras»
-  por defecto y cambiar el resaltado por un subrayado punteado sutil.
+- **El subrayado viene encendido de fábrica.** El estado vive en el store
+  `glossaryMode` del reproductor y no se podía encender desde afuera, así que se
+  cambia el valor inicial en la fuente, con el mismo mecanismo de parches que ya
+  usa el motor (`("glossaryMode",!1)` → `("glossaryMode",!0)`). Esto era
+  imprescindible: el globo con la definición **también** depende de ese store, de
+  modo que con el subrayado apagado tocar la palabra no hacía nada.
+- **Subrayado punteado sutil** en lugar de la píldora verde
+  (`bg-emerald-100/80 text-emerald-800`): línea punteada de 1 px en el
+  institucional 600, sin fondo, para que el texto se siga leyendo como texto.
+- **La elección del lector se respeta y persiste.** El runtime no guarda la
+  preferencia del switch en la misma clave que consulta para resaltar, así que
+  el libro registra la intención al tocar el switch
+  (`adt-reflow-glossary-highlight:…`), la respeta al recargar y sincroniza el
+  switch para que muestre lo que realmente pasa.
+
+**Verificación**: `tools/screen-test/verify-glossary-highlight.mjs` (nuevo)
+comprueba, en un perfil limpio, que hay palabras subrayadas a la vista sin tocar
+nada (14 en la segunda página), que el subrayado es `dotted` de 1 px en
+`rgb(0, 99, 93)` y sin fondo, que al tocar «trayectos» se abre el globo con su
+definición, que el switch dice «encendido», que al apagarlo no queda ninguna
+palabra subrayada y que la preferencia sobrevive a la recarga.
 
 ## Punto 14 · Sin indicador de foco en el índice — RESUELTO
 

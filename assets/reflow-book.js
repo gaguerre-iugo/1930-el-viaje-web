@@ -391,6 +391,7 @@
     settingsExpectedReadAloud: null,
     settingsExpectedWordHighlight: null,
     glossaryHighlightEnabled: false,
+    glossarySwitchValue: false,
     glossaryEntries: null,
     glossaryHighlightFrame: 0,
     glossaryHighlightGeneration: 0,
@@ -1139,8 +1140,7 @@
         var highlight = document.createElement("span");
         /* Match the stock glossary presentation while keeping the page-scoped
            implementation that avoids the full-book highlighting freeze. */
-        highlight.className =
-          "glossary-term bg-emerald-100/80 text-emerald-800 rounded cursor-pointer";
+        highlight.className = "glossary-term cursor-pointer";
         highlight.setAttribute("role", "button");
         highlight.setAttribute("tabindex", "0");
         highlight.setAttribute("aria-haspopup", "dialog");
@@ -1202,13 +1202,90 @@
     });
   }
 
+  /* Preferencia del subrayado del glosario (punto 1 de la revisión). El runtime
+     no persiste este ajuste y su switch arranca apagado, así que el valor por
+     defecto —encendido— y la elección del lector viven acá. */
+  var glossaryHighlightStorageKey =
+    "adt-reflow-glossary-highlight:1930-libro-completo-v47";
+
+  function readGlossaryHighlightPreference() {
+    try {
+      var raw = window.localStorage.getItem(glossaryHighlightStorageKey);
+      if (raw === "true") return true;
+      if (raw === "false") return false;
+    } catch (error) {}
+    return null;
+  }
+
+  function writeGlossaryHighlightPreference(enabled) {
+    try {
+      window.localStorage.setItem(
+        glossaryHighlightStorageKey,
+        enabled ? "true" : "false"
+      );
+    } catch (error) {}
+  }
+
+  /* El switch del panel es del runtime: se le refleja el valor efectivo para que
+     no muestre "apagado" mientras las palabras están subrayadas. */
+  function syncGlossaryHighlightSwitch() {
+    var panel = document.querySelector(".reflow-glossary-panel");
+    var control = panel && panel.querySelector("[role='switch']");
+    if (!control) return;
+    var effective = state.glossaryHighlightEnabled;
+    if (control.getAttribute("aria-checked") !== String(effective)) {
+      control.setAttribute("aria-checked", String(effective));
+    }
+    var input = panel.querySelector("input[type='checkbox']");
+    if (input && input.checked !== effective) input.checked = effective;
+  }
+
+  /* El lector decide con el switch: se guarda su intención antes de que React
+     procese el cambio. El switch ya muestra el valor efectivo, así que "está
+     encendido" significa que el clic lo quiere apagar. */
+  function recordGlossaryHighlightIntent(control) {
+    var next = control.getAttribute("aria-checked") !== "true";
+    state.glossarySwitchValue = !next;
+    state.glossaryHighlightEnabled = next;
+    if (window.__adtReflowGlossaryHighlightPreference) {
+      window.__adtReflowGlossaryHighlightPreference(next);
+    }
+    writeGlossaryHighlightPreference(next);
+  }
+
   function installReflowGlossaryBridge() {
+    /* El libro arranca con las palabras del glosario subrayadas (punto 1 de la
+       revisión). El switch del panel sigue siendo del runtime y su valor inicial
+       es "apagado", así que acá se decide el valor efectivo: manda la
+       preferencia del lector si existe y, si no, el subrayado queda encendido.
+       El switch se sincroniza para que muestre lo que realmente pasa. */
+    var preference = null;
+
+    function effectiveGlossaryHighlight(runtimeValue) {
+      if (preference === null) return true;
+      return preference;
+    }
+
+    window.__adtReflowGlossaryHighlightEffective = function () {
+      return effectiveGlossaryHighlight(state.glossarySwitchValue);
+    };
+
+    window.__adtReflowGlossaryHighlightPreference = function (value) {
+      if (value === undefined) return preference;
+      preference = Boolean(value);
+      return preference;
+    };
+
     window.__adtReflowSetGlossaryHighlight = function (enabled, entries) {
       var generation = ++state.glossaryHighlightGeneration;
-      state.glossaryHighlightEnabled = Boolean(enabled);
+      var stored = readGlossaryHighlightPreference();
+      if (stored !== null) preference = stored;
+      state.glossarySwitchValue = Boolean(enabled);
+      state.glossaryHighlightEnabled = effectiveGlossaryHighlight(enabled);
       state.glossaryEntries = entries || null;
       if (state.glossaryHighlightEnabled) scheduleGlossaryPageHighlight();
       else clearReflowGlossaryHighlights();
+      syncGlossaryHighlightSwitch();
       return function () {
         if (generation !== state.glossaryHighlightGeneration) return;
         state.glossaryHighlightEnabled = false;
@@ -4846,6 +4923,17 @@
       applySystemReducedMotionPreference();
     });
 
+    document.addEventListener("pointerdown", function (event) {
+      var control = event.target.closest(".reflow-glossary-panel [role='switch']");
+      if (control) recordGlossaryHighlightIntent(control);
+    }, true);
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar") return;
+      var control = event.target.closest(".reflow-glossary-panel [role='switch']");
+      if (control) recordGlossaryHighlightIntent(control);
+    }, true);
+
     document.addEventListener("click", function (event) {
       var control = event.target.closest('[role="switch"]');
       if (!control) return;
@@ -4950,6 +5038,9 @@
       if (window.__adtReflowRefreshPageStatus) {
         window.__adtReflowRefreshPageStatus();
       }
+      /* El switch del glosario es del runtime y se vuelve a pintar en cada
+         renderizado: se le reafirma el valor efectivo en el mismo ciclo. */
+      syncGlossaryHighlightSwitch();
 
       if (restricted && lastRestricted !== true && window.__adtReflowSetWordHighlight) {
         var wasWordHighlight = wordHighlightActive();
@@ -11366,6 +11457,13 @@
       'window.__adtReflowSetGlossaryHighlight(t,e):' +
       '(()=>{if(!t){If();return}if(Object.keys(e).length!==0' +
       ')return If(),Oy(e),()=>{If()}})(),[t,e])';
+    /* El subrayado del glosario viene apagado de fábrica (punto 1 de la
+       revisión: "el glosario quedó escondido"). El estado vive en el store
+       `glossaryMode` del reproductor y además condiciona el globo con la
+       definición, así que se cambia el valor inicial en la fuente: el switch
+       del panel queda encendido y coherente con lo que se ve en la página. */
+    var glossaryModeDefaultMarker = '("glossaryMode",!1)';
+    var glossaryModeDefaultReplacement = '("glossaryMode",!0)';
     var glossaryCloseFocusMarker =
       'p=(0,ja.useCallback)(()=>{i(null),s.current=null},[])';
     var glossaryCloseFocusReplacement =
@@ -11433,6 +11531,7 @@
       !source.includes(sentenceMetadataMarker) ||
       !source.includes(quizPauseMarker) ||
       !source.includes(glossaryHighlightEffectMarker) ||
+      !source.includes(glossaryModeDefaultMarker) ||
       !source.includes(glossaryCloseFocusMarker) ||
       !source.includes(glossarySkipMarker) ||
       !source.includes(glossaryBoundaryMarker) ||
@@ -11465,6 +11564,7 @@
       .replace(sentenceMetadataMarker, sentenceMetadataReplacement)
       .replace(quizPauseMarker, quizPauseReplacement)
       .replace(glossaryHighlightEffectMarker, glossaryHighlightEffectReplacement)
+      .replace(glossaryModeDefaultMarker, glossaryModeDefaultReplacement)
       .replace(glossaryCloseFocusMarker, glossaryCloseFocusReplacement)
       .replace(glossarySkipMarker, glossarySkipReplacement)
       .replace(glossaryBoundaryMarker, glossaryBoundaryReplacement)
