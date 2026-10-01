@@ -7148,6 +7148,85 @@
     if (tail.children.length) section.appendChild(tail);
   }
 
+  /* --------------------------------------------------------------------------
+     Clave de corrección de las actividades.
+
+     Antes viajaba en el HTML: `data-correct` en cada opción y, en algunas
+     secciones, `data-correct-answers` con el mapa completo. Quedaba a la vista
+     en el código fuente de la lección. Ahora vive en
+     `content/i18n/es-UY/quiz-answers.json` y se aplica al montar la actividad, de
+     modo que `option.dataset.correct` sigue siendo el contrato que leen
+     `quiz-sequence.js` y el propio motor.
+
+     En un libro offline esto es disuasión, no seguridad: el archivo se puede
+     leer. Lo que evita es que la respuesta viaje dentro del HTML de la lección.
+     ------------------------------------------------------------------------ */
+  var quizAnswers = null;
+  var quizAnswersPromise = null;
+
+  function quizSectionId(section) {
+    return (section && (section.dataset.id || section.dataset.sectionId)) || "";
+  }
+
+  function quizOptionKey(option) {
+    if (option.dataset.activityItem) return option.dataset.activityItem;
+    var input = option.querySelector('input[type="radio"], input[type="checkbox"]');
+    if (input && input.value) return input.value;
+    var explanation = option.dataset.explanationId;
+    if (explanation) return explanation.replace(/_exp$/, "");
+    return "";
+  }
+
+  function applyQuizAnswers(section) {
+    if (!quizAnswers || !section) return 0;
+    var mapa = quizAnswers[quizSectionId(section)];
+    if (!mapa) return 0;
+    var aplicadas = 0;
+    Array.prototype.slice
+      .call(section.querySelectorAll(".quiz-option, .activity-option"))
+      .forEach(function (option) {
+        var clave = quizOptionKey(option);
+        if (!clave || !(clave in mapa)) return;
+        option.dataset.correct = String(Boolean(mapa[clave]));
+        aplicadas += 1;
+      });
+    return aplicadas;
+  }
+
+  function applyQuizAnswersToDocument() {
+    if (!quizAnswers || !content) return 0;
+    var total = 0;
+    Array.prototype.slice
+      .call(
+        content.querySelectorAll(
+          '[data-section-type="activity_quiz"], [data-section-type="quiz_sequence"]'
+        )
+      )
+      .forEach(function (section) {
+        total += applyQuizAnswers(section);
+      });
+    return total;
+  }
+
+  function loadQuizAnswers() {
+    if (quizAnswersPromise) return quizAnswersPromise;
+    quizAnswersPromise = fetch("./content/i18n/es-UY/quiz-answers.json?v=1-quiz-answers")
+      .then(function (response) {
+        if (!response.ok) throw new Error("No se pudieron cargar las respuestas.");
+        return response.json();
+      })
+      .then(function (data) {
+        quizAnswers = data || {};
+        applyQuizAnswersToDocument();
+        return quizAnswers;
+      })
+      .catch(function (error) {
+        console.warn("Actividades sin clave de corrección.", error);
+        return null;
+      });
+    return quizAnswersPromise;
+  }
+
   function prepareChapterTwoQuiz() {
     var panel = content.querySelector(
       '[data-section-type="activity_quiz"][data-id="qz007"]'
@@ -7168,6 +7247,12 @@
 
     var answers = {};
     try { answers = JSON.parse(panel.dataset.correctAnswers || "{}"); } catch (_error) {}
+    if (!Object.keys(answers).length) {
+      /* La clave ya no está en el HTML: viene del archivo de respuestas. Se
+         aplica acá para que este panel no quede con todo marcado como falso si
+         todavía no llegó la carga. */
+      applyQuizAnswers(panel);
+    }
     var explanationBank = document.createElement("div");
     explanationBank.className = "quiz-explanation-bank";
     explanationBank.setAttribute("aria-hidden", "true");
@@ -7180,7 +7265,8 @@
         option.classList.add("quiz-option");
         input.classList.remove("sr-only");
         optionText.classList.add("quiz-option-text");
-        option.dataset.correct = String(Boolean(answers[input.value]));
+        /* `data-correct` lo pone applyQuizAnswers() con la clave del archivo; no
+           se reescribe acá para no pisarla. */
         var explanationId = option.dataset.explanationId;
         if (explanationId) {
           var explanation = document.createElement("span");
@@ -12064,6 +12150,7 @@
       composeChapterOneChat();
       prepareReadingFlow();
       prepareChapterTwoQuiz();
+      loadQuizAnswers();
       prepareQuizFeedbackAudio();
       installTtsMediaBridge();
       installReflowGlossaryBridge();

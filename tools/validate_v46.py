@@ -223,14 +223,35 @@ def main() -> int:
             "Chapter 2 quizzes must be qz007, qz008 and qz009 in reading-dimension order",
             errors,
         )
+    # La clave de corrección ya no vive en el HTML (ver
+    # tools/extract_quiz_answers.py): se lee del archivo de respuestas.
+    quiz_answers_path = ROOT / "content" / "i18n" / "es-UY" / "quiz-answers.json"
+    quiz_answers: dict[str, dict[str, bool]] = {}
+    if quiz_answers_path.exists():
+        try:
+            quiz_answers = json.loads(quiz_answers_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            fail("quiz-answers.json is not valid JSON", errors)
+    else:
+        fail("quiz-answers.json is missing (run tools/extract_quiz_answers.py)", errors)
+
+    # El archivo agrupa por sección (qz007.html → "qz007") y dentro lleva las
+    # opciones de sus tres preguntas (qz007_o0, qz008_o1, …).
+    respuestas_de_la_seccion = quiz_answers.get("qz007", {})
     for quiz_id, source in QUIZ_ARTICLE_RE.findall(chapter_two_quiz_source):
         option_count = len(re.findall(r'\bclass="quiz-option"', source))
-        correct_count = len(re.findall(r'\bdata-correct="true"', source))
+        correct_count = sum(
+            1
+            for clave, valor in respuestas_de_la_seccion.items()
+            if valor and clave.startswith(f"{quiz_id}_")
+        )
         if option_count != 3 or correct_count != 1:
             fail(
                 f"{quiz_id}: expected 3 options and exactly 1 correct answer",
                 errors,
             )
+        if re.search(r'\bdata-correct="', source) or "data-correct-answers=" in source:
+            fail(f"{quiz_id}: the answer key is still inside the HTML", errors)
 
     section_files: dict[str, Path] = {}
     for section_id in section_ids:

@@ -57,6 +57,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │           ├── audio/         ← Solo los archivos del manifiesto SCORM; el audio narrable vive en voices/
 │           ├── timecode/      ← Sincronización palabra por palabra
 │           ├── images.json    ← Descripciones de imágenes
+│           ├── quiz-answers.json ← Clave de corrección de las actividades
 │           └── videos.json    ← Metadatos de video
 │
 ├── images/                    ← Imágenes del libro (portada, ilustraciones)
@@ -69,6 +70,7 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 │   ├── report_voice_mismatches.py ← Reporte de discrepancias de voz
 │   ├── validate_v46.py            ← Validador de la v46
 │   ├── audit_charset.py           ← Caracteres fuera del español y de los emojis
+│   ├── extract_quiz_answers.py    ← Clave de corrección fuera del HTML
 │   ├── validate_paragraph_geometry.py ← Validación geométrica de párrafos
 │   ├── add_chapter_quizzes.py     ← Generador de cuestionarios
 │   ├── composite_cover_edit.py    ← Edición de portada compuesta
@@ -166,6 +168,10 @@ python3 tools/report_voice_mismatches.py
 # Buscar caracteres fuera del español y del rango de emojis (todo el libro)
 python3 tools/audit_charset.py
 python3 tools/audit_charset.py --repo      # incluye docs/ y tools/
+
+# Verificar que la clave de corrección de las actividades no esté en el HTML
+# y que content/i18n/es-UY/quiz-answers.json coincida (no modifica nada)
+python3 tools/extract_quiz_answers.py --check
 ```
 
 ### Tests visuales (Playwright)

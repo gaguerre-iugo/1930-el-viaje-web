@@ -94,7 +94,15 @@ def claves_a_inlinear() -> list[tuple[str, Path]]:
     # Catalogos de idioma
     i18n = ROOT / "content" / "i18n"
     for lang in sorted(p for p in i18n.iterdir() if p.is_dir()):
-        for nombre in ("audios.json", "glossary.json", "images.json", "texts.json", "videos.json"):
+        for nombre in (
+            "audios.json",
+            "glossary.json",
+            "images.json",
+            "quiz-answers.json",
+            "speech_texts.json",
+            "texts.json",
+            "videos.json",
+        ):
             p = lang / nombre
             if p.exists():
                 pares.append(("./" + p.relative_to(ROOT).as_posix(), p))

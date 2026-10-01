@@ -74,6 +74,51 @@ contador conserva el capítulo y que los diez bloques son **idénticos** a los d
 > se suba `bundleVersion`. Hay que decidirlo antes de esa fase, o mover esos
 > datos a un archivo con versión propia.
 
+## Punto 5 · Las respuestas viajaban en el HTML — RESUELTO
+
+**Problema:** cada actividad llevaba su clave de corrección en el propio HTML:
+`data-correct="true|false"` en cada opción y, en seis archivos, además
+`data-correct-answers` con el mapa completo sobre la sección. Cualquiera podía
+leer la respuesta con Ctrl+U o copiando el markup.
+
+**Solución**
+
+- La clave vive ahora en `content/i18n/es-UY/quiz-answers.json`
+  (`sección → { opción: esCorrecta }`, 14 actividades y 90 opciones), y se aplica
+  al montar la actividad. El contrato del motor no cambia: sigue leyendo
+  `option.dataset.correct`, sólo que ahora lo escribe el motor desde el archivo.
+- `tools/extract_quiz_answers.py` (nuevo) hace la migración y la verifica:
+  extrae las respuestas cubriendo **las dos formas** de actividad del libro
+  (`activity_quiz`, con `data-correct-answers`, y `quiz_sequence`, con
+  `data-correct` en cada etiqueta), escribe el JSON y limpia el HTML.
+  `--check` no modifica nada y falla si vuelve a aparecer una respuesta en el
+  HTML o si el JSON se desalinea.
+- Se quitó del HTML el pisotón que quedaba: `prepareChapterTwoQuiz()` reescribía
+  `data-correct` desde `data-correct-answers`; ahora delega en la carga común
+  (con el atributo ausente habría marcado **todas** las opciones como falsas).
+- **Paquete offline**: `tools/build_offline_preloader.py` no incluía el archivo
+  nuevo ni `speech_texts.json` (hueco previo, reportado por `validate_v46.py`).
+  Se agregaron los dos a la lista blanca: el precargador pasa de 231 a **233**
+  claves y el libro abierto como `file://` vuelve a corregir.
+- `validate_v46.py` leía `data-correct="true"` del HTML para comprobar que cada
+  pregunta tiene exactamente una respuesta correcta; ahora lee el archivo nuevo
+  (y falla si la clave vuelve al HTML).
+
+**Verificación**: `tools/screen-test/verify-quiz-answers.mjs` (nuevo) comprueba
+que los 14 archivos de actividad tengan **0** atributos de respuesta, que el
+archivo tenga las 14 actividades y 90 opciones, que el DOM reproduzca
+exactamente el archivo (**72 opciones comparadas, 0 discrepancias**) y que la
+corrección siga funcionando: elegir la opción correcta da «correcto» en las
+actividades probadas y elegir una incorrecta da «incorrecto» —sin esta última
+prueba, un motor que marcara todo como correcto pasaría inadvertido.
+
+**Decisión pendiente (contenido)**: los archivos `qz001.html` a `qz006.html` no
+están en el orden de lectura ni los enlaza nadie; sólo los lista
+`imsmanifest.xml`. Contienen las preguntas qz001–qz003 (que también viven dentro
+de `quiz_final`, con las mismas claves pero respuestas distintas) y **qz004,
+qz005 y qz006, que no existen en ningún otro lado**. Hay que decidir si se
+integran al libro, se dejan como están o se retiran del paquete.
+
 ## Punto 3 · Las flechas pesaban menos que los botones de al lado — RESUELTO
 
 **Qué se hizo**

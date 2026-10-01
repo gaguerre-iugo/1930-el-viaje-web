@@ -157,6 +157,11 @@ node verify-focus-visible.mjs --url http://127.0.0.1:5599/index.html
 
 # Fidelidad de los íconos de interfaz contra el export de EVA (no necesita servidor).
 node verify-icons.mjs
+
+# Respuestas de las actividades (punto 5): que no queden en el HTML, que el
+# archivo content/i18n/es-UY/quiz-answers.json cubra las 14 actividades y que el
+# motor reproduzca esa clave en el DOM (72 opciones) corrigiendo bien y mal.
+node verify-quiz-answers.mjs --url http://127.0.0.1:5599/index.html
 ```
 
 El diagnóstico completo, con magnitudes y causas, está en
