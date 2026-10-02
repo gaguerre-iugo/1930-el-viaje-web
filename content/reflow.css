@@ -6721,3 +6721,24 @@ body.reflow-book #content .quiz-next-question {
   padding-inline: var(--ceibal-space-5);
   text-align: center;
 }
+
+/* La fila de opción no puede quedar con la altura que el motor midió antes de
+   corregir la respuesta: al pasar a dos líneas, el texto se salía del borde. */
+body.reflow-book #content .quiz-option {
+  height: auto !important;
+  max-height: none !important;
+  min-height: 3.25rem;
+}
+
+/* «Siguiente pregunta» va alineado a la derecha y separado de «Enviar». */
+body.reflow-book #content .quiz-actions,
+body.reflow-book #content .quiz-feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--ceibal-space-3);
+  margin-top: var(--ceibal-space-3);
+}
+body.reflow-book #content .quiz-next-question {
+  margin-left: auto;
+}
