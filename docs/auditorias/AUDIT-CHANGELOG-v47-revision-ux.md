@@ -3,6 +3,28 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Regresión y reversión: el recorte del visor rompió la navegación
+
+Se aplicó `body.reflow-book #content { overflow-x: clip; overflow-y: visible }` para
+que el contenido de la página vecina no sangrara sobre la tarjeta del cuestionario.
+**Rompió la navegación**: no se podía avanzar ni con las flechas de la barra ni
+saltando desde el índice.
+
+La causa: `overflow-x: clip` **no crea** un contenedor de scroll, pero **deshabilita
+el que ya existía** en ese elemento, y el motor navega **haciendo scroll sobre
+`#content`**. Mi razonamiento cubrió la mitad del problema (que `clip` no obliga al
+otro eje a comportarse como `auto`, a diferencia de `hidden`) y se me escapó la otra:
+que `clip` quita la capacidad de desplazarse.
+
+**Revertido y verificado**: flechas 1→2→3→4, «Anterior» vuelve a 3, salto por el
+índice a «Sinopsis» (pág. 9 de 10), consola sin errores
+(`tools/screen-test/_diag-nav.mjs`).
+
+**Enfoque correcto para el sangrado**: recortar sin tocar el desplazamiento, con
+`clip-path: inset(0)`, que es puramente visual. Antes de aplicarlo hay que verificar
+**las dos cosas juntas**: que el sangrado se detenga **y** que la navegación siga
+funcionando.
+
 ## Punto 18 · Contraste de los cuestionarios (hallazgo suelto) — CORREGIDO
 
 El documento **no** pide cambiar el fondo de los cuestionarios: el turquesa es
