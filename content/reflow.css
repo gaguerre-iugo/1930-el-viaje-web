@@ -6708,3 +6708,16 @@ body.reflow-book #content .quiz-option :is(span, label, p) {
 /* El visor del paginado no deja pasar el contenido de las páginas vecinas. El motor
    arma el libro como una fila horizontal y la corre por página; el recorte va en el
    elemento que mide la ventana. `clip` en un eje permite `visible` en el otro. */
+
+/* El botón «Siguiente pregunta» del cuestionario quedaba aplastado a 32 px de ancho
+   —medido en el estado incorrecto—, así que su texto se envolvía en vertical y se
+   veía como un recuadro suelto sobre la tarjeta. Se le da ancho mínimo y se deja que
+   envuelva dentro de él. */
+body.reflow-book #content .quiz-next-question {
+  width: auto;
+  min-width: 12rem;
+  max-width: 100%;
+  white-space: normal;
+  padding-inline: var(--ceibal-space-5);
+  text-align: center;
+}
