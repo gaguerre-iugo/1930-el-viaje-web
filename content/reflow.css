@@ -6742,3 +6742,31 @@ body.reflow-book #content .quiz-feedback-actions {
 body.reflow-book #content .quiz-next-question {
   margin-left: auto;
 }
+
+/* «Enviar» vuelve al centro: la regla anterior lo había corrido a la derecha. */
+body.reflow-book #content .quiz-actions {
+  justify-content: center;
+}
+
+/* «Siguiente pregunta» va a la derecha dentro de la devolución: ancho al contenido
+   y margen izquierdo automático, que funciona en un contenedor de bloque. */
+body.reflow-book #content .quiz-next-question {
+  display: block;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: var(--ceibal-space-3);
+}
+
+/* «Siguiente pregunta» a la derecha. `margin-left: auto` no alcanzó (medido: seguía
+   en x=334), así que el contenedor debe ser una grilla con los ítems al inicio. Se
+   usa float, que alinea a la derecha en cualquier contenedor de bloque, más las
+   propiedades equivalentes para flex y grid. */
+body.reflow-book #content .quiz-next-question {
+  float: right !important;
+  clear: both !important;
+  justify-self: end !important;
+  align-self: end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
