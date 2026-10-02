@@ -1452,6 +1452,23 @@
   /* Punto 18 · Los pop-ups del runtime (globo del glosario, diálogos en capa)
      vienen del tema oscuro: fondo oklch(0.269 0 0) y texto casi blanco. Se pintan
      con los tokens y se les repara el contraste, igual que a los paneles. */
+  /* Punto 18 · El color del control de opción sigue al estado de la respuesta. El
+     runtime lo fija en una capa, así que va con prioridad inline. */
+  function syncQuizOptionAccent() {
+    var opciones = document.querySelectorAll("#content .quiz-option");
+    for (var i = 0; i < opciones.length; i++) {
+      var opcion = opciones[i];
+      var clase = opcion.className || "";
+      var elegido = "var(--ceibal-institutional-600)";
+      if (clase.indexOf("is-correct") >= 0) elegido = "#16803a";
+      else if (clase.indexOf("is-incorrect") >= 0) elegido = "#c42b24";
+      var control = opcion.querySelector("input[type='radio'], input[type='checkbox']");
+      if (control && control.style.getPropertyValue("accent-color") !== elegido) {
+        control.style.setProperty("accent-color", elegido, "important");
+      }
+    }
+  }
+
   var POPUP_SELECTOR = [
     '[data-radix-popper-content-wrapper]',
     '[role="dialog"]',
@@ -1501,6 +1518,7 @@
         repairPanelContrast(paneles[i]);
       }
       applyPopupInlineTheme();
+      syncQuizOptionAccent();
     };
     var pendiente = false;
     var programar = function () {
