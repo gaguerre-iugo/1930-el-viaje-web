@@ -6684,3 +6684,23 @@ body.reflow-book [role="tooltip"] {
 body.reflow-book [data-radix-popper-content-wrapper] :is(p, span, dd, dt, small) {
   color: var(--ui-text) !important;
 }
+
+/* El color del control sigue al estado de la respuesta: en la opción incorrecta la
+   burbuja quedaba turquesa contra el borde rojo. */
+body.reflow-book #content .quiz-option {
+  accent-color: var(--ceibal-institutional-600);
+}
+body.reflow-book #content .quiz-option.is-selected {
+  accent-color: var(--ceibal-institutional-600);
+}
+body.reflow-book #content .quiz-option.is-correct {
+  accent-color: #16803a;
+}
+body.reflow-book #content .quiz-option.is-incorrect {
+  accent-color: #c42b24;
+}
+/* El texto largo de una opción no se sale de su fila. */
+body.reflow-book #content .quiz-option :is(span, label, p) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
