@@ -33,6 +33,25 @@ incorrecta) y la devolución. El diagnóstico quedó a medio hacer porque usa te
 literals anidados (`${}` dentro de una plantilla que se inyecta en la página) y hay
 que reescribirlo con concatenación. Es lo único del punto 18 que falta medir.
 
+### Medición de los estados del cuestionario (parcial)
+
+Con `tools/screen-test/_mide-quiz-estados.mjs` (reescrito sin plantillas de cadena,
+con la lógica dentro de `page.evaluate`) se midió, sobre una actividad real:
+
+| Elemento | Contraste | AA |
+|---|---|---|
+| Opciones (texto gris-900 sobre blanco) | **17,73:1** | ✓ |
+| Devolución | **4,72:1** | ✓ (justo) |
+| Botón «Enviar» en su estado inactivo | **6,08:1** | ✓ |
+| Kicker y enunciado | 7,52:1 | ✓ |
+
+**Lo que no se pudo confirmar**: los colores de los estados **elegida, correcta e
+incorrecta**. Las mediciones salen idénticas antes y después de enviar, así que el
+clic y la corrección no llegaron a registrarse en el sondeo (o la actividad ya venía
+con la devolución mostrada). Falta ajustar la interacción —marcar la opción y
+enviar— para ver esos estados. Los textos base y la devolución sí quedaron medidos y
+cumplen.
+
 ## Punto 18 · Tema claro — CIERRE: pop-ups del runtime
 
 El punto pedía «barra, paneles y **pop-up** claros con los tokens de EVA». Cuando se
