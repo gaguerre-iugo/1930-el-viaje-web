@@ -168,6 +168,30 @@ node verify-quiz-answers.mjs --url http://127.0.0.1:5599/index.html
 # cierre de la secuencia al responder las tres.
 node verify-quiz-retry.mjs --url http://127.0.0.1:5599/index.html
 
+# «Siguiente pregunta» de punta a punta: falla la respuesta, presiona el botón y
+# exige que el kicker pase de «Pregunta 1 de 3» a «Pregunta 2 de 3». Mide el kicker
+# VISIBLE: el libro repite el mismo texto en 24 nodos (8 capítulos × 3 preguntas) y
+# buscar el primero del DOM devuelve una copia fuera de pantalla.
+node verify-quiz-next-question.mjs --url http://127.0.0.1:5599/index.html
+
+# Filas de opción y «Siguiente pregunta» con letra grande, extra grande y zoom del
+# navegador: 9 combinaciones (1366, 947 y 800/640 px CSS × zoom 1, 1,25 y 1,5).
+# Ninguna fila puede desbordar su tarjeta ni el viewport, y el botón tiene que
+# quedar pegado al borde derecho de la devolución (entre 0 y 24 px).
+node verify-quiz-zoom.mjs --url http://127.0.0.1:5599/index.html
+
+# Con la devolución desplegada, la devolución y «Siguiente pregunta» tienen que
+# entrar completos en la tarjeta: el motor las empujaba con una transformación y la
+# tarjeta las recortaba, y en columnas bajas el contenido no entraba. Responde mal
+# en las 8 secuencias y mide 7 combinaciones de tamaño y letra (56 casos).
+node verify-quiz-feedback-fit.mjs --url http://127.0.0.1:5599/index.html
+
+# Ninguna fila de opción puede cortar su propio texto. El motor le fija la altura
+# que midió ANTES de enviar, así que cuando el texto pasa a dos o tres líneas la
+# última se salía del recuadro. Cubre las dos formas: la opción marcada más larga y
+# el texto que se alarga DESPUÉS de enviar (112 comprobaciones).
+node verify-quiz-option-fit.mjs --url http://127.0.0.1:5599/index.html
+
 # Apertura (puntos 21 y 22): texto de carga «Abriendo 1930: El viaje…» y el
 # enlace «saltar al contenido» invisible en reposo (sin el filo de su sombra)
 # pero visible al enfocarlo con el teclado.

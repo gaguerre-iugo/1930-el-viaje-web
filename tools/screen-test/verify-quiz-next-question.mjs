@@ -3,7 +3,10 @@
 // Es la reproducción exacta del problema reportado.
 import { chromium } from "playwright";
 
-const url = process.argv[2] || "http://127.0.0.1:5501/index.html";
+/* Acepta la URL suelta o después de `--url`. */
+const url =
+  process.argv.slice(2).find((valor) => /^https?:\/\//.test(valor)) ||
+  "http://127.0.0.1:5501/index.html";
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
 const errores = [];
@@ -23,13 +26,25 @@ await page.waitForTimeout(2500);
 await page.keyboard.press("Escape");
 await page.waitForTimeout(1200);
 
-/* Kicker visible: «Comprensión lectora · Pregunta N de 3». */
+/* Kicker visible: «Comprensión lectora · Pregunta N de 3».
+   Medido: el libro tiene 24 kickers en el DOM (8 capítulos × 3 preguntas) y todos
+   repiten los mismos textos. Buscar el primero del DOM devuelve una copia que está
+   fuera de la pantalla, así que la medición tiene que ser la del lector: el nodo
+   cuyo centro cae dentro del viewport y que `elementFromPoint` confirma. */
 const kicker = () =>
   page.evaluate(() => {
-    const nodo = Array.from(document.querySelectorAll("#content *")).find((el) =>
-      /Pregunta\s+\d+\s+de\s+\d+/i.test((el.textContent || "").trim()) && (el.textContent || "").length < 80
-    );
-    return nodo ? (nodo.textContent || "").replace(/\s+/g, " ").trim() : "sin kicker";
+    const texto = (el) => (el.textContent || "").replace(/\s+/g, " ").trim();
+    const candidatos = Array.from(document.querySelectorAll("#content .quiz-kicker"));
+    const visible = candidatos.find((el) => {
+      const caja = el.getBoundingClientRect();
+      const x = caja.left + caja.width / 2;
+      const y = caja.top + caja.height / 2;
+      if (caja.width <= 0 || caja.height <= 0) return false;
+      if (x < 0 || x > window.innerWidth || y < 0 || y > window.innerHeight) return false;
+      const golpe = document.elementFromPoint(x, y);
+      return Boolean(golpe) && (golpe === el || el.contains(golpe) || golpe.contains(el));
+    });
+    return visible ? texto(visible) : "sin kicker visible";
   });
 
 console.log("antes de responder: " + (await kicker()));

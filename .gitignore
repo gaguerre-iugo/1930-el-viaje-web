@@ -10,3 +10,10 @@ node_modules/
 
 # Carpeta de trabajo de las herramientas de portada (mascaras y previews)
 tmp/
+
+# Exportaciones para AWS S3 (generadas con Export/export-to-aws.ps1)
+Export/sitio/
+
+# Exportaciones para AWS S3 (generadas con Export/export-to-aws.ps1)
+Export/sitio/
+Export/1930-El-Viaje.zip
