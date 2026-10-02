@@ -34,6 +34,37 @@ cae detrás de él hay que desplazar el libro lo justo para que la oración qued
 vista (observando el elemento resaltado del runtime y corrigiendo el desplazamiento
 sin animación, para no pelear con `prefers-reduced-motion`).
 
+### Parte 2 · La oración en lectura no queda tapada — RESUELTO
+
+El resaltado del runtime usa la **Custom Highlight API** (`::highlight(adt-tts-active)`),
+así que no es un elemento y no tiene caja. El **bloque** en lectura sí la tiene:
+lleva la clase `.tts-active-block`. Y como el libro es **paginado en columnas**, la
+oración no se puede desplazar: lo que se mueve es el reproductor.
+
+- `syncTtsPlayerAvoidance()` mide la caja del bloque activo contra la del
+  reproductor y, si se cruzan, le pone la clase `reflow-tts-player-top`, que lo
+  corre **arriba de la pantalla** mientras dure la situación; cuando el bloque sale
+  de esa franja, vuelve abajo.
+- Sin transición: el ciclo de lectura es rápido y una animación pelearía con
+  `prefers-reduced-motion`.
+- Se engancha en el ciclo de sincronización que ya corre cada 650 ms y se expone
+  `window.__adtReflowSyncTtsAvoidance` para la verificación.
+
+**Verificación**: `tools/screen-test/verify-tts-avoidance.mjs` (nuevo) marca un
+bloque real de contenido como «en lectura», en la banda de abajo y arriba, y
+comprueba que no se superponga con el reproductor. Medido: con el bloque abajo
+(737–793) el reproductor pasa a 8–68 px; con el bloque arriba (36–129) el
+reproductor queda en 763–823 px. **Sin superposición en los dos casos.**
+
+**Aviso para el paso siguiente**: la suite `verify-light-theme.mjs` quedó **en
+rojo** en un solo punto, la fila de capítulo del índice (`li > button`), que vuelve
+a medir 1:1. Ya había quedado bien (17,73:1) y se rompió al agregar el pase
+programado, así que es una **carrera con el re-render del runtime**: el pase inline
+escribe y el runtime vuelve a pintar la fila después. El CSS está sano (llaves
+balanceadas 796/796) y el resto de la suite pasa. Se resuelve reaplicando después
+del render del panel (observando el contenedor o con un repaso más largo), no
+alargando la espera de la prueba.
+
 ## Punto 23 · Detalles tipográficos del contenido — RESUELTO
 
 Se agregaron dos herramientas y se aplicaron tres arreglos.

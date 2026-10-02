@@ -1480,6 +1480,11 @@
       });
     }
     aplicar();
+    /* Repasos programados: el panel del runtime se monta de forma asincrónica y
+       el observador puede llegar tarde. Estos no dependen de él. */
+    [120, 400, 900, 1800].forEach(function (demora) {
+      window.setTimeout(aplicar, demora);
+    });
   }
 
   primeGlossaryModeStorage();
@@ -3498,6 +3503,30 @@
     );
   }
 
+  /* Punto 25 · La oración en lectura no puede quedar detrás del reproductor. El
+     runtime marca el bloque con .tts-active-block (el resaltado en sí es de la
+     Custom Highlight API y no tiene caja). Si el bloque cae en la banda del
+     reproductor, este se corre arriba mientras dure la situación. */
+  function syncTtsPlayerAvoidance() {
+    if (!ttsPlayer || ttsPlayer.hidden) {
+      if (ttsPlayer) ttsPlayer.classList.remove("reflow-tts-player-top");
+      return;
+    }
+    var bloque = document.querySelector(
+      "#content .tts-active-block, #content .bg-yellow-300"
+    );
+    if (!bloque) {
+      ttsPlayer.classList.remove("reflow-tts-player-top");
+      return;
+    }
+    var caja = bloque.getBoundingClientRect();
+    var reproductor = ttsPlayer.getBoundingClientRect();
+    /* Tapado si se cruzan en vertical y el bloque está en la misma franja. */
+    var seCruzan = caja.bottom > reproductor.top && caja.top < reproductor.bottom;
+    ttsPlayer.classList.toggle("reflow-tts-player-top", seCruzan);
+  }
+  window.__adtReflowSyncTtsAvoidance = syncTtsPlayerAvoidance;
+
   function syncFloatingTtsPlayer() {
     if (!ttsPlayer || !ttsPlayerToggleButton) return;
     var active = ttsSessionIsActive();
@@ -3507,6 +3536,7 @@
     ttsPlayer.hidden = !active;
     ttsPlayer.setAttribute("aria-hidden", String(!active));
     document.body.classList.toggle("reflow-tts-session-active", active);
+    syncTtsPlayerAvoidance();
 
     var playLabel = playing ? "Pausar" : "Reproducir";
     setAttributeIfChanged(ttsPlayerToggleButton, "aria-label", playLabel);

@@ -6663,3 +6663,11 @@ body.reflow-book .reflow-reader-panel .reflow-setting-description {
     padding: .5rem;
   }
 }
+
+/* Punto 25 · Cuando el bloque en lectura queda en la banda del reproductor, este
+   se corre arriba para no tapar la oración. Sin transición: el ciclo de lectura
+   es rápido y una animación pelearía con prefers-reduced-motion. */
+body.reflow-book #reflow-tts-player.reflow-tts-player-top {
+  bottom: auto;
+  top: max(.5rem, env(safe-area-inset-top));
+}
