@@ -316,26 +316,23 @@
       irAlSiguiente.className = "quiz-next-question";
       irAlSiguiente.textContent = "Siguiente pregunta";
       irAlSiguiente.addEventListener("click", function () {
-        /* El paginado del libro se hace con el scroll de #content, así que
-           scrollIntoView lo movía a una posición arbitraria en píxeles y el botón
-           terminaba mostrando la misma pregunta. Se lleva la siguiente pregunta al
-           foco y, si quedó fuera de la página, se alinea el scroll a la página que
-           la contiene (múltiplo del ancho visible), que es como pagina el motor. */
+        /* La siguiente pregunta vive en otra página del paginado, así que hay que
+           cambiar de página. No se toca el scroll a mano: el motor lo maneja en su
+           ciclo de sincronización y lo revierte. Se usan los botones de navegación
+           del libro, que son los que el motor escucha, tantas veces como páginas de
+           distancia haya. */
         focusFirstOption(siguiente);
         var contenedor = document.getElementById("content");
         if (!contenedor) return;
-        var ancho = contenedor.clientWidth;
+        var ancho = contenedor.clientWidth || window.innerWidth;
         if (!ancho) return;
         var caja = siguiente.getBoundingClientRect();
-        var visible = caja.left >= 0 && caja.right <= ancho;
-        if (visible) return;
-        var destino = Math.round((contenedor.scrollLeft + caja.left) / ancho) * ancho;
-        contenedor.scrollTo({
-          left: destino,
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-            ? "auto"
-            : "smooth"
-        });
+        var actual = Math.round(contenedor.scrollLeft / ancho);
+        var objetivo = Math.round((contenedor.scrollLeft + caja.left) / ancho);
+        if (objetivo === actual) return;
+        var boton = document.getElementById(objetivo > actual ? "reflow-next" : "reflow-previous");
+        if (!boton) return;
+        for (var paso = 0; paso < Math.abs(objetivo - actual); paso += 1) boton.click();
       });
       feedback.appendChild(irAlSiguiente);
     }
