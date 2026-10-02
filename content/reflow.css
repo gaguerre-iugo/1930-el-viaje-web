@@ -6671,3 +6671,16 @@ body.reflow-book #reflow-tts-player.reflow-tts-player-top {
   bottom: auto;
   top: max(.5rem, env(safe-area-inset-top));
 }
+
+/* Punto 18 · Pop-ups del runtime en claro (globo del glosario, diálogos en capa).
+   El pase inline del motor es el que garantiza el color; esto lo adelanta. */
+body.reflow-book [data-radix-popper-content-wrapper] > *,
+body.reflow-book [role="dialog"],
+body.reflow-book [role="tooltip"] {
+  color: var(--ui-text) !important;
+  background-color: var(--ui-surface) !important;
+  border-color: var(--ui-border) !important;
+}
+body.reflow-book [data-radix-popper-content-wrapper] :is(p, span, dd, dt, small) {
+  color: var(--ui-text) !important;
+}

@@ -1375,11 +1375,14 @@
     }
     /* oklch(L C H): L es la luminosidad perceptual (0 a 1) y alcanza para decidir
        si el texto se lee sobre el fondo. Se usa como gris equivalente. */
-    var oklch = texto.match(/^oklch\(\s*([\d.]+)/);
-    if (oklch) {
-      var luz = Math.max(0, Math.min(1, Number(oklch[1])));
+    /* oklch y oklab comparten el primer número: la luminosidad perceptual (0 a 1),
+       que alcanza para decidir si el texto se lee sobre el fondo. */
+    var luz_perceptual = texto.match(/^ok(?:lch|lab)\(\s*([\d.]+)/);
+    if (luz_perceptual) {
+      var luz = Math.max(0, Math.min(1, Number(luz_perceptual[1])));
       var gris = Math.round(luz * 255);
-      return { r: gris, g: gris, b: gris, a: 1 };
+      var alfa = texto.match(/\/\s*([\d.]+)\s*\)/);
+      return { r: gris, g: gris, b: gris, a: alfa ? Number(alfa[1]) : 1 };
     }
     var numeros = texto.match(/[\d.]+/g) || [];
     return {
@@ -1446,6 +1449,47 @@
     }
   }
 
+  /* Punto 18 · Los pop-ups del runtime (globo del glosario, diálogos en capa)
+     vienen del tema oscuro: fondo oklch(0.269 0 0) y texto casi blanco. Se pintan
+     con los tokens y se les repara el contraste, igual que a los paneles. */
+  var POPUP_SELECTOR = [
+    '[data-radix-popper-content-wrapper]',
+    '[role="dialog"]',
+    '[role="tooltip"]',
+    '[role="menu"]',
+    '[data-state="open"]',
+  ].join(", ");
+
+  function applyPopupInlineTheme() {
+    var candidatos = document.querySelectorAll(POPUP_SELECTOR);
+    for (var i = 0; i < candidatos.length; i++) {
+      var popup = candidatos[i];
+      var caja = popup.getBoundingClientRect();
+      if (caja.width < 60 || caja.height < 30) continue;
+      /* El elemento pintado es el que tiene fondo propio (el contenedor de Radix
+         suele ser transparente). */
+      var pintados = [];
+      var propio = panelRgb(window.getComputedStyle(popup).backgroundColor);
+      if (propio.a > 0.4) pintados.push(popup);
+      var hijos = popup.querySelectorAll("div, section, ul");
+      for (var j = 0; j < hijos.length; j++) {
+        var fondo = panelRgb(window.getComputedStyle(hijos[j]).backgroundColor);
+        if (fondo.a > 0.4) pintados.push(hijos[j]);
+      }
+      for (var k = 0; k < pintados.length; k++) {
+        var nodo = pintados[k];
+        var estilo = window.getComputedStyle(nodo);
+        /* Sólo se toca lo que está oscuro: si ya es claro, se deja. */
+        if (panelLuminance(panelRgb(estilo.backgroundColor)) >= 0.5) continue;
+        nodo.style.setProperty("background-color", "var(--ui-surface)", "important");
+        nodo.style.setProperty("color", "var(--ui-text)", "important");
+        nodo.style.setProperty("border-color", "var(--ui-border)", "important");
+      }
+      /* Y se reparan los textos que quedaron con contraste bajo. */
+      repairPanelContrast(popup);
+    }
+  }
+
   var panelInlineObserver = null;
   var panelInlineInterval = 0;
   function watchPanelInlineTheme() {
@@ -1456,6 +1500,7 @@
         applyPanelInlineTheme(paneles[i]);
         repairPanelContrast(paneles[i]);
       }
+      applyPopupInlineTheme();
     };
     var pendiente = false;
     var programar = function () {

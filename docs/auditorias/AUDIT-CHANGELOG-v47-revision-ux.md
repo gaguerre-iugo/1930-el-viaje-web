@@ -3,6 +3,29 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 18 · Tema claro — CIERRE: pop-ups del runtime
+
+El punto pedía «barra, paneles y **pop-up** claros con los tokens de EVA». Cuando se
+cerraron las etapas 1 y 2 quedaron afuera los **pop-ups**: el globo de definición
+del glosario y los diálogos en capa, que el runtime crea con las clases del tema
+oscuro (`oklch(0.269 0 0)` de fondo, texto casi blanco, borde blanco al 10 %).
+
+- El pase inline del motor se extendió a los **contenedores flotantes**
+  (`[data-radix-popper-content-wrapper]`, `[role="dialog"]`, `[role="tooltip"]`,
+  `[role="menu"]`, `[data-state="open"]`): pinta el elemento que tiene fondo propio
+  —sólo si está oscuro— con los tokens y le repara el contraste de los textos.
+  Se llama en el mismo ciclo que el pase de los paneles.
+- El medidor de contraste ahora también lee **`oklab`** (la definición del glosario
+  viene en `oklab(0.985 0 0 / 0.8)`), leyendo su **luminosidad perceptual** igual
+  que oklch: es el primer número y alcanza para saber si el texto se lee.
+- Reglas CSS declarativas para adelantar el color, con el pase inline como garantía.
+
+**Verificación**: `tools/screen-test/verify-popup-theme.mjs` (nuevo) abre el globo
+desde una palabra del glosario y mide, con lectura de oklch/oklab: fondo **blanco**
+(luminancia 1), texto del globo **17,73:1** y la definición **4,83:1**. En verde.
+
+Con esto el punto 18 queda completo: barra, reproductor de voz, paneles y pop-ups.
+
 ## Punto 25 · Reproductor de voz flotante — PARTE 1
 
 El reproductor reservaba un **carril fijo**: `syncToolbarReserve` sumaba la altura
