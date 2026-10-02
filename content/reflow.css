@@ -6704,3 +6704,11 @@ body.reflow-book #content .quiz-option :is(span, label, p) {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* El visor del paginado no deja pasar el contenido de las páginas vecinas. El motor
+   arma el libro como una fila horizontal y la corre por página; el recorte va en el
+   elemento que mide la ventana. `clip` en un eje permite `visible` en el otro. */
+body.reflow-book #content {
+  overflow-x: clip;
+  overflow-y: visible;
+}
