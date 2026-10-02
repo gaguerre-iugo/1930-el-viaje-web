@@ -56,14 +56,26 @@ comprueba que no se superponga con el reproductor. Medido: con el bloque abajo
 (737–793) el reproductor pasa a 8–68 px; con el bloque arriba (36–129) el
 reproductor queda en 763–823 px. **Sin superposición en los dos casos.**
 
-**Aviso para el paso siguiente**: la suite `verify-light-theme.mjs` quedó **en
-rojo** en un solo punto, la fila de capítulo del índice (`li > button`), que vuelve
-a medir 1:1. Ya había quedado bien (17,73:1) y se rompió al agregar el pase
-programado, así que es una **carrera con el re-render del runtime**: el pase inline
-escribe y el runtime vuelve a pintar la fila después. El CSS está sano (llaves
-balanceadas 796/796) y el resto de la suite pasa. Se resuelve reaplicando después
-del render del panel (observando el contenedor o con un repaso más largo), no
-alargando la espera de la prueba.
+**Aclaración sobre la fila del índice**: la suite `verify-light-theme.mjs` había
+quedado en rojo en un punto, la fila de capítulo del índice, que medía 1:1. **No era
+un problema del producto sino de la prueba**: la primera fila del índice es el
+**capítulo actual**, que el runtime pinta con fondo institucional-500
+(`rgb(0, 128, 120)`) y texto blanco, y la prueba calculaba el contraste contra el
+**blanco del panel** en vez de contra el fondo de la fila. Medida bien: **4,82:1**,
+por encima del 4,5:1 exigido.
+
+Dos cosas quedaron de esto:
+
+- La prueba ahora mide la fila contra su **fondo efectivo** (subiendo por sus
+  ancestros), que es lo correcto para cualquier elemento con fondo propio.
+- Se endureció igual el pase inline (el observador ahora también mira `class`, y hay
+  un repaso por intervalo mientras hay un panel abierto), porque el runtime
+  re-renderiza los paneles cuando quiere.
+
+**Observación para el diseño**: el capítulo actual queda en institucional-500
+(4,82:1) cuando la tabla de EVA pide institucional-600 para lo accionable (7,1:1).
+Es legible y cumple AA; cambiarlo a 600 es un ajuste de una línea, pendiente de
+confirmar con el equipo.
 
 ## Punto 23 · Detalles tipográficos del contenido — RESUELTO
 

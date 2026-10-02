@@ -187,7 +187,31 @@ for (const [selector, nombre] of paneles) {
         ? {
             color: getComputedStyle(fila).color,
             tamano: getComputedStyle(fila).fontSize,
-            contraste: Number(contraste(aRgb(getComputedStyle(fila).color), fondo).toFixed(2)),
+            /* El fondo que importa es el de la fila, no el del panel: el capítulo
+               actual va relleno de institucional con texto blanco. */
+            fondo: (() => {
+              let nodo = fila;
+              while (nodo && nodo !== document.documentElement) {
+                const propio = aRgb(getComputedStyle(nodo).backgroundColor);
+                if (propio.a > 0.4) return `rgb(${propio.r}, ${propio.g}, ${propio.b})`;
+                nodo = nodo.parentElement;
+              }
+              return `rgb(${fondo.r}, ${fondo.g}, ${fondo.b})`;
+            })(),
+            contraste: Number(
+              contraste(
+                aRgb(getComputedStyle(fila).color),
+                (() => {
+                  let nodo = fila;
+                  while (nodo && nodo !== document.documentElement) {
+                    const propio = aRgb(getComputedStyle(nodo).backgroundColor);
+                    if (propio.a > 0.4) return propio;
+                    nodo = nodo.parentElement;
+                  }
+                  return fondo;
+                })()
+              ).toFixed(2)
+            ),
           }
         : null,
     };

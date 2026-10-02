@@ -1447,6 +1447,7 @@
   }
 
   var panelInlineObserver = null;
+  var panelInlineInterval = 0;
   function watchPanelInlineTheme() {
     if (typeof MutationObserver !== "function") return;
     var aplicar = function () {
@@ -1476,7 +1477,7 @@
         /* Se observa "style" porque el runtime reescribe colores inline al
            re-renderizar; la guarda de "no escribir si ya está bien" evita el
            ciclo. */
-        attributeFilter: ["aria-current", "aria-selected", "data-state", "style"],
+        attributeFilter: ["aria-current", "aria-selected", "data-state", "style", "class"],
       });
     }
     aplicar();
@@ -1485,6 +1486,18 @@
     [120, 400, 900, 1800].forEach(function (demora) {
       window.setTimeout(aplicar, demora);
     });
+    /* Red de seguridad: el runtime re-renderiza el panel cuando quiere. El
+       intervalo se corta solo cuando no hay ningún panel abierto. */
+    if (!panelInlineInterval) {
+      panelInlineInterval = window.setInterval(function () {
+        if (!document.querySelector(".reflow-reader-panel")) {
+          window.clearInterval(panelInlineInterval);
+          panelInlineInterval = 0;
+          return;
+        }
+        aplicar();
+      }, 400);
+    }
   }
 
   primeGlossaryModeStorage();
