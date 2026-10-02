@@ -316,13 +316,26 @@
       irAlSiguiente.className = "quiz-next-question";
       irAlSiguiente.textContent = "Siguiente pregunta";
       irAlSiguiente.addEventListener("click", function () {
-        siguiente.scrollIntoView({
-          block: "center",
+        /* El paginado del libro se hace con el scroll de #content, así que
+           scrollIntoView lo movía a una posición arbitraria en píxeles y el botón
+           terminaba mostrando la misma pregunta. Se lleva la siguiente pregunta al
+           foco y, si quedó fuera de la página, se alinea el scroll a la página que
+           la contiene (múltiplo del ancho visible), que es como pagina el motor. */
+        focusFirstOption(siguiente);
+        var contenedor = document.getElementById("content");
+        if (!contenedor) return;
+        var ancho = contenedor.clientWidth;
+        if (!ancho) return;
+        var caja = siguiente.getBoundingClientRect();
+        var visible = caja.left >= 0 && caja.right <= ancho;
+        if (visible) return;
+        var destino = Math.round((contenedor.scrollLeft + caja.left) / ancho) * ancho;
+        contenedor.scrollTo({
+          left: destino,
           behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
             ? "auto"
             : "smooth"
         });
-        focusFirstOption(siguiente);
       });
       feedback.appendChild(irAlSiguiente);
     }

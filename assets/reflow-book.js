@@ -1452,6 +1452,19 @@
   /* Punto 18 · Los pop-ups del runtime (globo del glosario, diálogos en capa)
      vienen del tema oscuro: fondo oklch(0.269 0 0) y texto casi blanco. Se pintan
      con los tokens y se les repara el contraste, igual que a los paneles. */
+  /* Punto 18 · El motor fija el `min-height` de cada fila de opción con el valor que
+     midió al paginar (51.2188px), y `height: auto` no puede achicar por debajo de un
+     `min-height`. Al corregir la respuesta el texto pasa a dos líneas y se sale del
+     borde. Se suelta con prioridad inline, que gana sobre las capas del runtime. */
+  function syncQuizOptionGeometry() {
+    var filas = document.querySelectorAll("#content .quiz-option");
+    for (var i = 0; i < filas.length; i++) {
+      var fila = filas[i];
+      if (fila.style.getPropertyValue("min-height") === "0px") continue;
+      fila.style.setProperty("min-height", "0px", "important");
+    }
+  }
+
   /* Punto 18 · El color del control de opción sigue al estado de la respuesta. El
      runtime lo fija en una capa, así que va con prioridad inline. */
   function syncQuizOptionAccent() {
@@ -1519,6 +1532,7 @@
       }
       applyPopupInlineTheme();
       syncQuizOptionAccent();
+      syncQuizOptionGeometry();
     };
     var pendiente = false;
     var programar = function () {
