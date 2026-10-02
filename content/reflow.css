@@ -3474,7 +3474,7 @@ body.reflow-book .reflow-navigation-panel [role="tab"] {
 body.reflow-book .reflow-navigation-panel [role="tab"][aria-selected="true"] {
   border-color: var(--ceibal-institutional-500) !important;
   color: #fff !important;
-  background: var(--ceibal-quiz-page) !important;
+  background: var(--ceibal-institutional-600) !important;
   box-shadow: var(--ceibal-shadow-button) !important;
 }
 
@@ -3643,7 +3643,7 @@ body.reflow-book :is(
 body.reflow-book .reflow-accessibility-panel
   [role="radio"][aria-checked="true"] {
   color: #fff !important;
-  background: var(--ceibal-quiz-page) !important;
+  background: var(--ceibal-institutional-600) !important;
 }
 
 /* Every active switch uses the same white thumb. */
@@ -4094,7 +4094,7 @@ body.reflow-book .reflow-glossary-panel [role="tab"] {
 body.reflow-book .reflow-glossary-panel [role="tab"][aria-selected="true"] {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: var(--ceibal-quiz-page) !important;
+  background: var(--ceibal-institutional-600) !important;
   box-shadow: var(--ceibal-shadow-button) !important;
 }
 
@@ -4137,7 +4137,7 @@ body.reflow-book [aria-label="dock-label"]:not(:has(button[title="Enviar"]))
   button:is([aria-pressed="true"], [data-state="open"]) {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: var(--ceibal-quiz-page) !important;
+  background: var(--ceibal-institutional-600) !important;
 }
 
 #reflow-tts-voice-setting[hidden] {

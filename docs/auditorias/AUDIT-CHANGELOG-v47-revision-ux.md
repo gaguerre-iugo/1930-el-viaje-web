@@ -3,6 +3,36 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 18 · Contraste de los cuestionarios (hallazgo suelto) — CORREGIDO
+
+El documento **no** pide cambiar el fondo de los cuestionarios: el turquesa es
+identidad de Ceibal y tiene su token (`--ceibal-quiz-page` =
+`var(--ceibal-institutional-400)` = `rgb(0, 160, 150)`). Pero la fila de pruebas del
+punto 18 pide «medir contraste en **cada estado**», cuestionarios incluidos, y al
+medirlo apareció un fallo real:
+
+| Combinación | Contraste | AA |
+|---|---|---|
+| **Blanco sobre el turquesa del cuestionario** | **3,25:1** | ✗ (pide 4,5:1) |
+| Gris oscuro sobre ese turquesa | 5,53:1 | ✓ |
+| Blanco sobre institucional-600 | **7,14:1** | ✓ |
+| Kicker y enunciado del cuestionario sobre blanco | 7,52:1 | ✓ |
+
+El fallo estaba en **cuatro reglas propias** con `color: #fff` sobre
+`--ceibal-quiz-page` (pestaña activa del panel de navegación, un control del panel de
+accesibilidad, pestaña activa del glosario y una etiqueta del dock). Es la misma
+combinación que usa el runtime en sus pestañas activas, replicada por este CSS.
+
+**Corrección aplicada**: los cuatro rellenos pasan a **institucional-600**, que es lo
+que manda la tabla de EVA para el estado seleccionado, y da **7,14:1**. El turquesa
+sobrevive sólo como fondo de la página del cuestionario (sin texto blanco encima).
+Verificado: no queda ninguna regla con texto blanco sobre el turquesa.
+
+**Pendiente**: medir los estados de las **opciones** (normal, elegida, correcta,
+incorrecta) y la devolución. El diagnóstico quedó a medio hacer porque usa template
+literals anidados (`${}` dentro de una plantilla que se inyecta en la página) y hay
+que reescribirlo con concatenación. Es lo único del punto 18 que falta medir.
+
 ## Punto 18 · Tema claro — CIERRE: pop-ups del runtime
 
 El punto pedía «barra, paneles y **pop-up** claros con los tokens de EVA». Cuando se
