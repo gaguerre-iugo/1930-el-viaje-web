@@ -20,7 +20,20 @@ verificación, más las decisiones que faltan.
   offline** (`node tools/sync_offline_preloader.js`), porque embebe los catálogos.
 - Cada cambio de `assets/reflow-book.js` o `content/reflow.css` necesita subir su
   parámetro `?v=` en `index.html`; el `bundleVersion` de `assets/config.json` se
-  sube sólo al publicar (invalida los catálogos de voz, ~9 MB por voz).
+  sube al publicar (ver la corrección más abajo).
+- **Corrección sobre `bundleVersion`**: una nota anterior decía que subirlo
+  invalidaba los catálogos de voz (~9 MB por voz) y **es incorrecto**. Cada audio
+  lleva su **propia** versión en `content/i18n/es-UY/voices/<voz>/audios.json` (por
+  ejemplo `?v=47-uatsap-final-stress-valentina`, verificado sobre las 10 080
+  entradas). Los catálogos de audio, las imágenes y el índice **no contienen**
+  `bundleVersion`, así que subirlo no obliga a volver a descargarlos.
+  Lo que sí implica: cambiarlo en `assets/config.json` (fuente), en la **copia** de
+  `assets/reflow-book.js` (`data.bundleVersion`) y regenerar el precargador offline
+  con `tools/build_offline_preloader.py --apply`, que embebe `config.json`.
+  Aparte, los `?v=` de `index.html` son los que rompen la caché del navegador.
+  Conviene subirlo al publicar porque identifica la build de cada escuela y tiene
+  que moverse junto con los `?v=`: en esta sesión el navegador seguía sirviendo
+  `reflow-book.js?v=168` y los arreglos posteriores no se veían.
 
 ## Puntos ya resueltos
 
