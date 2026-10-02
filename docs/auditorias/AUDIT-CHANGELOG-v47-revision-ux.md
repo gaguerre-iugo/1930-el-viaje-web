@@ -52,6 +52,18 @@ con la devolución mostrada). Falta ajustar la interacción —marcar la opción
 enviar— para ver esos estados. Los textos base y la devolución sí quedaron medidos y
 cumplen.
 
+**Segundo intento**: se ajustó la interacción y ahora **sí funciona** —el sondeo
+detecta 72 controles, marca la opción y el botón «Enviar» deja de estar inactivo—,
+pero los colores siguen saliendo iguales. La causa es de la **medición**, no de la
+interfaz: la página tiene **varias preguntas** y el sondeo toma las **cuatro primeras
+opciones de la página**, que pertenecen a otra pregunta. Para ver los estados hay que
+acotar la muestra al contenedor de la pregunta respondida (el que tiene el control
+marcado).
+
+Lo que queda firme de la medición: opciones **17,73:1**, devolución **4,72:1**,
+botón inactivo **6,08:1** y kicker **7,52:1**, todo sobre blanco y por encima de
+4,5:1, con la salvedad de que la devolución tiene poco margen.
+
 ## Punto 18 · Tema claro — CIERRE: pop-ups del runtime
 
 El punto pedía «barra, paneles y **pop-up** claros con los tokens de EVA». Cuando se

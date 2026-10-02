@@ -116,25 +116,54 @@ const interactuo = await page.evaluate(() => {
   const enviar = Array.from(document.querySelectorAll("button")).find(
     (nodo) => /enviar/i.test(nodo.textContent || "") || nodo.getAttribute("title") === "Enviar"
   );
-  if (!enviar) return false;
-  const contenedor = enviar.closest("section, div, form") || document.body;
-  const opcion = Array.from(contenedor.querySelectorAll("button, label, [role='radio']")).find(
-    (nodo) => !nodo.contains(enviar) && nodo.getBoundingClientRect().height > 20
+  if (!enviar) return { error: "sin botón Enviar" };
+  /* Las opciones pueden ser radios ocultos dentro de una etiqueta: se marca el
+     control, que es lo que el formulario escucha, y si no hay, se hace clic en la
+     etiqueta. */
+  const controles = Array.from(
+    document.querySelectorAll("input[type='radio'], input[type='checkbox'], [role='radio']")
   );
-  if (!opcion) return false;
-  opcion.click();
+  let marcado = false;
+  if (controles.length) {
+    const control = controles[0];
+    control.click();
+    if (!control.checked && control.type) {
+      control.checked = true;
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+      control.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+    marcado = Boolean(control.checked) || control.getAttribute("aria-checked") === "true";
+  } else {
+    const contenedor = document.querySelector("#content") || document.body;
+    const opcion = Array.from(contenedor.querySelectorAll("button, label")).find((nodo) => {
+      const clase = (nodo.className || "").toString();
+      return /quiz|option|opcion|answer/i.test(clase) && !nodo.contains(enviar);
+    });
+    if (opcion) {
+      opcion.click();
+      marcado = true;
+    }
+  }
+  return {
+    opcionesDetectadas: controles.length,
+    marcado,
+    enviarDeshabilitado: enviar.disabled === true,
+  };
+});
+console.log("interacción: " + JSON.stringify(interactuo));
+await page.waitForTimeout(800);
+
+/* Recién ahora, si el botón quedó habilitado, se envía. */
+const enviado = await page.evaluate(() => {
+  const enviar = Array.from(document.querySelectorAll("button")).find(
+    (nodo) => /enviar/i.test(nodo.textContent || "") || nodo.getAttribute("title") === "Enviar"
+  );
+  if (!enviar || enviar.disabled) return false;
+  enviar.click();
   return true;
 });
-await page.waitForTimeout(600);
-if (interactuo) {
-  await page.evaluate(() => {
-    const enviar = Array.from(document.querySelectorAll("button")).find(
-      (nodo) => /enviar/i.test(nodo.textContent || "") || nodo.getAttribute("title") === "Enviar"
-    );
-    if (enviar) enviar.click();
-  });
-  await page.waitForTimeout(2000);
-}
+console.log("enviado: " + enviado);
+if (enviado) await page.waitForTimeout(2000);
 
 const despues = await medir();
 console.log("\n=== Después de enviar ===");
