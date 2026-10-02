@@ -3474,16 +3474,10 @@
     var pagination = document.getElementById("reflow-pagination");
     if (!pagination) return;
     var toolbarHeight = Math.ceil(pagination.getBoundingClientRect().height);
-    var rootStyles = getComputedStyle(document.documentElement);
-    var laneValue = rootStyles
-      .getPropertyValue("--reflow-tts-player-lane")
-      .trim();
-    var playerLane = parseFloat(laneValue);
-    if (laneValue.endsWith("rem")) {
-      playerLane *= parseFloat(rootStyles.fontSize) || 16;
-    }
-    if (!playerLane) playerLane = 72;
-    var reserve = toolbarHeight + playerLane;
+    /* Punto 25: el reproductor de voz flota sobre el contenido, así que la
+       reserva es sólo la barra. Antes sumaba el carril fijo del reproductor y el
+       texto se encogía para dejarle lugar. */
+    var reserve = toolbarHeight;
     /* Escribir en el elemento raíz invalida el estilo de todo el documento, así
        que solo se escribe cuando el valor cambia de verdad. Durante el arranque
        el ResizeObserver y los cambios de paginación llaman a esta función

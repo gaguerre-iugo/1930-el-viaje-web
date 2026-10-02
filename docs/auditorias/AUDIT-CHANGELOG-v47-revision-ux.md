@@ -3,6 +3,37 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 25 · Reproductor de voz flotante — PARTE 1
+
+El reproductor reservaba un **carril fijo**: `syncToolbarReserve` sumaba la altura
+de la barra **más** 4 rem (`--reflow-tts-player-lane`), y el texto se encogía para
+dejarle lugar. El documento pide un pop-up que flote.
+
+- **Sin carril**: la reserva es sólo la altura de la barra. Medido: pasa de
+  **141 px a 69 px**, o sea que el contenido recupera 4 rem de alto.
+- **Flotante**: se apoya 8 px sobre la barra, sin superponerse ni dejar hueco.
+- **Forma según el ancho**: en pantallas anchas se ancla a la **derecha con 16 px
+  de margen**; en angostas es una **pastilla compacta** de sólo íconos, centrada
+  (las etiquetas quedan para lectores de pantalla).
+- La variable `--reflow-tts-player-lane` desapareció: ya no se usa en CSS ni en JS.
+
+**Verificación**: `tools/screen-test/verify-floating-player.mjs` (nuevo) mide en
+tres anchos (1366, 1024 y 420 px): que la reserva no supere la barra, que el
+reproductor se apoye en ella, que en ancha el margen derecho sea 16 px con
+etiquetas visibles, y que en angosta esté centrado, más angosto que el viewport y
+con las etiquetas ocultas. Los tres anchos en verde.
+
+Nota sobre las capturas de esta prueba: el motor vuelve a ocultar el reproductor en
+su ciclo de sincronización (650 ms), así que la foto no siempre lo muestra; las
+**mediciones** se toman en la misma evaluación en que se lo muestra, y por eso son
+válidas.
+
+**Falta la parte 2**: la regla de **no tapar la oración resaltada**. Como el
+reproductor flota sobre el contenido, cuando el resaltado de la lectura en voz alta
+cae detrás de él hay que desplazar el libro lo justo para que la oración quede a la
+vista (observando el elemento resaltado del runtime y corrigiendo el desplazamiento
+sin animación, para no pelear con `prefers-reduced-motion`).
+
 ## Punto 23 · Detalles tipográficos del contenido — RESUELTO
 
 Se agregaron dos herramientas y se aplicaron tres arreglos.
