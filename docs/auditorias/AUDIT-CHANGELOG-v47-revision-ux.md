@@ -3,6 +3,215 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Bloqueante cerrado · «Siguiente pregunta» volvía a mostrar la misma pregunta
+
+El botón se sentía roto y **el motor estaba bien**: lo que estaba mal era **lo que
+la prueba medía**. Es el caso más útil para no repetir.
+
+### La contradicción, resuelta midiendo
+
+El traspaso dejaba abierta una duda que decidía el arreglo: ¿la pregunta siguiente
+está en la misma página o en la de al lado? **Está en la de al lado.** Con la sonda
+en el manejador del botón (`?quizdebug=1`), en un clic real:
+
+```
+MEDICION quiz-next {"scrollLeft":43712,"ancho":1366,"cajaLeft":1666,"actual":32,"objetivo":33}
+```
+
+`cajaLeft` = **1666**, o sea una página entera a la derecha del visor de 1366 px:
+el panel de la pregunta siguiente vive en la **página 33** y el lector estaba en la
+**32**. Las dos mediciones anteriores eran correctas cada una en su momento: las
+opciones en x=1691 eran las de la pregunta 2 (en la página de al lado) y el «panel
+siguiente en la misma página» se midió **después** de que el motor ya había
+cambiado de página. `actual` 32 → `objetivo` 33 confirma que **el salto de página
+es el arreglo correcto**, y el mensaje del traspaso («el manejador sale sin hacer
+nada si la página calculada es la actual») describía un estado **previo** al clic,
+no el clic.
+
+Línea de tiempo del scroll tras el clic (una sola asignación, sin reversión):
+
+```
+[{"t":2707,"valor":43712},{"t":9656,"valor":45078}]
+```
+
+Y ningún clic al motor: el cambio de página lo hace el `goToPage` del propio motor
+al recibir el clic, no el bucle de botones del manejador.
+
+### La causa real: la prueba leía un kicker fuera de pantalla
+
+`#content` contiene **24 kickers** (8 capítulos × 3 preguntas) con los mismos tres
+textos repetidos. La prueba buscaba el **primero del DOM**, que es una copia de la
+pregunta 1 **corrida fuera del visor**, y por eso seguía leyendo «Pregunta 1 de 3»
+aunque el lector ya veía la 2:
+
+| Momento | Candidato que leía la prueba | Lo que se veía en pantalla |
+|---|---|---|
+| antes de responder | n.º 0 · left=325 · **visible** | Pregunta 1 de 3 |
+| después de enviar | n.º 0 · left=325 · **visible** | Pregunta 1 de 3 |
+| después del botón | n.º 0 · left=**−1041** · **fuera** | **Pregunta 2 de 3** (left=325) |
+
+Al avanzar, el panel visible pasa de la página 32 a la 33: el kicker n.º 0 se va a
+−1041 y el n.º 1 entra a 325. La prueba fallaba por su propia consulta.
+
+**Arreglo de la prueba**: el kicker se busca entre los `.quiz-kicker`, exigiendo
+que el centro caiga dentro del viewport y que `elementFromPoint` lo confirme —la
+misma definición de «visible» que usa el resto del arnés—. La traza del manejador
+se conserva con `?quizdebug=1` para que la medición quede disponible.
+
+### El otro pendiente: «Siguiente pregunta» a la izquierda
+
+Tres intentos con `margin-left: auto`, `justify-self: end` y `float: right` no
+tuvieron efecto, y **no era la hoja de estilos**: las tres reglas se aplicaban
+(medido: `float` computado `right`) pero el contenedor `.quiz-feedback` es una
+**grilla de dos columnas** —el icono ✓/✕ y el texto—, y en una grilla el ítem ocupa
+su área por defecto, así que ni el `float` ni el margen automático mueven nada:
+el botón se estiraba al ancho de la grilla (716 px) con su contenido pegado al
+borde izquierdo (x=333,8). En una grilla, `float` se **ignora**.
+
+**Arreglo**: decirle al botón en qué columna vive y que se pegue a su borde
+derecho (`grid-column: 2; justify-self: end`), y borrar las tres reglas anteriores
+que se contradecían entre sí. Medido:
+
+| | antes | después |
+|---|---|---|
+| borde izquierdo del botón | 333,8 px | **840,2 px** |
+| borde derecho del botón | 525,8 px | **1032,2 px** (contenedor: 1041) |
+
+### Verificación
+
+- `tools/screen-test/verify-quiz-next-question.mjs` — **en verde**: «antes de
+  responder: Pregunta 1 de 3 · después del botón: Pregunta 2 de 3».
+- `tools/screen-test/verify-quiz-zoom.mjs` (nuevo) — **en verde** en 9
+  combinaciones (1366, 947 y 800/640 px CSS; letra normal, grande y extra grande;
+  zoom 1, 1,25 y 1,5): ninguna fila de opción desborda su tarjeta ni el viewport, y
+  el botón queda **a 8,8 px del borde derecho de la devolución en las 9** (columna
+  de grilla 2). Esto cierra el pendiente del traspaso («comprobar que la fila de
+  opción no desborde con el zoom del navegador»).
+
+  Dos trampas de medición que costaron tiempo y quedan anotadas en la propia
+  prueba: (a) el motor repagina en ciclos, así que hay que insistir hasta que la
+  devolución esté montada y las filas dentro de la página —si no, se mide una
+  página vacía y el «ok» no significa nada—; (b) la página de la sección **no** se
+  calcula sumando su `getBoundingClientRect().left`, que es relativo al viewport:
+  a 631 px eso daba **una página de más** y el botón quedaba en x=−232. Se usa el
+  borde izquierdo del visor (`content.getBoundingClientRect().left`) como origen.
+- `tools/screen-test/_diag-nav.mjs` — sin regresión en la navegación.
+
+## El recorte del cuestionario: «Siguiente pregunta» quedaba cortado
+
+La captura de la revisión en uso mostró que, con la devolución desplegada, la
+tarjeta del cuestionario **recortaba la devolución y el botón**. Eran **dos**
+causas apiladas, las dos medidas.
+
+### 1. El desplazamiento del motor empujaba el contenido fuera de la tarjeta
+
+`reflow-book.js` compensa el reacomodo que hace el runtime al reemplazar «Enviar»
+por la devolución: mide dónde estaba el enunciado antes de enviar y luego lo
+mantiene ahí con una **transformación** (`--reflow-quiz-content-shift`). Como es
+una transformación, **no cambia el layout**: lo que empuja fuera de la caja de la
+tarjeta lo recorta su `overflow: hidden`.
+
+Muestreo cuadro por cuadro (952x645, respuesta incorrecta):
+
+| Momento | desplazamiento | devolución respecto de la tarjeta | botón |
+|---|---|---|---|
+| justo después del clic | — | −11 px (adentro) | −19 px |
+| **cuadro 1 en adelante** | **32,06 px** | **+21 px** (afuera) | **+13 px** |
+
+El desplazamiento se aplicaba **después** de que la devolución crecía, y pedía más
+lugar del que había. Medido el hueco real disponible en cinco tamaños: **−33 px a
+952x645, −32 px a 800x600, −19 px a 947x700, −1 px a 1024 y a 1366**. O sea: el
+desplazamiento **nunca** cabía, y en los dos tamaños chicos el botón terminaba
+recortado (41 px a 800x600).
+
+**Arreglo** (`reflow-book.js`): el desplazamiento ahora se **acota al hueco que
+queda dentro de la tarjeta** y se descarta cuando no hay ninguno (que es el caso
+medido en todos los tamaños). Se mide con la transformación quitada, en lugar de
+restarle el desplazamiento anterior a la posición ya transformada.
+
+### 2. Aun sin desplazamiento, el contenido no entraba
+
+Con el desplazamiento en cero la devolución ya no se salía, pero el botón seguía
+pasándose: el contenido pedía **565 px en una caja de 558** (1280x720) y **452 en
+438** (800x600). Probadas en vivo las salidas posibles:
+
+| Salida | Resultado medido |
+|---|---|
+| `max-height: none` en la tarjeta | la tarjeta no crece: la limita la fila del paginado |
+| `overflow-y: auto` (lo que ya hacía la regla de teléfonos) | el contenido se puede desplazar, pero el botón sigue naciendo cortado |
+| apretar el ritmo vertical | **el botón entra 19 px adentro a 800x600 y 8 px a 1280x720** |
+
+**Arreglo** (`reflow.css`, `@media (max-height: 780px)`): en columnas de lectura
+bajas se acota la separación de las opciones (`.5rem`), el margen de las opciones y
+de las acciones, y el relleno de la tarjeta. Sólo clases del cuestionario y sólo en
+esa condición; ninguna fila de opción baja del mínimo táctil de 44 px.
+
+**Trampa de especificidad (costó dos intentos)**: el acotado no surtía efecto
+porque dos reglas existentes son **más específicas** y también usan `!important`:
+`body.reflow-book[data-reflow-font-size="xlarge"] … .quiz-options` y
+`body.reflow-book … .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options`. Se
+midió el `gap` calculado: seguía en **28 px**. La regla nueva replica esas dos
+formas de selector.
+
+**Verificación**: `tools/screen-test/verify-quiz-feedback-fit.mjs` (nuevo) responde
+mal en **las 8 secuencias** y exige, en 7 combinaciones de tamaño y letra (56
+casos), que la devolución y «Siguiente pregunta» entren completos en la tarjeta y
+que el botón sea lo que se pinta en su centro. **En verde**, y era **rojo** antes
+del arreglo (16 fallas, con el botón hasta 41 px afuera).
+
+**Regresión**: las 16 suites del arnés en verde, salvo
+`verify-glossary-highlight.mjs`, que falla **de forma intermitente** (1 de 3
+corridas: «con el valor viejo en "false" el globo no abrió»). **No es de este
+cambio**: se reprodujo igual contra HEAD. Queda anotado como intermitencia previa
+del globo del glosario.
+
+### 3. La fila de la opción cortaba su propio texto
+
+La captura de la segunda vuelta mostró otra cosa: en la opción marcada, el texto
+pasaba a dos líneas y **la segunda se salía del recuadro** («europeas.» cortado
+abajo). Es un tercer recorte, independiente de los dos anteriores.
+
+La causa es la misma familia de problema, pero al revés: el motor fija la altura de
+cada fila de opción con la que midió **antes de enviar**
+(`--reflow-quiz-option-interaction-height`), y esa altura queda **corta** cuando el
+texto envuelve después. La regla del motor es
+
+```css
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-option {
+  height: var(--reflow-quiz-option-interaction-height, auto) !important;
+}
+```
+
+y **es una cuarta regla con `!important` que ya existía** en `reflow.css`
+(`… .quiz-option { height: auto !important }`, al final del archivo) **con la
+intención de arreglar exactamente esto**. No lo lograba: cuando dos declaraciones
+tienen `!important`, decide la **especificidad**, no el orden, y el selector con
+`:has()` encadenado a `body.reflow-book #content` tiene más.
+
+Listado de las reglas que declaran `height` sobre la fila, sacado del CSSOM (el
+orden es la posición en la hoja):
+
+| Orden | Selector | `height` |
+|---|---|---|
+| 534 | `… .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-option` | `var(--…interaction-height, auto) !important` |
+| 809 | `… .quiz-option` | `auto !important` |
+
+Medido con el texto envolviendo después de enviar (892x681): la fila quedaba en
+**43,03 px** con el texto en 3 líneas y la última **37,42 px por debajo del borde**.
+
+**Arreglo**: la regla del final ahora **replica el selector del motor** para ganar
+la comparación. Medido después: la fila crece a **90,34 px** y la última línea queda
+**10,16 px adentro**.
+
+**Verificación**: `tools/screen-test/verify-quiz-option-fit.mjs` (nuevo) mide, en 7
+combinaciones de tamaño y letra y en las 8 secuencias, que cada línea del texto de
+cada opción entre en la caja de su fila — en las dos formas del problema: la opción
+marcada más larga y el texto que se alarga **después** de enviar (112 comprobaciones).
+
+**Lección para este archivo**: cuando un ajuste «no hace nada», hay que listar las
+reglas que declaran esa propiedad y su orden, no revisar el CSS a ojo: acá había una
+regla con la intención correcta que perdía por especificidad.
+
 ## Regresión y reversión: el recorte del visor rompió la navegación
 
 Se aplicó `body.reflow-book #content { overflow-x: clip; overflow-y: visible }` para
@@ -476,10 +685,14 @@ reproducir y que el botón arranque con el de reproducir.
 - «Preparando el libro reflowable…» → «**Abriendo 1930: El viaje…**», con
   `role="status"`, en institucional-600 y con N2 (17 px / 700) de la escala del
   punto 24.
-- El cargador quedó estructurado con un **hueco para el logo de Ceibal**
-  (`#reflow-loading .reflow-loading-logo`), que no ocupa lugar mientras esté
-  vacío. **Falta el SVG oficial**: no hay ninguno en el repositorio. Cuando
-  llegue, se aplica como `background-image` en esa regla, sin tocar JavaScript.
+- El cargador tiene el **logo de Ceibal**: `assets/icons/ceibal-logo.svg` (el SVG
+  oficial, `viewBox="0 0 190 64"`, símbolo en `#00A096`), aplicado como
+  `background-image` en `#reflow-loading .reflow-loading-logo` a 12 × 4 rem, con el
+  texto debajo, sin tocar JavaScript. Está declarado en `imsmanifest.xml` porque el
+  CSS lo referencia.
+  > Nota: una versión anterior de este changelog decía que el SVG seguía faltando.
+  > Era incorrecto: el archivo está en el repositorio y la regla lo aplica desde el
+  > commit del logo. Verificado sobre el repositorio, no sobre la nota.
 - El mensaje de error del cargador («No fue posible preparar el libro
   reflowable.») sigue con `role="alert"`.
 
