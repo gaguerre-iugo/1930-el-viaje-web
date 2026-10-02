@@ -6708,3 +6708,10 @@ body.reflow-book #content .quiz-option :is(span, label, p) {
 /* El visor del paginado no deja pasar el contenido de las páginas vecinas. El motor
    arma el libro como una fila horizontal y la corre por página; el recorte va en el
    elemento que mide la ventana. `clip` en un eje permite `visible` en el otro. */
+
+/* El visor del paginado recorta sin tocar el desplazamiento: el motor arma el libro
+   como una fila horizontal y navega haciendo scroll sobre este elemento, así que
+   recortar con `overflow` lo dejaba sin navegación. `clip-path` es sólo visual. */
+body.reflow-book #content {
+  clip-path: inset(0);
+}
