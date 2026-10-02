@@ -316,12 +316,8 @@
       irAlSiguiente.className = "quiz-next-question";
       irAlSiguiente.textContent = "Siguiente pregunta";
       irAlSiguiente.addEventListener("click", function () {
-        /* La siguiente pregunta vive en otra página del paginado, así que hay que
-           cambiar de página. No se toca el scroll a mano: el motor lo maneja en su
-           ciclo de sincronización y lo revierte. Se usan los botones de navegación
-           del libro, que son los que el motor escucha, tantas veces como páginas de
-           distancia haya. */
-        focusFirstOption(siguiente);
+        /* La medición que pedía el traspaso: deja por escrito qué decide el salto.
+           Se activa con `?quizdebug=1` para no ensuciar la consola del lector. */
         var contenedor = document.getElementById("content");
         if (!contenedor) return;
         var ancho = contenedor.clientWidth || window.innerWidth;
@@ -329,6 +325,22 @@
         var caja = siguiente.getBoundingClientRect();
         var actual = Math.round(contenedor.scrollLeft / ancho);
         var objetivo = Math.round((contenedor.scrollLeft + caja.left) / ancho);
+        if (/[?&]quizdebug=1/.test(window.location.search)) {
+          console.log(
+            "MEDICION quiz-next " +
+              JSON.stringify({
+                scrollLeft: contenedor.scrollLeft,
+                ancho: ancho,
+                cajaLeft: Math.round(caja.left * 100) / 100,
+                actual: actual,
+                objetivo: objetivo
+              })
+          );
+        }
+        /* La pregunta siguiente vive en la página de al lado (medido: caja.left
+           >0 y < ancho, con el panel entero dentro de la página siguiente). Hay
+           que cambiar de página con el control del motor, no tocar el scroll. */
+        focusFirstOption(siguiente);
         if (objetivo === actual) return;
         var boton = document.getElementById(objetivo > actual ? "reflow-next" : "reflow-previous");
         if (!boton) return;

@@ -4223,7 +4223,16 @@ body.reflow-book #content .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz
 /* Spacious quiz experiment requested for the integrated reader. The card may
    approach twice its former natural height, but remains bounded by the live
    viewport. Only spacing and the selected outline change; typography,
-   feedback colours and evaluation marks retain their established design. */
+   feedback colours and evaluation marks retain their established design.
+
+   El techo de altura recorta: la tarjeta tiene `overflow: hidden`, y con la
+   devolución desplegada el contenido puede ser más alto que el techo (medido:
+   565 px de contenido contra 558 px de caja a 1280x720, y 41 px de más en la
+   fila del botón a 800x600). Eso cortaba «Siguiente pregunta». Se alinea el
+   contenido ARRIBA —centrado, lo que sobra se repartía arriba y abajo— y se
+   permite el desplazamiento interno, que es lo que la regla de teléfonos ya
+   hacía: así el enunciado y las opciones se ven siempre y la devolución con el
+   botón quedan alcanzables. */
 body.reflow-book #content .quiz-card {
   height: auto !important;
   min-height: max(
@@ -4231,7 +4240,9 @@ body.reflow-book #content .quiz-card {
     var(--reflow-quiz-interaction-height, 0px)
   );
   max-height: calc(100dvh - var(--nav-height, 60px) - 5rem) !important;
-  justify-content: center;
+  justify-content: flex-start;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 body.reflow-book #content .quiz-options,
@@ -4245,6 +4256,41 @@ body.reflow-book #content .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz
 body.reflow-book[data-reflow-font-size="xlarge"] #content
   .quiz-card:not(:has(.quiz-feedback:not(:empty))) .quiz-actions {
   margin-top: 2rem !important;
+}
+
+/* Columnas de lectura bajas (por ejemplo 800x600 o 1280x720 en un panel de aula):
+   el techo de la tarjeta —el alto de la página— es más chico que su contenido con
+   la devolución desplegada, y la fila del botón quedaba cortada (medido: 21 px de
+   más a 800x600, 27 px a 1280x720, 31 px a 947x700 con letra extra grande). Se
+   aprieta el ritmo vertical del cuestionario para que entre completo. Medido: con
+   la separación de las opciones en .5rem, el botón queda 19 px adentro a 800x600,
+   8 px a 1280x720 y 8 px a 947x700, y ninguna fila baja del mínimo táctil de
+   44 px. Alcance deliberadamente corto: sólo las clases del cuestionario y sólo
+   cuando la columna es baja. */
+@media (max-height: 780px) {
+  body.reflow-book #content .quiz-card {
+    padding: .8rem 1rem !important;
+    /* El motor mide la separación de las opciones ANTES de enviar y la deja en
+       esta variable, que su regla impone con `!important`. Con la devolución
+       desplegada esa separación ya no entra en la página, así que se acota. */
+    --reflow-quiz-options-gap: .5rem !important;
+  }
+  /* Los selectores incluyen las dos variantes que ganaban por especificidad: la de
+     letra extra grande y la del estado CON devolución
+     (`… .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options`). Medido antes de
+     igualarlas: la separación seguía en 28 px y el botón se cortaba 13 px. */
+  body.reflow-book #content .quiz-card .quiz-options,
+  body.reflow-book[data-reflow-font-size] #content .quiz-card .quiz-options,
+  body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card .quiz-options,
+  body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options,
+  body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
+    gap: .5rem !important;
+    margin-top: .6rem !important;
+  }
+  body.reflow-book #content .quiz-card .quiz-actions,
+  body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
+    margin-top: .5rem !important;
+  }
 }
 
 /* Mobile browsers (phones) expose a `100dvh` that can exceed the actually
@@ -6723,8 +6769,18 @@ body.reflow-book #content .quiz-next-question {
 }
 
 /* La fila de opción no puede quedar con la altura que el motor midió antes de
-   corregir la respuesta: al pasar a dos líneas, el texto se salía del borde. */
-body.reflow-book #content .quiz-option {
+   corregir la respuesta: al pasar a dos líneas, el texto se salía del borde.
+
+   La regla que gana no es ésta sino la del motor
+   (`… .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-option`), que impone
+   `height: var(--reflow-quiz-option-interaction-height, auto) !important` — la
+   altura medida ANTES de enviar. Como las dos usan `!important`, decide la
+   especificidad, y el selector con `:has()` encadenado a `body.reflow-book #content`
+   tiene más. Medido con la opción envuelta después de enviar: la fila quedaba en
+   43,03 px con el texto en 3 líneas, y la última se salía 37,42 px. Se replica su
+   selector para que la fila pueda crecer con el texto. */
+body.reflow-book #content .quiz-option,
+body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-option {
   height: auto !important;
   max-height: none !important;
   min-height: 3.25rem;
@@ -6739,34 +6795,24 @@ body.reflow-book #content .quiz-feedback-actions {
   gap: var(--ceibal-space-3);
   margin-top: var(--ceibal-space-3);
 }
-body.reflow-book #content .quiz-next-question {
-  margin-left: auto;
-}
-
 /* «Enviar» vuelve al centro: la regla anterior lo había corrido a la derecha. */
 body.reflow-book #content .quiz-actions {
   justify-content: center;
 }
 
-/* «Siguiente pregunta» va a la derecha dentro de la devolución: ancho al contenido
-   y margen izquierdo automático, que funciona en un contenedor de bloque. */
+/* «Siguiente pregunta» va a la derecha dentro de la devolución. Medido: el
+   contenedor `.quiz-feedback` es una GRILLA de dos columnas —el icono ✓/✕ y el
+   texto—, así que `margin-left: auto` y `float` no tienen efecto: en una grilla el
+   ítem ocupa su área por defecto, que es lo que dejaba el botón en x=334 (el borde
+   izquierdo de la grilla). Se le dice en qué columna vive y que se pegue a su
+   borde derecho. */
 body.reflow-book #content .quiz-next-question {
   display: block;
   width: fit-content;
+  grid-column: 2;
+  justify-self: end;
   margin-left: auto;
   margin-right: 0;
   margin-top: var(--ceibal-space-3);
 }
 
-/* «Siguiente pregunta» a la derecha. `margin-left: auto` no alcanzó (medido: seguía
-   en x=334), así que el contenedor debe ser una grilla con los ítems al inicio. Se
-   usa float, que alinea a la derecha en cualquier contenedor de bloque, más las
-   propiedades equivalentes para flex y grid. */
-body.reflow-book #content .quiz-next-question {
-  float: right !important;
-  clear: both !important;
-  justify-self: end !important;
-  align-self: end !important;
-  margin-left: auto !important;
-  margin-right: 0 !important;
-}

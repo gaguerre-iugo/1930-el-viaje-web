@@ -4720,21 +4720,30 @@
          Its different natural height used to make the centred contents drift
          a few pixels. Preserve the original question origin after each phase
          of that mutation; account for an already applied transform so the
-         correction cannot oscillate. */
+         correction cannot oscillate.
+
+         The correction is a transform, so it does not change layout: content
+         pushed past the card's box is CLIPPED by the card's `overflow: hidden`.
+         Measured: on a 952x645 viewport the correction asked for 21px more than
+         the card had, so the feedback and «Siguiente pregunta» were cut off
+         (41px at 800x600). The shift is therefore clamped to the room actually
+         left inside the card — and dropped when there is none, which is the
+         case at every measured size. */
       function restoreQuizContentOrigin() {
         if (!question || !card.dataset.reflowQuizQuestionTop) return;
         var feedback = card.querySelector(".quiz-feedback");
         if (!feedback || !feedback.textContent.trim()) return;
-        var currentShift = parseFloat(
-          card.style.getPropertyValue("--reflow-quiz-content-shift")
-        ) || 0;
-        var unshiftedTop = question.getBoundingClientRect().top -
-          card.getBoundingClientRect().top - currentShift;
         var targetTop = Number(card.dataset.reflowQuizQuestionTop);
-        card.style.setProperty(
-          "--reflow-quiz-content-shift",
-          (targetTop - unshiftedTop) + "px"
-        );
+        /* Measure the natural position: without the transform on. */
+        card.style.removeProperty("--reflow-quiz-content-shift");
+        var cardRect = card.getBoundingClientRect();
+        var unshiftedTop = question.getBoundingClientRect().top - cardRect.top;
+        var needed = targetTop - unshiftedTop;
+        var paddingBottom = parseFloat(getComputedStyle(card).paddingBottom) || 0;
+        var room = card.clientHeight - paddingBottom;
+        var contentBottom = feedback.getBoundingClientRect().bottom - cardRect.top;
+        var shift = Math.max(0, Math.min(needed, room - contentBottom));
+        card.style.setProperty("--reflow-quiz-content-shift", shift + "px");
       }
       requestAnimationFrame(function () {
         restoreQuizContentOrigin();
