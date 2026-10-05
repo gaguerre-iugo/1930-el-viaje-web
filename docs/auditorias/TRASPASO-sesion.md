@@ -270,7 +270,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=147-fila-opcion`,
+  vieja. Valores actuales: `reflow.css?v=148-quiz-espaciado`,
   `reflow-book.js?v=184-evitacion-lectura-real` y
   `quiz-sequence.js?v=6-siguiente-pagina`.
 - El servidor local está en el puerto **5501** y sigue corriendo.

@@ -3,6 +3,31 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Correcciones de los quiz (kicker y separación)
+
+Tres ajustes pedidos sobre **todas** las páginas de actividad (8 secuencias, 24
+preguntas):
+
+- **Kicker**: «Comprensión lectora · Pregunta N de 3» → **«Pregunta N de 3»**. El
+  prefijo estaba escrito en los 8 HTML (`quiz_final.html` y `qz007…qz025`); se quitó
+  de los 24. El `aria-label` y el `h1` para lectores de pantalla no cambian.
+- **Separación kicker → título**: medido, el hueco era **0 px** (los dos párrafos
+  comparten caja, sin margen). Se agregó `margin-bottom: .5rem` al kicker → **8 px**.
+- **Separación «Enviar» → devolución**: medido, el hueco era **6 px**. La devolución
+  evaluada pasó de `margin-top: .35rem` a **.75rem** → **12 px**.
+
+Para que la tarjeta no recorte con la devolución desplegada, en columnas de lectura
+bajas (`@media (max-height: 780px)`) se compensa: relleno de la tarjeta `.55rem`,
+separación de opciones `.4rem` y margen de acciones `.35rem`; además, el
+`max-height` de la tarjeta pasa de `- 5rem` a `- 4.5rem`. Verificado:
+`verify-quiz-feedback-fit.mjs` en verde en los 7 tamaños (antes fallaba 1–3 px a
+947x700 con letra extra grande). Las otras suites de quiz (opciones, zoom,
+contraste, reintento, «Siguiente pregunta») siguen en verde.
+
+Caché: `reflow.css?v=148-quiz-espaciado`. El precargador offline se regeneró
+(`node tools/sync_offline_preloader.js`, 225 entradas) para que el modo `file://`
+sirva los HTML con el texto nuevo.
+
 ## Punto 18 · Estados de color de las opciones — MEDIDO (cierre)
 
 El sondeo anterior no fallaba por la interfaz sino por la consulta: tomaba las

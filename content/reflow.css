@@ -2284,6 +2284,7 @@ body.reflow-book #content .quiz-dimension {
 }
 
 body.reflow-book #content .quiz-kicker {
+  margin-bottom: .5rem;
   color: var(--ceibal-gray-700);
   font-size: 1rem;
   font-weight: 700;
@@ -4210,7 +4211,7 @@ body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty))
 }
 
 body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-feedback {
-  margin-top: .35rem !important;
+  margin-top: .75rem !important;
 }
 
 /* Give the unevaluated action a clear visual separation from the final
@@ -4239,7 +4240,7 @@ body.reflow-book #content .quiz-card {
     min(28rem, calc(100dvh - var(--nav-height, 60px) - 5rem)),
     var(--reflow-quiz-interaction-height, 0px)
   );
-  max-height: calc(100dvh - var(--nav-height, 60px) - 5rem) !important;
+  max-height: calc(100dvh - var(--nav-height, 60px) - 4.5rem) !important;
   justify-content: flex-start;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
@@ -4269,11 +4270,13 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
    cuando la columna es baja. */
 @media (max-height: 780px) {
   body.reflow-book #content .quiz-card {
-    padding: .8rem 1rem !important;
+    /* Se recorta el relleno para compensar el hueco nuevo entre el kicker y el
+       título y entre «Enviar» y la devolución, sin que el botón se corte. */
+    padding: .55rem 1rem !important;
     /* El motor mide la separación de las opciones ANTES de enviar y la deja en
        esta variable, que su regla impone con `!important`. Con la devolución
        desplegada esa separación ya no entra en la página, así que se acota. */
-    --reflow-quiz-options-gap: .5rem !important;
+    --reflow-quiz-options-gap: .4rem !important;
   }
   /* Los selectores incluyen las dos variantes que ganaban por especificidad: la de
      letra extra grande y la del estado CON devolución
@@ -4284,12 +4287,12 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card .quiz-options,
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
-    gap: .5rem !important;
-    margin-top: .6rem !important;
+    gap: .4rem !important;
+    margin-top: .4rem !important;
   }
   body.reflow-book #content .quiz-card .quiz-actions,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
-    margin-top: .5rem !important;
+    margin-top: .35rem !important;
   }
 }
 

@@ -26,7 +26,7 @@ await page.waitForTimeout(2500);
 await page.keyboard.press("Escape");
 await page.waitForTimeout(1200);
 
-/* Kicker visible: «Comprensión lectora · Pregunta N de 3».
+/* Kicker visible: «Pregunta N de 3».
    Medido: el libro tiene 24 kickers en el DOM (8 capítulos × 3 preguntas) y todos
    repiten los mismos textos. Buscar el primero del DOM devuelve una copia que está
    fuera de la pantalla, así que la medición tiene que ser la del lector: el nodo

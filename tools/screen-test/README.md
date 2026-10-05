@@ -192,6 +192,18 @@ node verify-quiz-feedback-fit.mjs --url http://127.0.0.1:5599/index.html
 # el texto que se alarga DESPUÉS de enviar (112 comprobaciones).
 node verify-quiz-option-fit.mjs --url http://127.0.0.1:5599/index.html
 
+# Contraste de los estados del cuestionario (punto 18): normal, elegida,
+# correcta e incorrecta, más la devolución y el botón. Acota la muestra al panel
+# de la pregunta respondida (el sondeo viejo tomaba opciones de otra pregunta) y
+# convierte oklch/oklab a sRGB. Recorre las 8 secuencias.
+node verify-quiz-contrast.mjs --url http://127.0.0.1:5599/index.html
+
+# La evitación del reproductor de voz en LECTURA REAL (punto 25): el resaltado
+# real es un rango de la Custom Highlight API y no lleva la clase que buscaba la
+# regla, así que se comprueba arrancando la lectura, saltando a una oración baja
+# (el reproductor se corre arriba) y después a una alta (vuelve abajo).
+node verify-tts-avoidance-real.mjs --url http://127.0.0.1:5599/index.html
+
 # Apertura (puntos 21 y 22): texto de carga «Abriendo 1930: El viaje…» y el
 # enlace «saltar al contenido» invisible en reposo (sin el filo de su sombra)
 # pero visible al enfocarlo con el teclado.

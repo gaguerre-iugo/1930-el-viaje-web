@@ -51,7 +51,7 @@ console.log("=== Kicker y dimensión (punto 17) ===");
 console.log(`  kicker:    ${JSON.stringify(tipografia && tipografia.kicker)}`);
 console.log(`  dimensión: ${JSON.stringify(tipografia && tipografia.dimension)}`);
 if (!tipografia || !tipografia.kicker || !tipografia.kicker.visible) {
-  fail("el kicker «Comprensión lectora · Pregunta N de 3» no se ve");
+  fail("el kicker «Pregunta N de 3» no se ve");
 }
 if (tipografia && tipografia.kicker && !/Pregunta \d+ de 3/.test(tipografia.kicker.texto)) {
   fail(`el kicker no dice la pregunta: ${tipografia.kicker.texto}`);
