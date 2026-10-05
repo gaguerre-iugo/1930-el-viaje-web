@@ -1273,24 +1273,23 @@
         control.style.setProperty("border-color", "var(--ui-border-strong)", "important");
       }
     }
-    /* Interruptores del runtime: pista y perilla se pintan con los valores del
-       tema oscuro y sobre la superficie blanca desaparecen. Se fijan por estado:
-       encendido en institucional, apagado en el gris de borde fuerte. */
-    var interruptores = raiz.querySelectorAll("[role='switch'], input[type='checkbox']");
+    /* Interruptores on/off: la pista y la perilla las dibuja el CSS con los SVG
+       de EVA (assets/icons/eva-switch-off.svg y eva-switch-on.svg). Acá sólo se
+       neutraliza el fondo oscuro que el runtime pinta, para no dejar un fleco
+       detrás de la imagen. */
+    var interruptores = raiz.querySelectorAll("[role='switch']");
     for (var s = 0; s < interruptores.length; s++) {
-      var interruptor = interruptores[s];
-      var encendido =
-        interruptor.getAttribute("aria-checked") === "true" || interruptor.checked === true;
-      interruptor.style.setProperty(
+      interruptores[s].style.setProperty("background-color", "transparent", "important");
+      interruptores[s].style.setProperty("border-color", "transparent", "important");
+    }
+    /* Casillas nativas: conservan el acento del tema cuando están marcadas. */
+    var casillas = raiz.querySelectorAll("input[type='checkbox']");
+    for (var k = 0; k < casillas.length; k++) {
+      casillas[k].style.setProperty(
         "background-color",
-        encendido ? "var(--ui-accent)" : "var(--ui-text-muted)",
+        casillas[k].checked ? "var(--ui-accent)" : "var(--ui-surface)",
         "important"
       );
-      var perilla = interruptor.querySelector("span, div");
-      if (perilla) {
-        perilla.style.setProperty("background-color", "#ffffff", "important");
-        perilla.style.setProperty("box-shadow", "0 1px 2px rgb(21 23 26 / 24%)", "important");
-      }
     }
     /* Las filas deshabilitadas se lavan por opacidad: el tema pide color, no
        transparencia (grey-100 de fondo con grey-600 de texto). */

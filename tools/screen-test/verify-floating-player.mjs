@@ -1,6 +1,6 @@
 // Verifica el pop-up de voz flotante (revisión UX, punto 25, parte 1):
-// que no reserve carril, que flote apoyado en la barra, que en pantallas anchas
-// se ancle a la derecha con margen y que en angostas sea una pastilla de íconos.
+// que no reserve carril, que flote apoyado en la barra, que quede centrado como
+// la barra en pantallas anchas y que en angostas sea una pastilla de íconos.
 //
 // Uso:
 //   node verify-floating-player.mjs
@@ -85,8 +85,9 @@ for (const [ancho, alto, etiqueta] of [
   }
   /* 3 · forma según el ancho */
   if (ancho >= 1024) {
-    if (Math.abs(datos.player.derecha - 16) > 8) {
-      fallar(`${etiqueta}: el margen derecho es ${datos.player.derecha} px y debería ser 16`);
+    const centro = datos.player.x + datos.player.ancho / 2;
+    if (Math.abs(centro - ancho / 2) > 3) {
+      fallar(`${etiqueta}: el reproductor no está centrado (centro ${Math.round(centro)} de ${ancho})`);
     }
     if (!datos.player.etiquetaVisible) {
       fallar(`${etiqueta}: las etiquetas del reproductor deberían verse`);
@@ -111,7 +112,7 @@ console.log(
   `\nURL: ${target}\n` +
     (fallas.length
       ? `FALLAS:\n - ${fallas.join("\n - ")}`
-      : "OK: el reproductor flota sin carril, con margen derecho en ancha y pastilla en angosta")
+      : "OK: el reproductor flota sin carril, centrado en ancha y pastilla en angosta")
 );
 await browser.close();
 process.exit(fallas.length ? 1 : 0);

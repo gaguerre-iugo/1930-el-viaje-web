@@ -754,6 +754,23 @@ body.reflow-book #content [data-section-id="pg021_sec001"] .whatsapp-chat-text {
   }
 }
 
+/* Todas las ventanas de chat comparten el ancho de la medida de lectura (el
+   mismo del texto de la página), centradas. Antes quedaban más anchas
+   (calc(100vw - 2*gutter) = 766 px a 1366) o encogidas a 672/702 según el
+   contenedor. La variable --reflow-text-measure sigue la escala (42rem normal,
+   52rem en tableros grandes), así que las ventanas acompañan al texto. */
+body.reflow-book #content#content :is(
+  .whatsapp-chat-window,
+  .reflow-book-chat-window,
+  .chapter-one-chat-part,
+  .chapter5-chat-window
+) {
+  width: min(100%, var(--reflow-text-measure)) !important;
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 body.reflow-book #content p.reading-sentence::after {
   content: none !important;
 }
@@ -1430,11 +1447,11 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
 #reflow-tts-player {
   position: fixed;
   z-index: 65;
-  /* Punto 25: flota sobre el contenido, apoyado en la barra. En pantallas anchas
-     se ancla a la derecha con margen; en angostas pasa a pastilla compacta. */
-  right: max(1rem, env(safe-area-inset-right));
-  left: auto;
-  transform: none;
+  /* Punto 25: flota sobre el contenido, apoyado en la barra y centrado como
+     ella. En angostas pasa a pastilla compacta. */
+  left: 50%;
+  right: auto;
+  transform: translateX(-50%);
   bottom: calc(var(--reflow-primary-toolbar-height, 4rem) + .5rem);
   display: grid;
   grid-template-columns:
@@ -3635,26 +3652,45 @@ body.reflow-book [role="switch"] {
 }
 
 /* A single green convention communicates every active accessible mode. */
-body.reflow-book :is(
-  .reflow-accessibility-panel,
-  .reflow-language-panel,
-  .reflow-glossary-panel
-)
-  [role="switch"][aria-checked="true"],
 body.reflow-book .reflow-accessibility-panel
   [role="radio"][aria-checked="true"] {
   color: #fff !important;
   background: var(--ceibal-institutional-600) !important;
 }
 
-/* Every active switch uses the same white thumb. */
-body.reflow-book :is(
-  .reflow-accessibility-panel,
-  .reflow-language-panel,
-  .reflow-glossary-panel
-)
-  [role="switch"][aria-checked="true"] > span {
-  background: #fff !important;
+/* Interruptores on/off de los paneles (Herramientas y Glosario) con los SVG de
+   EVA (`assets/icons/eva-switch-off.svg` y `eva-switch-on.svg`): pista y perilla
+   viajan juntas en una imagen por estado. Se oculta la perilla nativa y el pase
+   inline del motor neutraliza el fondo oscuro que dibujaba el runtime.
+
+   La pista visible es la caja de contenido (52 x 24 px, la proporción del SVG de
+   73 x 34), así que el elemento conserva su área táctil de 48 px de alto. */
+body.reflow-book .reflow-reader-panel [role="switch"] {
+  box-sizing: border-box !important;
+  position: relative !important;
+  width: 60px !important;
+  min-width: 60px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 11px 3px !important;
+  border-color: transparent !important;
+  border-radius: 999px !important;
+  background-color: transparent !important;
+  background-image: url("../assets/icons/eva-switch-off.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 100% 100% !important;
+  background-origin: content-box !important;
+  background-clip: border-box !important;
+}
+
+body.reflow-book .reflow-reader-panel [role="switch"][aria-checked="true"] {
+  background-image: url("../assets/icons/eva-switch-on.svg") !important;
+}
+
+body.reflow-book .reflow-reader-panel [role="switch"]
+  :is([data-slot="switch-thumb"], .reflow-custom-switch-thumb) {
+  display: none !important;
 }
 
 body.reflow-book .reflow-panel-anchor {
@@ -5935,11 +5971,15 @@ body.reflow-book #content :is(
 
 /* Imported PDF wrappers used several centred max-width boxes. In reading
    flow every ordinary prose block and every reconstructed chat owns the same
-   text measure and starts on the same page margin. */
+   text measure and starts on the same page margin. Las ventanas de chat y sus
+   burbujas quedan afuera: son fragmentos de interfaz con su propio ancho (si no,
+   este `width:100%` las encogía al ancho de la sección de texto y estiraba la
+   burbuja). */
 body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
-  > div:not(.chapter5-chat-page),
+  > div:not(.chapter5-chat-page):not(.whatsapp-chat-window):not(.reflow-book-chat-window):not(.chapter-one-chat-window),
 body.reflow-book #content > section.reflow-story-section:not(.reflow-later-illustrated)
-  > div:not(.chapter5-chat-page) > div:not(.whatsapp-chat-window, .reflow-book-chat-window) {
+  > div:not(.chapter5-chat-page):not(.whatsapp-chat-window):not(.reflow-book-chat-window):not(.chapter-one-chat-window)
+  > div:not(.whatsapp-chat-window, .reflow-book-chat-window) {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: none !important;
@@ -6160,14 +6200,37 @@ body.reflow-book .reflow-accessibility-panel [role="radio"]:active:not(:disabled
   box-shadow: inset 0 0 0 2px rgb(255 255 255 / 20%) !important;
 }
 
+body.reflow-book .reflow-reader-panel [role="switch"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 52px;
+  height: 24px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  pointer-events: none;
+  box-shadow: 0 0 0 0 transparent;
+}
+
 body.reflow-book .reflow-reader-panel [role="switch"]:hover:not(:disabled):not([aria-disabled="true"]) {
-  border-color: var(--ceibal-institutional-300) !important;
-  box-shadow: 0 0 0 2px rgb(102 198 192 / 24%) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body.reflow-book .reflow-reader-panel
+  [role="switch"]:hover:not(:disabled):not([aria-disabled="true"])::after {
+  box-shadow: 0 0 0 3px rgb(102 198 192 / 55%);
 }
 
 body.reflow-book .reflow-reader-panel [role="switch"]:active:not(:disabled):not([aria-disabled="true"]) {
-  border-color: var(--ceibal-institutional-200) !important;
-  box-shadow: inset 0 0 0 2px var(--ceibal-institutional-200) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+body.reflow-book .reflow-reader-panel
+  [role="switch"]:active:not(:disabled):not([aria-disabled="true"])::after {
+  box-shadow: 0 0 0 3px rgb(0 128 120 / 45%);
 }
 
 body.reflow-book .reflow-reader-panel :is(
@@ -6550,12 +6613,14 @@ body.reflow-book .reflow-reader-panel :is(p, small, dd, figcaption, .reflow-pane
   color: var(--ui-n4-color) !important;
 }
 
-/* Botones de panel: sin relleno, hover gris, selección institucional. */
-body.reflow-book .reflow-reader-panel button {
+/* Botones de panel: sin relleno, hover gris, selección institucional. Los
+   interruptores on/off quedan afuera: el atajo `background` les borraría la
+   imagen del SVG que dibuja la pista. */
+body.reflow-book .reflow-reader-panel button:not([role="switch"]) {
   background: transparent !important;
   border-color: transparent !important;
 }
-body.reflow-book .reflow-reader-panel button:hover:not(:disabled) {
+body.reflow-book .reflow-reader-panel button:not([role="switch"]):hover:not(:disabled) {
   background: var(--ui-surface-hover) !important;
 }
 body.reflow-book .reflow-reader-panel button[aria-pressed="true"],
@@ -6565,7 +6630,7 @@ body.reflow-book .reflow-reader-panel [aria-current="true"] {
   color: var(--ui-text-selected) !important;
   background: var(--ui-surface-selected) !important;
 }
-body.reflow-book .reflow-reader-panel button:disabled {
+body.reflow-book .reflow-reader-panel button:not([role="switch"]):disabled {
   color: var(--ui-disabled-text) !important;
   background: var(--ui-disabled-surface) !important;
 }

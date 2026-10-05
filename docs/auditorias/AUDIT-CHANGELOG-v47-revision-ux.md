@@ -3,6 +3,81 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Ancho de las ventanas de chat = ancho del texto
+
+Las ventanas de chat medían distinto y **más ancho que el texto**: 766 px en la
+mayoría (pg020, pg029, pg068…pg183), 672 px donde la normalización de prosa las
+encogía (pg021, pg095) y 702 px en la composición del capítulo 5. La corrección
+pedida es que **todas queden del ancho de la medida de lectura**, alineadas con
+el texto de la página.
+
+- Se excluyeron las ventanas (`whatsapp-chat-window`, `reflow-book-chat-window`,
+  `chapter-one-chat-window`) de la normalización de prosa, así las burbujas
+  conservan su ancho propio (saliente ajustada al texto; entrante 100 %).
+- Regla única para todas las ventanas (`whatsapp`, `reflow-book`,
+  `chapter-one-chat-part`, `chapter5`): `width: min(100%,
+  var(--reflow-text-measure))` y centradas. La medida acompaña la escala (42 rem
+  normal, 52 rem en tableros grandes). Medido después: **todas en 672 px** a
+  1366 (pg020, pg021, pg029, pg068…pg183, pg095 y pg117), el mismo ancho que el
+  texto. La burbuja saliente de pg021 queda en 240 px (ajustada al texto).
+- La composición del capítulo 5 (página con `overflow: hidden`) queda dentro de
+  su página.
+
+`verify-chapter-progress` falla por un desajuste **preexistente** del índice
+cacheado (`sobre:260-271` contra `260-270`); se reprodujo igual contra HEAD.
+
+Caché: `reflow.css?v=155-chat-ancho-texto`.
+
+## Reproductor de voz centrado (ajuste de uso)
+
+Con la lectura en voz alta activa, el reproductor quedaba anclado a la derecha
+mientras la barra se centra. Se pidió centrarlo: `#reflow-tts-player` pasa de
+`right: 1rem` a `left: 50%; transform: translateX(-50%)`, igual que
+`#reflow-pagination`. Medido: a 1366 el centro pasa de **998** a **683** (el del
+viewport) y a 1702 de **1334** a **851**. La pastilla angosta ya estaba centrada.
+
+`verify-floating-player.mjs` ahora exige el centrado en pantallas anchas (antes
+pedía un margen derecho de 16 px). `verify-tts-avoidance` y
+`verify-tts-avoidance-real` siguen en verde.
+
+Caché: `reflow.css?v=152-tts-centrado`.
+
+## Interruptores on/off con los SVG de EVA (Herramientas y Glosario)
+
+Se reemplazaron los interruptores de los paneles por los gráficos de EVA que dejó
+Comunicación (`status=off/on, label=no`): pista y perilla viajan juntas en una
+imagen por estado.
+
+- **Assets**: `assets/icons/eva-switch-off.svg` (pista `#F3F4F6`, borde `#4B5563`,
+  perilla `#6B7280` a la izquierda) y `eva-switch-on.svg` (pista `#CCECEA`, borde
+  `#008078`, perilla `#00635D` a la derecha). Declarados en `imsmanifest.xml`
+  porque el CSS los referencia.
+- **CSS**: el interruptor (`.reflow-reader-panel [role="switch"]`) dibuja la pista
+  con `background-image` según `aria-checked`, con `background-origin/clip:
+  content-box`, y oculta la perilla nativa. La caja de contenido queda en
+  **52 × 24 px** (la proporción del SVG de 73 × 34) y el elemento conserva
+  **60 × 48 px** de área táctil (el alto de 48 px no cambia).
+- **Motor**: el pase inline ya no pinta la pista —la dibuja el CSS—; sólo
+  neutraliza el fondo oscuro que escribe el runtime, para no dejar un fleco detrás
+  de la imagen. Las casillas nativas conservan su acento.
+
+**Verificación**: `verify-tools-panel` (escritorio y 390 px), `verify-light-theme`,
+`verify-focus-visible` y `verify-glossary-highlight`, todos en verde; sin 404 de
+los SVG.
+
+**Dos correcciones posteriores** (reportadas en uso):
+
+- El borde del SVG se recortaba en algunos lados: `background-clip: content-box`
+  cortaba la mitad externa del trazo. Pasó a `border-box`, con el origen en
+  `content-box` (la imagen sigue midiendo 52 × 24).
+- El interruptor de «Reducir movimiento» es un `<button>` y el hover genérico de
+  los botones del panel (atajo `background:`) le borraba la imagen y lo dejaba
+  como un círculo vacío. Se excluyó `[role="switch"]` de esas reglas y el anillo
+  de hover ahora lo dibuja un pseudo-elemento del tamaño de la pista, no del área
+  táctil.
+
+Caché: `reflow.css?v=151-switch-eva-hover` y `reflow-book.js?v=185-switch-eva`.
+
 ## Correcciones de los quiz (kicker y separación)
 
 Tres ajustes pedidos sobre **todas** las páginas de actividad (8 secuencias, 24
