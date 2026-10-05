@@ -82,34 +82,34 @@ conviene dar por cerrado lo que figura con asterisco.
 | 15 | Reintento señalizado, incorrecta marcada, «Siguiente pregunta» | Cerrado | `verify-quiz-retry.mjs` + las tres pruebas nuevas |
 | 16 | «Todavía no.» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` |
 | 17 | Kicker «Pregunta N de 3», dimensión oculta, cierre | Cerrado | `verify-quiz-retry.mjs` |
-| 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, **con dos salvedades** | (a) los colores de los estados de las opciones (elegida/correcta/incorrecta) **quedaron sin medir** después de tres intentos; (b) el capítulo actual del índice está en institucional-500 (4,82:1, cumple AA) y la tabla de EVA pide 600 (7,14:1) |
+| 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, **con una salvedad** | Los estados de las opciones ya se **midieron** (`verify-quiz-contrast.mjs`: 17,73:1 el texto en los cuatro estados; 10,93:1 / 7,08:1 las devoluciones). Queda sólo el borde en reposo (gris-400, 2,2:1) y el capítulo actual del índice en institucional-500 (4,82:1, cumple AA) donde EVA pide 600 (7,14:1) |
 | 19 | Íconos SVG de EVA en la interfaz | Cerrado, **con salvedad** | **3 de los 8** (detener, audio anterior, audio siguiente) fueron **generados** por nosotros a partir de pausa y reproducir: si Comunicación tiene los originales, se reemplazan. `verify-eva-icons.mjs` |
 | 20 | Escala tipográfica del contenido | **Decisión pendiente** | Cuerpo **20 px vs 18 px**: hoy 18. Es la única decisión que cambia la paginación de todo el libro (cliente) |
 | 21 | «Abriendo 1930: El viaje…» + logo de Ceibal | Cerrado | El SVG oficial está en `assets/icons/ceibal-logo.svg` y aplicado en el cargador |
 | 22 | Ocultar el enlace «Saltar al contenido» y la línea de apertura | Cerrado | `verify-opening.mjs` |
 | 23 | Dobles espacios y saltos sueltos | Cerrado, **con salvedad** | `audit_typo.py` bajó de 45 a **1** coincidencia; la que queda es de **contenido** («???» en `pg176177_n0009`), decisión editorial |
 | 24 | Jerarquía tipográfica N1–N4, íconos 24 px | Cerrado | `verify-ui-typography.mjs` |
-| 25 | Pop-up de voz flotante, sin carril | Cerrado, **con salvedad** | La regla de no tapar la oración se verificó **simulando** bloques marcados (`verify-tts-avoidance.mjs`), no en una lectura real de punta a punta |
+| 25 | Pop-up de voz flotante, sin carril | Cerrado | La evitación se midió **en lectura real**: se encontró que el resaltado de la Custom Highlight API no ponía la clase que la regla buscaba, y se corrigió (`verify-tts-avoidance-real.mjs`) |
 
 **Resumen**: 25 puntos atendidos. Quedan **1 decisión del cliente** (punto 20, 20 px
-vs 18 px) y **3 verificaciones a medias** (estados de color del punto 18, los 3
-íconos generados del punto 19, la lectura real del punto 25), más **1 salvedad
-menor** (punto 14).
+vs 18 px), **1 verificación a medias** (los 3 íconos generados del punto 19, que
+dependen de que Comunicación mande los originales) y **3 salvedades menores** (el
+borde en reposo del cuestionario, el capítulo actual del índice —las dos de
+diseño— y el foco del punto 14). Los estados de color del punto 18 y la lectura
+real del punto 25 **quedaron medidos y cerrados en esta sesión**.
 
 ### Lo que aún se puede hacer sin que nadie decida nada
 
 En orden de valor, y todo dentro del repo:
 
-1. **Medir los estados de color de las opciones** (punto 18). Es el ítem más viejo
-   sin cerrar. El error de los tres intentos está identificado: el sondeo tomaba las
-   cuatro primeras opciones de la página, que pertenecen a **otra pregunta**. Hay que
-   acotar la muestra al contenedor de la pregunta respondida (el que tiene el control
-   marcado). Ojo: al medir colores de este runtime hay que leer **oklch/oklab por su
-   luminosidad**, no parsear los números como r/g/b.
+1. **Medir los estados de color de las opciones** (punto 18) — **HECHO**: el
+   sondeo se acota al panel de la pregunta (`verify-quiz-contrast.mjs`) y los
+   cuatro estados cumplen (17,73:1 el texto; 10,93:1 / 7,08:1 las devoluciones).
 2. **Reemplazar los 3 íconos generados** si Comunicación manda los originales
-   (punto 19).
-3. **Verificar el punto 25 en una lectura real**: marcar la oración mientras el
-   reproductor está arriba y comprobar que no se superponen.
+   (punto 19). Único ítem que depende de material externo.
+3. **Verificar el punto 25 en una lectura real** — **HECHO**, y encontró un fallo:
+   la regla no se disparaba porque el resaltado real no lleva `.tts-active-block`.
+   Corregido y con prueba nueva (`verify-tts-avoidance-real.mjs`).
 
 ## El bloqueante, resuelto (y por qué parecía un problema del motor)
 
@@ -194,9 +194,12 @@ node tools/screen-test/_diag-nav.mjs                    # la navegación funcion
 node tools/screen-test/verify-quiz-next-question.mjs    # VERDE: Pregunta 1 → Pregunta 2
 node tools/screen-test/verify-quiz-zoom.mjs             # VERDE: 9 combinaciones de letra y zoom
 node tools/screen-test/verify-quiz-retry.mjs            # puntos 15 y 17
+node tools/screen-test/verify-quiz-contrast.mjs         # punto 18: contraste en los 4 estados
 node tools/screen-test/verify-light-theme.mjs           # tema claro y contraste
 node tools/screen-test/verify-popup-theme.mjs           # globo del glosario
 node tools/screen-test/verify-floating-player.mjs       # pop-up de voz
+node tools/screen-test/verify-tts-avoidance.mjs         # punto 25: bloque simulado
+node tools/screen-test/verify-tts-avoidance-real.mjs    # punto 25: lectura real
 ```
 
 Validadores de contenido: `python tools/validate_v46.py`,
@@ -252,6 +255,15 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - **`--ceibal-gray-500` no existe** en la paleta: el `var()` queda inválido y el
   fondo sale transparente.
 - **`overflow-x: clip` deshabilita el scroll** de ese elemento: rompió la navegación.
+- **El resaltado de la lectura real es un rango de la Custom Highlight API**
+  (`CSS.highlights.get("adt-tts-active")`), no un elemento: el párrafo **no** lleva
+  `.tts-active-block` en modo palabra/sentencia (sólo en imágenes o fallback). Y
+  como un rango no muta el DOM, **ningún observador se despierta** al cambiar de
+  oración: la evitación del reproductor hay que llamarla desde el pintado
+  (`paintTtsRange`), no esperar un ciclo. Ver el punto 25 del changelog.
+- **Al medir contraste de este runtime hay que convertir oklch/oklab a sRGB**, no
+  leer sólo su luminosidad: para decidir claro/oscuro alcanza el primer número,
+  pero para un contraste WCAG no. `verify-quiz-contrast.mjs` trae el conversor.
 
 ## Convenciones del repo
 
@@ -259,7 +271,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
   vieja. Valores actuales: `reflow.css?v=147-fila-opcion`,
-  `reflow-book.js?v=183-recorte-cuestionario` y
+  `reflow-book.js?v=184-evitacion-lectura-real` y
   `quiz-sequence.js?v=6-siguiente-pagina`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
@@ -277,7 +289,9 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-quiz-feedback-fit.mjs` | Devolución y botón entran completos en la tarjeta (56 casos) | Mide contra el **límite efectivo** (sube por los ancestros que recortan) |
 | `verify-quiz-zoom.mjs` | Filas de opción y alineación del botón con letra grande y zoom | El zoom se emula **achicando el viewport CSS**, que es lo que ve el lector |
 | `verify-quiz-retry.mjs` | Puntos 15 y 17: reintento, marcas, cierre de la secuencia | — |
-| `verify-tts-avoidance.mjs` | El reproductor no tapa el bloque en lectura | Marca los bloques **a mano**: no es una lectura real |
+| `verify-quiz-contrast.mjs` | Punto 18: contraste de texto y gráficos en los 4 estados, devolución y botón | Acota la muestra al panel de la pregunta; convierte oklch/oklab a sRGB |
+| `verify-tts-avoidance.mjs` | El reproductor no tapa el bloque en lectura | Marca los bloques **a mano**: es el caso simulado |
+| `verify-tts-avoidance-real.mjs` | Punto 25 en lectura real: oración baja y alta | Necesita `--autoplay-policy=no-user-gesture-required` (lo pasa el lanzador) |
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |
 
@@ -289,10 +303,10 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | Cuerpo de texto **20 px vs 18 px** (punto 20) | Cliente |
 | Fondo turquesa a sangre de la página del cuestionario | Identidad de Ceibal: ¿se deja o se atenúa? |
 | El capítulo actual del índice en institucional-500 (4,82:1) en vez de 600 (7,1:1) | Diseño: cumple AA, es un ajuste de una línea |
-| La devolución del cuestionario mide 4,72:1 (por encima de 4,5:1, con poco margen) | Diseño: ¿se refuerza? |
+| La devolución del cuestionario mide 4,72:1 (por encima de 4,5:1, con poco margen) | **Re-medido**: 10,93:1 la incorrecta y 7,08:1 la correcta; el 4,72 no se reproduce, ya no es un pendiente de diseño |
+| El borde en reposo de las opciones del cuestionario (gris-400, 2,2:1) | Diseño: WCAG 1.4.11 pide 3:1 si el límite identifica el componente; ¿se oscurece? |
 | Subir `bundleVersion` y publicar | Release. **No invalida los catálogos de voz** (cada audio tiene su propia versión): son 4 ediciones y regenerar el precargador |
 | Los 3 íconos de EVA generados (detener, audio anterior, siguiente) | Comunicación: si aparecen los originales, se reemplazan |
-| Fondo turquesa a sangre de la página del cuestionario | Identidad de Ceibal |
 
 ## Estado del repositorio al cerrar esta sesión
 

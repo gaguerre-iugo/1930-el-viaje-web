@@ -3594,24 +3594,76 @@
   }
 
   /* Punto 25 · La oración en lectura no puede quedar detrás del reproductor. El
-     runtime marca el bloque con .tts-active-block (el resaltado en sí es de la
-     Custom Highlight API y no tiene caja). Si el bloque cae en la banda del
-     reproductor, este se corre arriba mientras dure la situación. */
+     resaltado del runtime es un rango de la Custom Highlight API y NO es un
+     elemento: en modo palabra/sentencia el párrafo no lleva `.tts-active-block`.
+     Medido en lectura real: con el resaltado en 754–779 y el reproductor en
+     763–823, la regla no se disparaba y la oración quedaba tapada. La caja activa
+     sale del propio resaltado (`adt-tts-active`); si no hay —un modo sin
+     resaltado en línea, o la prueba que marca el bloque a mano—, se cae a
+     `.tts-active-block` / `.bg-yellow-300` y al elemento activo del motor. */
+  function ttsActiveBox() {
+    try {
+      var highlights = window.CSS && CSS.highlights;
+      var activo = highlights && highlights.get("adt-tts-active");
+      if (activo) {
+        var caja = null;
+        Array.from(activo).forEach(function (rango) {
+          var c = rango.getBoundingClientRect();
+          if (!c || (!c.width && !c.height)) return;
+          caja = caja
+            ? {
+                top: Math.min(caja.top, c.top),
+                bottom: Math.max(caja.bottom, c.bottom),
+                left: Math.min(caja.left, c.left),
+                right: Math.max(caja.right, c.right),
+                width: Math.max(caja.right, c.right) - Math.min(caja.left, c.left),
+                height: Math.max(caja.bottom, c.bottom) - Math.min(caja.top, c.top)
+              }
+            : c;
+        });
+        if (caja) return caja;
+      }
+    } catch (_error) {
+      /* Sin Custom Highlight API se sigue con los respaldos de abajo. */
+    }
+    var nodo = document.querySelector(
+      "#content .tts-active-block, #content .bg-yellow-300"
+    );
+    if (nodo) return nodo.getBoundingClientRect();
+    if (state.ttsActiveElement && state.ttsActiveElement.isConnected) {
+      return state.ttsActiveElement.getBoundingClientRect();
+    }
+    return null;
+  }
+
+  /* Posición de reposo del reproductor (abajo), independiente de si ahora está
+     corrido arriba: comparar contra la posición actual hacía que, ya arriba,
+     dejara de "cruzarse" y volviera abajo en el ciclo siguiente (parpadeo). */
+  function ttsPlayerRestingBox() {
+    var caja = ttsPlayer.getBoundingClientRect();
+    if (!ttsPlayer.classList.contains("reflow-tts-player-top")) return caja;
+    var raiz = getComputedStyle(document.documentElement);
+    var toolbar = parseFloat(raiz.getPropertyValue("--reflow-primary-toolbar-height")) || 64;
+    var inset = toolbar + 8; /* .5rem de separación de la barra */
+    return {
+      top: window.innerHeight - inset - caja.height,
+      bottom: window.innerHeight - inset,
+      height: caja.height
+    };
+  }
+
   function syncTtsPlayerAvoidance() {
     if (!ttsPlayer || ttsPlayer.hidden) {
       if (ttsPlayer) ttsPlayer.classList.remove("reflow-tts-player-top");
       return;
     }
-    var bloque = document.querySelector(
-      "#content .tts-active-block, #content .bg-yellow-300"
-    );
-    if (!bloque) {
+    var caja = ttsActiveBox();
+    if (!caja) {
       ttsPlayer.classList.remove("reflow-tts-player-top");
       return;
     }
-    var caja = bloque.getBoundingClientRect();
-    var reproductor = ttsPlayer.getBoundingClientRect();
-    /* Tapado si se cruzan en vertical y el bloque está en la misma franja. */
+    var reproductor = ttsPlayerRestingBox();
+    /* Tapado si se cruzan en vertical con la franja donde descansa. */
     var seCruzan = caja.bottom > reproductor.top && caja.top < reproductor.bottom;
     ttsPlayer.classList.toggle("reflow-tts-player-top", seCruzan);
   }
@@ -10934,6 +10986,7 @@
     }
     clearTtsImageHighlight();
     state.ttsActiveElement = null;
+    syncTtsPlayerAvoidance();
   }
 
   /* Do not expose the short local-audio loading gap between two consecutive
@@ -11036,6 +11089,7 @@
        for ordinary in-book illustrations. */
     if (semanticImage.dataset && semanticImage.dataset.id === "pg001_im001") {
       state.ttsActiveElement = semanticImage;
+      syncTtsPlayerAvoidance();
       return;
     }
     /* A chapter portadilla is narrated through its hidden source image but
@@ -11055,6 +11109,7 @@
     document.body.appendChild(overlay);
     state.ttsImageHighlightOverlay = overlay;
     updateTtsImageHighlight();
+    syncTtsPlayerAvoidance();
     if (!state.ttsImageHighlightListenersBound) {
       window.addEventListener("resize", updateTtsImageHighlight);
       window.addEventListener("scroll", updateTtsImageHighlight, true);
@@ -11087,6 +11142,10 @@
     }
     CSS.highlights.set("adt-tts-active", new Highlight(range));
     finishTtsManualHandoff();
+    /* El resaltado por Custom Highlight no muta el DOM, así que ningún
+       observador dispara la evitación: se engancha acá, en cada repintado de
+       palabra u oración, que es cuando la caja activa cambia de lugar. */
+    syncTtsPlayerAvoidance();
   }
 
   function createTextRange(textNode, start, end) {

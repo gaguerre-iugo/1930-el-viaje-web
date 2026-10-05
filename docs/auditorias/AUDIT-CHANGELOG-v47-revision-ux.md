@@ -3,6 +3,77 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 18 · Estados de color de las opciones — MEDIDO (cierre)
+
+El sondeo anterior no fallaba por la interfaz sino por la consulta: tomaba las
+**cuatro primeras opciones de `#content`**, que pertenecen a **otra pregunta**
+(el libro repite 8 secuencias × 3 paneles y el primer nodo del DOM cae fuera del
+visor). La muestra ahora se acota al **panel de la pregunta** (`[data-quiz-id]`).
+
+`tools/screen-test/verify-quiz-contrast.mjs` (nuevo) mide, en los 8 paneles, el
+texto de la opción contra su fondo efectivo en **normal, elegida, correcta e
+incorrecta**, más la devolución, el botón, la marca ✓/× y el borde. El parser lee
+`oklch`/`oklab` convirtiéndolos a sRGB (no por su luminosidad), porque una
+medición de contraste no puede conformarse con el primer número. Criterios: 4,5:1
+para texto, 3:1 para gráficos.
+
+| Elemento | Contraste | Mínimo | ¿Cumple? |
+|---|---|---|---|
+| Opciones · texto en los 4 estados (gris-900 sobre blanco) | **17,73:1** | 4,5 | ✓ |
+| Devolución incorrecta (`#68160f` sobre `#fbefef`) | **10,93:1** | 4,5 | ✓ |
+| Devolución correcta (`#275e2e` sobre `#edf8f1`) | **7,08:1** | 4,5 | ✓ |
+| Marca ✓ (blanco sobre verde `#16803a`) | **5,02:1** | 3 | ✓ |
+| Marca ✕ (blanco sobre rojo `#c42b24`) | **5,65:1** | 3 | ✓ |
+| Botón «Enviar» inactivo (gris-700 sobre gris-200) | **6,08:1** | 4,5 | ✓ |
+| Borde de la opción en reposo (gris-400 sobre blanco) | 2,20:1 | 3 | observación |
+
+El texto de las opciones **no cambia de color** al elegir, corregir o fallar: la
+señal de estado va en el borde (elegida `#008078` 4,82:1; correcta 5,02:1;
+incorrecta 5,65:1), la marca y el relleno de la devolución. Todo pasa.
+
+**Lo que queda**: el borde **en reposo** es 2,20:1. Es un gráfico decorativo —la
+opción se identifica por su etiqueta—, pero WCAG 1.4.11 pide 3:1 para los límites
+que identifican un componente. Es una decisión de diseño (oscurecer gris-400);
+queda informada, no como falla. La regla previa de 4,72:1 para la devolución **no
+se reproduce**; la medición actual da 10,93:1 y 7,08:1, con más margen.
+
+## Punto 25 · La evitación en lectura real — FALLO ENCONTRADO Y CORREGIDO
+
+El traspaso anotaba que la regla de no tapar la oración se había verificado
+**simulando** bloques marcados. Medido en **lectura real**, el resaltado del
+runtime es un rango de la **Custom Highlight API** (`adt-tts-active`) y el párrafo
+**NO lleva `.tts-active-block`** ni `.bg-yellow-300`. La función buscaba esas
+clases, así que **no encontraba la caja activa y nunca se disparaba**.
+Reproducido arrancando la lectura y saltando a una oración baja: resaltado en
+**754–779**, reproductor en **763–823**, `reflow-tts-player-top` ausente → la
+oración quedaba tapada.
+
+Segundo problema, de disparo: el resaltado por Custom Highlight **no muta el DOM**,
+así que ningún observador despertaba a la evitación; el «ciclo cada 650 ms» que
+decía el changelog no existía.
+
+**Arreglo** (`reflow-book.js`):
+
+- `ttsActiveBox()` toma la caja del **resaltado real** (unión de sus rangos) y, si
+  no hay, cae a `.tts-active-block` / `.bg-yellow-300` y al elemento activo del
+  motor (`state.ttsActiveElement`).
+- `ttsPlayerRestingBox()` compara contra la **franja de reposo** del reproductor
+  (abajo), no contra su posición actual: al correrse arriba dejaba de «cruzarse» y
+  volvía abajo en el ciclo siguiente.
+- La evitación se **engancha donde cambia la caja activa**: `paintTtsRange`,
+  `paintTtsImageHighlight` y `clearTtsRangeHighlight`.
+
+**Verificación**: `tools/screen-test/verify-tts-avoidance-real.mjs` (nuevo) enciende
+la lectura, arranca la reproducción y comprueba que hay resaltado real
+(`CSS.highlights`). Salta a una oración baja con `playAtIndex`: el reproductor pasa
+a **8–68 px** y no la tapa. Salta a una oración alta: el reproductor **vuelve a
+763–823** y no cubre el inicio. La prueba simulada (`verify-tts-avoidance.mjs`)
+sigue en verde.
+
+**Caché**: `reflow-book.js` sube a `?v=184-evitacion-lectura-real` en `index.html`.
+El precargador offline **no embebe** `reflow-book.js` (sólo HTML y catálogos), así
+que no hay que regenerarlo por esto.
+
 ## Bloqueante cerrado · «Siguiente pregunta» volvía a mostrar la misma pregunta
 
 El botón se sentía roto y **el motor estaba bien**: lo que estaba mal era **lo que
