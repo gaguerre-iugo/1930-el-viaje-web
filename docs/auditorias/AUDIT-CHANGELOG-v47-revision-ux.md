@@ -3,6 +3,27 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Sinopsis (las 2 páginas antes del capítulo 1) en claro
+
+Las dos páginas de la sinopsis (pg224, «1930: EL VIAJE») estaban en negro, con
+título amarillo y texto blanco. Ahora son una página clara como el resto: fondo
+blanco, texto y título en `--ceibal-gray-900` (gris-900) y la misma fuente
+(Atkinson Hyperlegible).
+
+- `content/reflow.css`: las reglas `.reflow-back-cover-page` /
+  `.reflow-back-cover-synopsis` / `.reflow-back-cover-inner` pasaron de
+  `#000` / `#fff` / `#f4ca43` a `#fff` / `--ceibal-gray-900`, y se quitó el
+  `box-shadow` negro que pintaba los gutters.
+- `reflow-book.js`: el fondo negro de página (`reflow-back-matter-page` sobre
+  `body`, `main` y `#content`) ahora se limita a la **página de créditos**
+  (`.reflow-collaborators-page`), no a la sinopsis; la sinopsis se separó de
+  `state.backMatterPages`.
+
+**Verificado**: sinopsis en blanco con texto `rgb(18, 24, 38)`; la última página
+(«Sobre el libro · pág. 11 de 11», créditos) sigue negra.
+
+Caché: `reflow.css?v=161-sinopsis-clara` y `reflow-book.js?v=187-sinopsis-clara`.
+
 ## Portadillas de los capítulos 1 y 2, iguales al resto
 
 Las portadillas de los capítulos 1 (pg017) y 2 (pg037) tenían el tratamiento

@@ -5737,9 +5737,9 @@ body.reflow-book #content > section.reflow-back-cover-page {
   height: auto !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: #fff !important;
-  background: #000 !important;
-  box-shadow: 0 0 0 var(--reflow-gutter) #000 !important;
+  color: var(--ceibal-gray-900) !important;
+  background: #fff !important;
+  box-shadow: none !important;
   -webkit-box-decoration-break: clone !important;
   box-decoration-break: clone !important;
   break-before: column !important;
@@ -5758,7 +5758,7 @@ body.reflow-book #content > section.reflow-back-cover-page
   height: auto !important;
   margin: 0 !important;
   padding: clamp(.5rem, 2vh, 1.25rem) 0 !important;
-  background: #000 !important;
+  background: #fff !important;
   -webkit-box-decoration-break: clone !important;
   box-decoration-break: clone !important;
 }
@@ -5768,7 +5768,7 @@ body.reflow-book #content .reflow-back-cover-inner {
   width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: #fff !important;
+  color: var(--ceibal-gray-900) !important;
   font-family: "Atkinson Hyperlegible", sans-serif !important;
   text-align: left !important;
 }
@@ -5777,7 +5777,7 @@ body.reflow-book #content .reflow-back-cover-inner h1 {
   display: block !important;
   width: 100% !important;
   margin: 0 0 clamp(1.25rem, 3vh, 2.25rem) !important;
-  color: #f4ca43 !important;
+  color: var(--ceibal-gray-900) !important;
   font-family: "Atkinson Hyperlegible", sans-serif !important;
   font-size: clamp(2.4rem, 6vh, 4.2rem) !important;
   font-weight: 700 !important;
@@ -5793,7 +5793,7 @@ body.reflow-book #content .reflow-back-cover-inner p {
   width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: #fff !important;
+  color: var(--ceibal-gray-900) !important;
   font-family: "Atkinson Hyperlegible", sans-serif !important;
   font-size: calc(var(--reflow-body-size) * var(--reflow-font-scale)) !important;
   font-weight: 400 !important;

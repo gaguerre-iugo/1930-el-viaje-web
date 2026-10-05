@@ -1986,8 +1986,11 @@
         });
       }
     );
+    /* La sinopsis (pg224) pasó al frente y ahora es una página clara como el
+       resto del libro. El fondo negro de página queda sólo para la página de
+       créditos institucionales, al final. */
     Array.prototype.slice.call(content.querySelectorAll(
-      ".reflow-back-cover-page, .reflow-collaborators-page"
+      ".reflow-collaborators-page"
     )).forEach(function (element) {
       pagesForElement(element).forEach(function (page) {
         state.backMatterPages[page] = true;
@@ -2016,7 +2019,7 @@
     var active = state.pageKindCacheReady
       ? Boolean(state.backMatterPages[state.current])
       : Array.prototype.slice.call(content.querySelectorAll(
-        ".reflow-back-cover-page, .reflow-collaborators-page"
+        ".reflow-collaborators-page"
       )).some(function (page) { return elementOccupiesPage(page, state.current); });
     document.body.classList.toggle("reflow-back-matter-page", active);
   }
