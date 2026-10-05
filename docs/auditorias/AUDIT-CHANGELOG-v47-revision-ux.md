@@ -3,6 +3,36 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Portadillas de los capítulos 1 y 2, iguales al resto
+
+Las portadillas de los capítulos 1 (pg017) y 2 (pg037) tenían el tratamiento
+invertido respecto de las de los capítulos 3 a 8 (`.reflow-later-chapter-cover`):
+el «Capítulo N» iba en peso 400 y con otro tamaño, y el título en negrita. Ahora
+comparten los mismos valores: h1 en `clamp(2.4rem, 6vh, 4.2rem)` con peso 700, y
+subtítulo en `clamp(1.45rem, 3.4vh, 2.1rem)` con peso 400.
+
+**Medido**: los capítulos 1, 2 y 3 quedan idénticos (h1 54 px / 700 / line-height
+54 px / letter-spacing 2,16 px; subtítulo 30,6 px / 400 / line-height 36,72 px).
+Capturas de los tres confirmadas.
+
+Caché: `reflow.css?v=160-portadillas-cap1-2`.
+
+## Índice: «Capítulo X. » antes de cada capítulo
+
+El índice listaba los capítulos sólo con su título. Ahora cada entrada de capítulo
+se muestra como **«Capítulo N. título»** (por ejemplo, «Capítulo 1. Hay algo
+extraño en esa foto»), tanto en la pestaña **Índice** como en las cabeceras de la
+pestaña **Páginas**. El número sale del orden de los capítulos agrupados en
+`content/toc.json` (con el respaldo del contador si el índice llegó sin grupos, el
+caso de la caché vieja). Las demás entradas (portada, «Sinopsis», «Fin», «Ana
+Solari», actividades) quedan igual, y el `aria-label` de cada capítulo acompaña el
+texto nuevo.
+
+Medido en el índice: «Capítulo 1. Hay algo extraño en esa foto» … «Capítulo 8. Dos
+mundiales, un mismo destino».
+
+Caché: `reflow-book.js?v=186-indice-capitulo`.
+
 ## Aire alrededor del contador de la barra
 
 Con el anillo de foco sobre «Siguiente», el texto del contador quedaba pegado a

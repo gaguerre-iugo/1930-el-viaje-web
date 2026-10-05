@@ -270,8 +270,8 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=159-barra-aire-contador`,
-  `reflow-book.js?v=185-switch-eva` y
+  vieja. Valores actuales: `reflow.css?v=160-portadillas-cap1-2`,
+  `reflow-book.js?v=186-indice-capitulo` y
   `quiz-sequence.js?v=6-siguiente-pagina`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de

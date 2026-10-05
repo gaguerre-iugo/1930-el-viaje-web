@@ -4500,6 +4500,29 @@ body.reflow-book #content > section.reflow-later-chapter-cover h2 {
   text-transform: none !important;
 }
 
+/* Las portadillas de los capítulos 1 y 2 (`.chapter-cover`) usan el mismo
+   tratamiento que las de los capítulos 3 a 8 (`.reflow-later-chapter-cover`):
+   "Capítulo N" grande y en negrita, y el título en peso regular. Antes quedaban
+   invertidos y con otro tamaño (h1 en 400 y el subtítulo en negrita). */
+body.reflow-book #content > .chapter-cover h1 {
+  font-size: clamp(2.4rem, 6vh, 4.2rem) !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em !important;
+}
+
+body.reflow-book #content > .chapter-cover [data-id="pg017_n0004"],
+body.reflow-book #content > .chapter-cover [data-id="pg037_n0004"],
+body.reflow-book #content > .chapter-cover h2 {
+  margin: .45rem 0 0 !important;
+  font-size: clamp(1.45rem, 3.4vh, 2.1rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  letter-spacing: .02em !important;
+  text-transform: none !important;
+}
+
 body.reflow-book #content > section.reflow-later-chapter-cover > .reflow-later-cover-art {
   display: flex !important;
   flex: 0 1 auto !important;

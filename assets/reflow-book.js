@@ -6245,6 +6245,33 @@
       return level === 1 ? "chapter" : level === 2 ? "section" : "page";
     }
 
+    /* Número de capítulo por sección, en el orden del índice. Usa el `group` del
+       toc.json y, si el índice llegó sin grupos (caché vieja), el respaldo del
+       contador. Sólo los capítulos entran en el mapa. */
+    function chapterNumberMap() {
+      var toc = window.__adtReflowTocEntries || [];
+      var tocHasGroups = toc.some(function (entry) {
+        return entry && entry.group;
+      });
+      var map = {};
+      var number = 0;
+      toc.forEach(function (entry) {
+        if (!entry) return;
+        var group = tocHasGroups
+          ? entry.group
+          : chapterProgressGroupFallback[entry.section_id];
+        if (group !== "chapter") return;
+        number += 1;
+        map[entry.section_id] = number;
+      });
+      return map;
+    }
+
+    function chapterDisplayTitle(entry, numbers) {
+      var number = entry && numbers ? numbers[entry.section_id] : 0;
+      return number ? "Capítulo " + number + ". " + entry.title : entry.title;
+    }
+
     function decorateActivityEntry(button, entry, progress) {
       var status = activityStatusForSection(entry.section_id, progress);
       if (!status) return false;
@@ -6424,6 +6451,7 @@
       ) return;
 
       var fragment = document.createDocumentFragment();
+      var chapterNumbers = chapterNumberMap();
       result.groups.forEach(function (group) {
         var chapterItem = document.createElement("li");
         var chapterHeading = document.createElement("span");
@@ -6436,7 +6464,7 @@
         chapterHeading.className = "reflow-index-group-title";
         chapterHeading.setAttribute("role", "heading");
         chapterHeading.setAttribute("aria-level", String(Math.min(6, groupLevel + 1)));
-        chapterHeading.textContent = group.chapter.entry.title;
+        chapterHeading.textContent = chapterDisplayTitle(group.chapter.entry, chapterNumbers);
         chapterItem.appendChild(chapterHeading);
         fragment.appendChild(chapterItem);
 
@@ -6470,6 +6498,7 @@
 
     function decorateToc(panel) {
       var toc = window.__adtReflowTocEntries || [];
+      var chapterNumbers = chapterNumberMap();
       var activityProgress = readActivityProgress();
       var chapters = visualChapters();
       var activeChapter = null;
@@ -6501,7 +6530,13 @@
         if (!decorateActivityEntry(button, entry, activityProgress)) {
           clearActivityEntryDecoration(button);
           var label = button.querySelector("span") || button;
-          if (normalized(label.textContent) !== normalized(entry.title)) label.textContent = entry.title;
+          var desired = chapterDisplayTitle(entry, chapterNumbers);
+          if (normalized(label.textContent) !== normalized(desired)) label.textContent = desired;
+          if (chapterNumbers[entry.section_id]) {
+            if (normalized(button.getAttribute("aria-label")) !== normalized(desired)) {
+              button.setAttribute("aria-label", desired);
+            }
+          }
         }
       });
     }
