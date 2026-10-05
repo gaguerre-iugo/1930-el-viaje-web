@@ -1441,6 +1441,7 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
    reflow-book.js. */
 #reflow-page-status {
   min-width: 5rem;
+  padding-inline: .75rem;
   text-align: center;
   color: var(--ui-n4-color);
   font-size: var(--ui-n4-size);

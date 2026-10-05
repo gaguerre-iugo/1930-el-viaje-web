@@ -3,6 +3,19 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Aire alrededor del contador de la barra
+
+Con el anillo de foco sobre «Siguiente», el texto del contador quedaba pegado a
+los botones **a ambos lados**: la barra usa una grilla con **4 px** de separación
+y el contador (ancho automático) llegaba justo. Se le dio
+`padding-inline: .75rem`, así el texto queda a **16 px** de los botones y el
+anillo de foco (2 px de offset más el borde) no lo toca. Medido: el contador pasó
+de 217 a **241 px** de ancho.
+
+Verificado con `verify-primary-toolbar` (8 anchos) y `verify-ui-typography`.
+
+Caché: `reflow.css?v=159-barra-aire-contador`.
+
 ## Salto de medida en la prosa de continuación de páginas ilustradas
 
 En pg047 (Cap. 2 · pág. 14) el texto que continúa la página ilustrada arrancaba
