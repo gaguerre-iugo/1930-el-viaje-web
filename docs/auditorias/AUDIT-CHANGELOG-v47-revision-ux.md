@@ -3,6 +3,29 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Salto de medida en la prosa de continuación de páginas ilustradas
+
+En pg047 (Cap. 2 · pág. 14) el texto que continúa la página ilustrada arrancaba
+en el borde de la columna (**x=300, 766 px de ancho**) mientras el resto de la
+página lo hacía en la medida de lectura (**x=347, 672 px**). Causa: la regla
+`section[data-section-id="pg047_sec001"] > div { display: contents }` alcanzaba
+también al bloque de prosa `.illustrated-overflow`; al no tener caja, el tope de
+medida del `.reading-block` no aplicaba y sus párrafos se hoisteaban al ancho
+completo de la columna.
+
+- Se excluyó `.illustrated-overflow` (y `.illustrated-page`) de esa regla, así la
+  prosa de continuación vuelve a ser un bloque con la medida del texto.
+- Se sumó un tope de medida por párrafo dentro de `.illustrated-overflow` como
+  respaldo.
+
+**Verificado en todo el libro**: escaneo de los 3.207 párrafos; todos los bloques
+de prosa arrancan en **347** (la medida) salvo los dos-columnas de créditos
+(pg225, por diseño). Los `.illustrated-overflow` de pg025, pg047, pg052, pg068,
+pg078, pg092, pg099, pg110, pg113, pg132, pg142, pg150, pg173 y pg190 quedan en
+**347..1019** (la medida).
+
+Caché: `reflow.css?v=158-pg047-overflow-bloque`.
+
 ## Ancho de las ventanas de chat = ancho del texto
 
 Las ventanas de chat medían distinto y **más ancho que el texto**: 766 px en la

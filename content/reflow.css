@@ -417,7 +417,8 @@ body.reflow-book #content > section[data-section-id="pg047_sec001"] {
   display: contents !important;
 }
 
-body.reflow-book #content > section[data-section-id="pg047_sec001"] > div {
+body.reflow-book #content > section[data-section-id="pg047_sec001"]
+  > div:not(.illustrated-page):not(.illustrated-overflow) {
   display: contents !important;
 }
 
@@ -1094,6 +1095,18 @@ body.reflow-book #content .illustrated-copy > :is(.reading-sentence, .sentence-c
 
 body.reflow-book #content .illustrated-overflow {
   display: block !important;
+}
+
+/* El contenedor de la prosa de continuación queda en `display: contents` (se
+   hoistea a la columna para paginar), así que el tope de medida del
+   `.reading-block` no aplica sobre él: se aplica a cada párrafo, para que el
+   texto de continuación tenga el mismo ancho y borde que el resto (medido:
+   766 px contra 672 px del texto). */
+body.reflow-book #content#content .illustrated-overflow
+  > :is(p, .reading-sentence, .sentence-chain) {
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* Page 52's legacy selector gives every direct div the image/copy grid.
@@ -4852,7 +4865,12 @@ body.reflow-book #content > section.reflow-later-illustrated > .illustrated-page
 body.reflow-book #content > section.reflow-later-illustrated > .illustrated-overflow {
   display: block !important;
   width: 100% !important;
-  max-width: none !important;
+  /* El texto que continúa una página ilustrada es prosa normal: debe llevar la
+     misma medida y el mismo borde que el resto, no el ancho completo de la
+     columna (medido: 766 px contra 672 px del texto). */
+  max-width: var(--reflow-text-measure) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* Contents, author, promotional and closing pages are independent semantic
