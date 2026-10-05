@@ -18,7 +18,7 @@
 |---|---|
 | `arquitectura/INTEGRATION-MANIFEST.md` | Manifiesto de la integraci贸n de la v45: qu茅 se integr贸 y con qu茅 criterios. |
 | `arquitectura/PROJECT-CONTINUITY.md` | Estado del proyecto y continuidad entre iteraciones. |
-| `arquitectura/EVA-TOKENS.md` | Paleta institucional y de grises de EVA, e inventario de los 韈onos de interfaz con su verificaci髇. |
+| `arquitectura/EVA-TOKENS.md` | Paleta institucional y de grises de EVA, e inventario de los 铆conos de interfaz con su verificaci贸n. |
 | `arquitectura/REFLOW-NAVIGATION-KNOWHOW.md` | C贸mo funciona la navegaci贸n del motor de reflow. |
 | `arquitectura/REFLOW-TYPOGRAPHY-KNOWHOW.md` | Criterios tipogr谩ficos y de paginaci贸n del reflow. |
 | `arquitectura/TTS-PROSODY-PLAN.md` | Plan de prosodia para la narraci贸n; incluye el l铆mite actual de la interfaz de s铆ntesis. |
