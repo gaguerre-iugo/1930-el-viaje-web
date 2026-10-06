@@ -271,7 +271,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
   vieja. Valores actuales: `reflow.css?v=161-sinopsis-clara`,
-  `reflow-book.js?v=187-sinopsis-clara` y
+  `reflow-book.js?v=188-quiz-considera` y
   `quiz-sequence.js?v=6-siguiente-pagina`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de

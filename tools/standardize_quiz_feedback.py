@@ -7,8 +7,9 @@ catálogo dice «❌ No.»: la misma frase con dos formas.
 
 Criterio único:
 
-- respuesta incorrecta: «Todavía no. <explicación> Elegí otra opción y volvé a
-  enviar.»
+- respuesta incorrecta: «Considerá que <explicación> Elegí otra opción y volvé a
+  enviar.» (fusión con voseo; la explicación arranca en minúscula salvo nombre
+  propio y, si empieza con «aunque», lleva coma después de «que»)
 - respuesta correcta: «Correcto. <explicación>» (ya estaba unificado)
 - sin emojis en las devoluciones: lo que se ve es lo que se narra
 
@@ -34,8 +35,11 @@ RAIZ = Path(__file__).resolve().parent.parent
 TEXTOS = RAIZ / "content" / "i18n" / "es-UY" / "texts.json"
 
 CIERRE = "Elegí otra opción y volvé a enviar."
-APERTURA_INCORRECTA = "Todavía no."
+APERTURA_INCORRECTA = "Considerá que"
+APERTURA_INCORRECTA_COMA = "Considerá que,"
 APERTURA_CORRECTA = "Correcto."
+# Nombres propios que, tras «Considerá que», conservan la mayúscula inicial.
+PROPIOS = {"Javier", "Federica", "Natalia", "Josephine", "Anastasia"}
 EMOJI = re.compile(
     "[\U0001F000-\U0001FAFF\u2190-\u21FF\u2600-\u27BF\u2B00-\u2BFF\uFE0F]"
 )
@@ -47,6 +51,7 @@ INICIO_INCORRECTO = re.compile(
     r"^(?:❌\s*)?(?:No\b[.,:]?|Incorrecto\b[.,:]?|Todavía no\b[.,:]?)\s*", re.I
 )
 INICIO_CORRECTO = re.compile(r"^(?:✅\s*)?(?:Correcto\b[.,:]?|¡?Muy bien!?[.,:]?)\s*", re.I)
+INICIO_NUEVO = re.compile(r"^Considerá\s+que\b[.,:]?\s*", re.I)
 
 
 def sin_emoji(texto: str) -> str:
@@ -57,9 +62,19 @@ def normalizar(texto: str) -> str:
     """Devuelve el texto unificado de una devolución."""
     limpio = sin_emoji(re.sub(r"\s+", " ", texto)).strip()
     limpio = re.sub(rf"\s*{re.escape(CIERRE)}\s*$", "", limpio).strip()
-    incorrecta = bool(INICIO_INCORRECTO.match(limpio))
-    if incorrecta:
+    # Ya está en el criterio nuevo: se respeta tal cual, porque puede traer
+    # ajustes editoriales puntuales (coma tras «que», punto y coma, sujeto
+    # explícito) que no se pueden reconstruir desde el texto viejo.
+    if INICIO_NUEVO.match(limpio):
+        return f"{limpio} {CIERRE}".strip()
+    if INICIO_INCORRECTO.match(limpio):
         resto = INICIO_INCORRECTO.sub("", limpio).strip()
+        if re.match(r"^aunque\b", resto, re.I):
+            resto = "aunque " + resto[len("aunque"):].lstrip()
+            return f"{APERTURA_INCORRECTA_COMA} {resto} {CIERRE}".strip()
+        primera = resto.split(" ", 1)[0]
+        if primera not in PROPIOS:
+            resto = resto[0].lower() + resto[1:]
         return f"{APERTURA_INCORRECTA} {resto} {CIERRE}".strip()
     if INICIO_CORRECTO.match(limpio):
         resto = INICIO_CORRECTO.sub("", limpio).strip()
@@ -127,8 +142,6 @@ def main() -> int:
     for identificador, texto in cambios.items():
         if not texto.startswith((APERTURA_INCORRECTA, APERTURA_CORRECTA)):
             problemas.append(f"{identificador}: no empieza con la apertura acordada")
-        if "No." == texto[:3]:
-            problemas.append(f"{identificador}: sigue empezando con «No.»")
         if EMOJI.search(texto):
             problemas.append(f"{identificador}: conserva emojis")
     incorrectas = [i for i, t in cambios.items() if t.startswith(APERTURA_INCORRECTA)]

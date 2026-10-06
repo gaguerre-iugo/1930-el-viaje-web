@@ -3,6 +3,33 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Devoluciones de quiz: «Considerá que…» en vez de «Todavía no.»
+
+Las **48** devoluciones de opción incorrecta pasaron de empezar con «Todavía no.» a
+la forma fusionada y en voseo **«Considerá que <explicación>»** (la explicación
+arranca en minúscula salvo nombre propio); se mantiene el cierre «Elegí otra opción
+y volvé a enviar.». Las **24** correctas siguen con «Correcto.».
+
+Ajustes además de la fusión:
+- Las **10** que empiezan con «aunque» llevan **coma** después de «que»:
+  «Considerá que, aunque…».
+- `qz008_o2`: el «:» pasó a **punto y coma**.
+- `qz017_o1` y `qz017_o2`: sujeto explícito («los jóvenes»).
+
+Aplicado con `tools/standardize_quiz_feedback.py` (criterio actualizado) en los 8
+HTML de actividad y en `content/i18n/es-UY/texts.json` (48 en cada uno; `--check`
+en verde y HTML == catálogo).
+
+**Audio regenerado** en las dos voces: 48 × 2 = **96 mp3** con sus timecodes, con
+`tools/_batch_tts.py` (respaldo → generador `--asset …` → inject) y cache-bust
+quirúrgico: sólo esas 48 entradas por voz quedaron con
+`?v=48-considera-que-<voz>` (sin claves ajenas). Verificado en vivo: la devolución
+de qz001 muestra el texto nuevo y pide
+`qz001_o1_exp.mp3?v=48-considera-que-valentina` sin fallos.
+
+Caché de página: `fetchSection` pasó a `?v=50-quiz-considera` y
+`reflow-book.js?v=188-quiz-considera`; precargador offline regenerado.
+
 ## Sinopsis (las 2 páginas antes del capítulo 1) en claro
 
 Las dos páginas de la sinopsis (pg224, «1930: EL VIAJE») estaban en negro, con

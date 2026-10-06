@@ -7278,7 +7278,7 @@
 
   async function fetchSection(entry) {
     var separator = entry[1].indexOf("?") >= 0 ? "&" : "?";
-    var response = await fetch(entry[1] + separator + "v=49-full-book-65-synopsis-move");
+    var response = await fetch(entry[1] + separator + "v=50-quiz-considera");
     if (!response.ok) throw new Error("No se pudo cargar " + entry[1]);
     var source = await response.text();
     var documentFragment = new DOMParser().parseFromString(source, "text/html");
