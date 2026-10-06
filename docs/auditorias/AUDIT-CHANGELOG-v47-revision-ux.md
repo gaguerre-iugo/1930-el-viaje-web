@@ -3,6 +3,23 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Devolución de qz012 (opción 2): sujeto explícito «Federica»
+
+La devolución de `qz012_o2_exp` decía «Considerá que, aunque considera distintas
+posibilidades, no lo descalifica ni lo abandona.»; el sujeto de «considera» quedaba
+ambiguo. Ahora nombra a **Federica**: «Considerá que, aunque **Federica** considera
+distintas posibilidades, no lo descalifica ni lo abandona.». Se mantiene el cierre
+«Elegí otra opción y volvé a enviar.» (igual que las otras 47 devoluciones).
+
+Aplicado en `qz010.html` (la actividad que contiene qz012) y en
+`content/i18n/es-UY/texts.json`; `tools/standardize_quiz_feedback.py --check` en
+verde (HTML == catálogo). **Audio regenerado** en las dos voces
+(`qz012_o2_exp.mp3` de Valentina y Mateo) con `tools/_batch_tts.py`
+(respaldo → `generate_dual_uy_voices.py --asset qz012_o2_exp` → inject) y cache-bust
+quirúrgico `?v=49-qz012-federica-<voz>`: sólo esa clave cambió por voz (10080 claves,
+0 ajenas). Verificado en vivo: la devolución muestra el texto nuevo y la consola no
+registra errores. Precargador offline regenerado.
+
 ## Devoluciones de quiz: «Considerá que…» en vez de «Todavía no.»
 
 Las **48** devoluciones de opción incorrecta pasaron de empezar con «Todavía no.» a

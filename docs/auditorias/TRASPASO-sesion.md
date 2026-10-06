@@ -57,6 +57,11 @@ la comprobación del desborde con zoom.
 Detalle de esta sesión en el changelog, sección **«Bloqueante cerrado · “Siguiente
 pregunta” volvía a mostrar la misma pregunta»**.
 
+Cambios posteriores (ya en `master`): la definición del glosario se cierra al cambiar
+de página, y la devolución ya no se encoge (en pantallas bajas el fondo no acompañaba
+al texto); además, la devolución `qz012_o2_exp` ahora nombra a **Federica** y su audio
+se regeneró en las dos voces. Detalle en el changelog.
+
 ## Estado real de los 25 puntos
 
 Tabla de entrada rápida. **El detalle de cada punto, con las mediciones, está en el
@@ -270,8 +275,8 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=161-sinopsis-clara`,
-  `reflow-book.js?v=188-quiz-considera` y
+  vieja. Valores actuales: `reflow.css?v=162-feedback-sin-encoger`,
+  `reflow-book.js?v=189-glosario-cierra` y
   `quiz-sequence.js?v=6-siguiente-pagina`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
