@@ -1863,6 +1863,21 @@
       ) || null;
     }
 
+    /* La definición del glosario queda montada aunque el término desaparezca al
+       cambiar de página: la cierra el mismo Escape que usa el runtime (probado).
+       goToPage() la llama cuando la página cambia de verdad. */
+    window.__adtReflowCloseGlossaryDefinition = function () {
+      var dialog = visibleDefinitionDialog();
+      if (!dialog) return false;
+      document.dispatchEvent(new KeyboardEvent("keydown", {
+        key: "Escape",
+        code: "Escape",
+        bubbles: true,
+        cancelable: true
+      }));
+      return true;
+    };
+
     function verifyGlossaryDefinitionClosed() {
       window.setTimeout(function () {
         var liveDialog = visibleDefinitionDialog();
@@ -2596,6 +2611,11 @@
       window.clearTimeout(state.panelToggleRestoreTimer);
       state.panelToggleLockPage = null;
       state.panelToggleLockUntil = 0;
+      /* Si había una definición del glosario abierta, se cierra junto con la
+         página que la contenía. */
+      if (typeof window.__adtReflowCloseGlossaryDefinition === "function") {
+        window.__adtReflowCloseGlossaryDefinition();
+      }
     }
     /* The quiz clone protects only a typography-driven repagination. If an
        explicit page control is pressed while a stale guard exists, remove it
@@ -7162,6 +7182,12 @@
         state.current = scrolledPage;
         state.currentAnchorId = paintedSemanticAnchorId() ||
           anchorIdForPage(scrolledPage) || state.currentAnchorId;
+        /* Un cambio de página que llega por el scroll nativo del runtime (por
+           ejemplo, las flechas del lector) también tiene que cerrar la
+           definición del glosario abierta. */
+        if (typeof window.__adtReflowCloseGlossaryDefinition === "function") {
+          window.__adtReflowCloseGlossaryDefinition();
+        }
         updateControls(false);
         saveProgress();
       }, 80);

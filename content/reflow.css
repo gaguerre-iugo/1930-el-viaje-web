@@ -4309,6 +4309,15 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
   margin-top: 2rem !important;
 }
 
+/* La tarjeta es un flex en columna con `overflow-y: auto`. Cuando el contenido
+   supera el techo (pantallas bajas, letra extra grande), los hijos se encogen
+   por el flex-shrink inicial: la devolución quedaba en una caja de ~14 px con el
+   texto desbordado y el fondo sin acompañarlo. La devolución conserva su altura
+   y la tarjeta se desplaza. */
+body.reflow-book #content .quiz-card > .quiz-feedback {
+  flex-shrink: 0 !important;
+}
+
 /* Columnas de lectura bajas (por ejemplo 800x600 o 1280x720 en un panel de aula):
    el techo de la tarjeta —el alto de la página— es más chico que su contenido con
    la devolución desplegada, y la fila del botón quedaba cortada (medido: 21 px de
@@ -4343,6 +4352,12 @@ body.reflow-book[data-reflow-font-size="xlarge"] #content
   body.reflow-book #content .quiz-card .quiz-actions,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
     margin-top: .35rem !important;
+  }
+  /* La devolución ya no se encoge (conserva su fondo sobre el texto), así que en
+     esta columna baja se recorta su separación superior para que siga entrando:
+     medido, pasaba 1,81 px del techo a 947x700 con letra extra grande. */
+  body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-feedback {
+    margin-top: .5rem !important;
   }
 }
 
