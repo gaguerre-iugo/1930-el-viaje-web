@@ -5423,11 +5423,20 @@ body.reflow-book #content .editorial-unit-group {
 
 /* CSS multi-column pagination honors inline-block as one atomic fragment
    more consistently than a plain block. This short lead-in and its WhatsApp
-   window must never be split, but retain the full text-column width. */
-body.reflow-book #content
+   window must never be split, but retain the full text-column width.
+   Como `inline-block` es de nivel en línea, los `margin: auto` de la medida de
+   lectura no lo centran: cuando la columna es más ancha que la medida el grupo
+   quedaba pegado a la izquierda mientras el resto de la página se centraba
+   (medido a 1440: grupo en x=300, resto en x=384). Se replica el centrado con un
+   margen izquierdo calculado; en columnas angostas el `max()` lo deja en 0. El
+   triple `#content` es sólo para subir la especificidad y ganarle al reset del
+   paso 2 (`… div:has(> p) { margin: auto }`), que asume un bloque. */
+body.reflow-book #content#content#content
   .editorial-unit-group.reflow-chat-lead-group {
   display: inline-block !important;
   vertical-align: top !important;
+  margin-left: max(0px, calc((100% - var(--reflow-text-measure)) / 2)) !important;
+  margin-right: 0 !important;
 }
 
 body.reflow-book #content .sentence-chain.editorial-cross-section-chain {
