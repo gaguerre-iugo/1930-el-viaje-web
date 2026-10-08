@@ -3,6 +3,31 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 16 · Tono de las devoluciones: verificado
+
+Las 72 devoluciones ya cumplían el criterio; la revisión lo confirmó en los dos
+catálogos y arregló el verificador, que había quedado desactualizado por el punto 5.
+
+- **Incorrectas (48)**: «Considerá que <explicación> Elegí otra opción y volvé a
+  enviar.» (48/48; ninguna arranca con «No.», «No,» ni «Incorrecto.»).
+- **Correctas (24)**: «Correcto. <explicación>» (24/24, sin cambios).
+- **Sin revelar la respuesta**: las explicaciones corrigen el razonamiento sin
+  nombrar la opción correcta.
+- **Texto y audio coinciden**: `quiz-feedback.json` y los `_exp` de `texts.json`
+  son idénticos (72 ↔ 72), y el timecode de `qz001_o1_exp` contiene «Considerá …
+  volvé a enviar» (mp3 de 60,3 / 56,7 KB, regenerados el 6/10).
+
+**Decisión del prefijo**: el punto se contradice (el «Resultado esperado» usa
+«Todavía no.» pero el lineamiento pide «Considera que…»). Por decisión del usuario
+se mantiene **«Considerá que…»** (el lineamiento), no «Todavía no.».
+
+**Arreglo de herramientas**: `standardize_quiz_feedback.py` y
+`harden_quiz_answers.py` son migraciones de un solo uso que leían las devoluciones
+del HTML, que el punto 5 ya vació. El verificador ahora valida los dos catálogos
+(`quiz-feedback.json` y `texts.json`) y `--check` vuelve a estar en verde;
+`harden_quiz_answers.py` se niega a reescribir si eso borraría respuestas y
+devoluciones.
+
 ## Punto 14 · Anillo de foco turquesa y repaso con teclado
 
 Las entradas del índice ya usaban el anillo turquesa de la barra (regla
@@ -1249,7 +1274,7 @@ scroll (termina en 823 de 900 px).
 
 **Punto 16 · Devoluciones unificadas y audio en las dos voces**
 
-- Criterio único para las 72 devoluciones: la incorrecta dice «Todavía no.
+- Criterio único para las 72 devoluciones: la incorrecta dice «Considerá que
   <explicación> Elegí otra opción y volvé a enviar.»; la correcta, «Correcto.
   <explicación>». Sin emojis: **lo que se ve es lo que se narra** (antes el HTML
   decía «No.» y el catálogo de narración «❌ No.»).

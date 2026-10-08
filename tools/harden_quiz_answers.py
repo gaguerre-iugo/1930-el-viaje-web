@@ -116,6 +116,16 @@ def main() -> int:
         print("\n(dry-run; usar --apply)")
         return 0
 
+    # Migración de un solo uso (punto 5): lee las devoluciones del HTML. Si ya se
+    # corrió, el HTML no tiene bancos y volver a aplicar borraría las respuestas y
+    # las devoluciones. Se corta antes de escribir nada.
+    if not feedback and not hashed and FEEDBACK.exists():
+        actual = FEEDBACK.read_text(encoding="utf-8").strip()
+        if actual and actual != "{}":
+            print("\nERROR: el HTML ya no trae devoluciones (el punto 5 ya las movio):")
+            print("  no se reescriben quiz-feedback.json ni quiz-answers.json.")
+            return 1
+
     ANSWERS.write_text(
         json.dumps({"version": 2, "quizzes": hashed}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",

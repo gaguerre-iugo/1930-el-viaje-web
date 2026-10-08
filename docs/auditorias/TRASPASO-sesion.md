@@ -89,7 +89,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 13 | «Cap. N · título», agrupar, «Sobre la autora» | Cerrado | «Cap. N · título»; grupos «Antes de empezar» / «Sobre el libro»; «Fin» oculto |
 | 14 | Anillo de foco turquesa en el índice | Cerrado | Índice ya lo tenía; se sumaron los contenedores con `tabindex="0"` y los `[role="switch"]` del runtime |
 | 15 | Reintento señalizado, incorrecta marcada, «Siguiente pregunta» | Cerrado | `verify-quiz-retry.mjs` + las tres pruebas nuevas |
-| 16 | «Todavía no.» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` |
+| 16 | «Considerá que…» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` (el usuario eligió «Considerá que…» sobre «Todavía no.») |
 | 17 | Kicker «Pregunta N de 3», dimensión oculta, cierre | Cerrado | `verify-quiz-retry.mjs` |
 | 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, **con una salvedad** | Los estados de las opciones ya se **midieron** (`verify-quiz-contrast.mjs`: 17,73:1 el texto en los cuatro estados; 10,93:1 / 7,08:1 las devoluciones). Queda sólo el borde en reposo (gris-400, 2,2:1) y el capítulo actual del índice en institucional-500 (4,82:1, cumple AA) donde EVA pide 600 (7,14:1) |
 | 19 | Íconos SVG de EVA en la interfaz | Cerrado, **con salvedad** | **3 de los 8** (detener, audio anterior, audio siguiente) fueron **generados** por nosotros a partir de pausa y reproducir: si Comunicación tiene los originales, se reemplazan. `verify-eva-icons.mjs` |
