@@ -2640,7 +2640,9 @@ body.reflow-book #content .quiz-explanation-bank {
 
 .reflow-font-settings-options {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Punto 10 · Diseño A: fila de cuatro «A» de tamaño creciente (el nombre va
+     en la etiqueta accesible). Antes era una grilla 2×2 de palabras. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--ceibal-space-1);
   padding: var(--ceibal-space-1);
   border-radius: var(--ceibal-radius-md);
@@ -2670,6 +2672,26 @@ body.reflow-book #content .quiz-explanation-bank {
   outline: var(--ceibal-border-focus) solid var(--ui-focus);
   outline-offset: 2px;
   box-shadow: var(--ceibal-shadow-focus);
+}
+
+/* Punto 10 · La «A» crece con cada opción; el nombre del tamaño queda en
+   `aria-label` (arriba), no visible. */
+.reflow-font-settings-options .reflow-font-size-glyph {
+  display: inline-block;
+  line-height: 1;
+  font-weight: 700;
+}
+.reflow-font-settings-options button[data-reflow-font-size="normal"] .reflow-font-size-glyph {
+  font-size: 1rem;
+}
+.reflow-font-settings-options button[data-reflow-font-size="large"] .reflow-font-size-glyph {
+  font-size: 1.3rem;
+}
+.reflow-font-settings-options button[data-reflow-font-size="xlarge"] .reflow-font-size-glyph {
+  font-size: 1.62rem;
+}
+.reflow-font-settings-options button[data-reflow-font-size="xxlarge"] .reflow-font-size-glyph {
+  font-size: 1.95rem;
 }
 
 /* The Tools panel follows the approved information architecture without
@@ -3232,7 +3254,7 @@ body.reflow-book .reflow-accessibility-panel [role="radio"],
 body.reflow-book .reflow-accessibility-panel [role="switch"] + :is(span, label),
 body.reflow-book .reflow-font-settings-options button,
 body.reflow-book .reflow-shortcuts-link,
-body.reflow-book .reflow-font-settings-card :is(label, span),
+body.reflow-book .reflow-font-settings-card :is(label, span):not(.reflow-font-size-glyph),
 body.reflow-book .reflow-reduce-motion-setting :is(label, span),
 body.reflow-book .reflow-panel-control-header button,
 body.reflow-book .reflow-navigation-panel [role="tab"],

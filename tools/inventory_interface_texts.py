@@ -37,6 +37,11 @@ USTED = [
     "Elija", "Toque", "Desplace", "Escriba", "Marque", "Desactive", "Verifique",
     "Consulte", "Espere", "Continúe", "Cambie", "Ajuste", "Elija", "Vuelva",
     "Intente", "Recuerde", "Tenga", "Haga", "Cierre", "Abra",
+    # Imperativos en -e que faltaban: «Pulse» se escapaba y el verificador daba
+    # un falso OK. Se agregan los que puede emitir la interfaz.
+    "Pulse", "Acceda", "Introduzca", "Regrese", "Escoja", "Utilice", "Oprima",
+    "Sitúe", "Complete", "Confirme", "Acepte", "Reinicie", "Descargue",
+    "Comparta", "Envíe", "Recorra",
 ]
 TUTEO = [
     "Toca", "Elige", "Puedes", "Habilita", "Activa", "Selecciona", "Usa",

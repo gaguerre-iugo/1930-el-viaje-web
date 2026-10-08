@@ -3,6 +3,60 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 12 · Pestañas del índice: «Capítulos» y «Vista de páginas»
+
+El panel «Índice» tenía adentro dos pestañas llamadas **«Índice»** y **«Páginas»**
+(la primera redundante; la segunda pierde sentido porque los números de página
+cambian, punto 4). Ahora son **«Capítulos»** y **«Vista de páginas»**. El runtime las
+re-renderiza con los textos originales, así que el motor las reescribe en cada
+refresco del panel (`renameNavigationTabs()`), y sus reconocimientos por texto
+(`isNavigationPanel`, `navigationMode`, el cierre del panel, …) aceptan las etiquetas
+nuevas y las viejas. Verificado en vivo: «Capítulos» (índice decorado, 22 entradas) y
+«Vista de páginas» (272 páginas); `_diag-nav`, `verify-tools-panel` y
+`verify-chapter-progress` en verde.
+
+Caché: `reflow-book.js?v=196-pestanas`.
+
+## Punto 11 · El índice cierra al elegir y el foco va al título de la sección
+
+El índice ya se cerraba al elegir (en todos los anchos), pero el foco volvía al
+botón «Índice» de la barra. Ahora, al elegir un ítem del panel de navegación, el
+motor recuerda su `data-reflow-anchor-id` y, cuando el panel se cierra, enfoca el
+**título de la sección** (`[data-id="<chapter_id>"]`, con `tabindex="-1"` y sin
+scroll) en vez del disparador. Si se descarta con Escape (sin elegir nada), el foco
+sigue volviendo al botón «Índice». Verificado en vivo con «Capítulo 1» y «Sinopsis»;
+`verify-tools-panel` y `_diag-nav` en verde.
+
+Caché: `reflow-book.js?v=195-indice-foco`.
+
+## Punto 10 · Selector de tamaño: cuatro «A» de tamaño creciente
+
+El corte de «Extra grande» se había resuelto ensanchando las columnas de la grilla
+2 × 2. Se pasó al **Diseño A** del documento: una **fila de cuatro «A» de tamaño
+creciente** (16 / 20,8 / 25,9 / 31,2 px), con el **nombre del tamaño en la etiqueta
+accesible** (`aria-label`: «Normal», «Grande», «Extra grande», «Máximo»). La «A» va
+`aria-hidden`; se mantiene `role="radio"`, `data-reflow-font-size` y el estado
+`aria-checked`.
+
+Detalle de especificidad: la «A» heredaba `font-size: var(--ui-n3-size) !important`
+de la regla N3 del panel (`.reflow-font-settings-card :is(label, span)`); se la
+excluyó con `:not(.reflow-font-size-glyph)`. Verificado en vivo: los cuatro tamaños
+crecen, sin recorte, en una fila; `verify-tools-panel` y `verify-light-theme` en
+verde.
+
+Caché: `reflow.css?v=165-letra-a` y `reflow-book.js?v=194-letra-a`.
+
+## Punto 8 · Atajos: `aria-keyshortcuts` completo
+
+Los atajos ya vivían **fuera del panel** (una ayuda aparte, `role="dialog"`, que se
+abre desde el botón «Atajos de teclado» y con `Alt+A`) y exigían la modificadora
+`Alt` (`Alt+I` índice, `Alt+H` herramientas, `Alt+G` glosario; las letras sueltas no
+hacen nada), con lo que se cumple **WCAG 2.1.4**. Faltaba sólo la pieza de
+accesibilidad: únicamente el botón del **glosario** anunciaba su atajo. Se agregó
+`aria-keyshortcuts` a **Índice** (`Alt+I`), **Herramientas** (`Alt+H`) y al botón
+**«Atajos de teclado»** (`Alt+A`). Verificado en vivo (`verify-tools-panel` en
+verde). Caché: `reflow-book.js?v=193-atajos-aria`.
+
 ## Punto 5 · La respuesta y la devolución ya no viajan en la página
 
 Antes: cada opción llevaba `data-explanation-id`, el banco `.quiz-explanation-bank`
@@ -888,6 +942,13 @@ esa parte; el verificador los informa aparte para que no se pierdan de vista.
 
 `--check` falla si vuelve a aparecer un texto sin voseo (excluido el tutorial):
 hoy informa «0 en usted · 4 en tuteo (tutorial) · 140 neutros».
+
+**Corrección posterior**: el inventario daba un **falso OK** porque su lista de
+«usted» no incluía los imperativos en **-e**. Se escapaba un tercer texto del
+motor, el anuncio de `reflow-book.js`: «Lectura en voz alta activada. **Pulse**
+Reproducir para comenzar.» → **«Usá Reproducir para comenzar.»**. Se amplió la
+lista (`Pulse`, `Acceda`, `Introduzca`, `Regrese`, `Escoja`, `Utilice`, `Oprima`,
+`Sitúe`, …) y `--check` sigue en verde. Caché: `reflow-book.js?v=192-voseo-pulse`.
 
 **Nota de caché**: el runtime pide el catálogo con una URL que puede quedar en
 caché del navegador. El texto nuevo se ve tras recargar; si no, conviene forzar

@@ -382,6 +382,8 @@
     sentencePaginationKey: "",
     runtimeMenu: null,
     panelFocusOrigin: null,
+    panelChosenAnchorId: null,
+    panelChosenSectionId: null,
     panelFocusMenu: "",
     panelFocusRestoreTimer: 0,
     panelFocusRestoreSuppressedUntil: 0,
@@ -2199,7 +2201,7 @@
     if (api && api.pause) api.pause();
     if (announcer) {
       announcer.textContent =
-        "Lectura en voz alta activada. Pulse Reproducir para comenzar.";
+        "Lectura en voz alta activada. Usá Reproducir para comenzar.";
     }
     requestAnimationFrame(syncPrimaryToolbar);
     window.setTimeout(syncPrimaryToolbar, 160);
@@ -3457,9 +3459,48 @@
     }
   }
 
+  /* Punto 11 · Enfoca el título de la sección elegida desde el índice. El
+     contenido puede tardar en montarse tras navegar, así que se reintenta. */
+  function focusChosenSectionTitle() {
+    var anchorId = state.panelChosenAnchorId;
+    var sectionId = state.panelChosenSectionId;
+    state.panelChosenAnchorId = null;
+    state.panelChosenSectionId = null;
+    if (!anchorId && !sectionId) return;
+    var attempts = 0;
+    function attempt() {
+      if (Date.now() < state.panelFocusRestoreSuppressedUntil) return;
+      var heading = anchorId && content
+        ? content.querySelector('[data-id="' + CSS.escape(anchorId) + '"]')
+        : null;
+      if (!heading && sectionId && content) {
+        var section = content.querySelector('[data-section-id="' + sectionId + '"]');
+        heading = section &&
+          section.querySelector("h1, h2, h3, h4, .reflow-chapter-title, [data-id]");
+      }
+      if (!heading || !heading.getClientRects().length) {
+        attempts += 1;
+        if (attempts < 25) window.setTimeout(attempt, 80);
+        return;
+      }
+      if (!heading.hasAttribute("tabindex")) heading.setAttribute("tabindex", "-1");
+      focusWithoutScroll(heading);
+    }
+    attempt();
+  }
+
   function restoreRuntimePanelFocus(menuValue) {
     window.clearTimeout(state.panelFocusRestoreTimer);
     if (Date.now() < state.panelFocusRestoreSuppressedUntil) return;
+    /* Punto 11 · Si se eligió una sección del índice, el foco va al título de la
+       sección elegida (teclado y lector de pantalla), no al botón «Índice». */
+    if (menuValue === "toc" && (state.panelChosenAnchorId || state.panelChosenSectionId)) {
+      state.panelFocusOrigin = null;
+      state.panelFocusMenu = "";
+      state.panelPendingFocusSelector = "";
+      focusChosenSectionTitle();
+      return;
+    }
     var target = state.panelFocusOrigin;
     if (!target || !target.isConnected || !target.getClientRects().length) {
       target = menuValue === "toc" ? indexButton : toolsButton;
@@ -4123,7 +4164,8 @@
     pagination.setAttribute("aria-busy", "true");
     pagination.innerHTML =
       '<button id="reflow-index" class="reflow-toolbar-action" type="button" ' +
-        'aria-label="Índice" aria-haspopup="dialog" aria-expanded="false">' +
+        'aria-label="Índice" aria-haspopup="dialog" aria-expanded="false" ' +
+        'aria-keyshortcuts="Alt+I">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconFilled("menu") + '</span>' +
         '<span class="reflow-toolbar-label">Índice</span>' +
       '</button>' +
@@ -4149,7 +4191,8 @@
         '<span class="reflow-toolbar-label">Glosario</span>' +
       '</button>' +
       '<button id="reflow-tools" class="reflow-toolbar-action" type="button" ' +
-        'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false">' +
+        'aria-label="Herramientas" aria-haspopup="dialog" aria-expanded="false" ' +
+        'aria-keyshortcuts="Alt+H">' +
         '<span class="reflow-toolbar-icon" aria-hidden="true">' + uiIconFilled("gear") + '</span>' +
         '<span class="reflow-toolbar-label">Herramientas</span>' +
       '</button>';
@@ -5271,6 +5314,7 @@
         link.id = "reflow-shortcuts-link";
         link.className = "reflow-shortcuts-link";
         link.innerHTML = "<span>Atajos de teclado</span><kbd>Alt+A</kbd>";
+        link.setAttribute("aria-keyshortcuts", "Alt+A");
         link.addEventListener("click", function () {
           if (typeof window.__adtReflowToggleShortcutsHelp === "function") {
             window.__adtReflowToggleShortcutsHelp(true);
@@ -5410,10 +5454,14 @@
             '<span id="reflow-font-settings-label">Tamaño de letra</span>' +
             '<div class="reflow-font-settings-options" role="radiogroup" ' +
               'aria-labelledby="reflow-font-settings-label">' +
-              '<button type="button" role="radio" data-reflow-font-size="normal" aria-pressed="false">Normal</button>' +
-              '<button type="button" role="radio" data-reflow-font-size="large" aria-pressed="false">Grande</button>' +
-              '<button type="button" role="radio" data-reflow-font-size="xlarge" aria-pressed="false">Extra grande</button>' +
-              '<button type="button" role="radio" data-reflow-font-size="xxlarge" aria-pressed="false">Máximo</button>' +
+              '<button type="button" role="radio" data-reflow-font-size="normal" aria-pressed="false" aria-label="Normal">' +
+                '<span class="reflow-font-size-glyph" aria-hidden="true">A</span></button>' +
+              '<button type="button" role="radio" data-reflow-font-size="large" aria-pressed="false" aria-label="Grande">' +
+                '<span class="reflow-font-size-glyph" aria-hidden="true">A</span></button>' +
+              '<button type="button" role="radio" data-reflow-font-size="xlarge" aria-pressed="false" aria-label="Extra grande">' +
+                '<span class="reflow-font-size-glyph" aria-hidden="true">A</span></button>' +
+              '<button type="button" role="radio" data-reflow-font-size="xxlarge" aria-pressed="false" aria-label="Máximo">' +
+                '<span class="reflow-font-size-glyph" aria-hidden="true">A</span></button>' +
             '</div>' +
             '<div class="reflow-reduce-motion-setting">' +
               '<label for="reflow-reduce-motion">' +
@@ -5575,6 +5623,19 @@
       if (!event.target.closest("#reflow-reduce-motion-system")) return;
       applySystemReducedMotionPreference();
     });
+
+    /* Punto 11 · Al elegir una sección en el índice se recuerda su título para
+       enfocarlo cuando el panel se cierre. En fase de captura: corre antes de
+       que el runtime cierre el panel. */
+    document.addEventListener("click", function (event) {
+      var item = event.target && event.target.closest &&
+        event.target.closest(".reflow-navigation-panel [data-reflow-toc-section-id]");
+      if (!item) return;
+      state.panelChosenAnchorId = item.getAttribute("data-reflow-anchor-id") ||
+        state.panelChosenAnchorId;
+      state.panelChosenSectionId = item.getAttribute("data-reflow-toc-section-id") ||
+        state.panelChosenSectionId;
+    }, true);
 
     document.addEventListener("pointerdown", function (event) {
       var control = event.target.closest(".reflow-glossary-panel [role='switch']");
@@ -6060,12 +6121,12 @@
         return;
       }
       var isNavigation = controls.some(function (control) {
-        return /^(índice|lista de páginas|páginas)$/i.test(normalized(control.textContent));
+        return /^(índice|capítulos|lista de páginas|páginas|vista de páginas)$/i.test(normalized(control.textContent));
       });
       /* On the first frame the tabs may not exist yet, but the heading and
          search field already do. Classify from the stable heading so the
          panel does not need a second click to receive its complete layout. */
-      if (/^índice$/i.test(headingText) || isNavigation) {
+      if (/^(índice|capítulos)$/i.test(headingText) || isNavigation) {
         panel.classList.add("reflow-navigation-panel");
         return;
       }
@@ -6477,7 +6538,7 @@
       if (!panel) return false;
       if (panel.id === "navPopup") return true;
       return Array.prototype.slice.call(panel.querySelectorAll('button, [role="tab"]')).some(function (item) {
-        return /^(índice|lista de páginas|páginas)$/i.test(normalized(item.textContent));
+        return /^(índice|capítulos|lista de páginas|páginas|vista de páginas)$/i.test(normalized(item.textContent));
       });
     }
 
@@ -6489,7 +6550,7 @@
 
     function navigationMode(panel) {
       var selectedTab = panel && panel.querySelector('[role="tab"][aria-selected="true"]');
-      return selectedTab && /lista de páginas|páginas/i.test(normalized(selectedTab.textContent))
+      return selectedTab && /lista de páginas|vista de páginas|páginas/i.test(normalized(selectedTab.textContent))
         ? "pages"
         : "toc";
     }
@@ -6718,7 +6779,7 @@
           document.querySelectorAll('[data-dock-trigger][aria-pressed="true"]')
         ).find(function (candidate) {
           var label = normalized(candidate.getAttribute("aria-label") + " " + candidate.getAttribute("title"));
-          return /menú principal|navegación|índice/i.test(label);
+          return /menú principal|navegación|índice|capítulos/i.test(label);
         });
       }
       if (trigger) {
@@ -6736,12 +6797,26 @@
       });
     }
 
+    /* Punto 12 · Las pestañas se llaman «Capítulos» y «Vista de páginas» (antes
+       «Índice» y «Páginas», redundantes entre sí). El runtime las re-renderiza
+       con los textos originales, así que se reescriben en cada refresco. */
+    function renameNavigationTabs(panel) {
+      Array.prototype.slice.call(panel.querySelectorAll('[role="tab"]')).forEach(function (tab) {
+        var text = normalized(tab.textContent);
+        var desired = /^(índice|capítulos)$/i.test(text) ? "Capítulos"
+          : /^(páginas|lista de páginas|vista de páginas)$/i.test(text) ? "Vista de páginas"
+          : null;
+        if (desired && tab.textContent !== desired) tab.textContent = desired;
+      });
+    }
+
     function refreshMenus() {
       refreshScheduled = false;
       var candidates = document.querySelectorAll('#navPopup, [role="dialog"], [data-slot="popover-content"]');
       Array.prototype.slice.call(candidates).forEach(function (panel) {
         if (!isNavigationPanel(panel)) return;
         panel.dataset.reflowNavigationPanel = "true";
+        renameNavigationTabs(panel);
         panel.querySelectorAll('[role="tabpanel"] button').forEach(removePrintLabel);
         if (navigationMode(panel) === "pages") rebuildVisualPageList(panel);
         else decorateToc(panel);
@@ -6922,7 +6997,7 @@
       var triggerLabel = null;
       if (
         dialog.classList.contains("reflow-navigation-panel") ||
-        /^índice\b/i.test(dialogText)
+        /^(índice|capítulos)\b/i.test(dialogText)
       ) {
         triggerLabel = "Menú principal";
       } else if (
