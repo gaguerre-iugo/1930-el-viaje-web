@@ -2172,6 +2172,18 @@
     }
   }
 
+  /* ¿El ítem que el runtime tiene seleccionado sigue en la página visible?
+     Cubre el caso de pausar y mover con Anterior/Siguiente: ahí hay que
+     reanudar desde ese ítem, no desde el primero de la página. */
+  function ttsCurrentItemIsOnVisiblePage(api) {
+    if (!api || !api.items) return false;
+    var index = state.ttsCurrentItemIndex;
+    if (!(index >= 0 && index < api.items.length)) return false;
+    var item = api.items[index];
+    if (!item || !item.el || !item.el.isConnected) return false;
+    return livePageForTtsElement(item.el) === visiblePageIndex();
+  }
+
   function startTtsFromUserGesture() {
     ensureTtsVoiceCatalog();
     state.ttsExplicitlyStarted = true;
@@ -2182,10 +2194,23 @@
     }
     state.ttsManuallyPaused = false;
     state.ttsResumeAfterSeek = true;
+    state.ttsStepShouldRemainPaused = false;
     lockTtsToExplicitNavigation(state.current);
     /* Chrome grants unmuted playback only while the activating click is still
-       on the stack. Start the selected item now; alignment cleanup may remain
-       asynchronous after play() has already received that authorization. */
+       on the stack. If the current item — including the sentence chosen with
+       Previous/Next while paused — is still on the visible page, resume from
+       it: replaying the page's first item would silently lose the selection
+       (the reported "play doesn't start" after stepping). Only when the reader
+       has navigated away from that item do we re-align to the visible page. */
+    if (api.play && ttsCurrentItemIsOnVisiblePage(api)) {
+      state.ttsAligning = false;
+      state.ttsDesiredPage = null;
+      state.ttsSeeking = false;
+      if (state.ttsAudio) state.ttsAudio.muted = false;
+      api.play();
+      requestAnimationFrame(followTtsHighlight);
+      return;
+    }
     scheduleTtsAlignment(state.current, true, true);
   }
 
