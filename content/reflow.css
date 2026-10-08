@@ -7146,7 +7146,11 @@ body.reflow-book {
   --adt-titulo-cap: 2.125rem;   /* 34 px */
   --adt-titulo-sec: 1.625rem;   /* 26 px */
   --adt-enunciado: 1.375rem;    /* 22 px */
-  --adt-cuerpo: 1.25rem;        /* 20 px */
+  /* El cuerpo de lectura sigue el tamaño responsivo del libro
+     (18 px en celular, 20 px en laptop, 24 px en pizarras ≥100rem). Antes
+     estaba fijo en 20 px y el texto de las secciones boxed_text/chat no
+     acompañaba el escalado de text_only en pantallas anchas. */
+  --adt-cuerpo: var(--reflow-body-size);
   --adt-secundario: 1.0625rem;  /* 17 px */
 }
 @media (max-width: 40rem) {
