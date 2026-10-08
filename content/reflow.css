@@ -601,7 +601,7 @@ body.reflow-book #content .reading-sentence {
   padding: 0 .24em 0 0 !important;
   text-indent: 0 !important;
   vertical-align: top;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-size: calc(1.125rem * var(--reflow-font-scale)) !important;
   line-height: 1.55 !important;
   break-inside: avoid-column !important;
@@ -682,7 +682,7 @@ body.reflow-book #content .whatsapp-chat-date {
   border-radius: 999px !important;
   background: #e7e5e4 !important;
   color: #78716c !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-weight: 400 !important;
   line-height: 1.25 !important;
   text-align: center !important;
@@ -734,7 +734,7 @@ body.reflow-book #content .whatsapp-chat-text {
   max-width: 100% !important;
   padding: 0 !important;
   text-indent: 0 !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 body.reflow-book #content [data-section-id="pg020_sec001"] .whatsapp-chat-sender {
@@ -1842,7 +1842,7 @@ body.reflow-book #content .book-cover-final .book-cover-copy h2 {
   width: 100% !important;
   margin: 0 !important;
   color: var(--book-cover-title-color) !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-style: normal !important;
   font-weight: 700 !important;
 }
@@ -1872,7 +1872,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   margin: 0 !important;
   padding: 0 !important;
   color: var(--book-cover-title-color) !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-size: clamp(1.08rem, 1.85vh, 1.22rem) !important;
   line-height: 1.2 !important;
   font-weight: 700 !important;
@@ -3207,7 +3207,7 @@ body.reflow-book :where(
   [data-slot="popover-content"],
   [role="dialog"]
 ) {
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 body.reflow-book :where(
@@ -3224,7 +3224,7 @@ body.reflow-book :where(
    unified Atkinson rule to generated utility classes. */
 body.reflow-book [role="dialog"][role="dialog"],
 body.reflow-book [role="dialog"][role="dialog"] * {
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 body.reflow-book .reflow-reader-panel {
@@ -3961,7 +3961,7 @@ body.reflow-book #content :where(
   p, h1, h2, h3, h4, h5, h6, span, button, input, textarea, select, label,
   figcaption
 ) {
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 /* Body copy, synchronized sentences and activity answers share one scale. */
@@ -4013,7 +4013,7 @@ body.reflow-book #content > .chapter-cover h2 {
 body.reflow-book #content .book-cover-final .book-cover-copy h1,
 body.reflow-book #content .book-cover-final .book-cover-copy h2,
 body.reflow-book #content .book-cover-final .book-cover-site {
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 /* Voice selection follows the same Ceibal segmented-control language used
@@ -4940,6 +4940,9 @@ body.reflow-book #content .reflow-chat-emoji {
   object-fit: contain !important;
   vertical-align: text-bottom !important;
 }
+
+/* Punto 19 · La fuente de emojis (Noto Color Emoji) se declara en
+   assets/fonts.css, junto con el resto de la tipografía del libro. */
 
 /* Image/text rebalancing moves semantic sentences between the side column
    and continuation blocks. The PDF-derived start class must therefore carry
@@ -5876,7 +5879,7 @@ body.reflow-book #content .reflow-back-cover-inner {
   margin: 0 !important;
   padding: 0 !important;
   color: var(--ceibal-gray-900) !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   text-align: left !important;
 }
 
@@ -5885,7 +5888,7 @@ body.reflow-book #content .reflow-back-cover-inner h1 {
   width: 100% !important;
   margin: 0 0 clamp(1.25rem, 3vh, 2.25rem) !important;
   color: var(--ceibal-gray-900) !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-size: clamp(2.4rem, 6vh, 4.2rem) !important;
   font-weight: 700 !important;
   line-height: 1 !important;
@@ -5901,7 +5904,7 @@ body.reflow-book #content .reflow-back-cover-inner p {
   margin: 0 !important;
   padding: 0 !important;
   color: var(--ceibal-gray-900) !important;
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
   font-size: calc(var(--reflow-body-size) * var(--reflow-font-scale)) !important;
   font-weight: 400 !important;
   line-height: 1.55 !important;
@@ -5945,7 +5948,7 @@ body.reflow-book.reflow-easy-read[data-reflow-font-size="xlarge"]
 
 body.reflow-book #content .reflow-back-cover-inner
   :is(h1, p, p > .reading-sentence) {
-  font-family: "Atkinson Hyperlegible", sans-serif !important;
+  font-family: "Atkinson Hyperlegible", "Noto Color Emoji", sans-serif !important;
 }
 
 /* Easy Read must operate on grammatical sentences, not on the arbitrary
@@ -7110,4 +7113,3 @@ body.reflow-book #content .quiz-next-question {
   margin-right: 0;
   margin-top: var(--ceibal-space-3);
 }
-

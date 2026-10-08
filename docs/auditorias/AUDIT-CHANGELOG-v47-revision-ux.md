@@ -3,6 +3,22 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 19 · Íconos de EVA y emojis del glosario
+
+- **Barra y paneles**: ya usaban los **SVG del set de EVA** (menú, flechas, engranaje,
+  glosario, cerrar, reproducir/pausar/detener) en vez de caracteres de texto;
+  verificado con `verify-ui-icons` (24 px, sin glifos de texto).
+- **Glosario**: los términos traían **pares** de emojis («🛠️📚», «🚆🚢», «🏔️🗺️»). Se
+  redujeron a **un emoji por término** (631 de 638; 7 ya tenían uno y 16 son
+  secuencias ZWJ o banderas, un solo glifo). Decisión del usuario: **mantener los
+  emojis**, no quitarlos ni pasar a íconos por categoría.
+- **Fuente de emojis incluida**: se sumó **Noto Color Emoji** (11 subsets, ~2 MB) en
+  `assets/fonts/noto-color-emoji/`, declarada en `assets/fonts.css` y agregada a los
+  stacks de Atkinson, para que se vean igual en todos los dispositivos (antes
+  dependían de la fuente del sistema).
+
+Caché: `fonts.css?v=3-emoji-font`, `reflow.css?v=170-emoji-font`.
+
 ## Punto 18 · Marco de la interfaz con los tokens de EVA
 
 El tema claro ya estaba (barra y paneles blancos, acciones institucionales), pero

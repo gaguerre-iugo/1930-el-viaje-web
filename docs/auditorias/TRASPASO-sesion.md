@@ -92,7 +92,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 16 | «Considerá que…» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` (el usuario eligió «Considerá que…» sobre «Todavía no.») |
 | 17 | Kicker «Pregunta N de 3», dimensión oculta, cierre y «Seguir leyendo» | Cerrado | `verify-quiz-retry.mjs` |
 | 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, con dos salvedades | Tokens `eva-color-*` y variables semánticas (`--ui-bg`, `--ui-border`, `--ui-text`, `--ui-text-muted`, `--ui-primary`, `--ui-primary-hover`, `--ui-primary-pressed`, `--ui-selected-bg`, `--ui-focus`); grises del ADT eliminados; títulos de grupo y seleccionados en institucional-600 con check. Capturas en `docs/auditorias/punto18-capturas/`. Salvedades: el deshabilitado de la acción principal queda al 40 % (punto 3) y el foco en 3 px (punto 14) |
-| 19 | Íconos SVG de EVA en la interfaz | Cerrado, **con salvedad** | **3 de los 8** (detener, audio anterior, audio siguiente) fueron **generados** por nosotros a partir de pausa y reproducir: si Comunicación tiene los originales, se reemplazan. `verify-eva-icons.mjs` |
+| 19 | Íconos SVG de EVA + emojis del glosario | Cerrado, con salvedad | Barra y paneles con los SVG de EVA (`verify-ui-icons`). Glosario: **un emoji por término** (631 de 638 reducidos) y **fuente Noto Color Emoji incluida** (~2 MB) en `assets/fonts.css`. Salvedad: 3 íconos (detener, audio anterior/siguiente) son derivados de pausa/reproducir |
 | 20 | Escala tipográfica del contenido | **Decisión pendiente** | Cuerpo **20 px vs 18 px**: hoy 18. Es la única decisión que cambia la paginación de todo el libro (cliente) |
 | 21 | «Abriendo 1930: El viaje…» + logo de Ceibal | Cerrado | El SVG oficial está en `assets/icons/ceibal-logo.svg` y aplicado en el cargador |
 | 22 | Ocultar el enlace «Saltar al contenido» y la línea de apertura | Cerrado | `verify-opening.mjs` |
@@ -279,9 +279,9 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=169-eva-tokens`,
-  `reflow-book.js?v=197-punto13` y
-  `quiz-sequence.js?v=9-cierre-listo`.
+  vieja. Valores actuales: `reflow.css?v=170-emoji-font`,
+  `reflow-book.js?v=197-punto13`, `quiz-sequence.js?v=9-cierre-listo` y
+  `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
   DSH bloquea (`spawn EPERM`). Las pruebas corren con acceso pleno.
