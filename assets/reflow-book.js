@@ -13142,6 +13142,55 @@
       return;
     }
 
+    /* Punto 23 · La composición de las cadenas deja un espacio al final de la
+       cadena y otro en el hueco con el bloque siguiente, así que el texto queda
+       con dobles espacios («…la economía.  ¡Si…»). Se colapsan los espacios
+       redundantes sin tocar los saltos de línea de la lectura fácil. */
+    function collapseContentSpaces(root) {
+      if (!root) return;
+      /* Residuos vacíos de la fuente: al quedar entre dos espacios dejan el
+         texto con dos («…cierto.  Pero…»). */
+      Array.prototype.slice.call(root.querySelectorAll(".reflow-source-residue")).forEach(function (residuo) {
+        if (!(residuo.textContent || "").trim()) residuo.remove();
+      });
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      var nodos = [];
+      var nodo;
+      while ((nodo = walker.nextNode())) nodos.push(nodo);
+      nodos.forEach(function (texto) {
+        if (/[ \t]{2,}/.test(texto.nodeValue)) {
+          texto.nodeValue = texto.nodeValue.replace(/[ \t]{2,}/g, " ");
+        }
+      });
+      Array.prototype.slice.call(root.querySelectorAll("*")).forEach(function (elemento) {
+        var ultimo = elemento.lastChild;
+        if (ultimo && ultimo.nodeType === 3 && /[ \t]$/.test(ultimo.nodeValue)) {
+          var siguiente = elemento.nextSibling;
+          while (siguiente && siguiente.nodeType === 3 && !siguiente.nodeValue.trim()) {
+            var aBorrar = siguiente;
+            siguiente = siguiente.nextSibling;
+            aBorrar.remove();
+          }
+          if (siguiente && siguiente.nodeType === 3) {
+            siguiente.nodeValue = siguiente.nodeValue.replace(/^[ \t]+/, "");
+          }
+        }
+        /* Espacios sueltos seguidos dentro del mismo padre («…creés?» + " " + " "). */
+        Array.prototype.slice.call(elemento.childNodes).forEach(function (hijo) {
+          if (hijo.nodeType !== 3 || hijo.nodeValue.trim()) return;
+          var previo = hijo.previousSibling;
+          var termina = previo && (previo.nodeType === 3
+            ? /[ \t]$/.test(previo.nodeValue)
+            : /[ \t]$/.test((previo.textContent || "").slice(-1)));
+          if (termina) hijo.remove();
+        });
+      });
+    }
+    collapseContentSpaces(content);
+    requestAnimationFrame(function () { collapseContentSpaces(content); });
+    var spaceObserver = new MutationObserver(function () { collapseContentSpaces(content); });
+    spaceObserver.observe(content, { childList: true, subtree: true });
+    window.setTimeout(function () { spaceObserver.disconnect(); }, 4000);
     loading.remove();
   }
 

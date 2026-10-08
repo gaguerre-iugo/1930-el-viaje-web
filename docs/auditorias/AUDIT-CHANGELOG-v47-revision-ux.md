@@ -3,6 +3,30 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 23 · Dobles espacios y saltos de línea
+
+- **Dobles espacios (resuelto)**: la composición de las cadenas de oraciones dejaba
+  un espacio al final de la cadena y otro en el hueco con el bloque siguiente, más un
+  **residuo vacío** (`.reflow-source-residue`) entre dos espacios. Medido en el DOM:
+  **59 secciones** con doble espacio («…la economía.  ¡Si…») → **0**. Se agregó
+  `collapseContentSpaces()` al motor: colapsa espacios redundantes (incluso entre
+  nodos) y quita los residuos vacíos, sin tocar los saltos de línea de la lectura
+  fácil.
+- **Corrección de texto**: `audit_typo.py` queda en **1** coincidencia — un marcador
+  de contenido («Instituto para el futuro **???**», `pg176177_n0009`), decisión
+  editorial, no un doble espacio. `texts.json` no tiene dobles espacios (0 de 10.102
+  valores). Los **656** valores con salto interno son **todos de lectura fácil**
+  (`_easy_read`, una oración por línea, formato legítimo); 44 son listas con viñetas y
+  2 cortan a mitad de oración (`pg121_n0005`, `pg121_n0009`).
+- **Salto del prólogo (pendiente)**: «…propuesta didáctica. / Para ello» es la fuente
+  partida en dos `<p>` (`pg009_n0019` + `pg009_n0020`). Unirlos en el HTML hace que el
+  motor mueva `n0020` fuera de la sección, así que queda **pendiente**: necesita un
+  ajuste del motor (unir el fragmento), no sólo de la fuente.
+- De paso, el contador de la barra se fijó en 15 px (no crece con «Tamaño de letra»)
+  porque a 620 px desbordaba su celda.
+
+Caché: `reflow-book.js?v=200-espacios`, `reflow.css?v=173-espacios`.
+
 ## Punto 24 · Jerarquía tipográfica de la barra y los paneles
 
 La jerarquía ya estaba casi armada (N1 20/700, N2 17/700, N3 17/400, N4 15/400,

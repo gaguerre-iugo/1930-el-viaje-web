@@ -1483,7 +1483,9 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
   padding-inline: .75rem;
   text-align: center;
   color: var(--ui-n4-color);
-  font-size: var(--ui-n4-size);
+  /* Punto 24 · El contador no crece con «Tamaño de letra»: a 620 px y «Grande»
+     desbordaba su celda. */
+  font-size: .9375rem !important;
   font-weight: var(--ui-weight-regular);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
