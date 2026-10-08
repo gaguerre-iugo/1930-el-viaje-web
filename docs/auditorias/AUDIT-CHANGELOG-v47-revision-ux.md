@@ -9,14 +9,17 @@ implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
   (verificado: «Pregunta 1 de 3», «Pregunta 2 de 3», «Pregunta 3 de 3»).
 - **Dimensión lectora oculta**: `.quiz-dimension` sigue en `display: none`
   (información para el equipo docente, no para el lector).
-- **Cierre + «Seguir leyendo»**: al responder las tres aparece el cierre («Terminaste
-  las 3 preguntas de este capítulo.» + la nota de reintento o «Las respondiste todas
-  bien.»). Faltaba el enlace para seguir leyendo: se agregó un botón **«Seguir
+- **Cierre + «Seguir leyendo»**: al responder las tres aparece el cierre **«¡Listo!
+  Respondiste las 3 preguntas.»** y, si quedó alguna mal, la nota de reintento («Las
+  que quedaron marcadas se pueden volver a intentar: elegí otra opción y volvé a
+  enviar.»). Faltaba el enlace para seguir leyendo: se agregó un botón **«Seguir
   leyendo»** que lleva a la página de la próxima sección del libro (medido en
-  `qz010`: de la pág. 89 a la 94, sección `pg080081_sec001`).
+  `qz010`: de la pág. 89 a la 94, sección `pg080081_sec001`). El cierre se genera en
+  tiempo de ejecución y **no se narra** (no vive en los catálogos de audio): no hay
+  audio que regenerar.
 
 `verify-quiz-retry` ahora comprueba también la presencia de «Seguir leyendo».
-Caché: `quiz-sequence.js?v=8-seguir-leyendo`, `reflow.css?v=168-seguir-leyendo`.
+Caché: `quiz-sequence.js?v=9-cierre-listo`, `reflow.css?v=168-seguir-leyendo`.
 
 ## Punto 16 · Tono de las devoluciones: verificado
 

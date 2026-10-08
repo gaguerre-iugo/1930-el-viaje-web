@@ -139,7 +139,7 @@ estado = await estadoPanel(SECUENCIA, 2);
 console.log(`  cierre visible: ${estado.cierre}`);
 console.log(`  texto: «${estado.textoCierre.replace(/\s+/g, " ").trim().slice(0, 120)}»`);
 if (!estado.cierre) fail("no apareció el cierre al responder las tres preguntas");
-if (estado.cierre && !/Terminaste las 3 preguntas/.test(estado.textoCierre)) {
+if (estado.cierre && !/Respondiste las 3 preguntas/.test(estado.textoCierre)) {
   fail(`el cierre no dice que terminó las tres: ${estado.textoCierre}`);
 }
 console.log(`  ¿ofrece «Seguir leyendo»? ${estado.seguirLeyendo}`);

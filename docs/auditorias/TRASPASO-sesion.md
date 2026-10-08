@@ -281,7 +281,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
   vieja. Valores actuales: `reflow.css?v=168-seguir-leyendo`,
   `reflow-book.js?v=197-punto13` y
-  `quiz-sequence.js?v=8-seguir-leyendo`.
+  `quiz-sequence.js?v=9-cierre-listo`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
   DSH bloquea (`spawn EPERM`). Las pruebas corren con acceso pleno.

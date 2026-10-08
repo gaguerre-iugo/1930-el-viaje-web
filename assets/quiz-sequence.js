@@ -231,7 +231,7 @@
       cierre.className = "quiz-sequence-closing";
       cierre.setAttribute("role", "status");
       var titulo = document.createElement("span");
-      titulo.textContent = "Terminaste las " + paneles.length + " preguntas de este capítulo.";
+      titulo.textContent = "¡Listo! Respondiste las " + paneles.length + " preguntas.";
       cierre.appendChild(titulo);
       var nota = document.createElement("span");
       nota.className = "quiz-sequence-closing-note";
@@ -242,7 +242,7 @@
     if (notaFinal) {
       notaFinal.textContent = pendientes.length
         ? "Las que quedaron marcadas se pueden volver a intentar: elegí otra opción y volvé a enviar."
-        : "Las respondiste todas bien.";
+        : "";
     }
     /* Punto 17 · «Seguir leyendo»: lleva al contenido que sigue a la secuencia. */
     if (!cierre.querySelector(".quiz-keep-reading")) {
