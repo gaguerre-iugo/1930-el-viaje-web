@@ -149,12 +149,13 @@
     "title": "Fin",
     "chapter_id": "pg215_n0023",
     "level": 1,
-    "group": "sobre"
+    "group": "sobre",
+    "hidden": true
   },
   {
     "section_id": "pg221_sec001",
     "href": "index.html#pg221_sec001",
-    "title": "Ana Solari",
+    "title": "Sobre la autora",
     "chapter_id": "pg221_n0002",
     "level": 1,
     "group": "sobre"

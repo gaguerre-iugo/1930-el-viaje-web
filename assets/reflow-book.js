@@ -236,7 +236,7 @@
     pg122123_sec001: "Otra viajera del tiempo",
     pg144145_sec001: "Josephine está en peligro",
     pg176177_sec001: "Dos mundiales, un mismo destino",
-    pg221_sec001: "Ana Solari",
+    pg221_sec001: "Sobre la autora",
     pg224_sec001: "Sinopsis",
     pg225_sec001: "Créditos",
     pg226_sec001: "Agradecimientos",
@@ -781,7 +781,7 @@
 
   async function loadIndexMetadata() {
     try {
-      var response = await fetch("./content/toc.json?v=11-toc-groups");
+      var response = await fetch("./content/toc.json?v=12-toc-punto13");
       if (!response.ok) throw new Error("No se pudo cargar el índice editorial.");
       var entries = await response.json();
       if (Array.isArray(entries)) window.__adtReflowTocEntries = entries;
@@ -6491,7 +6491,14 @@
 
     function chapterDisplayTitle(entry, numbers) {
       var number = entry && numbers ? numbers[entry.section_id] : 0;
-      return number ? "Capítulo " + number + ". " + entry.title : entry.title;
+      return number ? "Cap. " + number + " · " + entry.title : entry.title;
+    }
+
+    /* Forma accesible del título del capítulo (para `aria-label`): «Cap. 1 ·»
+       se lee como «Capítulo 1:». El texto visible se mantiene corto. */
+    function chapterSpokenTitle(entry, numbers) {
+      var number = entry && numbers ? numbers[entry.section_id] : 0;
+      return number ? "Capítulo " + number + ": " + entry.title : entry.title;
     }
 
     function decorateActivityEntry(button, entry, progress) {
@@ -6718,6 +6725,47 @@
       panel.dataset.reflowPageCount = String(state.total);
     }
 
+    /* Punto 13 · Grupo editorial de cada entrada («antes» / «chapter» /
+       «sobre»), tomado del `group` del índice y, si llegó sin grupos (caché
+       vieja), del respaldo del contador. */
+    function tocGroup(entry) {
+      if (!entry) return null;
+      var toc = window.__adtReflowTocEntries || [];
+      var tocHasGroups = toc.some(function (candidate) {
+        return candidate && candidate.group;
+      });
+      return tocHasGroups ? entry.group : chapterProgressGroupFallback[entry.section_id];
+    }
+
+    /* Punto 13 · «Fin» no aporta al índice: se oculta sin sacarlo del TOC (el
+       mapeo del runtime usa el orden del índice). La marca vive en toc.json. */
+    function toggleTocEntryHidden(button, hidden) {
+      var item = button.closest("li");
+      if (!item) return;
+      if (hidden) item.classList.add("reflow-toc-hidden");
+      else item.classList.remove("reflow-toc-hidden");
+    }
+
+    /* Punto 13 · Encabezados de grupo del índice. La lista la maneja el runtime
+       (React) y no acepta nodos propios, así que el encabezado se marca como
+       contenido generado (`attr()`) sobre la primera entrada visible del grupo. */
+    function syncTocGroupHeaders(tabpanel, decorated) {
+      var labels = { antes: "Antes de empezar", sobre: "Sobre el libro" };
+      Array.prototype.slice.call(
+        tabpanel.querySelectorAll("li[data-reflow-toc-group-start]")
+      ).forEach(function (item) {
+        item.removeAttribute("data-reflow-toc-group-start");
+      });
+      var seen = {};
+      decorated.forEach(function (item) {
+        var group = tocGroup(item.entry);
+        if (!labels[group] || item.entry.hidden || seen[group]) return;
+        seen[group] = true;
+        var li = item.button.closest("li");
+        if (li) li.setAttribute("data-reflow-toc-group-start", labels[group]);
+      });
+    }
+
     function decorateToc(panel) {
       var toc = window.__adtReflowTocEntries || [];
       var chapterNumbers = chapterNumberMap();
@@ -6732,6 +6780,7 @@
       });
       var tabpanel = panel.querySelector('[role="tabpanel"]');
       if (!tabpanel) return;
+      var decorated = [];
       Array.prototype.slice.call(tabpanel.querySelectorAll("button")).forEach(function (button, index) {
         var entry = tocEntryForButton(button, panel) || toc[index];
         if (!entry) return;
@@ -6749,18 +6798,22 @@
         ) {
           button.setAttribute("aria-current", "location");
         }
+        toggleTocEntryHidden(button, !!entry.hidden);
         if (!decorateActivityEntry(button, entry, activityProgress)) {
           clearActivityEntryDecoration(button);
           var label = button.querySelector("span") || button;
           var desired = chapterDisplayTitle(entry, chapterNumbers);
           if (normalized(label.textContent) !== normalized(desired)) label.textContent = desired;
           if (chapterNumbers[entry.section_id]) {
-            if (normalized(button.getAttribute("aria-label")) !== normalized(desired)) {
-              button.setAttribute("aria-label", desired);
+            var spoken = chapterSpokenTitle(entry, chapterNumbers);
+            if (normalized(button.getAttribute("aria-label")) !== normalized(spoken)) {
+              button.setAttribute("aria-label", spoken);
             }
           }
         }
+        decorated.push({ button: button, entry: entry });
       });
+      syncTocGroupHeaders(tabpanel, decorated);
     }
 
     function closeNavigationPanel() {

@@ -3,6 +3,36 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 13 · Índice: «Cap. N · título», grupos y limpieza
+
+Cuatro cambios en el panel «Índice»:
+
+- **Capítulos numerados**: las entradas dicen **«Cap. 1 · Hay algo extraño en esa
+  foto»** (antes sólo el título; ya decoradas, «Capítulo 1.»). El formato vive en
+  `chapterDisplayTitle()`; la forma accesible del `aria-label` sigue siendo
+  «Capítulo 1: …».
+- **Grupos**: las secciones iniciales quedan bajo **«Antes de empezar»** y las
+  finales bajo **«Sobre el libro»**. La lista la maneja el runtime (React) y no
+  acepta nodos propios, así que el encabezado se pinta como contenido generado
+  (`content: attr(data-reflow-toc-group-start)`) sobre la primera entrada visible
+  de cada grupo.
+- **«Ana Solari» → «Sobre la autora»**: el título editorial se corrigió en
+  `content/toc.json`, pero el motor tiene un mapa `editorialTocTitles` que lo
+  pisaba, así que también se actualizó ahí (era la fuente efectiva).
+- **«Fin» sale del índice**: `content/toc.json` lo marca `hidden` y el motor oculta
+  su fila sin sacarlo del TOC (el mapeo del runtime usa el orden del índice, así que
+  el conteo tiene que seguir igual).
+
+Verificado en vivo: la lista muestra «Antes de empezar» (1930: El viaje, La historia
+que nos une, Una mezcla perfecta, Sinopsis), los ocho «Cap. N · título» con su
+actividad, «Fin» oculto y «Sobre el libro · Sobre la autora»; la búsqueda sigue
+filtrando y el encabezado acompaña al primer resultado. `_diag-nav`,
+`verify-tools-panel`, `verify-chapter-progress`, `verify-primary-toolbar` y
+`verify-published` en verde.
+
+Caché: `reflow-book.js?v=197-punto13`, `reflow.css?v=166-grupos-indice`,
+`toc.json?v=12-toc-punto13`.
+
 ## Punto 12 · Pestañas del índice: «Capítulos» y «Vista de páginas»
 
 El panel «Índice» tenía adentro dos pestañas llamadas **«Índice»** y **«Páginas»**

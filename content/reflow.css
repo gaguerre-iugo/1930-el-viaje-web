@@ -3659,6 +3659,28 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"]
   font-weight: 400 !important;
 }
 
+/* Punto 13 · Encabezados de grupo del índice («Antes de empezar», «Sobre el
+   libro»). La lista la maneja el runtime (React) y no admite nodos propios, así
+   que el encabezado se pinta como contenido generado sobre la primera entrada
+   visible de cada grupo. */
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  li[data-reflow-toc-group-start]::before {
+  content: attr(data-reflow-toc-group-start);
+  display: block;
+  padding: .875rem .25rem .4rem;
+  color: var(--ceibal-institutional-200);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+/* Punto 13 · El «Fin» del índice no aporta: se oculta (toc.json: hidden). */
+body.reflow-book .reflow-navigation-panel [role="tabpanel"]
+  li.reflow-toc-hidden {
+  display: none !important;
+}
+
 /* Keep the familiar 40 x 24 px switch track while expanding its real focus
    and pointer target to 44 x 44 px. Padding belongs to the interactive
    element, so the enlarged area works for touch, mouse and keyboard alike. */
