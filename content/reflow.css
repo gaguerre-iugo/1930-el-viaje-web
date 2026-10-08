@@ -2362,6 +2362,35 @@ body.reflow-book .quiz-sequence-closing .quiz-sequence-closing-note {
   font-weight: 400;
 }
 
+/* Punto 17 · «Seguir leyendo»: cierra la secuencia de las tres preguntas y lleva
+   al contenido siguiente. */
+body.reflow-book #content .quiz-keep-reading {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: .75rem;
+  padding: .5rem 1.25rem;
+  border: 0;
+  border-radius: var(--ceibal-radius-md);
+  color: #fff;
+  background: var(--ceibal-institutional-600);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--ceibal-shadow-button);
+}
+
+body.reflow-book #content .quiz-keep-reading:hover {
+  background: var(--ceibal-institutional-700);
+}
+
+body.reflow-book #content .quiz-keep-reading:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-light);
+  outline-offset: 2px;
+  box-shadow: var(--ceibal-shadow-focus);
+}
+
 body.reflow-book #content .quiz-question {
   margin: 0 auto;
   text-align: center;

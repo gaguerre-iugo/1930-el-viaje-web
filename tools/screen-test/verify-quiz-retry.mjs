@@ -95,6 +95,9 @@ const estadoPanel = (SECUENCIA, indicePanel) =>
         siguientePregunta: Boolean(feedback.querySelector(".quiz-next-question")),
         cierre: Boolean(seccion.querySelector(".quiz-sequence-closing")),
         textoCierre: (seccion.querySelector(".quiz-sequence-closing") || {}).textContent || "",
+        seguirLeyendo: Boolean(
+          seccion.querySelector(".quiz-sequence-closing .quiz-keep-reading")
+        ),
         textoFeedback: feedback.textContent.replace(/\s+/g, " ").trim().slice(0, 90),
       };
     },
@@ -139,6 +142,8 @@ if (!estado.cierre) fail("no apareció el cierre al responder las tres preguntas
 if (estado.cierre && !/Terminaste las 3 preguntas/.test(estado.textoCierre)) {
   fail(`el cierre no dice que terminó las tres: ${estado.textoCierre}`);
 }
+console.log(`  ¿ofrece «Seguir leyendo»? ${estado.seguirLeyendo}`);
+if (estado.cierre && !estado.seguirLeyendo) fail("el cierre no ofrece «Seguir leyendo»");
 
 const ultimo = await estadoPanel(SECUENCIA, 2);
 console.log(`  en la última pregunta, ¿ofrece «Siguiente pregunta»? ${ultimo.siguientePregunta}`);

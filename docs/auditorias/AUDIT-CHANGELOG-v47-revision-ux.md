@@ -3,6 +3,21 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 17 · Avance en la actividad: kicker, dimensión oculta y «Seguir leyendo»
+
+- **«Pregunta N de 3»**: visible en las tres preguntas de las ocho secuencias
+  (verificado: «Pregunta 1 de 3», «Pregunta 2 de 3», «Pregunta 3 de 3»).
+- **Dimensión lectora oculta**: `.quiz-dimension` sigue en `display: none`
+  (información para el equipo docente, no para el lector).
+- **Cierre + «Seguir leyendo»**: al responder las tres aparece el cierre («Terminaste
+  las 3 preguntas de este capítulo.» + la nota de reintento o «Las respondiste todas
+  bien.»). Faltaba el enlace para seguir leyendo: se agregó un botón **«Seguir
+  leyendo»** que lleva a la página de la próxima sección del libro (medido en
+  `qz010`: de la pág. 89 a la 94, sección `pg080081_sec001`).
+
+`verify-quiz-retry` ahora comprueba también la presencia de «Seguir leyendo».
+Caché: `quiz-sequence.js?v=8-seguir-leyendo`, `reflow.css?v=168-seguir-leyendo`.
+
 ## Punto 16 · Tono de las devoluciones: verificado
 
 Las 72 devoluciones ya cumplían el criterio; la revisión lo confirmó en los dos

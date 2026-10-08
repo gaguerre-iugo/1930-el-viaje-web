@@ -182,6 +182,28 @@
     return indice >= 0 && indice + 1 < paneles.length ? paneles[indice + 1] : null;
   }
 
+  /* Primera página (1-based) después de la secuencia: la de la próxima sección
+     del libro o, si no hay, la siguiente a la actual. */
+  function pageAfterSequence(sequence) {
+    var contenedor = document.getElementById("content");
+    if (!contenedor) return null;
+    var ancho = contenedor.clientWidth || window.innerWidth;
+    if (!ancho) return null;
+    var secciones = Array.prototype.slice.call(
+      contenedor.querySelectorAll("[data-section-id]")
+    );
+    var siguiente = secciones.find(function (seccion) {
+      return Boolean(
+        sequence.compareDocumentPosition(seccion) & Node.DOCUMENT_POSITION_FOLLOWING
+      );
+    });
+    if (siguiente) {
+      var caja = siguiente.getBoundingClientRect();
+      return Math.round((contenedor.scrollLeft + caja.left) / ancho) + 1;
+    }
+    return Math.round(contenedor.scrollLeft / ancho) + 2;
+  }
+
   function focusFirstOption(panel) {
     var primera = panel.querySelector('input[type="radio"]');
     if (primera) primera.focus({ preventScroll: true });
@@ -221,6 +243,23 @@
       notaFinal.textContent = pendientes.length
         ? "Las que quedaron marcadas se pueden volver a intentar: elegí otra opción y volvé a enviar."
         : "Las respondiste todas bien.";
+    }
+    /* Punto 17 · «Seguir leyendo»: lleva al contenido que sigue a la secuencia. */
+    if (!cierre.querySelector(".quiz-keep-reading")) {
+      var seguir = document.createElement("button");
+      seguir.type = "button";
+      seguir.className = "quiz-keep-reading";
+      seguir.textContent = "Seguir leyendo";
+      seguir.addEventListener("click", function () {
+        var pagina = pageAfterSequence(sequence);
+        if (pagina && typeof window.__adtReflowGoToVisualPage === "function") {
+          window.__adtReflowGoToVisualPage(pagina);
+          return;
+        }
+        var boton = document.getElementById("reflow-next");
+        if (boton) boton.click();
+      });
+      cierre.appendChild(seguir);
     }
   }
 
