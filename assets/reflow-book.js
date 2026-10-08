@@ -13132,7 +13132,10 @@
       console.error(error);
       content.classList.remove("opacity-0");
       content.classList.add("opacity-100");
-      loading.textContent = "No fue posible preparar el libro reflowable.";
+      var loadingText = loading.querySelector(".reflow-loading-text");
+      var errorText = "No se pudo abrir 1930: El viaje.";
+      if (loadingText) loadingText.textContent = errorText;
+      else loading.textContent = errorText;
       loading.setAttribute("role", "alert");
       return;
     }

@@ -3,6 +3,18 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 21 · Mensaje de carga
+
+- El cargador ya decía **«Abriendo 1930: El viaje…»** (no «Preparando el libro
+  reflowable…») y muestra el **logo de Ceibal** (`assets/icons/ceibal-logo.svg`,
+  192 × 64) arriba del texto, sobre fondo blanco. Verificado en vivo (captura con
+  el logo y el texto).
+- La **variante de error** todavía decía «No fue posible preparar el libro
+  reflowable.» y, además, borraba el logo al reemplazar el contenido: ahora dice
+  **«No se pudo abrir 1930: El viaje.»** y **conserva el logo**.
+
+Caché: `reflow-book.js?v=198-carga`.
+
 ## Punto 20 · Escala tipográfica del contenido
 
 El contenido venía con la tipografía del export (cada portadilla con su propio tag,
