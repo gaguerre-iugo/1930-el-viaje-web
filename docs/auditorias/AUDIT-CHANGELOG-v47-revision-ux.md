@@ -3,6 +3,36 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 20 · Escala tipográfica del contenido
+
+El contenido venía con la tipografía del export (cada portadilla con su propio tag,
+tamaño y peso): el antetítulo «Capítulo N» salía en **54 px** y el título en
+**30,6 px con peso 400**, así que el antetítulo dominaba. Se definió la **escala de
+EVA** con dos pesos (400 y 700), todo multiplicado por el factor de «Tamaño de
+letra»:
+
+| Nivel | Estilo | Escritorio / celular |
+|---|---|---|
+| Antetítulo («Capítulo N») | 700 · institucional-600 · ls .02 em · lh 1,4 | 17 px / 17 px |
+| Título de capítulo | 700 · grey-900 · lh 1,2 | 34 px / 28 px |
+| Título de sección | 700 · grey-900 · lh 1,3 | 26 px / 26 px |
+| Enunciado de actividad | 700 · grey-900 · lh 1,4 | 22 px / 22 px |
+| Texto corrido | 400 · grey-900 · lh 1,6 | 20 px / 20 px |
+| Texto secundario | 400 · grey-600 · lh 1,5 | 17 px / 17 px |
+
+- Aplicada a las **ocho portadillas** (capítulos 1-2 en `.chapter-cover` y 3-8 en
+  `.reflow-later-chapter-cover`): el antetítulo queda arriba y chico (17 px) y el
+  **título pasa a ser lo que más pesa** (34 px), con **8 px** entre ambos y **32 px**
+  después. Antes era al revés.
+- Títulos de sección (prólogos y cierre) a 26 px con **24 px** antes; enunciado de
+  actividad a 22 px; texto corrido a 20 px con lh 1,6. El cuerpo **ya estaba en
+  20 px**, así que la decisión «20 vs 18 px» del documento quedó del lado de 20.
+- **Pendiente**: el **texto secundario** (créditos, pies de imagen, firma) no tiene
+  una clase común en el contenido; queda a 18 px y hay que etiquetarlo antes de
+  bajarlo a 17 px grey-600.
+
+Caché: `reflow.css?v=171-escala-contenido`.
+
 ## Punto 19 · Íconos de EVA y emojis del glosario
 
 - **Barra y paneles**: ya usaban los **SVG del set de EVA** (menú, flechas, engranaje,

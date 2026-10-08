@@ -7113,3 +7113,69 @@ body.reflow-book #content .quiz-next-question {
   margin-right: 0;
   margin-top: var(--ceibal-space-3);
 }
+
+/* Punto 20 · Escala tipográfica del contenido de lectura (tabla de EVA). Dos
+   pesos (400 y 700) y todos los valores multiplicados por el factor de «Tamaño
+   de letra». En la portadilla el antetítulo va arriba y chico; el título —lo que
+   el lector recuerda— pesa más. */
+body.reflow-book {
+  --adt-antetitulo: 1.0625rem;  /* 17 px */
+  --adt-titulo-cap: 2.125rem;   /* 34 px */
+  --adt-titulo-sec: 1.625rem;   /* 26 px */
+  --adt-enunciado: 1.375rem;    /* 22 px */
+  --adt-cuerpo: 1.25rem;        /* 20 px */
+  --adt-secundario: 1.0625rem;  /* 17 px */
+}
+@media (max-width: 40rem) {
+  body.reflow-book { --adt-titulo-cap: 1.75rem; }  /* 28 px en celular */
+}
+
+/* Antetítulo: «Capítulo N». */
+body.reflow-book #content > .chapter-cover h1,
+body.reflow-book #content > section.reflow-later-chapter-cover h1 {
+  margin-bottom: .5rem !important;
+  color: var(--eva-color-institucional-600) !important;
+  font-size: calc(var(--adt-antetitulo) * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  letter-spacing: .02em !important;
+  line-height: 1.4 !important;
+}
+
+/* Título de capítulo (subtítulo de la portadilla). */
+body.reflow-book #content > .chapter-cover h2,
+body.reflow-book #content > .chapter-cover [data-id="pg017_n0004"],
+body.reflow-book #content > section.reflow-later-chapter-cover h2 {
+  margin-bottom: 2rem !important;
+  color: var(--eva-color-grey-900) !important;
+  font-size: calc(var(--adt-titulo-cap) * var(--reflow-font-scale)) !important;
+  font-style: normal !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* Título de sección: prólogos y secciones finales. */
+body.reflow-book #content [data-id="pg009_n0002"],
+body.reflow-book #content [data-id="pg013_n0002"],
+body.reflow-book #content [data-id="pg221_n0002"] {
+  margin-top: 1.5rem !important;
+  color: var(--eva-color-grey-900) !important;
+  font-size: calc(var(--adt-titulo-sec) * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.3 !important;
+}
+
+/* Enunciado de actividad. */
+body.reflow-book #content .quiz-question {
+  color: var(--eva-color-grey-900) !important;
+  font-size: calc(var(--adt-enunciado) * var(--reflow-font-scale)) !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+}
+
+/* Texto corrido. */
+body.reflow-book #content :is(.adt-body, .reading-sentence) {
+  font-size: calc(var(--adt-cuerpo) * var(--reflow-font-scale)) !important;
+  line-height: 1.6 !important;
+}
