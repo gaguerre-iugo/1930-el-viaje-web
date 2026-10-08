@@ -3,6 +3,30 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 14 · Anillo de foco turquesa y repaso con teclado
+
+Las entradas del índice ya usaban el anillo turquesa de la barra (regla
+`[role="tabpanel"] li > button:focus-visible`), así que el primer paso ya estaba.
+El repaso con **Tab y Shift+Tab** por barra, índice, Herramientas y glosario
+encontró tres huecos:
+
+- **Contenedores de desplazamiento del runtime**: `role="tabpanel"` y
+  `role="presentation"` con `tabindex="0"` traen `outline-none`, así que recibían
+  foco sin ninguna señal. Se les devolvió el anillo turquesa por dentro
+  (`outline-offset: -3px`) para no tapar el contenido.
+- **Interruptores del runtime** (`.reflow-accessibility-panel [role="switch"]`):
+  mostraban el anillo gris de Tailwind, no el turquesa. Se sumaron a la regla de
+  foco de los paneles (`--ceibal-focus-on-dark` + `--ceibal-shadow-focus`).
+- **Test `verify-focus-visible`**: auditaba controles no alcanzables con Tab (p. ej.
+  un `input` del glosario con `tabindex="-1"`), lo que dejaba «pendientes» falsos.
+  Ahora solo audita controles con `tabIndex >= 0`.
+
+Verificado: en las cuatro superficies, **todos los controles alcanzables con Tab y
+Shift+Tab muestran contorno**. `verify-focus-visible`, `verify-tools-panel`,
+`verify-primary-toolbar`, `verify-light-theme` y `_diag-nav` en verde.
+
+Caché: `reflow.css?v=167-foco-contenedores`.
+
 ## Punto 13 · Índice: «Cap. N · título», grupos y limpieza
 
 Cuatro cambios en el panel «Índice»:

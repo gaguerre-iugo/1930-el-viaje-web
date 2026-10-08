@@ -1,9 +1,10 @@
 // Auditoría de foco visible (revisión UX, punto 14).
 //
-// Recorre los controles de la barra y de los tres paneles, los enfoca uno por uno
-// y comprueba que el foco cambie alguna señal visual (contorno, sombra, borde,
-// fondo o color). Los controles que no cambian nada se informan: en la barra y en
-// el índice son un fallo, en el resto del runtime quedan como pendientes.
+// Recorre los controles alcanzables con teclado de la barra y de los tres paneles,
+// los enfoca uno por uno y comprueba que el foco cambie alguna señal visual
+// (contorno, sombra, borde, fondo o color). Los controles que no cambian nada se
+// informan: en la barra y en el índice son un fallo, en el resto del runtime quedan
+// como pendientes.
 //
 // Uso:
 //   node verify-focus-visible.mjs
@@ -94,7 +95,8 @@ for (const surface of SURFACES) {
         .replace(/\s+/g, " ").trim().slice(0, 46);
 
     const controls = [...document.querySelectorAll(selector)].filter(
-      (element) => element.getClientRects().length && !element.disabled
+      (element) =>
+        element.getClientRects().length && !element.disabled && element.tabIndex >= 0
     );
     const withoutSignal = [];
     const withoutOutline = [];

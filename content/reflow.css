@@ -3321,7 +3321,8 @@ body.reflow-book .reflow-reader-panel :is(
   button,
   input,
   [role="tab"],
-  [role="radio"]
+  [role="radio"],
+  [role="switch"]
 ):focus-visible {
   outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
   outline-offset: 2px !important;
@@ -6732,6 +6733,16 @@ body.reflow-book .reflow-reader-panel button:not([role="switch"]):disabled {
 body.reflow-book .reflow-reader-panel :is(button, a, input, select, summary):focus-visible {
   outline: var(--ceibal-border-focus) solid var(--ui-focus) !important;
   outline-offset: 2px;
+}
+
+/* Punto 14 · Los contenedores de desplazamiento del runtime (`role="tabpanel"`
+   y `role="presentation"` con `tabindex="0"`) traen `outline-none`: al recibir
+   foco con Tab no mostraban ninguna señal. Se les devuelve el anillo turquesa,
+   por dentro para no tapar el contenido. */
+body.reflow-book .reflow-reader-panel
+  :is([role="tabpanel"], [role="presentation"])[tabindex="0"]:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ui-focus) !important;
+  outline-offset: -3px !important;
 }
 
 /* Controles de formulario del runtime (interruptores, casillas, selects). */

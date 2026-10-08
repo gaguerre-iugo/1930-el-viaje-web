@@ -87,7 +87,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 11 | Cerrar el índice al elegir y llevar el foco | Cerrado | Foco al **título de la sección** elegida (no al botón «Índice») |
 | 12 | Renombrar las pestañas del índice | Cerrado | Ahora «Capítulos» y «Vista de páginas» |
 | 13 | «Cap. N · título», agrupar, «Sobre la autora» | Cerrado | «Cap. N · título»; grupos «Antes de empezar» / «Sobre el libro»; «Fin» oculto |
-| 14 | Anillo de foco turquesa en el índice | Cerrado, **con salvedad** | Quedan **4 controles del runtime** del panel Herramientas y 1 del glosario sin contorno al enfocar (son del runtime, no nuestros) |
+| 14 | Anillo de foco turquesa en el índice | Cerrado | Índice ya lo tenía; se sumaron los contenedores con `tabindex="0"` y los `[role="switch"]` del runtime |
 | 15 | Reintento señalizado, incorrecta marcada, «Siguiente pregunta» | Cerrado | `verify-quiz-retry.mjs` + las tres pruebas nuevas |
 | 16 | «Todavía no.» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` |
 | 17 | Kicker «Pregunta N de 3», dimensión oculta, cierre | Cerrado | `verify-quiz-retry.mjs` |
@@ -279,7 +279,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=166-grupos-indice`,
+  vieja. Valores actuales: `reflow.css?v=167-foco-contenedores`,
   `reflow-book.js?v=197-punto13` y
   `quiz-sequence.js?v=7-quiz-sin-clave`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
