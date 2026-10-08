@@ -35,6 +35,33 @@ const equal = (actual, expected, label) => {
   }
 };
 
+/* El libro se repagina durante los primeros segundos (fuentes, imágenes) y el
+   último bloque usa `state.total - 1`. La firma oscila (272/271) hasta
+   estabilizarse, así que se espera a que se mantenga igual durante 4 s seguidos
+   antes de comparar: dos cargas comparadas en fases distintas daban un falso
+   off-by-one en el último bloque. */
+const bloquesFirma = (target) =>
+  target.evaluate(() => {
+    const blocks = window.__adtReflowChapterProgress.blocks();
+    return blocks.map((b) => `${b.key}:${b.startPage}-${b.endPage}`).join("|");
+  });
+const esperarAsentado = async (target) => {
+  let anterior = null;
+  let estables = 0;
+  for (let intento = 0; intento < 60; intento += 1) {
+    await target.waitForTimeout(500);
+    const firma = await bloquesFirma(target);
+    if (firma === anterior) {
+      estables += 1;
+      if (estables >= 8) return firma;
+    } else {
+      estables = 0;
+      anterior = firma;
+    }
+  }
+  return anterior;
+};
+
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1366, height: 900 } });
 const consoleErrors = [];
@@ -116,6 +143,9 @@ if (fallbacksDuringStartup.length) {
 } else {
   console.log("  durante el arranque nunca perdió el capítulo");
 }
+
+/* Esperar a que la paginación se asiente antes de leer los bloques reales. */
+await esperarAsentado(page);
 
 const cobertura = await page.evaluate(() => {
   const api = window.__adtReflowChapterProgress;
@@ -329,7 +359,7 @@ try {
   );
   await stalePage.goto(target, { waitUntil: "load" });
   await stalePage.waitForSelector("#reflow-page-status", { timeout: 30000 });
-  await stalePage.waitForTimeout(2500);
+  await esperarAsentado(stalePage);
   const stale = await stalePage.evaluate(() => {
     const api = window.__adtReflowChapterProgress;
     const blocks = api.blocks();

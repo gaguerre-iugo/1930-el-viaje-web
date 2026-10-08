@@ -259,12 +259,13 @@
     if (!panel || !selected) return;
 
     var option = selected.closest(".quiz-option");
-    var explanationId = option && option.dataset.explanationId;
-    var explanation = explanationId
-      ? panel.querySelector('[data-feedback-audio-id="' + explanationId + '"]') ||
-        panel.querySelector('[data-id="' + explanationId + '"]')
-      : null;
-    var isCorrect = option && option.dataset.correct === "true";
+    var optionInput = option && option.querySelector('input[type="radio"], input[type="checkbox"]');
+    var optionValue = optionInput && optionInput.value ? optionInput.value : "";
+    var explanationId = optionValue ? optionValue + "_exp" : "";
+    var correctApi = window.__adtReflowQuizOptionIsCorrect;
+    var isCorrect = correctApi
+      ? Boolean(correctApi(option))
+      : Boolean(option && option.dataset.correct === "true");
     var feedback = panel.querySelector(".quiz-feedback");
     if (!feedback) return;
 
@@ -285,10 +286,16 @@
     icon.textContent = isCorrect ? "✓" : "×";
     var message = document.createElement("span");
     message.className = "quiz-feedback-text";
-    message.textContent = explanation ? explanation.textContent.trim() :
-      (isCorrect ? "Correcto." : "La respuesta no es correcta.");
+    /* Punto 5: la devolución se pide recién al enviar. Se muestra un texto base
+       inmediato y, cuando llega el archivo, se reemplaza. */
+    message.textContent = isCorrect ? "Correcto." : "La respuesta no es correcta.";
     feedback.replaceChildren(icon, message);
-    feedback.dataset.feedbackAudioId = explanationId || "";
+    feedback.dataset.feedbackAudioId = explanationId;
+    if (window.__adtReflowQuizFeedbackFor && option) {
+      window.__adtReflowQuizFeedbackFor(option).then(function (fb) {
+        if (fb && fb.text && message.isConnected) message.textContent = fb.text;
+      });
+    }
     feedback.classList.toggle("is-correct", Boolean(isCorrect));
     feedback.classList.toggle("is-incorrect", !isCorrect);
     feedback.setAttribute("aria-hidden", "false");

@@ -1,0 +1,306 @@
+{
+  "quiz_final": {
+    "qz001_o0": {
+      "text": "Correcto. El texto dice de forma explícita que Javier está construyendo una maqueta del Titanic.",
+      "audio": "qz001_o0_exp"
+    },
+    "qz001_o1": {
+      "text": "Considerá que el estadio y el Mundial aparecen en la conversación familiar, pero no son el proyecto que construye Javier. Elegí otra opción y volvé a enviar.",
+      "audio": "qz001_o1_exp"
+    },
+    "qz001_o2": {
+      "text": "Considerá que Javier quiere averiguar qué barco transportó a las selecciones, pero el proyecto que construye es otro. Elegí otra opción y volvé a enviar.",
+      "audio": "qz001_o2_exp"
+    },
+    "qz002_o0": {
+      "text": "Correcto. El silencio sobre el bisabuelo, el posible secreto familiar y la prohibición tajante aumentan la curiosidad de Javier.",
+      "audio": "qz002_o0_exp"
+    },
+    "qz002_o1": {
+      "text": "Considerá que se mencionan recortes, pero el texto no relaciona las cajas con un trabajo del liceo. Elegí otra opción y volvé a enviar.",
+      "audio": "qz002_o1_exp"
+    },
+    "qz002_o2": {
+      "text": "Considerá que Javier disfruta los canjes, pero esa idea no explica su curiosidad por el bisabuelo y el secreto familiar. Elegí otra opción y volvé a enviar.",
+      "audio": "qz002_o2_exp"
+    },
+    "qz003_o0": {
+      "text": "Correcto. La combinación muestra una intención de ignorar el acoso y, al mismo tiempo, una reacción emocional que la contradice.",
+      "audio": "qz003_o0_exp"
+    },
+    "qz003_o1": {
+      "text": "Considerá que esta evidencia muestra que Javier conserva sus gustos frente a una broma de su amiga, no el efecto del acoso digital. Elegí otra opción y volvé a enviar.",
+      "audio": "qz003_o1_exp"
+    },
+    "qz003_o2": {
+      "text": "Considerá que el cambio de ánimo se relaciona con otros temas y no demuestra cómo lo afectan las publicaciones ofensivas. Elegí otra opción y volvé a enviar.",
+      "audio": "qz003_o2_exp"
+    }
+  },
+  "qz007": {
+    "qz007_o0": {
+      "text": "Considerá que, aunque Javier interactúa con el capitán, no es esta acción la que permite que el barco zarpe. Elegí otra opción y volvé a enviar.",
+      "audio": "qz007_o0_exp"
+    },
+    "qz007_o1": {
+      "text": "Correcto. Javier entra a la sala de máquinas y repara la turbina, así el barco puede zarpar.",
+      "audio": "qz007_o1_exp"
+    },
+    "qz007_o2": {
+      "text": "Considerá que, aunque Javier logra convencer a algunos pasajeros en otras situaciones, esta acción no está relacionada con el problema de la turbina. Elegí otra opción y volvé a enviar.",
+      "audio": "qz007_o2_exp"
+    },
+    "qz008_o0": {
+      "text": "Considerá que Javier coopera con los gemelos, pero el texto no presenta la reparación como una manera de impresionarlos. Elegí otra opción y volvé a enviar.",
+      "audio": "qz008_o0_exp"
+    },
+    "qz008_o1": {
+      "text": "Correcto. Javier sabe que el Conte Verde salió el 21 de junio y usa sus conocimientos de motores para convertir esa certeza en un plan.",
+      "audio": "qz008_o1_exp"
+    },
+    "qz008_o2": {
+      "text": "Considerá que los maquinistas no se lo piden; Javier organiza una distracción para poder trabajar cuando ellos salen. Elegí otra opción y volvé a enviar.",
+      "audio": "qz008_o2_exp"
+    },
+    "qz009_o0": {
+      "text": "Considerá que pellizcarse expresa su desconcierto, pero todavía no constituye una respuesta activa al problema. Elegí otra opción y volvé a enviar.",
+      "audio": "qz009_o0_exp"
+    },
+    "qz009_o1": {
+      "text": "Considerá que esa observación amplía su comprensión del pasado, pero no resuelve el conflicto inmediato. Elegí otra opción y volvé a enviar.",
+      "audio": "qz009_o1_exp"
+    },
+    "qz009_o2": {
+      "text": "Correcto. Aunque siente miedo y duda, Javier diseña una estrategia, actúa con sus conocimientos y consigue que el barco pueda partir.",
+      "audio": "qz009_o2_exp"
+    }
+  },
+  "qz010": {
+    "qz010_o0": {
+      "text": "Considerá que el Rumano ayuda a Javier en 1930, pero no interviene en este ataque del Loro. Elegí otra opción y volvé a enviar.",
+      "audio": "qz010_o0_exp"
+    },
+    "qz010_o1": {
+      "text": "Correcto. Federica aparece, enfrenta al grupo y ayuda a Javier a ponerse de pie.",
+      "audio": "qz010_o1_exp"
+    },
+    "qz010_o2": {
+      "text": "Considerá que, aunque hay marineros en el barco, ninguno interviene en este ataque. Elegí otra opción y volvé a enviar.",
+      "audio": "qz010_o2_exp"
+    },
+    "qz011_o0": {
+      "text": "Considerá que Federica no piensa en vender los recortes. Elegí otra opción y volvé a enviar.",
+      "audio": "qz011_o0_exp"
+    },
+    "qz011_o1": {
+      "text": "Correcto. Federica toma en serio el relato y busca en los recortes una clave que permita comprender el viaje.",
+      "audio": "qz011_o1_exp"
+    },
+    "qz011_o2": {
+      "text": "Considerá que la búsqueda se relaciona con el viaje en el tiempo, no con una tarea de clase. Elegí otra opción y volvé a enviar.",
+      "audio": "qz011_o2_exp"
+    },
+    "qz012_o0": {
+      "text": "Correcto. Federica combina confianza, escucha y una búsqueda razonada de pruebas.",
+      "audio": "qz012_o0_exp"
+    },
+    "qz012_o1": {
+      "text": "Considerá que su curiosidad por los gemelos no es la mejor prueba de apoyo a Javier. Elegí otra opción y volvé a enviar.",
+      "audio": "qz012_o1_exp"
+    },
+    "qz012_o2": {
+      "text": "Considerá que, aunque Federica considera distintas posibilidades, no lo descalifica ni lo abandona. Elegí otra opción y volvé a enviar.",
+      "audio": "qz012_o2_exp"
+    }
+  },
+  "qz013": {
+    "qz013_o0": {
+      "text": "Correcto. Los datos históricos que encuentra Federica no coinciden con el relato de la mujer del barco.",
+      "audio": "qz013_o0_exp"
+    },
+    "qz013_o1": {
+      "text": "Considerá que, aunque hay conspiraciones en la historia, esta mujer no está relacionada con ninguna. Elegí otra opción y volvé a enviar.",
+      "audio": "qz013_o1_exp"
+    },
+    "qz013_o2": {
+      "text": "Considerá que, aunque Josephine Baker fue una actriz famosa, esta mujer no es quien dice ser. Elegí otra opción y volvé a enviar.",
+      "audio": "qz013_o2_exp"
+    },
+    "qz014_o0": {
+      "text": "Considerá que las fotografías son útiles, pero no son la razón principal. Elegí otra opción y volvé a enviar.",
+      "audio": "qz014_o0_exp"
+    },
+    "qz014_o1": {
+      "text": "Correcto. Sin una forma segura de cargarlo, conservar la batería es esencial para recibir información desde 2030.",
+      "audio": "qz014_o1_exp"
+    },
+    "qz014_o2": {
+      "text": "Considerá que el capitán desconoce ese aparato y no puede cobrarle por su uso. Elegí otra opción y volvé a enviar.",
+      "audio": "qz014_o2_exp"
+    },
+    "qz015_o0": {
+      "text": "Correcto. La verificación de fuentes convierte una sospecha en información útil para actuar.",
+      "audio": "qz015_o0_exp"
+    },
+    "qz015_o1": {
+      "text": "Considerá que esa acción lo protege, pero no depende de una investigación histórica. Elegí otra opción y volvé a enviar.",
+      "audio": "qz015_o1_exp"
+    },
+    "qz015_o2": {
+      "text": "Considerá que contemplar el mar no aporta evidencia para resolver el conflicto. Elegí otra opción y volvé a enviar.",
+      "audio": "qz015_o2_exp"
+    }
+  },
+  "qz016": {
+    "qz016_o0": {
+      "text": "Correcto. El Rumano les transmite la advertencia y les pide que hablen con el capitán.",
+      "audio": "qz016_o0_exp"
+    },
+    "qz016_o1": {
+      "text": "Considerá que, aunque hay espías en la historia, esta advertencia no proviene de uno. Elegí otra opción y volvé a enviar.",
+      "audio": "qz016_o1_exp"
+    },
+    "qz016_o2": {
+      "text": "Considerá que la advertencia proviene de alguien conocido y confiable. Elegí otra opción y volvé a enviar.",
+      "audio": "qz016_o2_exp"
+    },
+    "qz017_o0": {
+      "text": "Correcto. El peligro es urgente y el capitán puede movilizar a la tripulación.",
+      "audio": "qz017_o0_exp"
+    },
+    "qz017_o1": {
+      "text": "Considerá que los jóvenes nunca pretenden dirigir el barco. Elegí otra opción y volvé a enviar.",
+      "audio": "qz017_o1_exp"
+    },
+    "qz017_o2": {
+      "text": "Considerá que los jóvenes actúan para evitar el crimen, no para ganar dinero. Elegí otra opción y volvé a enviar.",
+      "audio": "qz017_o2_exp"
+    },
+    "qz018_o0": {
+      "text": "Correcto. Las detenciones y la seguridad del rey confirman que el peligro era real.",
+      "audio": "qz018_o0_exp"
+    },
+    "qz018_o1": {
+      "text": "Considerá que la falta de batería aumenta la tensión, pero no prueba la conspiración. Elegí otra opción y volvé a enviar.",
+      "audio": "qz018_o1_exp"
+    },
+    "qz018_o2": {
+      "text": "Considerá que su miedo es comprensible, pero no constituye una prueba. Elegí otra opción y volvé a enviar.",
+      "audio": "qz018_o2_exp"
+    }
+  },
+  "qz019": {
+    "qz019_o0": {
+      "text": "Correcto. Federica elige el nombre Vanja y dice que tiene antepasados rusos.",
+      "audio": "qz019_o0_exp"
+    },
+    "qz019_o1": {
+      "text": "Considerá que, aunque Anastasia es un nombre ruso, Federica no lo utiliza en esta ocasión. Elegí otra opción y volvé a enviar.",
+      "audio": "qz019_o1_exp"
+    },
+    "qz019_o2": {
+      "text": "Considerá que Natalia es un nombre común, pero no es el que Federica utiliza para presentarse. Elegí otra opción y volvé a enviar.",
+      "audio": "qz019_o2_exp"
+    },
+    "qz020_o0": {
+      "text": "Correcto. La identidad inventada reduce el riesgo de que sus palabras y su procedencia despierten sospechas.",
+      "audio": "qz020_o0_exp"
+    },
+    "qz020_o1": {
+      "text": "Considerá que la representación no forma parte de un espectáculo. Elegí otra opción y volvé a enviar.",
+      "audio": "qz020_o1_exp"
+    },
+    "qz020_o2": {
+      "text": "Considerá que Federica no intenta comprar un pasaje. Elegí otra opción y volvé a enviar.",
+      "audio": "qz020_o2_exp"
+    },
+    "qz021_o0": {
+      "text": "Correcto. Federica debe controlar lo que dice y cómo actúa para parecer una joven de la época.",
+      "audio": "qz021_o0_exp"
+    },
+    "qz021_o1": {
+      "text": "Considerá que ninguno de los jóvenes conduce el barco. Elegí otra opción y volvé a enviar.",
+      "audio": "qz021_o1_exp"
+    },
+    "qz021_o2": {
+      "text": "Considerá que el desafío central no es conectarse a internet, sino ocultar que vienen del futuro. Elegí otra opción y volvé a enviar.",
+      "audio": "qz021_o2_exp"
+    }
+  },
+  "qz022": {
+    "qz022_o0": {
+      "text": "Correcto. Los jóvenes logran frustrar el plan y asegurar la seguridad del barco.",
+      "audio": "qz022_o0_exp"
+    },
+    "qz022_o1": {
+      "text": "Considerá que, aunque hay tensiones entre los pasajeros, no ocurre ningún motín. Elegí otra opción y volvé a enviar.",
+      "audio": "qz022_o1_exp"
+    },
+    "qz022_o2": {
+      "text": "Considerá que el sabotaje no es parte del peligro que enfrentan en esta ocasión. Elegí otra opción y volvé a enviar.",
+      "audio": "qz022_o2_exp"
+    },
+    "qz023_o0": {
+      "text": "Correcto. El miedo del Káiser ante las botellitas demuestra que sabe qué contienen.",
+      "audio": "qz023_o0_exp"
+    },
+    "qz023_o1": {
+      "text": "Considerá que los líquidos no son bebidas de celebración. Elegí otra opción y volvé a enviar.",
+      "audio": "qz023_o1_exp"
+    },
+    "qz023_o2": {
+      "text": "Considerá que el capitán sabe que forman parte de la conspiración. Elegí otra opción y volvé a enviar.",
+      "audio": "qz023_o2_exp"
+    },
+    "qz024_o0": {
+      "text": "Correcto. Cada participante aporta información, valentía o autoridad para detener a los conspiradores.",
+      "audio": "qz024_o0_exp"
+    },
+    "qz024_o1": {
+      "text": "Considerá que los responsables son descubiertos y detenidos mediante un plan. Elegí otra opción y volvé a enviar.",
+      "audio": "qz024_o1_exp"
+    },
+    "qz024_o2": {
+      "text": "Considerá que el resultado depende del trabajo en equipo. Elegí otra opción y volvé a enviar.",
+      "audio": "qz024_o2_exp"
+    }
+  },
+  "qz025": {
+    "qz025_o0": {
+      "text": "Correcto. Federica les deja su celular para que puedan comunicarse y un cable para cargarlo.",
+      "audio": "qz025_o0_exp"
+    },
+    "qz025_o1": {
+      "text": "Considerá que, aunque Federica podría haber dejado pistas, no les entrega un diario en esta ocasión. Elegí otra opción y volvé a enviar.",
+      "audio": "qz025_o1_exp"
+    },
+    "qz025_o2": {
+      "text": "Considerá que Federica no deja ningún mensaje escrito antes de despedirse. Elegí otra opción y volvé a enviar.",
+      "audio": "qz025_o2_exp"
+    },
+    "qz026_o0": {
+      "text": "Correcto. Cada pareja percibe las construcciones y los sonidos de su propia época.",
+      "audio": "qz026_o0_exp"
+    },
+    "qz026_o1": {
+      "text": "Considerá que la diferencia no se debe al clima. Elegí otra opción y volvé a enviar.",
+      "audio": "qz026_o1_exp"
+    },
+    "qz026_o2": {
+      "text": "Considerá que los gemelos llevan días viajando en el Conte Verde. Elegí otra opción y volvé a enviar.",
+      "audio": "qz026_o2_exp"
+    },
+    "qz027_o0": {
+      "text": "Correcto. La aventura crea un vínculo que supera la distancia temporal y cambia a los cuatro.",
+      "audio": "qz027_o0_exp"
+    },
+    "qz027_o1": {
+      "text": "Considerá que el valor principal está en los vínculos, el aprendizaje y la memoria compartida. Elegí otra opción y volvé a enviar.",
+      "audio": "qz027_o1_exp"
+    },
+    "qz027_o2": {
+      "text": "Considerá que Javier y Federica regresan con una comprensión más profunda de su presente. Elegí otra opción y volvé a enviar.",
+      "audio": "qz027_o2_exp"
+    }
+  }
+}

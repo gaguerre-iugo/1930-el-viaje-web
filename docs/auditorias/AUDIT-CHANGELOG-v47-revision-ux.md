@@ -3,6 +3,69 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 5 · La respuesta y la devolución ya no viajan en la página
+
+Antes: cada opción llevaba `data-explanation-id`, el banco `.quiz-explanation-bank`
+traía la devolución completa (la correcta empieza con «Correcto.») y el motor volvía
+a escribir `data-correct` en el DOM. Todo eso quedaba a la vista con «Inspeccionar».
+Se endureció:
+
+- **HTML limpio**: se quitaron el banco de devoluciones y los atributos
+  `data-explanation-id` de los 8 archivos de actividad. Servido `qz010.html`:
+  0 `data-correct`, 0 banco, 0 «Correcto.».
+- **Clave hasheada**: `content/i18n/es-UY/quiz-answers.json` pasó a
+  `{ version: 2, quizzes: { <actividad>: [<hash>] } }` (FNV-1a por opción). El motor
+  resuelve la corrección **en memoria** (`__adtReflowQuizOptionIsCorrect`), sin
+  escribir `data-correct` en el DOM.
+- **Devolución al enviar**: vive en `content/i18n/es-UY/quiz-feedback.json` y el
+  motor la pide recién al enviar (`__adtReflowQuizFeedbackFor`); antes de responder
+  no hay ningún texto de devolución en el DOM.
+- Generado con `tools/harden_quiz_answers.py` (nuevo), que también reescribe el HTML.
+
+**Verificación**: `verify-quiz-answers.mjs` (rehecha) comprueba HTML limpio, hashes,
+que el motor coincide con el archivo (72 opciones), que no hay devolución antes de
+responder y que aparece al enviar. `verify-quiz-contrast`, `verify-quiz-retry`,
+`verify-quiz-next-question`, `verify-quiz-feedback-fit` y `verify-quiz-option-fit`
+en verde.
+
+**Salvedad**: en un libro offline esto es disuasión, no seguridad: los archivos se
+pueden leer. Lo que se evita es que la respuesta y la devolución viajen en la página
+de la lección.
+
+Caché: `reflow-book.js?v=191-quiz-sin-clave` y `quiz-sequence.js?v=7-quiz-sin-clave`;
+precargador offline regenerado (ahora incluye `quiz-feedback.json`).
+
+## Punto 25 · Pop-up de voz completo (margen derecho, minimizar, Esc, opciones)
+
+El traspaso daba el punto por cerrado apoyándose en la «PARTE 1/2» (quitar carril +
+evitación), pero el requerimiento pedía más y el reproductor seguía siendo una barra
+centrada, siempre del mismo tamaño. Se completó:
+
+- **Ancha (≥1024)**: el pop-up va en el **margen derecho**, fuera de la medida de
+  lectura (42 rem), así no tapa el texto. Antes estaba centrado (un ajuste posterior
+  lo había centrado a pedido; se volvió a lo que pide el punto).
+- **Angosta (<1024)**: **pastilla compacta** centrada sobre la barra con
+  Reproducir/Pausa, Opciones, Minimizar y Cerrar (las flechas de audio quedan sólo en
+  ancha).
+- **Minimizar**: a un **botón redondo de 48 px**; **Esc** minimiza (salvo panel o
+  diálogo abierto) y la **barra espaciadora** alterna Reproducir/Pausa cuando el foco
+  no está en un control. `aria-pressed` ya estaba.
+- **Opciones dentro del pop-up**: despliega **Voz del narrador** (Valentina/Mateo) y
+  **Velocidad** (Lenta/Normal/Rápida/Muy rápida) reutilizando los controles del motor
+  (`[data-reflow-tts-voice]`, `[data-reflow-tts-speed]`, con su manejador delegado).
+- **No tapa la oración**: cuando el resaltado entra en la banda del pop-up, el pop-up
+  ahora **se minimiza solo** (antes se corría arriba, contra el pedido); al salir de
+  la franja, se restaura.
+- **El foco no salta** al pop-up al aparecer (se quitó el `focus()` que lo movía).
+
+Medido: a 1366 el pop-up queda en x=1056–1350 (borde de texto 704) y a 620 es una
+pastilla centrada de 192 px; minimizado mide 48×48. `verify-floating-player.mjs`
+(rehecha), `verify-tts-avoidance.mjs`, `verify-tts-avoidance-real.mjs` y
+`verify-ui-icons.mjs` en verde.
+
+Caché: `reflow.css?v=164-tts-popup` y `reflow-book.js?v=190-tts-popup`; precargador
+offline regenerado.
+
 ## Devolución de qz012 (opción 2): sujeto explícito «Federica»
 
 La devolución de `qz012_o2_exp` decía «Considerá que, aunque considera distintas

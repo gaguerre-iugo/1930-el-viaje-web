@@ -68,9 +68,11 @@ const responder = (SECUENCIA, indicePanel, quiereCorrecta) =>
       const paneles = [...seccion.querySelectorAll(".quiz-panel")];
       const panel = paneles[indicePanel];
       const opciones = [...panel.querySelectorAll(".quiz-option")];
-      const elegida = opciones.find(
-        (opcion) => (opcion.dataset.correct === "true") === quiereCorrecta
-      );
+      const esCorrecta = (opcion) =>
+        Boolean(window.__adtReflowQuizOptionIsCorrect
+          ? window.__adtReflowQuizOptionIsCorrect(opcion)
+          : opcion.dataset.correct === "true");
+      const elegida = opciones.find((opcion) => esCorrecta(opcion) === quiereCorrecta);
       const entrada = elegida.querySelector('input[type="radio"]');
       entrada.click();
       const envio = panel.querySelector("button.quiz-submit");

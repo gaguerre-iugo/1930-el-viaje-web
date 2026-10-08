@@ -58,9 +58,13 @@ Detalle de esta sesión en el changelog, sección **«Bloqueante cerrado · “S
 pregunta” volvía a mostrar la misma pregunta»**.
 
 Cambios posteriores (ya en `master`): la definición del glosario se cierra al cambiar
-de página, y la devolución ya no se encoge (en pantallas bajas el fondo no acompañaba
-al texto); además, la devolución `qz012_o2_exp` ahora nombra a **Federica** y su audio
-se regeneró en las dos voces. Detalle en el changelog.
+de página; la devolución ya no se encoge (en pantallas bajas el fondo no acompañaba
+al texto); la devolución `qz012_o2_exp` ahora nombra a **Federica** y su audio se
+regeneró en las dos voces; el chat de pg095 quedó centrado; el **punto 25 se
+rehízo** (pop-up en el margen derecho en ancha, pastilla + minimizar + Esc + opciones
+dentro del pop-up en angosta, y la oración se evita minimizando el pop-up); y el
+**punto 5 se endureció** (la respuesta y la devolución ya no viajan en la página).
+Detalle en el changelog.
 
 ## Estado real de los 25 puntos
 
@@ -74,7 +78,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 2 | Caracteres rotos en el glosario | Cerrado | commit `cb50d205`; `audit_charset.py` |
 | 3 | Jerarquía de la barra (flechas 56 px, íconos de EVA, 40 % deshabilitado) | Cerrado | `verify-primary-toolbar.mjs` (8 anchos) |
 | 4 | Contador por capítulo en vez de «14 / 395» | Cerrado | `verify-chapter-progress.mjs` |
-| 5 | Sacar la clave de corrección del HTML | Cerrado | `extract_quiz_answers.py --check` |
+| 5 | Sacar la clave de corrección del HTML | Cerrado (endurecido) | Sin `data-correct` en el DOM ni devolución en la página; clave hasheada en memoria y devolución al enviar (`verify-quiz-answers.mjs`) |
 | 6 | Panel demasiado largo | Cerrado | commit `fd86dd23`; `verify-tools-panel.mjs` |
 | 7 | Voseo en toda la interfaz + inventario | Cerrado | `inventory_interface_texts.py --check` |
 | 8 | Atajos fuera del panel (ayuda como diálogo) | Cerrado | commit `fd86dd23` |
@@ -94,7 +98,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 22 | Ocultar el enlace «Saltar al contenido» y la línea de apertura | Cerrado | `verify-opening.mjs` |
 | 23 | Dobles espacios y saltos sueltos | Cerrado, **con salvedad** | `audit_typo.py` bajó de 45 a **1** coincidencia; la que queda es de **contenido** («???» en `pg176177_n0009`), decisión editorial |
 | 24 | Jerarquía tipográfica N1–N4, íconos 24 px | Cerrado | `verify-ui-typography.mjs` |
-| 25 | Pop-up de voz flotante, sin carril | Cerrado | La evitación se midió **en lectura real**: se encontró que el resaltado de la Custom Highlight API no ponía la clase que la regla buscaba, y se corrigió (`verify-tts-avoidance-real.mjs`) |
+| 25 | Pop-up de voz flotante, sin carril | Cerrado (rehecho) | Margen derecho en ancha; pastilla + minimizar + Esc + opciones dentro del pop-up; la oración se evita **minimizando** el pop-up (`verify-floating-player.mjs`, `verify-tts-avoidance*.mjs`) |
 
 **Resumen**: 25 puntos atendidos. Quedan **1 decisión del cliente** (punto 20, 20 px
 vs 18 px), **1 verificación a medias** (los 3 íconos generados del punto 19, que
@@ -275,9 +279,9 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=162-feedback-sin-encoger`,
-  `reflow-book.js?v=189-glosario-cierra` y
-  `quiz-sequence.js?v=6-siguiente-pagina`.
+  vieja. Valores actuales: `reflow.css?v=164-tts-popup`,
+  `reflow-book.js?v=191-quiz-sin-clave` y
+  `quiz-sequence.js?v=7-quiz-sin-clave`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
   DSH bloquea (`spawn EPERM`). Las pruebas corren con acceso pleno.

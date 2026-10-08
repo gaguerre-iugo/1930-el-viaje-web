@@ -61,14 +61,20 @@ async function medir(posicion) {
 
     const cajaBloque = objetivo.getBoundingClientRect();
     const cajaPlayer = player.getBoundingClientRect();
-    const seCruzan = cajaBloque.bottom > cajaPlayer.top && cajaBloque.top < cajaPlayer.bottom;
+    /* Intersección real (2D): el pop-up puede estar al costado y no superponerse
+       aunque se cruce en vertical. */
+    const seCruzan =
+      cajaBloque.bottom > cajaPlayer.top &&
+      cajaBloque.top < cajaPlayer.bottom &&
+      cajaBloque.right > cajaPlayer.left &&
+      cajaBloque.left < cajaPlayer.right;
     return {
       posicion,
       bloque: { top: Math.round(cajaBloque.top), bottom: Math.round(cajaBloque.bottom) },
       player: {
         top: Math.round(cajaPlayer.top),
         bottom: Math.round(cajaPlayer.bottom),
-        arriba: player.classList.contains("reflow-tts-player-top"),
+        minimizado: player.classList.contains("reflow-tts-player-minimized"),
       },
       seCruzan,
       altoVentana: alto,
@@ -92,8 +98,8 @@ for (const posicion of ["abajo", "arriba"]) {
   if (datos.seCruzan) {
     fallar(`${posicion}: el reproductor se superpone con el bloque en lectura`);
   }
-  if (posicion === "abajo" && !datos.player.arriba) {
-    fallar("con el bloque en la banda de abajo, el reproductor no se corrió arriba");
+  if (posicion === "abajo" && !datos.player.minimizado) {
+    fallar("con el bloque en la banda de abajo, el reproductor no se minimizó");
   }
 }
 
@@ -103,7 +109,7 @@ if (errores.length) fallar(`errores de consola: ${errores[0]}`);
 console.log(
   fallas.length
     ? `FALLAS:\n - ${fallas.join("\n - ")}`
-    : "OK: el reproductor se corre y no tapa el bloque en lectura"
+    : "OK: el reproductor se minimiza y no tapa el bloque en lectura"
 );
 await browser.close();
 process.exit(fallas.length ? 1 : 0);

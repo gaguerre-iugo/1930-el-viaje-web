@@ -100,6 +100,7 @@ DEFAULT_GLOBS: tuple[str, ...] = (
     "content/navigation/nav.html",
     "content/i18n/es-UY/glossary.json",
     "content/i18n/es-UY/texts.json",
+    "content/i18n/es-UY/quiz-feedback.json",
     "content/i18n/es-UY/audios.json",
     "content/i18n/es-UY/speech_texts.json",
     "content/i18n/es-UY/images.json",

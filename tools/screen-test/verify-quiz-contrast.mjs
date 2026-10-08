@@ -153,7 +153,9 @@ const MEDIR = (PANEL) => {
       n: indice,
       texto: (texto && texto.textContent ? texto.textContent : "").replace(/\s+/g, " ").trim().slice(0, 40),
       clases: (fila.className || "").toString(),
-      correcta: fila.dataset.correct === "true",
+      correcta: window.__adtReflowQuizOptionIsCorrect
+        ? window.__adtReflowQuizOptionIsCorrect(fila)
+        : fila.dataset.correct === "true",
       textoMedido: describir(texto),
       borde: {
         color: rgbTxt(componer(borde, fondoFila)),
@@ -214,7 +216,11 @@ const responder = async (PANEL, correcta) => {
       const panel = document.querySelector('[data-quiz-id="' + PANEL + '"]');
       if (!panel) return { ok: false, motivo: "sin panel" };
       const opciones = [...panel.querySelectorAll(".quiz-option")];
-      const elegida = opciones.find((o) => (o.dataset.correct === "true") === correcta);
+      const esCorrecta = (o) =>
+        Boolean(window.__adtReflowQuizOptionIsCorrect
+          ? window.__adtReflowQuizOptionIsCorrect(o)
+          : o.dataset.correct === "true");
+      const elegida = opciones.find((o) => esCorrecta(o) === correcta);
       if (!elegida) return { ok: false, motivo: "sin opción " + (correcta ? "correcta" : "incorrecta") };
       const input = elegida.querySelector('input[type="radio"]');
       if (input) input.click();
@@ -232,14 +238,16 @@ const responder = async (PANEL, correcta) => {
   );
 };
 
-const esperarDataset = async (PANEL) => {
-  for (let i = 0; i < 20; i += 1) {
+const esperarClave = async (PANEL) => {
+  for (let i = 0; i < 30; i += 1) {
     const listo = await page.evaluate(
       (PANEL) => {
+        const api = window.__adtReflowQuizOptionIsCorrect;
         const panel = document.querySelector('[data-quiz-id="' + PANEL + '"]');
-        if (!panel) return false;
-        const conClave = [...panel.querySelectorAll(".quiz-option")].some((o) => o.dataset.correct !== undefined);
-        return conClave;
+        if (typeof api !== "function" || !panel) return false;
+        const opciones = [...panel.querySelectorAll(".quiz-option")];
+        /* La clave se resuelve en memoria: `data-correct` ya no va al DOM. */
+        return opciones.length > 0 && opciones.every((o) => api(o) !== null);
       },
       PANEL
     );
@@ -272,7 +280,7 @@ for (const seccion of secciones) {
     fail(seccion + ": sin panel de cuestionario");
     continue;
   }
-  await esperarDataset(panelId);
+  await esperarClave(panelId);
   console.log("\n=== " + seccion + " · panel " + panelId + (enPagina ? "" : " (no se pudo centrar)") + " ===");
 
   const normal = await page.evaluate(MEDIR, panelId);

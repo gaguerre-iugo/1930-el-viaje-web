@@ -99,6 +99,7 @@ def claves_a_inlinear() -> list[tuple[str, Path]]:
             "glossary.json",
             "images.json",
             "quiz-answers.json",
+            "quiz-feedback.json",
             "speech_texts.json",
             "texts.json",
             "videos.json",

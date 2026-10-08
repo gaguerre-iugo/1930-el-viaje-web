@@ -1,90 +1,45 @@
 {
-  "quiz_final": {
-    "qz001_o0": true,
-    "qz001_o1": false,
-    "qz001_o2": false,
-    "qz002_o0": true,
-    "qz002_o1": false,
-    "qz002_o2": false,
-    "qz003_o0": true,
-    "qz003_o1": false,
-    "qz003_o2": false
-  },
-  "qz007": {
-    "qz007_o0": false,
-    "qz007_o1": true,
-    "qz007_o2": false,
-    "qz008_o0": false,
-    "qz008_o1": true,
-    "qz008_o2": false,
-    "qz009_o0": false,
-    "qz009_o1": false,
-    "qz009_o2": true
-  },
-  "qz010": {
-    "qz010_o0": false,
-    "qz010_o1": true,
-    "qz010_o2": false,
-    "qz011_o0": false,
-    "qz011_o1": true,
-    "qz011_o2": false,
-    "qz012_o0": true,
-    "qz012_o1": false,
-    "qz012_o2": false
-  },
-  "qz013": {
-    "qz013_o0": true,
-    "qz013_o1": false,
-    "qz013_o2": false,
-    "qz014_o0": false,
-    "qz014_o1": true,
-    "qz014_o2": false,
-    "qz015_o0": true,
-    "qz015_o1": false,
-    "qz015_o2": false
-  },
-  "qz016": {
-    "qz016_o0": true,
-    "qz016_o1": false,
-    "qz016_o2": false,
-    "qz017_o0": true,
-    "qz017_o1": false,
-    "qz017_o2": false,
-    "qz018_o0": true,
-    "qz018_o1": false,
-    "qz018_o2": false
-  },
-  "qz019": {
-    "qz019_o0": true,
-    "qz019_o1": false,
-    "qz019_o2": false,
-    "qz020_o0": true,
-    "qz020_o1": false,
-    "qz020_o2": false,
-    "qz021_o0": true,
-    "qz021_o1": false,
-    "qz021_o2": false
-  },
-  "qz022": {
-    "qz022_o0": true,
-    "qz022_o1": false,
-    "qz022_o2": false,
-    "qz023_o0": true,
-    "qz023_o1": false,
-    "qz023_o2": false,
-    "qz024_o0": true,
-    "qz024_o1": false,
-    "qz024_o2": false
-  },
-  "qz025": {
-    "qz025_o0": true,
-    "qz025_o1": false,
-    "qz025_o2": false,
-    "qz026_o0": true,
-    "qz026_o1": false,
-    "qz026_o2": false,
-    "qz027_o0": true,
-    "qz027_o1": false,
-    "qz027_o2": false
+  "version": 2,
+  "quizzes": {
+    "quiz_final": [
+      "741d763b",
+      "7998e6ec",
+      "b3684c6a"
+    ],
+    "qz007": [
+      "24134fca",
+      "254113e1",
+      "a909ee42"
+    ],
+    "qz010": [
+      "2de8d14d",
+      "727acffc",
+      "b1155678"
+    ],
+    "qz013": [
+      "09a168ef",
+      "c40f68ad",
+      "cd0543f1"
+    ],
+    "qz016": [
+      "8f6bc200",
+      "f04dd3d2",
+      "fc77c6d1"
+    ],
+    "qz019": [
+      "3d59a643",
+      "80e28a92",
+      "b4a1a803"
+    ],
+    "qz022": [
+      "1a33daa5",
+      "59ce62b4",
+      "8d0b0207"
+    ],
+    "qz025": [
+      "1ffefd36",
+      "4d20c818",
+      "52ebeaa9"
+    ]
   }
 }

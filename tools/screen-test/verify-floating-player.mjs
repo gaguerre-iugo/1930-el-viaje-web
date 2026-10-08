@@ -1,6 +1,10 @@
-// Verifica el pop-up de voz flotante (revisión UX, punto 25, parte 1):
-// que no reserve carril, que flote apoyado en la barra, que quede centrado como
-// la barra en pantallas anchas y que en angostas sea una pastilla de íconos.
+// Verifica el pop-up de voz flotante (revisión UX, punto 25):
+//  - que no reserve carril (la reserva es la barra);
+//  - que en pantalla ancha (≥1024) vaya en el MARGEN DERECHO, fuera de la medida
+//    de lectura, con todos los controles;
+//  - que en angosta sea una pastilla compacta centrada con Reproducir/Pausa,
+//    Opciones, Minimizar y Cerrar;
+//  - que se pueda minimizar a un botón redondo de 48 px.
 //
 // Uso:
 //   node verify-floating-player.mjs
@@ -19,7 +23,7 @@ const fallar = (mensaje) => fallas.push(mensaje);
 
 const browser = await chromium.launch();
 
-/** Muestra y mide el reproductor en un ancho dado. */
+/** Muestra el reproductor, lo mide expandido y luego minimizado. */
 async function medirEn(ancho, alto) {
   const page = await browser.newPage({ viewport: { width: ancho, height: alto } });
   const errores = [];
@@ -39,12 +43,13 @@ async function medirEn(ancho, alto) {
     }
     const cajaBarra = barra.getBoundingClientRect();
     const caja = player.getBoundingClientRect();
-    const etiqueta = player.querySelector(".reflow-tts-player-label");
-    const estiloEtiqueta = etiqueta ? getComputedStyle(etiqueta) : null;
-    const estiloPlayer = getComputedStyle(player);
+    const medida = parseFloat(estiloRaiz.getPropertyValue("--reflow-text-measure")) || 672;
+    const visibles = (sel) =>
+      [...player.querySelectorAll(sel)].filter((n) => n.getClientRects().length);
     return {
       reserva: estiloRaiz.getPropertyValue("--reflow-toolbar-reserve").trim(),
       altoBarra: Math.round(cajaBarra.height),
+      bordeTextoDerecho: Math.round((window.innerWidth + medida) / 2),
       player: {
         x: Math.round(caja.x),
         ancho: Math.round(caja.width),
@@ -52,67 +57,96 @@ async function medirEn(ancho, alto) {
         arriba: Math.round(caja.bottom),
         barraArriba: Math.round(cajaBarra.top),
         derecha: Math.round(window.innerWidth - caja.right),
-        etiquetaVisible: estiloEtiqueta ? estiloEtiqueta.position !== "absolute" : null,
-        columnas: estiloPlayer.gridTemplateColumns,
       },
+      botones: visibles(".reflow-tts-player-main button").map((b) =>
+        b.id.replace("reflow-tts-", "")
+      ),
     };
   });
   await page.screenshot({ path: `tmp/popup-${ancho}.png` });
+  const min = await page.evaluate(() => {
+    const player = document.getElementById("reflow-tts-player");
+    /* El motor vuelve a ocultarlo en su ciclo: se re-muestra y se mide en el
+       mismo paso, así la medición no queda condicionada por ese ciclo. */
+    player.hidden = false;
+    player.setAttribute("aria-hidden", "false");
+    const btn = document.getElementById("reflow-tts-minimize");
+    if (btn) btn.click();
+    const caja = player.getBoundingClientRect();
+    return {
+      clase: player.classList.contains("reflow-tts-player-minimized"),
+      w: Math.round(caja.width),
+      h: Math.round(caja.height),
+      fabVisible: document.getElementById("reflow-tts-fab").getClientRects().length > 0,
+    };
+  });
   await page.close();
-  return { ...datos, errores };
+  return { ...datos, min, errores };
 }
 
 console.log("=== Reproductor de voz flotante (punto 25) ===");
 for (const [ancho, alto, etiqueta] of [
   [1366, 900, "ancha"],
   [1024, 800, "media"],
-  [420, 860, "angosta"],
+  [620, 800, "angosta"],
 ]) {
-  const datos = await medirEn(ancho, alto);
+  const d = await medirEn(ancho, alto);
   console.log(`\n${etiqueta} ${ancho}×${alto}:`);
-  console.log(`  reserva (--reflow-toolbar-reserve): ${datos.reserva} · barra ${datos.altoBarra} px`);
-  console.log(`  reproductor: ${JSON.stringify(datos.player)}`);
+  console.log(`  reserva (--reflow-toolbar-reserve): ${d.reserva} · barra ${d.altoBarra} px`);
+  console.log(`  pop-up: ${JSON.stringify(d.player)} · botones ${JSON.stringify(d.botones)}`);
+  console.log(`  minimizado: ${JSON.stringify(d.min)}`);
 
   /* 1 · la reserva es la barra, sin carril del reproductor */
-  const reserva = parseFloat(datos.reserva) || 0;
-  if (reserva > datos.altoBarra + 8) {
-    fallar(`${etiqueta}: la reserva (${datos.reserva}) supera la barra (${datos.altoBarra} px): sigue el carril`);
+  const reserva = parseFloat(d.reserva) || 0;
+  if (reserva > d.altoBarra + 8) {
+    fallar(`${etiqueta}: la reserva (${d.reserva}) supera la barra (${d.altoBarra} px): sigue el carril`);
   }
   /* 2 · flota apoyado en la barra (sin hueco ni superposición) */
-  const separacion = datos.player.barraArriba - datos.player.arriba;
+  const separacion = d.player.barraArriba - d.player.arriba;
   if (separacion < 0 || separacion > 24) {
-    fallar(`${etiqueta}: el reproductor no se apoya en la barra (separación ${separacion} px)`);
+    fallar(`${etiqueta}: el pop-up no se apoya en la barra (separación ${separacion} px)`);
   }
   /* 3 · forma según el ancho */
   if (ancho >= 1024) {
-    const centro = datos.player.x + datos.player.ancho / 2;
-    if (Math.abs(centro - ancho / 2) > 3) {
-      fallar(`${etiqueta}: el reproductor no está centrado (centro ${Math.round(centro)} de ${ancho})`);
+    if (d.player.x < d.bordeTextoDerecho - 1) {
+      fallar(`${etiqueta}: el pop-up invade la medida de lectura (x ${d.player.x} < ${d.bordeTextoDerecho})`);
     }
-    if (!datos.player.etiquetaVisible) {
-      fallar(`${etiqueta}: las etiquetas del reproductor deberían verse`);
+    if (d.player.derecha < 4 || d.player.derecha > 40) {
+      fallar(`${etiqueta}: margen derecho inesperado (${d.player.derecha} px)`);
+    }
+    for (const id of ["previous", "toggle", "next", "options", "minimize", "stop"]) {
+      if (!d.botones.includes(id)) fallar(`${etiqueta}: falta el control ${id}`);
     }
   } else {
-    /* Pastilla: centrada, más angosta que el viewport y sin etiquetas visibles. */
-    const centro = datos.player.x + datos.player.ancho / 2;
+    const centro = d.player.x + d.player.ancho / 2;
     if (Math.abs(centro - ancho / 2) > 6) {
       fallar(`${etiqueta}: la pastilla no está centrada (centro ${Math.round(centro)} de ${ancho})`);
     }
-    if (datos.player.ancho > ancho - 8) {
-      fallar(`${etiqueta}: la pastilla ocupa todo el ancho (${datos.player.ancho})`);
+    if (d.player.ancho > ancho - 8) {
+      fallar(`${etiqueta}: la pastilla ocupa todo el ancho (${d.player.ancho})`);
     }
-    if (datos.player.etiquetaVisible) {
-      fallar(`${etiqueta}: las etiquetas deberían quedar sólo para lectores de pantalla`);
+    for (const id of ["toggle", "options", "minimize", "stop"]) {
+      if (!d.botones.includes(id)) fallar(`${etiqueta}: falta el control ${id}`);
+    }
+    if (d.botones.includes("previous") || d.botones.includes("next")) {
+      fallar(`${etiqueta}: la pastilla angosta no debería llevar las flechas de audio`);
     }
   }
-  if (datos.errores.length) fallar(`${etiqueta}: errores de consola: ${datos.errores[0]}`);
+  /* 4 · se minimiza a un botón redondo de 48 px */
+  if (!d.min.clase || !d.min.fabVisible) {
+    fallar(`${etiqueta}: no se minimiza a un botón redondo`);
+  }
+  if (Math.abs(d.min.w - 48) > 3 || Math.abs(d.min.h - 48) > 3) {
+    fallar(`${etiqueta}: el botón minimizado no mide 48 px (${d.min.w}×${d.min.h})`);
+  }
+  if (d.errores.length) fallar(`${etiqueta}: errores de consola: ${d.errores[0]}`);
 }
 
 console.log(
   `\nURL: ${target}\n` +
     (fallas.length
       ? `FALLAS:\n - ${fallas.join("\n - ")}`
-      : "OK: el reproductor flota sin carril, centrado en ancha y pastilla en angosta")
+      : "OK: el pop-up flota sin carril, en el margen derecho en ancha, pastilla en angosta, y se minimiza a 48 px")
 );
 await browser.close();
 process.exit(fallas.length ? 1 : 0);

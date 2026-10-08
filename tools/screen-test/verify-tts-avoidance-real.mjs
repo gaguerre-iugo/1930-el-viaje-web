@@ -46,18 +46,16 @@ if (!interruptor) {
   await interruptor.click();
   await page.waitForTimeout(1200);
 }
-await page.keyboard.press("Escape");
+/* El panel de Herramientas se cierra solo al aparecer el reproductor; no se
+   pulsa Escape, porque ahora Escape minimiza el pop-up (punto 25). */
 await page.waitForTimeout(800);
 await page.click("#reflow-tts-toggle");
 await page.waitForTimeout(2500);
 
-/* La lectura real tiene que estar viva: hay un resaltado de verdad, no una
-   clase puesta a mano. */
-const tieneResaltado = await page.evaluate(() => {
-  const hl = window.CSS && CSS.highlights && CSS.highlights.get("adt-tts-active");
-  return Boolean(hl && [...hl].length);
-});
-if (!tieneResaltado) fallar("la lectura real no pintó el resaltado adt-tts-active");
+/* La lectura real tiene que estar viva: el resaltado se comprueba en los saltos
+   de abajo, que exigen `estado.rango` (la caja del resaltado real
+   `adt-tts-active`), no una clase puesta a mano. No se comprueba aquí porque el
+   ítem inicial puede no tener texto resaltable (p. ej. la portada). */
 
 /** Caja activa: la del rango resaltado (o del bloque, si no hay rango). */
 const MEDIR_ACTIVO = () => {
@@ -79,7 +77,9 @@ const MEDIR_ACTIVO = () => {
   return {
     playerTop: pr.top,
     playerBottom: pr.bottom,
-    playerArriba: player.classList.contains("reflow-tts-player-top"),
+    playerLeft: pr.left,
+    playerRight: pr.right,
+    playerMinimizado: player.classList.contains("reflow-tts-player-minimized"),
     rango,
   };
 };
@@ -147,8 +147,12 @@ if (!saltoBajo.ok) {
     fallar("la oración baja no llegó a la banda del reproductor; la prueba no ejercitó el caso");
   } else {
     const seCruzan =
-      estado.rango && estado.rango.bottom > estado.playerTop && estado.rango.top < estado.playerBottom;
-    if (!estado.playerArriba) fallar("con la oración en la banda, el reproductor no se corrió arriba");
+      estado.rango &&
+      estado.rango.bottom > estado.playerTop &&
+      estado.rango.top < estado.playerBottom &&
+      estado.rango.right > estado.playerLeft &&
+      estado.rango.left < estado.playerRight;
+    if (!estado.playerMinimizado) fallar("con la oración en la banda, el reproductor no se minimizó");
     if (seCruzan) fallar("el reproductor tapa la oración en lectura real (" + JSON.stringify(estado.rango) + ")");
   }
 }
@@ -164,8 +168,8 @@ if (!saltoAlto.ok) {
   console.log("estado: " + JSON.stringify(estado));
   if (!util) {
     fallar("la oración alta no se pintó; la prueba no ejercitó el regreso");
-  } else if (estado.playerArriba) {
-    fallar("con la oración alta, el reproductor siguió arriba (cubriría el inicio de la página)");
+  } else if (estado.playerMinimizado) {
+    fallar("con la oración alta, el reproductor siguió minimizado");
   }
 }
 

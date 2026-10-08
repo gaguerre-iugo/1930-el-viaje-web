@@ -76,7 +76,11 @@ async function medir(combinacion) {
     if (!seccion) return;
     const panel = seccion.querySelector(".quiz-panel");
     const opciones = [...panel.querySelectorAll(".quiz-option")];
-    const incorrecta = opciones.find((opcion) => opcion.dataset.correct !== "true");
+    const esCorrecta = (opcion) =>
+      Boolean(window.__adtReflowQuizOptionIsCorrect
+        ? window.__adtReflowQuizOptionIsCorrect(opcion)
+        : opcion.dataset.correct === "true");
+    const incorrecta = opciones.find((opcion) => !esCorrecta(opcion));
     if (incorrecta) incorrecta.querySelector('input[type="radio"]')?.click();
     const envio = panel.querySelector("button.quiz-submit");
     if (envio) {

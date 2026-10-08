@@ -1455,29 +1455,22 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
   display: none;
 }
 
-/* Read-aloud is a persistent session rather than a primary navigation action.
-   Its compact player stays immediately above the permanent book toolbar and
-   reserves its own height so it cannot cover text or keyboard focus. */
+/* Read-aloud es una sesión persistente, no una acción de navegación primaria.
+   Punto 25: es un pop-up flotante que NO reserva carril. En pantalla ancha va
+   en el MARGEN DERECHO (fuera de la medida de lectura, 42rem) para no tapar el
+   texto; en angosta es una pastilla compacta centrada sobre la barra. */
 #reflow-tts-player {
   position: fixed;
   z-index: 65;
-  /* Punto 25: flota sobre el contenido, apoyado en la barra y centrado como
-     ella. En angostas pasa a pastilla compacta. */
-  left: 50%;
-  right: auto;
-  transform: translateX(-50%);
+  right: 1rem;
+  left: auto;
   bottom: calc(var(--reflow-primary-toolbar-height, 4rem) + .5rem);
-  display: grid;
-  grid-template-columns:
-    minmax(6rem, auto)
-    minmax(8.5rem, 1fr)
-    minmax(6rem, auto)
-    minmax(8.5rem, auto)
-    minmax(6rem, auto);
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: var(--ceibal-space-1);
-  width: min(calc(100vw - 1rem), 44rem);
-  min-height: 3.5rem;
+  width: auto;
+  max-width: calc((100vw - var(--reflow-text-measure, 42rem)) / 2 - 1rem);
   padding: var(--ceibal-space-1);
   border: var(--ceibal-border-default) solid var(--ui-border);
   border-radius: var(--ceibal-radius-lg);
@@ -1490,15 +1483,24 @@ body.reflow-book #reflow-pagination .reflow-toolbar-primary {
   display: none;
 }
 
+#reflow-tts-player .reflow-tts-player-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ceibal-space-1);
+  max-width: 100%;
+}
+
 #reflow-tts-player button {
   display: inline-flex;
-  width: 100%;
-  min-width: 0;
-  min-height: 2.875rem;
+  width: auto;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   align-items: center;
   justify-content: center;
   gap: var(--ceibal-space-2);
-  padding: var(--ceibal-space-3) var(--ceibal-space-4);
+  padding: var(--ceibal-space-2);
   border: var(--ceibal-border-default) solid transparent;
   border-radius: var(--ceibal-radius-md);
   color: var(--ui-text);
@@ -1553,8 +1555,15 @@ body.reflow-book #reflow-tts-player button:disabled {
 }
 
 #reflow-tts-player .reflow-tts-player-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Keep the component-base dock mounted as a state and panel bridge. Its
@@ -1635,30 +1644,6 @@ body.reflow-book .reflow-upstream-dock {
 
   #reflow-page-status {
     min-width: 3.75rem;
-  }
-  #reflow-tts-player {
-    grid-template-columns: repeat(5, minmax(2.75rem, 1fr));
-    gap: .125rem;
-    width: calc(100vw - .75rem);
-    min-height: 3.375rem;
-    padding: .25rem;
-  }
-
-  #reflow-tts-player button {
-    min-height: 2.75rem;
-    padding: .25rem;
-  }
-
-  #reflow-tts-player .reflow-tts-player-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
 }
 
@@ -6806,50 +6791,107 @@ body.reflow-book .reflow-reader-panel .reflow-setting-description {
 }
 
 /* ==========================================================================
-   Punto 25 · Reproductor de voz flotante
+   Punto 25 · Reproductor de voz flotante (pop-up)
    --------------------------------------------------------------------------
-   Flota sobre el contenido, apoyado en la barra, sin carril fijo: el texto ya no
-   se encoge para dejarle lugar (la reserva es sólo la barra). En pantallas anchas
-   se ancla a la derecha con margen; en angostas es una pastilla compacta de sólo
-   íconos, centrada sobre la barra.
+   Flota sobre el contenido, sin carril fijo: la reserva es sólo la barra. En
+   pantalla ancha ya está anclado al margen derecho (regla base, fuera de la
+   medida de lectura). En angosta es una pastilla compacta centrada sobre la
+   barra, con Reproducir/Pausa, Opciones, Minimizar y Cerrar; se puede minimizar
+   a un botón redondo de 48 px.
    ========================================================================== */
-@media (max-width: 47.999rem) {
+@media (max-width: 63.999rem) {
   body.reflow-book #reflow-tts-player {
     right: auto;
     left: 50%;
     transform: translateX(-50%);
+    align-items: center;
     width: auto;
     max-width: calc(100vw - 1rem);
-    grid-template-columns: repeat(5, auto);
-    gap: .25rem;
     padding: .25rem;
   }
-
-  body.reflow-book #reflow-tts-player .reflow-tts-player-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+  body.reflow-book #reflow-tts-player .reflow-tts-player-main {
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: .125rem;
   }
-
+  /* La pastilla angosta no lleva las flechas de audio: quedan Reproducir/Pausa,
+     Opciones, Minimizar y Cerrar (punto 25). */
+  body.reflow-book #reflow-tts-player #reflow-tts-previous,
+  body.reflow-book #reflow-tts-player #reflow-tts-next {
+    display: none !important;
+  }
   body.reflow-book #reflow-tts-player button {
-    min-width: 2.75rem;
     gap: 0;
     padding: .5rem;
   }
 }
 
-/* Punto 25 · Cuando el bloque en lectura queda en la banda del reproductor, este
-   se corre arriba para no tapar la oración. Sin transición: el ciclo de lectura
-   es rápido y una animación pelearía con prefers-reduced-motion. */
-body.reflow-book #reflow-tts-player.reflow-tts-player-top {
-  bottom: auto;
-  top: max(.5rem, env(safe-area-inset-top));
+/* Opciones: se despliega dentro del mismo pop-up (voz y velocidad). */
+#reflow-tts-player .reflow-tts-player-options {
+  box-sizing: border-box;
+  display: grid;
+  gap: .4rem;
+  width: 15rem;
+  max-width: 100%;
+  padding: .5rem;
+  border-top: 1px solid var(--ui-border);
+}
+#reflow-tts-player .reflow-tts-player-options[hidden] {
+  display: none !important;
+}
+#reflow-tts-player .reflow-tts-player-options-title {
+  color: var(--ui-text);
+  font-size: .95rem;
+  font-weight: 700;
+}
+/* Los controles de voz/velocidad heredan el lenguaje del panel; se repintan con
+   los tokens del tema claro para el pop-up flotante. */
+body.reflow-book #reflow-tts-player .reflow-tts-voice-options,
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options {
+  background: var(--ui-surface-hover);
+}
+body.reflow-book #reflow-tts-player .reflow-tts-voice-options button,
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button {
+  min-height: 2.5rem !important;
+  color: var(--ui-text) !important;
+  font-size: .95rem !important;
+}
+body.reflow-book #reflow-tts-player .reflow-tts-voice-options button[aria-checked="true"],
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"] {
+  border-color: var(--ui-accent) !important;
+  color: var(--ui-on-accent) !important;
+  background: var(--ui-accent) !important;
+}
+
+/* Punto 25 · Minimizado: sólo un botón redondo de 48 px que restaura los
+   controles. La evitación de la oración usa este estado (ver reflow-book.js). */
+body.reflow-book #reflow-tts-player .reflow-tts-fab {
+  display: none;
+  width: 3rem;
+  height: 3rem;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  border: var(--ceibal-border-default) solid var(--ui-border);
+  border-radius: 999px;
+  color: var(--ui-text);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-raised);
+}
+body.reflow-book #reflow-tts-player.reflow-tts-player-minimized {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+body.reflow-book #reflow-tts-player.reflow-tts-player-minimized .reflow-tts-player-main,
+body.reflow-book #reflow-tts-player.reflow-tts-player-minimized .reflow-tts-player-options {
+  display: none !important;
+}
+body.reflow-book #reflow-tts-player.reflow-tts-player-minimized .reflow-tts-fab {
+  display: inline-flex;
 }
 
 /* Punto 18 · Pop-ups del runtime en claro (globo del glosario, diálogos en capa).

@@ -369,6 +369,10 @@
     ttsManualHandoffGeneration: 0,
     ttsManualHandoffTimer: 0,
     ttsPlayerVisible: false,
+    ttsPlayerMinimized: false,
+    ttsPlayerOptionsOpen: false,
+    ttsPlayerAutoMinimized: false,
+    ttsPlayerExpandedHeight: 0,
     ttsPlayerReserve: 0,
     ttsPlayerStopPendingUntil: 0,
     reducedMotion: false,
@@ -429,10 +433,14 @@
   var glossaryButton;
   var toolsButton;
   var ttsPlayer;
+  var ttsPlayerMain;
   var ttsPlayerPreviousButton;
   var ttsPlayerToggleButton;
   var ttsPlayerNextButton;
-  var ttsPlayerSettingsButton;
+  var ttsPlayerOptionsButton;
+  var ttsPlayerOptionsPanel;
+  var ttsPlayerMinimizeButton;
+  var ttsPlayerFab;
   var ttsPlayerStopButton;
   var announcer;
   var ttsWordTickerRefs = new WeakMap();
@@ -553,7 +561,10 @@
         if (!panel || panel.dataset.quizEvaluated !== "true") return;
         var selected = panel.querySelector('input[type="radio"]:checked');
         var option = selected && selected.closest(".quiz-option");
-        recordActivityInteraction(panel, Boolean(option && option.dataset.correct === "true"));
+        var correcto = window.__adtReflowQuizOptionIsCorrect
+          ? window.__adtReflowQuizOptionIsCorrect(option)
+          : Boolean(option && option.dataset.correct === "true");
+        recordActivityInteraction(panel, Boolean(correcto));
       }, 0);
     });
 
@@ -3658,36 +3669,83 @@
     return null;
   }
 
-  /* Posición de reposo del reproductor (abajo), independiente de si ahora está
-     corrido arriba: comparar contra la posición actual hacía que, ya arriba,
-     dejara de "cruzarse" y volviera abajo en el ciclo siguiente (parpadeo). */
+  /* Franja de reposo del reproductor (abajo, apoyado en la barra). Se mide
+     contra la caja EXPANDIDA y no contra la actual: comparar contra la
+     minimizada hacía que, ya minimizado, dejara de "cruzarse" y volviera a
+     expandirse en el ciclo siguiente (parpadeo). */
   function ttsPlayerRestingBox() {
-    var caja = ttsPlayer.getBoundingClientRect();
-    if (!ttsPlayer.classList.contains("reflow-tts-player-top")) return caja;
     var raiz = getComputedStyle(document.documentElement);
     var toolbar = parseFloat(raiz.getPropertyValue("--reflow-primary-toolbar-height")) || 64;
     var inset = toolbar + 8; /* .5rem de separación de la barra */
+    var height = state.ttsPlayerExpandedHeight ||
+      (ttsPlayer ? ttsPlayer.getBoundingClientRect().height : 0) || 60;
     return {
-      top: window.innerHeight - inset - caja.height,
+      top: window.innerHeight - inset - height,
       bottom: window.innerHeight - inset,
-      height: caja.height
+      height: height
     };
+  }
+
+  /* Punto 25 · Una sola función aplica el estado expandido/minimizado y el
+     despliegue de Opciones, para que los tres disparadores (botones, Esc y la
+     evitación) dejen el DOM coherente. */
+  function applyTtsPlayerMode() {
+    if (!ttsPlayer) return;
+    var minimized = Boolean(state.ttsPlayerMinimized);
+    ttsPlayer.classList.toggle("reflow-tts-player-minimized", minimized);
+    if (ttsPlayerFab) {
+      ttsPlayerFab.setAttribute("aria-expanded", String(!minimized));
+    }
+    if (ttsPlayerMinimizeButton) {
+      ttsPlayerMinimizeButton.setAttribute("aria-expanded", String(minimized));
+    }
+    if (minimized) state.ttsPlayerOptionsOpen = false;
+    var optionsOpen = Boolean(state.ttsPlayerOptionsOpen) && !minimized;
+    if (ttsPlayerOptionsPanel) ttsPlayerOptionsPanel.hidden = !optionsOpen;
+    if (ttsPlayerOptionsButton) {
+      ttsPlayerOptionsButton.setAttribute("aria-expanded", String(optionsOpen));
+    }
+    if (!minimized) {
+      state.ttsPlayerExpandedHeight = ttsPlayer.getBoundingClientRect().height;
+    }
+    if (optionsOpen) {
+      updateTtsVoiceControls();
+      updateTtsSpeedControls();
+    }
+  }
+
+  function setTtsPlayerMinimized(value) {
+    state.ttsPlayerMinimized = Boolean(value);
+    if (!state.ttsPlayerMinimized) state.ttsPlayerAutoMinimized = false;
+    applyTtsPlayerMode();
+  }
+
+  function setTtsPlayerOptionsOpen(value) {
+    state.ttsPlayerOptionsOpen = Boolean(value);
+    applyTtsPlayerMode();
   }
 
   function syncTtsPlayerAvoidance() {
     if (!ttsPlayer || ttsPlayer.hidden) {
-      if (ttsPlayer) ttsPlayer.classList.remove("reflow-tts-player-top");
+      state.ttsPlayerAutoMinimized = false;
       return;
     }
     var caja = ttsActiveBox();
-    if (!caja) {
-      ttsPlayer.classList.remove("reflow-tts-player-top");
-      return;
+    var seCruzan = false;
+    if (caja) {
+      var reproductor = ttsPlayerRestingBox();
+      seCruzan = caja.bottom > reproductor.top && caja.top < reproductor.bottom;
     }
-    var reproductor = ttsPlayerRestingBox();
-    /* Tapado si se cruzan en vertical con la franja donde descansa. */
-    var seCruzan = caja.bottom > reproductor.top && caja.top < reproductor.bottom;
-    ttsPlayer.classList.toggle("reflow-tts-player-top", seCruzan);
+    /* La oración en lectura no puede quedar detrás del reproductor: si se
+       cruzan, el reproductor se minimiza solo (punto 25, opción elegida). Cuando
+       la oración sale de la franja, se restaura el estado que eligió el lector. */
+    if (seCruzan && !state.ttsPlayerMinimized) {
+      state.ttsPlayerAutoMinimized = true;
+      setTtsPlayerMinimized(true);
+    } else if (!seCruzan && state.ttsPlayerAutoMinimized) {
+      state.ttsPlayerAutoMinimized = false;
+      setTtsPlayerMinimized(false);
+    }
   }
   window.__adtReflowSyncTtsAvoidance = syncTtsPlayerAvoidance;
 
@@ -3700,6 +3758,12 @@
     ttsPlayer.hidden = !active;
     ttsPlayer.setAttribute("aria-hidden", String(!active));
     document.body.classList.toggle("reflow-tts-session-active", active);
+    if (!active) {
+      state.ttsPlayerMinimized = false;
+      state.ttsPlayerOptionsOpen = false;
+      state.ttsPlayerAutoMinimized = false;
+    }
+    applyTtsPlayerMode();
     syncTtsPlayerAvoidance();
 
     var playLabel = playing ? "Pausar" : "Reproducir";
@@ -3724,11 +3788,10 @@
       typeof window.__adtReflowSetDockMenu === "function" &&
       window.__adtReflowGetDockMenu() === "settings"
     ) {
+      /* Punto 25: al aparecer el reproductor el foco NO salta a él (no debe
+         interrumpir la lectura). Sólo se cierra el panel de configuración. */
       state.panelFocusRestoreSuppressedUntil = Date.now() + 500;
       window.__adtReflowSetDockMenu("");
-      window.setTimeout(function () {
-        if (!ttsPlayer.hidden) ttsPlayerToggleButton.focus({ preventScroll: true });
-      }, 0);
     }
   }
 
@@ -3832,11 +3895,6 @@
       toolsButton,
       "aria-expanded",
       currentMenu === "settings" || currentMenu === "glossary"
-    );
-    setAttributeIfChanged(
-      ttsPlayerSettingsButton,
-      "aria-expanded",
-      visibleMenu === "settings"
     );
     primaryToolbar.classList.toggle(
       "reflow-primary-toolbar-hidden",
@@ -4001,6 +4059,18 @@
     'stroke="currentColor" stroke-width="3.2" stroke-linecap="round" ' +
     'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
     '<path d="M19.8 12H7.1"/><path d="M7.44 8.04 4.44 12l3 3.96"/></svg>';
+  /* Punto 25: chevrones locales para minimizar/expandir el reproductor. No van
+     en uiFilledIcons porque ese bloque lo genera tools/trace_eva_icons.py. */
+  var uiIconChevronDown =
+    '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="3" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M6 9.5 12 15.5 18 9.5"/></svg>';
+  var uiIconChevronUp =
+    '<svg class="reflow-toolbar-svg" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="3" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true" focusable="false">' +
+    '<path d="M6 14.5 12 8.5 18 14.5"/></svg>';
 
   /* eva-icons:start — bloque generado por tools/trace_eva_icons.py --inyectar.
      No editar a mano: los trazados salen de los SVG de assets/icons/ y se
@@ -4091,26 +4161,59 @@
     ttsPlayer.setAttribute("aria-hidden", "true");
     ttsPlayer.hidden = true;
     ttsPlayer.innerHTML =
-      '<button id="reflow-tts-previous" type="button" aria-label="Audio anterior">' +
-        uiIconFilled("prev") +
-        '<span class="reflow-tts-player-label">Anterior</span>' +
-      '</button>' +
-      '<button id="reflow-tts-toggle" type="button" aria-label="Reproducir" aria-pressed="false">' +
-        uiIconFilled("play") +
-        '<span class="reflow-tts-player-label">Reproducir</span>' +
-      '</button>' +
-      '<button id="reflow-tts-next" type="button" aria-label="Audio siguiente">' +
-        uiIconFilled("next") +
-        '<span class="reflow-tts-player-label">Siguiente</span>' +
-      '</button>' +
-      '<button id="reflow-tts-settings" type="button" aria-label="Voz y velocidad" ' +
-        'aria-haspopup="dialog" aria-expanded="false">' +
-        uiIconFilled("gear") +
-        '<span class="reflow-tts-player-label">Voz y velocidad</span>' +
-      '</button>' +
-      '<button id="reflow-tts-stop" type="button" aria-label="Detener">' +
-        uiIconFilled("stop") +
-        '<span class="reflow-tts-player-label">Detener</span>' +
+      '<div class="reflow-tts-player-main" id="reflow-tts-player-main">' +
+        '<button id="reflow-tts-previous" type="button" aria-label="Audio anterior">' +
+          uiIconFilled("prev") +
+          '<span class="reflow-tts-player-label">Anterior</span>' +
+        '</button>' +
+        '<button id="reflow-tts-toggle" type="button" aria-label="Reproducir" aria-pressed="false">' +
+          '<span class="reflow-tts-player-icon">' + uiIconFilled("play") + '</span>' +
+          '<span class="reflow-tts-player-label">Reproducir</span>' +
+        '</button>' +
+        '<button id="reflow-tts-next" type="button" aria-label="Audio siguiente">' +
+          uiIconFilled("next") +
+          '<span class="reflow-tts-player-label">Siguiente</span>' +
+        '</button>' +
+        '<button id="reflow-tts-options" type="button" aria-label="Opciones de voz y velocidad" ' +
+          'aria-expanded="false" aria-controls="reflow-tts-options-panel">' +
+          uiIconFilled("gear") +
+          '<span class="reflow-tts-player-label">Opciones</span>' +
+        '</button>' +
+        '<button id="reflow-tts-minimize" type="button" aria-label="Minimizar reproductor">' +
+          uiIconChevronDown +
+          '<span class="reflow-tts-player-label">Minimizar</span>' +
+        '</button>' +
+        '<button id="reflow-tts-stop" type="button" aria-label="Cerrar lectura en voz alta">' +
+          uiIconFilled("close") +
+          '<span class="reflow-tts-player-label">Cerrar</span>' +
+        '</button>' +
+      '</div>' +
+      '<div id="reflow-tts-options-panel" class="reflow-tts-player-options" ' +
+        'role="group" aria-label="Voz y velocidad" hidden>' +
+        '<span class="reflow-tts-player-options-title" id="reflow-tts-player-voice-label">Voz del narrador</span>' +
+        '<div class="reflow-tts-voice-options" role="radiogroup" ' +
+          'aria-labelledby="reflow-tts-player-voice-label">' +
+          '<button type="button" role="radio" data-reflow-tts-voice="valentina" ' +
+            'aria-checked="false" aria-pressed="false">Valentina</button>' +
+          '<button type="button" role="radio" data-reflow-tts-voice="mateo" ' +
+            'aria-checked="false" aria-pressed="false">Mateo</button>' +
+        '</div>' +
+        '<span class="reflow-tts-player-options-title" id="reflow-tts-player-speed-label">Velocidad</span>' +
+        '<div class="reflow-tts-speed-options" role="radiogroup" ' +
+          'aria-labelledby="reflow-tts-player-speed-label">' +
+          '<button type="button" role="radio" data-reflow-tts-speed="0.5" ' +
+            'aria-label="Lenta, 0,5 veces" aria-checked="false">Lenta</button>' +
+          '<button type="button" role="radio" data-reflow-tts-speed="1" ' +
+            'aria-label="Normal, 1 vez" aria-checked="false">Normal</button>' +
+          '<button type="button" role="radio" data-reflow-tts-speed="1.5" ' +
+            'aria-label="Rápida, 1,5 veces" aria-checked="false">Rápida</button>' +
+          '<button type="button" role="radio" data-reflow-tts-speed="2" ' +
+            'aria-label="Muy rápida, 2 veces" aria-checked="false">Muy rápida</button>' +
+        '</div>' +
+      '</div>' +
+      '<button id="reflow-tts-fab" class="reflow-tts-fab" type="button" ' +
+        'aria-label="Mostrar controles de lectura" aria-expanded="true">' +
+        uiIconChevronUp +
       '</button>';
 
     announcer = document.createElement("div");
@@ -4142,10 +4245,14 @@
     indexButton = document.getElementById("reflow-index");
     glossaryButton = document.getElementById("reflow-glossary");
     toolsButton = document.getElementById("reflow-tools");
+    ttsPlayerMain = document.getElementById("reflow-tts-player-main");
     ttsPlayerPreviousButton = document.getElementById("reflow-tts-previous");
     ttsPlayerToggleButton = document.getElementById("reflow-tts-toggle");
     ttsPlayerNextButton = document.getElementById("reflow-tts-next");
-    ttsPlayerSettingsButton = document.getElementById("reflow-tts-settings");
+    ttsPlayerOptionsButton = document.getElementById("reflow-tts-options");
+    ttsPlayerOptionsPanel = document.getElementById("reflow-tts-options-panel");
+    ttsPlayerMinimizeButton = document.getElementById("reflow-tts-minimize");
+    ttsPlayerFab = document.getElementById("reflow-tts-fab");
     ttsPlayerStopButton = document.getElementById("reflow-tts-stop");
 
     indexButton.addEventListener("click", function () {
@@ -4217,15 +4324,46 @@
     ttsPlayerNextButton.addEventListener("click", function () {
       stepFloatingReadAloud(1);
     });
-    ttsPlayerSettingsButton.addEventListener("click", function () {
-      switchRuntimePanel(
-        ["Configuración", "Settings"],
-        ["Menú principal", "Main Menu"]
-      );
+    ttsPlayerOptionsButton.addEventListener("click", function () {
+      setTtsPlayerOptionsOpen(!state.ttsPlayerOptionsOpen);
+    });
+    ttsPlayerMinimizeButton.addEventListener("click", function () {
+      setTtsPlayerMinimized(true);
+    });
+    ttsPlayerFab.addEventListener("click", function () {
+      setTtsPlayerMinimized(false);
     });
     ttsPlayerStopButton.addEventListener("click", function (event) {
       event.stopPropagation();
       stopFloatingReadAloud();
+    });
+
+    /* Punto 25 · Esc minimiza el reproductor, salvo que haya un panel o diálogo
+       abierto: en ese caso Escape cierra el panel y el reproductor no se toca. */
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== "Escape" && event.key !== "Esc") return;
+      if (!ttsPlayer || ttsPlayer.hidden || state.ttsPlayerMinimized) return;
+      if (document.querySelector('[role="dialog"]')) return;
+      if (visibleRuntimeMenu()) return;
+      setTtsPlayerMinimized(true);
+    });
+
+    /* Punto 25 · La barra espaciadora alterna Reproducir/Pausa sin robar el foco.
+       Cuando el foco está en un botón (el propio control o un interruptor), la
+       maneja el control y no se intercepta. */
+    document.addEventListener("keydown", function (event) {
+      if (event.key !== " " && event.key !== "Spacebar") return;
+      if (!ttsPlayer || ttsPlayer.hidden) return;
+      var activo = document.activeElement;
+      if (
+        activo && activo !== document.body && activo.closest &&
+        activo.closest("button, a, input, select, textarea, [contenteditable], [role='dialog']")
+      ) {
+        return;
+      }
+      if (document.querySelector('[role="dialog"]') || visibleRuntimeMenu()) return;
+      event.preventDefault();
+      toggleFloatingReadAloud();
     });
 
     document.addEventListener("keydown", function (event) {
@@ -7668,8 +7806,21 @@
      En un libro offline esto es disuasión, no seguridad: el archivo se puede
      leer. Lo que evita es que la respuesta viaje dentro del HTML de la lección.
      ------------------------------------------------------------------------ */
-  var quizAnswers = null;
+  var QUIZ_HASH_SALT = "1930-quiz-5";
+  var quizAnswerSets = null;
   var quizAnswersPromise = null;
+  var quizFeedbackPromise = null;
+
+  /* FNV-1a de 32 bits, igual que tools/harden_quiz_answers.py. Sólo cubre los
+     identificadores de opción (ASCII). */
+  function quizHash(text) {
+    var value = 0x811C9DC5;
+    for (var index = 0; index < text.length; index += 1) {
+      value ^= text.charCodeAt(index);
+      value = Math.imul(value, 0x01000193) >>> 0;
+    }
+    return ("00000000" + value.toString(16)).slice(-8);
+  }
 
   function quizSectionId(section) {
     return (section && (section.dataset.id || section.dataset.sectionId)) || "";
@@ -7679,53 +7830,44 @@
     if (option.dataset.activityItem) return option.dataset.activityItem;
     var input = option.querySelector('input[type="radio"], input[type="checkbox"]');
     if (input && input.value) return input.value;
-    var explanation = option.dataset.explanationId;
-    if (explanation) return explanation.replace(/_exp$/, "");
     return "";
   }
 
-  function applyQuizAnswers(section) {
-    if (!quizAnswers || !section) return 0;
-    var mapa = quizAnswers[quizSectionId(section)];
-    if (!mapa) return 0;
-    var aplicadas = 0;
-    Array.prototype.slice
-      .call(section.querySelectorAll(".quiz-option, .activity-option"))
-      .forEach(function (option) {
-        var clave = quizOptionKey(option);
-        if (!clave || !(clave in mapa)) return;
-        option.dataset.correct = String(Boolean(mapa[clave]));
-        aplicadas += 1;
-      });
-    return aplicadas;
-  }
-
-  function applyQuizAnswersToDocument() {
-    if (!quizAnswers || !content) return 0;
-    var total = 0;
-    Array.prototype.slice
-      .call(
-        content.querySelectorAll(
+  function quizSectionForOption(option) {
+    return option && option.closest
+      ? option.closest(
           '[data-section-type="activity_quiz"], [data-section-type="quiz_sequence"]'
         )
-      )
-      .forEach(function (section) {
-        total += applyQuizAnswers(section);
-      });
-    return total;
+      : null;
   }
+
+  /* Contrato que leen quiz-sequence.js y el propio motor: la corrección se
+     resuelve en memoria, sin escribir `data-correct` en el DOM. */
+  function quizOptionIsCorrect(option) {
+    if (!quizAnswerSets || !option) return null;
+    var section = quizSectionForOption(option);
+    var set = section && quizAnswerSets[quizSectionId(section)];
+    if (!set) return null;
+    var key = quizOptionKey(option);
+    if (!key) return null;
+    return set.has(quizHash(QUIZ_HASH_SALT + "|" + key));
+  }
+  window.__adtReflowQuizOptionIsCorrect = quizOptionIsCorrect;
 
   function loadQuizAnswers() {
     if (quizAnswersPromise) return quizAnswersPromise;
-    quizAnswersPromise = fetch("./content/i18n/es-UY/quiz-answers.json?v=1-quiz-answers")
+    quizAnswersPromise = fetch("./content/i18n/es-UY/quiz-answers.json?v=2-quiz-answers")
       .then(function (response) {
         if (!response.ok) throw new Error("No se pudieron cargar las respuestas.");
         return response.json();
       })
       .then(function (data) {
-        quizAnswers = data || {};
-        applyQuizAnswersToDocument();
-        return quizAnswers;
+        var quizzes = (data && data.quizzes) || {};
+        quizAnswerSets = Object.create(null);
+        Object.keys(quizzes).forEach(function (activity) {
+          quizAnswerSets[activity] = new Set(quizzes[activity] || []);
+        });
+        return quizAnswerSets;
       })
       .catch(function (error) {
         console.warn("Actividades sin clave de corrección.", error);
@@ -7733,6 +7875,32 @@
       });
     return quizAnswersPromise;
   }
+
+  function loadQuizFeedback() {
+    if (quizFeedbackPromise) return quizFeedbackPromise;
+    quizFeedbackPromise = fetch("./content/i18n/es-UY/quiz-feedback.json?v=1-quiz-feedback")
+      .then(function (response) {
+        if (!response.ok) throw new Error("No se pudieron cargar las devoluciones.");
+        return response.json();
+      })
+      .catch(function (error) {
+        console.warn("Actividades sin devoluciones.", error);
+        return null;
+      });
+    return quizFeedbackPromise;
+  }
+
+  /* La devolución se pide recién al enviar: Promise<{text, audio}|null>. */
+  window.__adtReflowQuizFeedbackFor = function (option) {
+    var section = quizSectionForOption(option);
+    var key = option ? quizOptionKey(option) : "";
+    if (!section || !key) return Promise.resolve(null);
+    var activity = quizSectionId(section);
+    return loadQuizFeedback().then(function (data) {
+      var map = data && data[activity];
+      return (map && map[key]) || null;
+    });
+  };
 
   function prepareChapterTwoQuiz() {
     var panel = content.querySelector(
@@ -7752,14 +7920,6 @@
     options.classList.add("quiz-options");
     options.setAttribute("role", "radiogroup");
 
-    var answers = {};
-    try { answers = JSON.parse(panel.dataset.correctAnswers || "{}"); } catch (_error) {}
-    if (!Object.keys(answers).length) {
-      /* La clave ya no está en el HTML: viene del archivo de respuestas. Se
-         aplica acá para que este panel no quede con todo marcado como falso si
-         todavía no llegó la carga. */
-      applyQuizAnswers(panel);
-    }
     var explanationBank = document.createElement("div");
     explanationBank.className = "quiz-explanation-bank";
     explanationBank.setAttribute("aria-hidden", "true");

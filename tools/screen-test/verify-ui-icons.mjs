@@ -66,8 +66,9 @@ const controles = await page.evaluate(() => {
     medir("#reflow-tts-previous", "voz · Anterior"),
     medir("#reflow-tts-toggle", "voz · Reproducir"),
     medir("#reflow-tts-next", "voz · Siguiente"),
-    medir("#reflow-tts-settings", "voz · Voz y velocidad"),
-    medir("#reflow-tts-stop", "voz · Detener"),
+    medir("#reflow-tts-options", "voz · Opciones"),
+    medir("#reflow-tts-minimize", "voz · Minimizar"),
+    medir("#reflow-tts-stop", "voz · Cerrar"),
   ];
 });
 
