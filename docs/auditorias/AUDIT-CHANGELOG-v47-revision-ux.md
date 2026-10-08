@@ -3,6 +3,26 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Reproductor de audio · Anterior/Siguiente y Play/Pausa
+
+- **Síntoma (reportado)**: al mover con **Anterior/Siguiente** la frase siguiente se
+  marcaba en amarillo, pero al dar **Play** la lectura no arrancaba desde ahí; el
+  play/pausa «no funcionaba bien».
+- **Causa**: `startTtsFromUserGesture` (el Play del reproductor flotante) alineaba
+  siempre a la **página visible** con `playAtIndex(primerÍtemDeLaPágina)`. Eso
+  **perdía la frase elegida**; y si ese primer ítem ya era el actual, `playAtIndex`
+  quedaba en **no-op** (el runtime no vuelve a llamar a `play()` si el `src` no
+  cambia) y el audio ni sonaba.
+- **Arreglo**: si el ítem seleccionado —incluida la frase elegida con
+  Anterior/Siguiente en pausa— **sigue en la página visible**, se reanuda desde él
+  con `api.play()` (que además respeta la posición dentro de la frase); solo se
+  alinea a la página cuando el lector navegó a otra. Medido con audio real
+  (`--autoplay-policy=no-user-gesture-required`): pausa en 90 → Siguiente 91 →
+  Play **91** (antes iba al inicio de página); Anterior 90 → Play **90**.
+- **Regresión**: `tools/screen-test/verify-tts-transport.mjs`.
+
+Caché: `reflow-book.js?v=201-tts-transporte`.
+
 ## Punto 23 · Dobles espacios y saltos de línea
 
 - **Dobles espacios (resuelto)**: la composición de las cadenas de oraciones dejaba

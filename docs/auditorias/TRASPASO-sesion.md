@@ -280,7 +280,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
   vieja. Valores actuales: `reflow.css?v=174-cuerpo-responsivo`,
-  `reflow-book.js?v=200-espacios`, `quiz-sequence.js?v=9-cierre-listo` y
+  `reflow-book.js?v=201-tts-transporte`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
@@ -301,6 +301,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-quiz-contrast.mjs` | Punto 18: contraste de texto y gráficos en los 4 estados, devolución y botón | Acota la muestra al panel de la pregunta; convierte oklch/oklab a sRGB |
 | `verify-tts-avoidance.mjs` | El reproductor no tapa el bloque en lectura | Marca los bloques **a mano**: es el caso simulado |
 | `verify-tts-avoidance-real.mjs` | Punto 25 en lectura real: oración baja y alta | Necesita `--autoplay-policy=no-user-gesture-required` (lo pasa el lanzador) |
+| `verify-tts-transport.mjs` | Reproductor: Anterior/Siguiente en pausa y Play reanudan en la frase elegida | También necesita `--autoplay-policy=no-user-gesture-required`; salta a `pg019` para evitar el auto-avance de los ítems cortos |
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
 | `verify-body-size.mjs` | Punto 20 (seguimiento): `text_only` y `boxed_text` miden lo mismo en celular, laptop y pizarra | El caso de pizarra necesita un viewport ≥1600 px para ejercitar el cuerpo de 24 px |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |
