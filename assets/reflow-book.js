@@ -4447,6 +4447,7 @@
       state.fontSize = "normal";
     }
     content.style.setProperty("--reflow-font-scale", String(fontScales[state.fontSize]));
+    document.documentElement.style.setProperty("--reflow-font-scale", String(fontScales[state.fontSize]));
     document.body.dataset.reflowFontSize = state.fontSize;
   }
 
@@ -5122,6 +5123,7 @@
       state.currentAnchorId || anchorIdForPage(state.current);
     state.fontSize = size;
     content.style.setProperty("--reflow-font-scale", String(fontScales[size]));
+    document.documentElement.style.setProperty("--reflow-font-scale", String(fontScales[size]));
     document.body.dataset.reflowFontSize = size;
     syncChapterOneChatContinuation();
     try { localStorage.setItem(fontStorageKey, size); } catch (_error) {}

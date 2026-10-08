@@ -97,7 +97,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 21 | «Abriendo 1930: El viaje…» + logo de Ceibal | Cerrado | El SVG oficial está en `assets/icons/ceibal-logo.svg`, aplicado en el cargador. Se alineó la variante de error («No se pudo abrir 1930: El viaje.») y conserva el logo |
 | 22 | Ocultar el enlace «Saltar al contenido» y la línea de apertura | Cerrado | `verify-opening.mjs` |
 | 23 | Dobles espacios y saltos sueltos | Cerrado, **con salvedad** | `audit_typo.py` bajó de 45 a **1** coincidencia; la que queda es de **contenido** («???» en `pg176177_n0009`), decisión editorial |
-| 24 | Jerarquía tipográfica N1–N4, íconos 24 px | Cerrado | `verify-ui-typography.mjs` |
+| 24 | Jerarquía tipográfica N1–N4, íconos 24 px | Cerrado | `verify-ui-typography.mjs` (en verde). Se sumaron `--ui-title/group/label/help`, la barra a 16 px (eva-text-button), los «A» a 400 y la interfaz crece hasta «Grande» |
 | 25 | Pop-up de voz flotante, sin carril | Cerrado (rehecho) | Margen derecho en ancha; pastilla + minimizar + Esc + opciones dentro del pop-up; la oración se evita **minimizando** el pop-up (`verify-floating-player.mjs`, `verify-tts-avoidance*.mjs`) |
 
 **Resumen**: 25 puntos atendidos. Quedan **1 decisión del cliente** (punto 20, 20 px
@@ -279,8 +279,8 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=171-escala-contenido`,
-  `reflow-book.js?v=198-carga`, `quiz-sequence.js?v=9-cierre-listo` y
+  vieja. Valores actuales: `reflow.css?v=172-tipografia-ui`,
+  `reflow-book.js?v=199-tipografia-ui`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de

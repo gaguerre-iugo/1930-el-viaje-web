@@ -3,6 +3,26 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 24 · Jerarquía tipográfica de la barra y los paneles
+
+La jerarquía ya estaba casi armada (N1 20/700, N2 17/700, N3 17/400, N4 15/400,
+íconos 24 px), pero quedaban tres cosas:
+
+- **Negrita**: los cuatro «A» del selector de tamaño salían en 700; la opción
+  seleccionable no cambia el peso (se distingue por el relleno + el check). Ahora
+  van en **400**, y `verify-ui-typography` pasa de rojo a verde.
+- **Texto de la barra**: usaba N3 (17 px); la tabla pide **eva-text-button (16 px)**,
+  distinto del N3 de los paneles. Ahora la barra va en **16 px** (principal 700,
+  secundaria 400).
+- **Variables por nivel**: se agregaron `--ui-title`, `--ui-group`, `--ui-label` y
+  `--ui-help` (con sus colores), además de los nombres N1-N4 que ya existían.
+- **Crecimiento**: la interfaz **crece con «Tamaño de letra» hasta «Grande» (1,2) y
+  después se mantiene** (medido: 16 → 19,2 px), para que la barra no se coma la
+  página. El motor expone `--reflow-font-scale` en `:root` para que la interfaz lo
+  vea.
+
+Caché: `reflow.css?v=172-tipografia-ui`, `reflow-book.js?v=199-tipografia-ui`.
+
 ## Punto 21 · Mensaje de carga
 
 - El cargador ya decía **«Abriendo 1930: El viaje…»** (no «Preparando el libro

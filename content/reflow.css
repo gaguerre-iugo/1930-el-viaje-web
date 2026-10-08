@@ -32,14 +32,29 @@
   --eva-text-body-regular-md: 1.0625rem; /* 17 px */
   --eva-text-body-regular-sm: .9375rem;  /* 15 px */
 
-  --ui-n1-size: var(--eva-text-body-bold-lg);
-  --ui-n2-size: var(--eva-text-body-bold-md);
-  --ui-n3-size: var(--eva-text-body-regular-md);
-  --ui-n4-size: var(--eva-text-body-regular-sm);
-  --ui-n1-color: var(--ceibal-gray-900);
-  --ui-n2-color: var(--ceibal-institutional-600);
-  --ui-n3-color: var(--ceibal-gray-900);
+  /* Punto 24 · La interfaz crece con «Tamaño de letra» hasta «Grande» (1,2) y
+     después se mantiene, para que la barra no se coma la página. */
+  --ui-scale: min(var(--reflow-font-scale, 1), 1.2);
+
+  --ui-n1-size: calc(var(--eva-text-body-bold-lg) * var(--ui-scale));
+  --ui-n2-size: calc(var(--eva-text-body-bold-md) * var(--ui-scale));
+  --ui-n3-size: calc(var(--eva-text-body-regular-md) * var(--ui-scale));
+  --ui-n4-size: calc(var(--eva-text-body-regular-sm) * var(--ui-scale));
+  --ui-button: calc(1rem * var(--ui-scale));  /* eva-text-button · 16 px */
+  --ui-n1-color: var(--eva-color-grey-900);
+  --ui-n2-color: var(--eva-color-institucional-600);
+  --ui-n3-color: var(--eva-color-grey-900);
   --ui-n4-color: var(--eva-color-grey-600);
+
+  /* Punto 24 · Nombres por nivel. */
+  --ui-title: var(--ui-n1-size);
+  --ui-group: var(--ui-n2-size);
+  --ui-label: var(--ui-n3-size);
+  --ui-help: var(--ui-n4-size);
+  --ui-title-color: var(--ui-n1-color);
+  --ui-group-color: var(--ui-n2-color);
+  --ui-label-color: var(--ui-n3-color);
+  --ui-help-color: var(--ui-n4-color);
 
   /* Colores semánticos de la interfaz (punto 18). La barra, los paneles y el
      pop-up usan sólo estas variables, que apuntan a los tokens de EVA. */
@@ -2732,7 +2747,9 @@ body.reflow-book #content .quiz-explanation-bank {
 .reflow-font-settings-options .reflow-font-size-glyph {
   display: inline-block;
   line-height: 1;
-  font-weight: 700;
+  /* Punto 24 · La opción seleccionable no cambia el peso (400); se distingue por
+     el relleno y el check. */
+  font-weight: 400;
 }
 .reflow-font-settings-options button[data-reflow-font-size="normal"] .reflow-font-size-glyph {
   font-size: 1rem;
@@ -3301,7 +3318,11 @@ body.reflow-book .reflow-glossary-panel .reflow-index-group {
 
 /* N3 · etiquetas de control: barra, filas y opciones del panel, índice y
    glosario. */
-body.reflow-book #reflow-pagination .reflow-toolbar-label,
+/* Punto 24 · El texto de la barra usa eva-text-button (16 px), distinto del N3
+   de los paneles (17 px). */
+body.reflow-book #reflow-pagination .reflow-toolbar-label {
+  font-size: var(--ui-button) !important;
+}
 body.reflow-book .reflow-accessibility-panel .reflow-setting-row :is(span, label, strong, b),
 body.reflow-book .reflow-accessibility-panel [role="radio"],
 body.reflow-book .reflow-accessibility-panel [role="switch"] + :is(span, label),
