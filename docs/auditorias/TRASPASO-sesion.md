@@ -279,7 +279,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=173-espacios`,
+  vieja. Valores actuales: `reflow.css?v=174-cuerpo-responsivo`,
   `reflow-book.js?v=200-espacios`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
@@ -302,6 +302,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-tts-avoidance.mjs` | El reproductor no tapa el bloque en lectura | Marca los bloques **a mano**: es el caso simulado |
 | `verify-tts-avoidance-real.mjs` | Punto 25 en lectura real: oración baja y alta | Necesita `--autoplay-policy=no-user-gesture-required` (lo pasa el lanzador) |
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
+| `verify-body-size.mjs` | Punto 20 (seguimiento): `text_only` y `boxed_text` miden lo mismo en celular, laptop y pizarra | El caso de pizarra necesita un viewport ≥1600 px para ejercitar el cuerpo de 24 px |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |
 
 ## Decisiones que NO son de código

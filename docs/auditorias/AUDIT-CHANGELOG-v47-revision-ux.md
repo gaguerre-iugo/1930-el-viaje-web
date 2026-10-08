@@ -87,7 +87,15 @@ letra»:
   una clase común en el contenido; queda a 18 px y hay que etiquetarlo antes de
   bajarlo a 17 px grey-600.
 
-Caché: `reflow.css?v=171-escala-contenido`.
+- **Corrección (seguimiento)**: el texto corrido de las secciones `boxed_text`
+  (diálogo y chat) quedaba **clavado en 20 px** porque `--adt-cuerpo` era un valor
+  fijo (`1.25rem`), mientras que `text_only` usaba `var(--reflow-body-size)`. En
+  **celular (18 px)** y en **pizarras ≥100rem (24 px)** se veían **dos tamaños** en
+  el mismo texto (el usuario lo reportó como «dos fuentes»). Ahora `--adt-cuerpo`
+  sigue `var(--reflow-body-size)`, así que el cuerpo escala igual en todos los
+  tipos de sección. Regresión: `tools/screen-test/verify-body-size.mjs`.
+
+Caché: `reflow.css?v=174-cuerpo-responsivo`.
 
 ## Punto 19 · Íconos de EVA y emojis del glosario
 
