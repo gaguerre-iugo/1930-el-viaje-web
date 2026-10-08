@@ -3,6 +3,39 @@
 Registro de los 25 puntos de `Revision_UX_1930_msuarez.docx` a medida que se
 implementan. El plan completo está en `PLAN-REVISION-UX-msuarez.md`.
 
+## Punto 18 · Marco de la interfaz con los tokens de EVA
+
+El tema claro ya estaba (barra y paneles blancos, acciones institucionales), pero
+usaba los **grises del ADT**. Se pasó al **vocabulario de EVA**:
+
+- **Tokens**: se definieron `--eva-color-*` (blanco; grises #E1E3E6, #6B7280,
+  #565B66, #15171A; institucional #CCECEA…#00302D). Los nombres viejos del ADT
+  (`--ceibal-*`) quedan como alias hacia ellos; los grises oscuros (#121826,
+  #212936, #242424, #1b1b1b, #4D5562, #E5E7EB, #F1F2F4) salieron del CSS.
+- **Variables semánticas** (regla 1): `--ui-bg`, `--ui-border`, `--ui-text`,
+  `--ui-text-muted`, `--ui-primary`, `--ui-primary-hover`, `--ui-primary-pressed`,
+  `--ui-selected-bg`, `--ui-focus`. Barra, paneles y pop-up las usan.
+- **Títulos de grupo** (N2): pasaron de institucional-200 (claro) a
+  **institucional-600** (7,1:1), tanto en los encabezados del índice como en los
+  bloques del panel (Leer, Escuchar, Pantalla).
+- **Estado seleccionado** (regla 4): además del relleno institucional-600, la opción
+  elegida lleva un **check** visible (tamaño, voz y velocidad).
+
+**Medido**: barra blanca + grey-900 = **17,96:1**; ayudas grey-600 = 6,8:1; acción
+principal #00635D = **7,1:1**; deshabilitada del reproductor = 5,3:1; fila activa del
+índice = 7,1:1. El resaltado amarillo de la lectura (`#FDE047` con texto `#111827`) no
+se tocó.
+
+**Capturas** (barra, los tres paneles y el pop-up, en 620 y 1280 px):
+`docs/auditorias/punto18-capturas/`.
+
+**Salvedades** (conflictos entre puntos de la misma revisión):
+- El **deshabilitado de la acción principal** queda al 40 % (punto 3, que lo exige y
+  lo prueba `verify-primary-toolbar`) en vez del grey-100 + grey-600 de la tabla.
+- El **anillo de foco** sigue en 3 px (punto 14) en vez de los 2 px de la tabla.
+
+Caché: `reflow.css?v=169-eva-tokens`.
+
 ## Punto 17 · Avance en la actividad: kicker, dimensión oculta y «Seguir leyendo»
 
 - **«Pregunta N de 3»**: visible en las tres preguntas de las ocho secuencias

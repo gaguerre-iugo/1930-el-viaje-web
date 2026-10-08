@@ -91,7 +91,7 @@ conviene dar por cerrado lo que figura con asterisco.
 | 15 | Reintento señalizado, incorrecta marcada, «Siguiente pregunta» | Cerrado | `verify-quiz-retry.mjs` + las tres pruebas nuevas |
 | 16 | «Considerá que…» + cierre, sin emojis, audio en dos voces | Cerrado | `standardize_quiz_feedback.py --check` (el usuario eligió «Considerá que…» sobre «Todavía no.») |
 | 17 | Kicker «Pregunta N de 3», dimensión oculta, cierre y «Seguir leyendo» | Cerrado | `verify-quiz-retry.mjs` |
-| 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, **con una salvedad** | Los estados de las opciones ya se **midieron** (`verify-quiz-contrast.mjs`: 17,73:1 el texto en los cuatro estados; 10,93:1 / 7,08:1 las devoluciones). Queda sólo el borde en reposo (gris-400, 2,2:1) y el capítulo actual del índice en institucional-500 (4,82:1, cumple AA) donde EVA pide 600 (7,14:1) |
+| 18 | Tema claro con tokens de EVA (barra, paneles, pop-ups) | Cerrado, con dos salvedades | Tokens `eva-color-*` y variables semánticas (`--ui-bg`, `--ui-border`, `--ui-text`, `--ui-text-muted`, `--ui-primary`, `--ui-primary-hover`, `--ui-primary-pressed`, `--ui-selected-bg`, `--ui-focus`); grises del ADT eliminados; títulos de grupo y seleccionados en institucional-600 con check. Capturas en `docs/auditorias/punto18-capturas/`. Salvedades: el deshabilitado de la acción principal queda al 40 % (punto 3) y el foco en 3 px (punto 14) |
 | 19 | Íconos SVG de EVA en la interfaz | Cerrado, **con salvedad** | **3 de los 8** (detener, audio anterior, audio siguiente) fueron **generados** por nosotros a partir de pausa y reproducir: si Comunicación tiene los originales, se reemplazan. `verify-eva-icons.mjs` |
 | 20 | Escala tipográfica del contenido | **Decisión pendiente** | Cuerpo **20 px vs 18 px**: hoy 18. Es la única decisión que cambia la paginación de todo el libro (cliente) |
 | 21 | «Abriendo 1930: El viaje…» + logo de Ceibal | Cerrado | El SVG oficial está en `assets/icons/ceibal-logo.svg` y aplicado en el cargador |
@@ -279,7 +279,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=168-seguir-leyendo`,
+  vieja. Valores actuales: `reflow.css?v=169-eva-tokens`,
   `reflow-book.js?v=197-punto13` y
   `quiz-sequence.js?v=9-cierre-listo`.
 - El servidor local está en el puerto **5501** y sigue corriendo.

@@ -39,27 +39,34 @@
   --ui-n1-color: var(--ceibal-gray-900);
   --ui-n2-color: var(--ceibal-institutional-600);
   --ui-n3-color: var(--ceibal-gray-900);
-  --ui-n4-color: var(--ceibal-gray-600);
+  --ui-n4-color: var(--eva-color-grey-600);
 
-  /* Colores semánticos de la interfaz (punto 18), tomados de los tokens de EVA.
-     La barra, el reproductor de voz y los paneles son claros: superficies casi
-     blancas, texto grey-900 y el institucional para lo accionable. */
-  --ui-surface: #ffffff;
-  --ui-surface-sunken: var(--ceibal-gray-50);
-  --ui-surface-hover: var(--ceibal-gray-100);
-  --ui-surface-selected: var(--ceibal-institutional-100);
-  --ui-border: var(--ceibal-gray-200);
-  --ui-border-strong: var(--ceibal-gray-300);
-  --ui-text: var(--ceibal-gray-900);
-  --ui-text-muted: var(--ceibal-gray-600);
-  --ui-text-selected: var(--ceibal-institutional-700);
-  --ui-accent: var(--ceibal-institutional-600);
-  --ui-accent-hover: var(--ceibal-institutional-700);
-  --ui-accent-soft: var(--ceibal-institutional-100);
-  --ui-on-accent: #ffffff;
-  --ui-disabled-surface: var(--ceibal-gray-100);
-  --ui-disabled-text: var(--ceibal-gray-600);
-  --ui-focus: var(--ceibal-institutional-600);
+  /* Colores semánticos de la interfaz (punto 18). La barra, los paneles y el
+     pop-up usan sólo estas variables, que apuntan a los tokens de EVA. */
+  --ui-bg: var(--eva-color-white);
+  --ui-border: var(--eva-color-grey-100);
+  --ui-text: var(--eva-color-grey-900);
+  --ui-text-muted: var(--eva-color-grey-600);
+  --ui-primary: var(--eva-color-institucional-600);
+  --ui-primary-hover: var(--eva-color-institucional-700);
+  --ui-primary-pressed: var(--eva-color-institucional-800);
+  --ui-selected-bg: var(--eva-color-institucional-100);
+  --ui-focus: var(--eva-color-institucional-600);
+
+  /* Alias con los nombres anteriores: el resto del CSS ya los usa. */
+  --ui-surface: var(--ui-bg);
+  --ui-surface-sunken: var(--eva-color-grey-100);
+  --ui-surface-hover: var(--eva-color-grey-100);
+  --ui-surface-selected: var(--ui-selected-bg);
+  --ui-border-strong: var(--eva-color-grey-500);
+  --ui-text-selected: var(--eva-color-institucional-700);
+  --ui-accent: var(--ui-primary);
+  --ui-accent-hover: var(--ui-primary-hover);
+  --ui-accent-pressed: var(--ui-primary-pressed);
+  --ui-accent-soft: var(--ui-selected-bg);
+  --ui-on-accent: var(--eva-color-white);
+  --ui-disabled-surface: var(--eva-color-grey-100);
+  --ui-disabled-text: var(--eva-color-grey-600);
   --ui-shadow: 0 -.25rem 1rem rgb(21 23 26 / 12%);
   --ui-shadow-raised: 0 .25rem 1rem rgb(21 23 26 / 12%);
   --ui-weight-bold: 700;
@@ -68,28 +75,45 @@
   --ui-letter-spacing-title: .01em;
   --ui-letter-spacing-label: .04em;
 
-  /* EVA Ceibal interface tokens, extracted from the supplied design-system
-     references. They intentionally apply to reader chrome and activities,
-     never to the book artwork or editorial content. */
-  --ceibal-institutional-100: #ccecea;
-  --ceibal-institutional-200: #99d9d5;
-  --ceibal-institutional-300: #66c6c0;
-  --ceibal-institutional-400: #00a096;
-  --ceibal-institutional-500: #008078;
-  --ceibal-institutional-600: #00635d;
-  --ceibal-institutional-700: #00504b;
-  --ceibal-institutional-800: #00403c;
-  --ceibal-institutional-900: #00302d;
-  --ceibal-quiz-page: var(--ceibal-institutional-400);
+  /* Tokens de EVA (tabla del punto 18). La escala institucional es la misma que
+     ya tenía el ADT; los grises son los de EVA. Estos tokens aplican al chrome
+     del lector y a las actividades, nunca a la obra ni al contenido editorial. */
+  --eva-color-white: #ffffff;
+  --eva-color-grey-100: #e1e3e6;
+  --eva-color-grey-500: #6b7280;
+  --eva-color-grey-600: #565b66;
+  --eva-color-grey-900: #15171a;
+  --eva-color-institucional-100: #ccecea;
+  --eva-color-institucional-200: #99d9d5;
+  --eva-color-institucional-300: #66c6c0;
+  --eva-color-institucional-400: #00a096;
+  --eva-color-institucional-500: #008078;
+  --eva-color-institucional-600: #00635d;
+  --eva-color-institucional-700: #00504b;
+  --eva-color-institucional-800: #00403c;
+  --eva-color-institucional-900: #00302d;
+
+  /* Alias heredados: los nombres del ADT apuntan a los tokens de EVA. Los grises
+     oscuros del ADT quedan fuera de la interfaz. */
+  --ceibal-institutional-100: var(--eva-color-institucional-100);
+  --ceibal-institutional-200: var(--eva-color-institucional-200);
+  --ceibal-institutional-300: var(--eva-color-institucional-300);
+  --ceibal-institutional-400: var(--eva-color-institucional-400);
+  --ceibal-institutional-500: var(--eva-color-institucional-500);
+  --ceibal-institutional-600: var(--eva-color-institucional-600);
+  --ceibal-institutional-700: var(--eva-color-institucional-700);
+  --ceibal-institutional-800: var(--eva-color-institucional-800);
+  --ceibal-institutional-900: var(--eva-color-institucional-900);
+  --ceibal-quiz-page: var(--eva-color-institucional-400);
   --ceibal-gray-50: #f8f9fa;
-  --ceibal-gray-100: #f1f2f4;
-  --ceibal-gray-200: #e5e7eb;
+  --ceibal-gray-100: var(--eva-color-grey-100);
+  --ceibal-gray-200: var(--eva-color-grey-100);
   --ceibal-gray-300: #d1d5db;
   --ceibal-gray-400: #a9afbb;
-  --ceibal-gray-600: #6b7280;
-  --ceibal-gray-700: #4d5562;
-  --ceibal-gray-800: #212936;
-  --ceibal-gray-900: #121826;
+  --ceibal-gray-600: var(--eva-color-grey-500);
+  --ceibal-gray-700: var(--eva-color-grey-600);
+  --ceibal-gray-800: var(--eva-color-grey-100);
+  --ceibal-gray-900: var(--eva-color-grey-900);
   --ceibal-success-surface: #edf8f1;
   --ceibal-success-text: #275e2e;
   --ceibal-error-surface: #fbefef;
@@ -2764,7 +2788,7 @@ body.reflow-book .reflow-settings-organized .reflow-setting-row {
   min-width: 0;
   padding: .75rem .25rem !important;
   border: 0 !important;
-  border-bottom: 1px solid var(--ceibal-gray-800) !important;
+  border-bottom: 1px solid var(--ui-border) !important;
   border-radius: 0 !important;
   background: transparent !important;
 }
@@ -2804,7 +2828,7 @@ body.reflow-book .reflow-settings-organized .reflow-settings-section-shortcuts {
 
 body.reflow-book .reflow-settings-organized .reflow-settings-block-title {
   margin: .75rem 0 .25rem !important;
-  color: var(--ceibal-gray-300);
+  color: var(--ui-n2-color) !important;
   font-size: var(--ui-n2-size);
   font-weight: var(--ui-weight-bold);
   letter-spacing: var(--ui-letter-spacing-label);
@@ -2889,7 +2913,7 @@ body.reflow-book .reflow-shortcuts-link {
   margin-top: .75rem;
   padding: .5rem .25rem;
   border: 0;
-  border-top: 1px solid var(--ceibal-gray-800);
+  border-top: 1px solid var(--ui-border);
   color: var(--ceibal-gray-300);
   background: transparent;
   font-size: 1rem;
@@ -2978,7 +3002,7 @@ body.reflow-book .reflow-shortcuts-card {
   border: 1px solid rgb(255 255 255 / 12%);
   border-radius: var(--ceibal-radius-lg);
   color: var(--ceibal-gray-50);
-  background: #1b1b1b;
+  background: var(--ui-surface-hover);
   box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 45%);
 }
 
@@ -3024,7 +3048,7 @@ body.reflow-book .reflow-shortcuts-row {
   justify-content: space-between;
   gap: 1rem;
   padding: .5rem 0;
-  border-top: 1px solid var(--ceibal-gray-800);
+  border-top: 1px solid var(--ui-border);
 }
 
 body.reflow-book .reflow-shortcuts-row kbd {
@@ -3092,7 +3116,7 @@ body.reflow-book .reflow-settings-organized .reflow-reduce-motion-setting {
   justify-content: space-between;
   gap: .75rem;
   padding: .75rem .25rem;
-  border-top: 1px solid var(--ceibal-gray-800);
+  border-top: 1px solid var(--ui-border);
 }
 
 body.reflow-book .reflow-settings-organized
@@ -3363,7 +3387,7 @@ body.reflow-book .reflow-reader-panel.reflow-navigation-panel {
   max-width: min(18rem, 100vw) !important;
   border-radius: 0 var(--ceibal-radius-md) var(--ceibal-radius-md) 0 !important;
   color: var(--ceibal-gray-50) !important;
-  background: #242424 !important;
+  background: var(--ui-bg) !important;
   box-shadow: var(--ceibal-shadow-card), 0 .5rem 1.5rem rgb(0 0 0 / 22%) !important;
 }
 
@@ -3386,7 +3410,7 @@ body.reflow-book .reflow-navigation-panel input[placeholder="Buscar"] {
   border: 2px solid var(--ceibal-gray-600) !important;
   border-radius: var(--ceibal-radius-md) !important;
   color: var(--ceibal-gray-50) !important;
-  background: #242424 !important;
+  background: var(--ui-bg) !important;
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 4%) !important;
 }
 
@@ -3530,7 +3554,7 @@ body.reflow-book .reflow-navigation-panel [role="tablist"] {
   padding: .25rem !important;
   border: 1px solid var(--ceibal-gray-700) !important;
   border-radius: var(--ceibal-radius-md) !important;
-  background: #1b1b1b !important;
+  background: var(--ui-surface-hover) !important;
 }
 
 body.reflow-book .reflow-navigation-panel [role="tab"] {
@@ -3588,14 +3612,14 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"] li > button[aria-cur
   /* Accessible variant (#008078 = 4.82:1 with white text) instead of the
      identity teal --ceibal-quiz-page (#00A096 = 3.25:1), so the selected index
      entry meets WCAG 1.4.3 for normal-size text. */
-  background: var(--ceibal-institutional-500) !important;
+  background: var(--ceibal-institutional-600) !important;
   box-shadow: inset .25rem 0 0 var(--ceibal-institutional-200) !important;
 }
 
 body.reflow-book .reflow-navigation-panel [data-reflow-visual-pages="true"]
   .reflow-index-group {
   padding: .875rem .25rem .4rem !important;
-  color: var(--ceibal-institutional-200) !important;
+  color: var(--ceibal-institutional-600) !important;
   font-size: 1.125rem !important;
   font-weight: 700 !important;
   letter-spacing: 0 !important;
@@ -3698,7 +3722,7 @@ body.reflow-book .reflow-navigation-panel [role="tabpanel"]
   content: attr(data-reflow-toc-group-start);
   display: block;
   padding: .875rem .25rem .4rem;
-  color: var(--ceibal-institutional-200);
+  color: var(--ceibal-institutional-600);
   font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -4000,7 +4024,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   gap: .5rem !important;
   width: 100% !important;
   padding: .75rem .5rem !important;
-  border-top: 1px solid var(--ceibal-gray-800) !important;
+  border-top: 1px solid var(--ui-border) !important;
 }
 
 #reflow-tts-voice-label {
@@ -4035,7 +4059,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
 .reflow-tts-voice-options button[aria-checked="true"] {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: var(--ceibal-institutional-500) !important;
+  background: var(--ceibal-institutional-600) !important;
   box-shadow: var(--ceibal-shadow-button);
 }
 
@@ -4055,7 +4079,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   gap: .5rem !important;
   width: 100% !important;
   padding: .75rem .5rem !important;
-  border-top: 1px solid var(--ceibal-gray-800) !important;
+  border-top: 1px solid var(--ui-border) !important;
 }
 
 #reflow-tts-speed-label {
@@ -4090,7 +4114,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
 .reflow-tts-speed-options button[aria-checked="true"] {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: var(--ceibal-institutional-500) !important;
+  background: var(--ceibal-institutional-600) !important;
   box-shadow: var(--ceibal-shadow-button);
 }
 
@@ -4104,7 +4128,7 @@ body.reflow-book #content .book-cover-final .book-cover-site {
    Configuration. Equal minmax columns plus a real gap prevent tab overlap. */
 body.reflow-book .reflow-reader-panel.reflow-glossary-panel {
   border: 1px solid var(--ceibal-gray-700) !important;
-  background: #242424 !important;
+  background: var(--ui-bg) !important;
   box-shadow: 0 .5rem 1.5rem rgb(0 0 0 / 24%) !important;
 }
 
@@ -4158,7 +4182,7 @@ body.reflow-book .reflow-glossary-panel input:is([type="search"], [placeholder="
   border: 1px solid var(--ceibal-gray-600) !important;
   border-radius: var(--ceibal-radius-md) !important;
   color: #fff !important;
-  background: #242424 !important;
+  background: var(--ui-bg) !important;
   font-size: 1.125rem !important;
 }
 
@@ -4180,7 +4204,7 @@ body.reflow-book .reflow-glossary-panel [role="tablist"] {
   padding: .25rem !important;
   border: 1px solid var(--ceibal-gray-700) !important;
   border-radius: var(--ceibal-radius-md) !important;
-  background: #1b1b1b !important;
+  background: var(--ui-surface-hover) !important;
 }
 
 body.reflow-book .reflow-glossary-panel [role="tab"] {
@@ -4680,7 +4704,7 @@ body.reflow-book #content .chapter5-chat-date {
   margin: 0 auto .45rem !important;
   padding: .3rem .65rem !important;
   border-radius: 999px;
-  color: #4d5562;
+  color: var(--ui-text-muted);
   background: #ebe8df;
   font-family: inherit !important;
   font-size: max(1rem, calc(1rem * var(--reflow-font-scale))) !important;
@@ -4719,7 +4743,7 @@ body.reflow-book #content .chapter5-chat-text {
 }
 
 body.reflow-book #content .chapter5-chat-sender {
-  color: #4d5562;
+  color: var(--ui-text-muted);
   font-size: max(1rem, calc(1rem * var(--reflow-font-scale))) !important;
   font-weight: 700;
   line-height: 1.3 !important;
@@ -4727,7 +4751,7 @@ body.reflow-book #content .chapter5-chat-sender {
 
 body.reflow-book #content .chapter5-chat-text {
   margin-top: .2rem !important;
-  color: #121826;
+  color: var(--ui-text);
   font-size: var(--reflow-chat-message-size, calc(var(--reflow-body-size) * var(--reflow-font-scale))) !important;
   line-height: var(--reflow-chat-message-line-height, 1.55) !important;
 }
@@ -4781,7 +4805,7 @@ body.reflow-book #content .reflow-chat-date {
   margin: 0 auto .55rem !important;
   padding: .28rem .65rem !important;
   border-radius: 999px !important;
-  color: #4d5562 !important;
+  color: var(--ui-text-muted) !important;
   background: #ebe8df !important;
   font-family: inherit !important;
   font-size: max(1rem, calc(1rem * var(--reflow-font-scale))) !important;
@@ -4888,7 +4912,7 @@ body.reflow-book #content .reflow-chat-text {
 }
 
 body.reflow-book #content .reflow-chat-sender {
-  color: #4d5562 !important;
+  color: var(--ui-text-muted) !important;
   font-size: max(1rem, calc(1rem * var(--reflow-font-scale))) !important;
   font-weight: 700 !important;
   line-height: 1.3 !important;
@@ -4896,7 +4920,7 @@ body.reflow-book #content .reflow-chat-sender {
 
 body.reflow-book #content .reflow-chat-text {
   margin-top: .18rem !important;
-  color: #121826 !important;
+  color: var(--ui-text) !important;
   font-size: var(--reflow-chat-message-size, calc(var(--reflow-body-size) * var(--reflow-font-scale))) !important;
   line-height: var(--reflow-chat-message-line-height, 1.55) !important;
 }
@@ -6274,7 +6298,18 @@ body.reflow-book .reflow-reader-panel [role="radio"][aria-checked="true"],
 body.reflow-book .reflow-reader-panel button[aria-pressed="true"]:not([role="switch"]) {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
-  background: var(--ceibal-institutional-500) !important;
+  background: var(--ceibal-institutional-600) !important;
+}
+
+/* Punto 18 · La opción elegida no se distingue sólo por el color: suma un check
+   visible (además del relleno institucional). */
+body.reflow-book .reflow-reader-panel [role="radio"][aria-checked="true"]::after,
+body.reflow-book #reflow-tts-player .reflow-tts-voice-options button[aria-checked="true"]::after,
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"]::after {
+  content: "✓";
+  margin-inline-start: .375rem;
+  font-weight: var(--ui-weight-bold);
+  line-height: 1;
 }
 
 /* Selected Index entries (chapter/section in the TOC and page-number list)
@@ -6286,7 +6321,7 @@ body.reflow-book .reflow-navigation-panel [aria-current]:not([aria-current="fals
 body.reflow-book .reflow-reader-panel [aria-current="location"],
 body.reflow-book .reflow-reader-panel [aria-current="page"] {
   color: #fff !important;
-  background: var(--ceibal-institutional-500) !important;
+  background: var(--ceibal-institutional-600) !important;
 }
 
 body.reflow-book .reflow-reader-panel [role="tab"]:hover:not(:disabled):not([aria-disabled="true"]):not([aria-selected="true"]) {
@@ -6443,7 +6478,7 @@ body.reflow-book .reflow-control-status {
   border: 1px solid var(--ceibal-gray-600);
   border-radius: var(--ceibal-radius-md);
   color: var(--ceibal-gray-100);
-  background: #242424;
+  background: var(--ui-bg);
   font-size: 1rem;
   line-height: 1.3;
 }
