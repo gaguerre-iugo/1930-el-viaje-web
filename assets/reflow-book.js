@@ -3344,7 +3344,10 @@
         (parseFloat(contentStyle.paddingLeft) || 0) -
         (parseFloat(contentStyle.paddingRight) || 0)
     );
-    var targetGap = Math.max(12, Math.min(42, columnHeight * .04));
+    /* Un margen chico alcanza para no fragmentar una astilla en la columna
+       siguiente y deja la portada lo más grande posible: el margen anterior
+       (4 %, hasta 42 px por lado) la achicaba de más. */
+    var targetGap = Math.min(12, Math.max(4, columnHeight * .015));
     var coverRatio = 738 / 1078;
     /* Fit strictly inside the column so the wrapper never fragments a sliver
        into the next column. */
@@ -3352,11 +3355,16 @@
     coverHeight = Math.min(coverHeight, horizontalRoom / coverRatio);
     var coverWidth = coverHeight * coverRatio;
 
-    cover.style.width = coverWidth + "px";
-    cover.style.height = coverHeight + "px";
-    cover.style.maxWidth = "none";
-    cover.style.maxHeight = "none";
-    cover.style.flex = "0 0 auto";
+    /* Width and height must travel together and win over the stylesheet: the
+       CSS pins the wrapper width with `!important` (`min(100%, 57dvh, 40rem)`).
+       When only the height came from here, the box ended up wider than the
+       738/1078 artwork, so `object-fit: contain` drew two side bars of the
+       `#210f1c` background — the lateral columns reported on the cover. */
+    cover.style.setProperty("width", coverWidth + "px", "important");
+    cover.style.setProperty("height", coverHeight + "px", "important");
+    cover.style.setProperty("max-width", "none", "important");
+    cover.style.setProperty("max-height", "none", "important");
+    cover.style.setProperty("flex", "0 0 auto", "important");
     /* The wrapper is height:100% of the column and flex-centers its child, so
        the art is already vertically centred within the page. No innerHeight-
        based transform is needed. */
