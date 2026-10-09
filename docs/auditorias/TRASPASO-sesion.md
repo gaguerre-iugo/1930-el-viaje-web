@@ -66,6 +66,18 @@ dentro del pop-up en angosta, y la oración se evita minimizando el pop-up); y e
 **punto 5 se endureció** (la respuesta y la devolución ya no viajan en la página).
 Detalle en el changelog.
 
+**Bug del reproductor de audio (reportado por el usuario, corregido):** «pausar →
+Siguiente → Play: el primer toque no hace nada; el segundo arranca». La causa no
+era el audio sino el **botón**: `pointerdown` sobre el reproductor llama a
+`syncPrimaryToolbar()`, que reescribía el `innerHTML` del icono Reproducir/Pausar
+en **cada** sincronización. Al reemplazar el `<path>` que había recibido el
+`mousedown`, Chrome no sintetiza el `click`: el primer toque moría. El segundo
+funcionaba porque el botón ya quedaba enfocado y `preserveTtsPanel` no volvía a
+sincronizar. Arreglo: la actualización del icono (y de la etiqueta) es
+**idempotente** (`data-reflow-icon`), así no se toca el DOM si no cambió.
+`verify-tts-transport.mjs` ahora toca el botón con **puntero real** (`page.click`),
+no con `el.click()`, que era lo que ocultaba el bug.
+
 ## Estado real de los 25 puntos
 
 Tabla de entrada rápida. **El detalle de cada punto, con las mediciones, está en el
@@ -270,6 +282,12 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
   como un rango no muta el DOM, **ningún observador se despierta** al cambiar de
   oración: la evitación del reproductor hay que llamarla desde el pintado
   (`paintTtsRange`), no esperar un ciclo. Ver el punto 25 del changelog.
+- **El botón Reproducir/Pausar no se debe reescribir en cada sincronización.** El
+  reproductor sincroniza la barra en el `pointerdown` (`preserveTtsPanel`). Si esa
+  sincronización reemplaza el `<path>` del icono, el objetivo del `mousedown` queda
+  desconectado y **Chrome no emite el `click`**: el toque se pierde (el segundo
+  funciona porque el botón ya está enfocado y no se resincroniza). Al escribir
+  íconos o etiquetas en controles que se sincronizan por gesto, comparar antes.
 - **Al medir contraste de este runtime hay que convertir oklch/oklab a sRGB**, no
   leer sólo su luminosidad: para decidir claro/oscuro alcanza el primer número,
   pero para un contraste WCAG no. `verify-quiz-contrast.mjs` trae el conversor.
@@ -280,7 +298,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
   vieja. Valores actuales: `reflow.css?v=174-cuerpo-responsivo`,
-  `reflow-book.js?v=201-tts-transporte`, `quiz-sequence.js?v=9-cierre-listo` y
+  `reflow-book.js?v=202-clic-reproductor`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
@@ -301,7 +319,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-quiz-contrast.mjs` | Punto 18: contraste de texto y gráficos en los 4 estados, devolución y botón | Acota la muestra al panel de la pregunta; convierte oklch/oklab a sRGB |
 | `verify-tts-avoidance.mjs` | El reproductor no tapa el bloque en lectura | Marca los bloques **a mano**: es el caso simulado |
 | `verify-tts-avoidance-real.mjs` | Punto 25 en lectura real: oración baja y alta | Necesita `--autoplay-policy=no-user-gesture-required` (lo pasa el lanzador) |
-| `verify-tts-transport.mjs` | Reproductor: Anterior/Siguiente en pausa y Play reanudan en la frase elegida | También necesita `--autoplay-policy=no-user-gesture-required`; salta a `pg019` para evitar el auto-avance de los ítems cortos |
+| `verify-tts-transport.mjs` | Reproductor: Anterior/Siguiente en pausa y Play reanudan en la frase elegida; el **primer** toque de Play responde | Toca el botón con **puntero real** (`page.click`), no con `el.click()`; también necesita `--autoplay-policy=no-user-gesture-required`; salta a `pg019` para evitar el auto-avance de los ítems cortos |
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
 | `verify-body-size.mjs` | Punto 20 (seguimiento): `text_only` y `boxed_text` miden lo mismo en celular, laptop y pizarra | El caso de pizarra necesita un viewport ≥1600 px para ejercitar el cuerpo de 24 px |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |

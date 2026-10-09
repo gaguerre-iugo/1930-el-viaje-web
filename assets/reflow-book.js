@@ -3837,8 +3837,17 @@
     setAttributeIfChanged(ttsPlayerToggleButton, "aria-pressed", playing);
     var playIcon = ttsPlayerToggleButton.querySelector(".reflow-tts-player-icon");
     var playText = ttsPlayerToggleButton.querySelector(".reflow-tts-player-label");
-    if (playIcon) playIcon.innerHTML = playing ? uiIconFilled("pause") : uiIconFilled("play");
-    if (playText) playText.textContent = playLabel;
+    /* No reescribir el icono si no cambió: `syncPrimaryToolbar()` corre en el
+       `pointerdown` del reproductor y reemplazar el <path> del botón Play/Pausa
+       desengancha el objetivo del `mousedown`, así que Chrome no sintetiza el
+       `click`. El primer toque moría y recién el segundo respondía (el botón ya
+       quedaba enfocado y no se volvía a sincronizar). */
+    var playIconName = playing ? "pause" : "play";
+    if (playIcon && playIcon.dataset.reflowIcon !== playIconName) {
+      playIcon.dataset.reflowIcon = playIconName;
+      playIcon.innerHTML = uiIconFilled(playIconName);
+    }
+    if (playText && playText.textContent !== playLabel) playText.textContent = playLabel;
 
     var api = window.__adtReflowAudio;
     var canStep = Boolean(active && api && api.items && api.items.length && api.playAtIndex);

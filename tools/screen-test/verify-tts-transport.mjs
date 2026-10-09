@@ -7,6 +7,13 @@
 // Ahora, si el ítem elegido sigue en la página visible, se reanuda desde él con
 // `api.play()`; solo se alinea a la página cuando el lector navegó a otra.
 //
+// Segundo bug (regresión de puntero): el botón Reproducir/Pausar no respondía al
+// primer toque tras pausar y mover con Siguiente. `pointerdown` sobre el
+// reproductor llama a `syncPrimaryToolbar()`, que reescribía el <path> del icono
+// del botón; eso desenganchaba el objetivo del `mousedown` y Chrome no
+// sintetizaba el `click`. El primer toque moría y el segundo funcionaba. Por eso
+// este test toca el botón con `page.click` (puntero real), no con `el.click()`.
+//
 // Uso:
 //   node verify-tts-transport.mjs
 //   node verify-tts-transport.mjs --url http://127.0.0.1:5501/index.html
@@ -49,7 +56,10 @@ const estado = () =>
     const api = window.__adtReflowAudio;
     return { idx: api.currentIndex, playing: !!api.isPlaying };
   });
-const clickBoton = (sel) => page.$eval(sel, (el) => el.click());
+/* El botón Reproducir/Pausar se toca con puntero real (`page.click`), no con
+   `el.click()`: en `pointerdown` el reproductor sincroniza la barra, y si esa
+   sincronización reescribe el <path> del icono el `click` no se sintetiza y el
+   primer toque muere. Con `el.click()` el bug no se veía. */
 
 /* Saltar a un ítem de texto de pg019 (frases largas, sin auto-avance veloz) y
    dejar el transporte en pausa. */
@@ -82,7 +92,7 @@ if (trasSiguiente.idx !== pausa.idx + 1) {
 }
 
 /* Play: reanuda desde la frase elegida, no desde el inicio de la página. */
-await clickBoton("#reflow-tts-toggle");
+await page.click("#reflow-tts-toggle");
 await page.waitForTimeout(1200);
 const trasPlay = await estado();
 if (!trasPlay.playing) fallar("Play tras Siguiente no arrancó");
@@ -91,7 +101,7 @@ if (trasPlay.idx !== trasSiguiente.idx) {
 }
 
 /* Anterior en pausa. */
-await clickBoton("#reflow-tts-toggle");
+await page.click("#reflow-tts-toggle");
 await page.waitForTimeout(900);
 await page.click("#reflow-tts-previous");
 await page.waitForTimeout(1500);
@@ -102,7 +112,7 @@ if (trasAnterior.idx !== trasSiguiente.idx - 1) {
 }
 
 /* Play de nuevo: reanuda desde la frase elegida. */
-await clickBoton("#reflow-tts-toggle");
+await page.click("#reflow-tts-toggle");
 await page.waitForTimeout(1200);
 const trasPlay2 = await estado();
 if (!trasPlay2.playing) fallar("Play tras Anterior no arrancó");
