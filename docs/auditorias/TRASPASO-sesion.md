@@ -84,10 +84,13 @@ causa: el CSS fija el **ancho** de `.book-cover-layout` con `!important`
 (`min(100%, 57dvh, 40rem)`) y `balanceCoverMargins()` sólo fijaba el **alto**
 (inline). La caja quedaba más ancha que la imagen (738/1078) y `object-fit:
 contain` dibujaba las franjas. Arreglo: ancho y alto viajan juntos desde el
-script, con `!important`; y el margen pasó de 4 % (hasta 42 px por lado) a un
-máximo de 12 px para que la portada ocupe lo máximo posible (llena 97 % del alto
-disponible, o el 100 % del ancho cuando el viewport es angosto).
-`verify-cover-fit.mjs` (nuevo) lo mide en 7 tamaños.
+script, con `!important`. Además la portada ahora **usa también el margen
+vertical de la página**: se ajusta al alto real de `#content` (que termina donde
+empieza la barra inferior) con ~10 px de aire y el arte desborda el alto de la
+columna hacia el padding (`overflow: visible`), sin cambiar el paginado. Queda
+un 10 % más grande y nunca se mete bajo la barra. (Anular el padding de la
+página **no** sirve: repagina el libro entero.) `verify-cover-fit.mjs` (nuevo)
+lo mide en 7 tamaños y comprueba que la portada no aparezca en la página 2.
 
 ## Estado real de los 25 puntos
 
@@ -300,6 +303,12 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
   y alto tienen que ir juntos. Y ojo al medir: el rect del `<img>` **siempre**
   llena la caja, así que la franja hay que calcularla con
   `min(ancho, alto × 738/1078)`, no con el rect.
+- **La portada puede usar el margen vertical de la página sin repaginar.** Se la
+  dimensiona contra el alto real de `#content` (que termina donde empieza la
+  barra) y el arte **desborda** el alto de la columna hacia el padding con
+  `overflow: visible`. Lo que **no** hay que hacer es anular el padding de la
+  página: cambia el alto de la columna y **repagina el libro entero** (medido:
+  11→10, 8→7, 14→12 páginas).
 - **El botón Reproducir/Pausar no se debe reescribir en cada sincronización.** El
   reproductor sincroniza la barra en el `pointerdown` (`preserveTtsPanel`). Si esa
   sincronización reemplaza el `<path>` del icono, el objetivo del `mousedown` queda
@@ -315,8 +324,8 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=174-cuerpo-responsivo`,
-  `reflow-book.js?v=203-portada-sin-franjas`, `quiz-sequence.js?v=9-cierre-listo` y
+  vieja. Valores actuales: `reflow.css?v=175-portada-margen`,
+  `reflow-book.js?v=204-portada-margen`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
 - **Playwright**: el lanzador necesita `--remote-debugging-pipe`, que el sandbox de
@@ -340,7 +349,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-tts-transport.mjs` | Reproductor: Anterior/Siguiente en pausa y Play reanudan en la frase elegida; el **primer** toque de Play responde | Toca el botón con **puntero real** (`page.click`), no con `el.click()`; también necesita `--autoplay-policy=no-user-gesture-required`; salta a `pg019` para evitar el auto-avance de los ítems cortos |
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
 | `verify-body-size.mjs` | Punto 20 (seguimiento): `text_only` y `boxed_text` miden lo mismo en celular, laptop y pizarra | El caso de pizarra necesita un viewport ≥1600 px para ejercitar el cuerpo de 24 px |
-| `verify-cover-fit.mjs` | Portada: sin franjas laterales (la caja mantiene 738/1078) y ocupa lo máximo disponible | Mide la franja real de `object-fit: contain`, no el rect del `<img>` (que siempre llena la caja) |
+| `verify-cover-fit.mjs` | Portada: sin franjas laterales (la caja mantiene 738/1078), ocupa el margen y no se mete bajo la barra; tampoco aparece en la página 2 | Mide la franja real de `object-fit: contain`, no el rect del `<img>` (que siempre llena la caja) |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |
 
 ## Decisiones que NO son de código

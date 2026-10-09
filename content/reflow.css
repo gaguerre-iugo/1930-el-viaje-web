@@ -1800,12 +1800,13 @@ body.reflow-book #content > .book-cover-final {
   padding: 0 !important;
   break-after: column;
   break-inside: avoid-column;
-  /* Clip instead of letting an over-tall cover bleed a strip into the next
-     column (a phantom page on mobile browsers whose dynamic viewport makes the
-     `100dvh` column taller than the visible area). The art is sized and centred
-     against the real column box in JS (balanceCoverMargins), so it stays within
-     this single page. */
-  overflow: hidden;
+  /* La portada usa también el margen vertical de la página: `balanceCoverMargins`
+     la dimensiona contra el alto real de #content (que termina donde empieza la
+     barra) y el arte desborda el alto de la columna hacia el padding. Con
+     `overflow: hidden` ese desborde se recortaba. El ancho sigue contenido
+     (la portada es más angosta que la columna), así que no hay sangrado
+     horizontal ni página fantasma. */
+  overflow: visible;
   background: #fff;
 }
 

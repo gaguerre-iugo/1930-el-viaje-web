@@ -3319,39 +3319,32 @@
     });
   }
 
-  /* Center the cover against the real paginated column box (#content minus its
-     vertical padding) rather than window.innerHeight. On mobile browsers the
-     layout viewport (window.innerHeight) does not match the `100dvh`-based
-     column height, so sizing/positioning against innerHeight pushed the artwork
-     partly outside its column — clipping it and spilling phantom pages. Sizing
-     and centering against the column keeps the whole cover on its single page
-     on every browser. */
+  /* Center the cover against the real paginated box (#content, whose height ends
+     where the bottom toolbar starts) rather than window.innerHeight. On mobile
+     browsers the layout viewport does not match the `100dvh`-based column, so
+     sizing against innerHeight pushed the artwork outside its column — clipping
+     it and spilling phantom pages. */
   function balanceCoverMargins() {
     if (!content) return;
     var cover = content.querySelector(".book-cover-final .book-cover-layout");
     if (!cover) return;
 
     var contentStyle = getComputedStyle(content);
-    var paddingTop = parseFloat(contentStyle.paddingTop) || 0;
-    var paddingBottom = parseFloat(contentStyle.paddingBottom) || 0;
-    var columnHeight = Math.max(
-      1,
-      content.clientHeight - paddingTop - paddingBottom
-    );
+    /* La portada usa también el margen vertical de la página: se ajusta al alto
+       real de #content (que termina donde empieza la barra inferior) con ~10 px
+       de aire arriba y abajo, y el arte desborda el alto de la columna hacia el
+       padding del section (`overflow: visible`). Es lo más grande posible sin
+       meterse bajo la barra. */
+    var availableHeight = Math.max(1, content.clientHeight);
     var horizontalRoom = Math.max(
       1,
       content.clientWidth -
         (parseFloat(contentStyle.paddingLeft) || 0) -
         (parseFloat(contentStyle.paddingRight) || 0)
     );
-    /* Un margen chico alcanza para no fragmentar una astilla en la columna
-       siguiente y deja la portada lo más grande posible: el margen anterior
-       (4 %, hasta 42 px por lado) la achicaba de más. */
-    var targetGap = Math.min(12, Math.max(4, columnHeight * .015));
+    var targetGap = 10;
     var coverRatio = 738 / 1078;
-    /* Fit strictly inside the column so the wrapper never fragments a sliver
-       into the next column. */
-    var coverHeight = Math.max(1, columnHeight - (2 * targetGap));
+    var coverHeight = Math.max(1, availableHeight - (2 * targetGap));
     coverHeight = Math.min(coverHeight, horizontalRoom / coverRatio);
     var coverWidth = coverHeight * coverRatio;
 
