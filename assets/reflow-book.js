@@ -2061,6 +2061,15 @@
     );
   }
 
+  /* La devolución del cuestionario se lee con un audio propio (no pasa por el
+     motor de lectura): es lo que suena mientras el libro dice «Correcto…» o
+     «Todavía no…». Mientras dura, el botón Reproducir/Pausar del reproductor
+     tiene que manejarlo a él y no a la narración. */
+  function quizFeedbackIsPlaying() {
+    var audio = state.quizFeedbackAudio;
+    return Boolean(audio && !audio.paused && !audio.ended);
+  }
+
   var readAloudEnabledSelector = [
     'button[aria-label="Desactivar texto a voz"]',
     'button[aria-label="Desactivar lectura en voz alta"]'
@@ -3820,7 +3829,9 @@
   function syncFloatingTtsPlayer() {
     if (!ttsPlayer || !ttsPlayerToggleButton) return;
     var active = ttsSessionIsActive();
-    var playing = active && ttsPlaybackIsRunning();
+    /* La devolución del cuestionario también «suena»: mientras se lee, el botón
+       muestra Pausar y maneja ese audio (ver `quizFeedbackIsPlaying`). */
+    var playing = active && (ttsPlaybackIsRunning() || quizFeedbackIsPlaying());
     var visibilityChanged = active !== state.ttsPlayerVisible;
     state.ttsPlayerVisible = active;
     ttsPlayer.hidden = !active;
@@ -4076,6 +4087,24 @@
   }
 
   function toggleFloatingReadAloud() {
+    /* Si está sonando la devolución del cuestionario, este botón la pausa (y la
+       reanuda) a ella. Antes preguntaba por la narración del libro —que el quiz
+       dejó en pausa—, así que el toque intentaba arrancar la lectura y el audio
+       de la devolución seguía sonando: parecía que no respondía. */
+    var devolucion = state.quizFeedbackAudio;
+    if (devolucion) {
+      if (devolucion.paused) {
+        var reanudar = devolucion.play();
+        if (reanudar && typeof reanudar.catch === "function") {
+          reanudar.catch(function () {});
+        }
+      } else {
+        devolucion.pause();
+      }
+      requestAnimationFrame(syncPrimaryToolbar);
+      window.setTimeout(syncPrimaryToolbar, 160);
+      return;
+    }
     var api = window.__adtReflowAudio;
     if (ttsPlaybackIsRunning()) {
       state.ttsManuallyPaused = true;
@@ -4092,6 +4121,9 @@
   }
 
   function stepFloatingReadAloud(direction) {
+    /* Mover la lectura del libro corta la devolución del cuestionario: si no,
+       las dos suenan a la vez. */
+    if (state.quizFeedbackAudio) stopQuizFeedbackAudio();
     var api = window.__adtReflowAudio;
     if (!api || !api.items || !api.items.length || !api.playAtIndex) return;
     state.ttsStepShouldRemainPaused = state.ttsManuallyPaused || !ttsPlaybackIsRunning();
@@ -4113,6 +4145,8 @@
 
   function stopFloatingReadAloud() {
     state.ttsPlayerStopPendingUntil = Date.now() + 600;
+    /* «Detener» apaga todo, también la devolución del cuestionario si sonaba. */
+    stopQuizFeedbackAudio();
     syncReadAloudSetting(false);
     stopTtsFromSettings();
     syncFloatingTtsPlayer();
@@ -12021,10 +12055,16 @@
       function finish() {
         feedbackElement.classList.remove("tts-active-block");
         if (state.quizFeedbackAudio === audio) state.quizFeedbackAudio = null;
+        /* Terminó la devolución: el reproductor vuelve a mostrar el estado de la
+           narración del libro. */
+        syncFloatingTtsPlayer();
       }
       audio.onended = finish;
       audio.onerror = finish;
       audio.play().catch(finish);
+      /* Mientras suena la devolución, el botón tiene que verse como «Pausar» y
+         pausar este audio (ver `quizFeedbackIsPlaying`). */
+      syncFloatingTtsPlayer();
     };
     window.__adtReflowTargetIndex = function (items) {
       return ttsIndexForPage(items, visiblePageIndex());
@@ -12070,6 +12110,7 @@
       state.quizFeedbackAudio.load();
       state.quizFeedbackAudio = null;
     }
+    if (!content) return;
     content.querySelectorAll(".quiz-feedback.tts-active-block").forEach(function (element) {
       element.classList.remove("tts-active-block");
     });
