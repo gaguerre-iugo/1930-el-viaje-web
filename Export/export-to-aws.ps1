@@ -9,13 +9,25 @@
     .\Export\export-to-aws.ps1
     Crea/actualiza Export/sitio/ con el contenido listo para subir a S3.
 .NOTES
-    Version: 1.0
-    Fecha:   2026-09-23
+    Version: 1.1
+    Fecha:   2026-10-13
+    v1.1: se suman assets/icons/ (el logo de Ceibal del cargador lo referencia
+          content/reflow.css) y assets/mobile-diagnostics.js (?diag=1). Se agrega
+          una verificacion de que el CSS encuentre sus assets.
 #>
 
 $ErrorActionPreference = "Stop"
-$SourceRoot   = Resolve-Path "."
+# La raiz del repo es la carpeta padre de Export/, asi el script corre desde
+# cualquier directorio y no solo desde la raiz.
+$SourceRoot   = Resolve-Path (Join-Path $PSScriptRoot "..")
 $TargetRoot   = Join-Path $SourceRoot "Export\sitio"
+
+# Chequeo de cordura: que estemos parados sobre el repo correcto.
+foreach ($required in @("index.html", "assets\reflow-book.js", "content\reflow.css", "imsmanifest.xml")) {
+    if (-not (Test-Path (Join-Path $SourceRoot $required))) {
+        throw "No parece la raiz del repo: falta '$required' en $SourceRoot"
+    }
+}
 
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host " 1930 - El viaje :: Export to AWS S3" -ForegroundColor Cyan
@@ -63,6 +75,7 @@ $AssetsFiles = @(
     "config.json",
     "font-validation.js",
     "fonts.css",
+    "mobile-diagnostics.js",
     "offline-preloader.js",
     "quiz-sequence.js",
     "reflow-book.js",
@@ -75,11 +88,15 @@ foreach ($file in $AssetsFiles) {
     if (Test-Path $src) {
         Copy-Item -Path $src -Destination $TargetAssets -Force
     }
+    else {
+        Write-Host "   [WARN] assets/$file no encontrado" -ForegroundColor DarkYellow
+    }
 }
 
 # Subdirectorios de assets/
 $AssetDirs = @(
     "fonts",
+    "icons",
     "libs",
     "sounds",
     "symbols",
@@ -93,6 +110,9 @@ foreach ($dir in $AssetDirs) {
         Copy-Item -Path $src -Destination $dst -Recurse -Force
         $count = (Get-ChildItem -Path $dst -Recurse -File).Count
         Write-Host "   -> assets/$dir ($count archivos)" -ForegroundColor Gray
+    }
+    else {
+        Write-Host "   [WARN] assets/$dir no encontrado" -ForegroundColor DarkYellow
     }
 }
 
@@ -157,6 +177,30 @@ $contentCount = (Get-ChildItem -Path $TargetContent -Recurse -File).Count
 Write-Host "   -> Total content: $contentCount archivos" -ForegroundColor Green
 
 # ──────────────────────────────────────────────
+# 5b. Verificacion: assets referenciados por el CSS
+# ──────────────────────────────────────────────
+# content/reflow.css referencia ../assets/... (por ejemplo el logo de Ceibal del
+# cargador). Si esos archivos no se copian, el libro se sirve con 404 silenciosos.
+Write-Host "> Verificando assets referenciados por content/reflow.css..." -ForegroundColor Yellow
+$cssRefs = @()
+$cssPath = Join-Path $TargetContent "reflow.css"
+if (Test-Path $cssPath) {
+    $cssRefs = Select-String -Path $cssPath -Pattern '\.\./assets/[A-Za-z0-9_\-./]+' -AllMatches |
+        ForEach-Object { $_.Matches } | ForEach-Object { $_.Value } | Sort-Object -Unique
+}
+$cssFaltan = @()
+foreach ($ref in $cssRefs) {
+    $rel = $ref -replace '^\.\./', ''
+    if (-not (Test-Path (Join-Path $TargetRoot $rel))) { $cssFaltan += $rel }
+}
+if ($cssFaltan.Count -gt 0) {
+    Write-Host "   [ERROR] El CSS referencia assets que no se copiaron:" -ForegroundColor Red
+    $cssFaltan | ForEach-Object { Write-Host "      - $_" -ForegroundColor Red }
+    throw "Export incompleto: faltan assets referenciados por content/reflow.css."
+}
+Write-Host "   [OK] $($cssRefs.Count) referencias de assets del CSS presentes" -ForegroundColor Green
+
+# ──────────────────────────────────────────────
 # 6. Resumen
 # ──────────────────────────────────────────────
 Write-Host ""
@@ -172,6 +216,12 @@ $sizeGB     = [math]::Round($totalSize / 1GB, 2)
 Write-Host "  Destino:    $TargetRoot" -ForegroundColor White
 Write-Host "  Archivos:   $totalFiles" -ForegroundColor White
 Write-Host "  Tamano:     ${sizeMB} MB (${sizeGB} GB)" -ForegroundColor White
+$indexHtml = Join-Path $SourceRoot "index.html"
+if (Test-Path $indexHtml) {
+    $versiones = Select-String -Path $indexHtml -Pattern '\?v=([A-Za-z0-9_\-]+)' -AllMatches |
+        ForEach-Object { $_.Matches } | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
+    if ($versiones) { Write-Host "  Versiones:  $($versiones -join ', ')" -ForegroundColor White }
+}
 Write-Host ""
 Write-Host "[OK] Exportacion completada exitosamente" -ForegroundColor Green
 Write-Host ""

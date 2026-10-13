@@ -4,7 +4,10 @@
 >
 > **Versión del libro:** v48 — full-book
 > **Build ID:** `47-full-book-106`
-> **Última actualización:** 2026-09-23
+> **Última actualización:** 2026-10-13
+> **Script:** `export-to-aws.ps1` v1.1 (suma `assets/icons/` y
+> `assets/mobile-diagnostics.js`, corre desde cualquier directorio y verifica que
+> `content/reflow.css` encuentre sus assets)
 
 ---
 
@@ -36,7 +39,9 @@ La exportación contiene **solo los archivos necesarios para servir el libro** e
 │   ├── base.bundle.min.js           ← Librerías minificadas
 │   ├── base.bundle.local.js         ← Librerías debug
 │   ├── base.bundle.min.js.map       ← Source map
+│   ├── mobile-diagnostics.js        ← Diagnóstico móvil (se carga con ?diag=1)
 │   ├── fonts/                       ← Atkinson Hyperlegible (.woff2)
+│   ├── icons/                       ← Logo de Ceibal y SVG de EVA (los usa reflow.css)
 │   ├── libs/fontawesome/            ← Iconos FontAwesome
 │   ├── symbols/                     ← Símbolos gráficos
 │   ├── sounds/                      ← Efectos de sonido
@@ -85,11 +90,14 @@ La exportación contiene **solo los archivos necesarios para servir el libro** e
 ### Opción 1: Script automatizado (recomendado)
 
 ```powershell
-# Desde la raíz del repositorio
+# Desde la raíz del repositorio (o desde Export\; el script se ubica solo)
 .\Export\export-to-aws.ps1
 ```
 
-Esto copia todos los archivos necesarios a `Export/sitio/`.
+Esto copia todos los archivos necesarios a `Export/sitio/`. Al final verifica
+que `content/reflow.css` encuentre sus assets (por ejemplo el logo de Ceibal del
+cargador en `assets/icons/`): si falta alguno, **aborta** en vez de dejar un 404
+silencioso.
 
 ### Opción 2: Manual (sin PowerShell)
 

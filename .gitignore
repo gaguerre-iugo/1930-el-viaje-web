@@ -13,7 +13,4 @@ tmp/
 
 # Exportaciones para AWS S3 (generadas con Export/export-to-aws.ps1)
 Export/sitio/
-
-# Exportaciones para AWS S3 (generadas con Export/export-to-aws.ps1)
-Export/sitio/
 Export/1930-El-Viaje.zip
