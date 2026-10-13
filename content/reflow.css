@@ -2392,10 +2392,13 @@ body.reflow-book .quiz-sequence-closing {
   font-weight: 700;
 }
 
-body.reflow-book .quiz-sequence-closing .quiz-sequence-closing-note {
-  display: block;
-  margin-top: .25rem;
-  font-weight: 400;
+/* «¡Listo!…» y «Seguir leyendo» en la misma línea; el botón pegado a la derecha. */
+body.reflow-book .quiz-sequence-closing .quiz-sequence-closing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  flex-wrap: wrap;
 }
 
 /* Punto 17 · «Seguir leyendo»: cierra la secuencia de las tres preguntas y lleva
@@ -2405,7 +2408,8 @@ body.reflow-book #content .quiz-keep-reading {
   min-height: 2.75rem;
   align-items: center;
   justify-content: center;
-  margin-top: .75rem;
+  /* Va dentro de la fila del cierre, a la derecha; sin margen propio. */
+  margin-top: 0;
   padding: .5rem 1.25rem;
   border: 0;
   border-radius: var(--ceibal-radius-md);
@@ -3513,55 +3517,87 @@ body.reflow-book .reflow-accessibility-panel .reflow-font-settings-card {
   padding-inline: .5rem !important;
 }
 
-/* Keep the full Resaltado control inside the compact settings panel without
-   reducing legacy text widths. The label keeps its natural width; the segmented buttons
-   give back only redundant horizontal padding. */
-body.reflow-book .reflow-accessibility-panel
-  [role="group"]:has(> span + div > [role="radio"]) {
-  min-width: 0 !important;
-  gap: .25rem !important;
-}
-
-body.reflow-book .reflow-accessibility-panel
-  [role="group"]:has(> span + div > [role="radio"]) > span {
-  flex: 0 0 auto !important;
-}
-
-body.reflow-book .reflow-accessibility-panel
-  [role="group"]:has(> span + div > [role="radio"]) > div {
-  flex: 0 1 auto !important;
-  min-width: 0 !important;
-}
-
-body.reflow-book .reflow-accessibility-panel
-  [role="group"]:has(> span + div > [role="radio"]) > div > [role="radio"] {
-  padding-inline: .45rem !important;
-}
-
-/* The availability hint is a third child of the Resaltado group. Keep it on
-   its own line so it cannot squeeze or overlap the segmented control in the
-   narrow Tools panel. */
+/* Resaltado comparte la jerarquía de «Voz del narrador» y «Velocidad»: la
+   etiqueta va en negrita sobre su propia línea y las opciones Palabra/Oración
+   usan el mismo control segmentado que las voces, para que los tres bloques de
+   «Escuchar» se lean igual. El runtime renderiza el grupo como
+   [role="group"] > span + div > [role="radio"]. */
 body.reflow-book .reflow-accessibility-panel
   .reflow-setting-highlight[role="group"] {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center !important;
-  column-gap: .5rem !important;
-  row-gap: .25rem !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: stretch !important;
+  column-gap: 0 !important;
+  row-gap: .5rem !important;
+  min-width: 0 !important;
 }
 
 body.reflow-book .reflow-accessibility-panel
-  .reflow-setting-highlight[role="group"] > div {
-  grid-column: 2;
-  justify-self: end;
+  .reflow-setting-highlight[role="group"] > span {
+  grid-column: 1 !important;
+  color: var(--ceibal-gray-100) !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
 }
 
+/* Contenedor de opciones: conserva los radios del runtime y adopta el mismo
+   lenguaje visual que .reflow-tts-voice-options (fondo hundido y botón activo
+   en turquesa institucional). */
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] > div {
+  grid-column: 1 !important;
+  justify-self: stretch !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: .25rem !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: .25rem !important;
+  border: 0 !important;
+  border-radius: var(--ceibal-radius-md) !important;
+  background: #252525 !important;
+  box-shadow: none !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] > div > [role="radio"] {
+  min-width: 0 !important;
+  min-height: 2.875rem !important;
+  padding: .5rem .35rem !important;
+  border: 1px solid transparent !important;
+  border-radius: .6rem !important;
+  color: var(--ceibal-gray-300) !important;
+  background: transparent !important;
+  font-size: 1.125rem !important;
+  font-weight: var(--ui-weight-regular) !important;
+  box-shadow: none !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] > div > [role="radio"][aria-checked="true"] {
+  border-color: var(--ceibal-institutional-300) !important;
+  color: #fff !important;
+  background: var(--ceibal-institutional-600) !important;
+  box-shadow: var(--ceibal-shadow-button) !important;
+}
+
+body.reflow-book .reflow-accessibility-panel
+  .reflow-setting-highlight[role="group"] > div > [role="radio"]:focus-visible {
+  outline: var(--ceibal-border-focus) solid var(--ceibal-focus-on-dark) !important;
+  outline-offset: 2px !important;
+  box-shadow: var(--ceibal-shadow-focus) !important;
+}
+
+/* El aviso de disponibilidad es el tercer hijo del grupo: en la grilla de una
+   sola columna se acomoda debajo del control, sin pisarlo. */
 body.reflow-book .reflow-accessibility-panel
   .reflow-setting-highlight[role="group"]
   > #reflow-highlight-requirement {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  margin-top: 0;
+  grid-column: 1 / -1 !important;
+  grid-row: auto !important;
+  justify-self: stretch !important;
+  margin-top: 0 !important;
 }
 
 /* The second navigation tab needs slightly more room than the first one.
@@ -4051,7 +4087,8 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   font-weight: 700 !important;
 }
 
-.reflow-tts-voice-options {
+.reflow-tts-voice-options,
+.reflow-tts-highlight-options {
   box-sizing: border-box;
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4062,7 +4099,8 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   background: #252525;
 }
 
-.reflow-tts-voice-options button {
+.reflow-tts-voice-options button,
+.reflow-tts-highlight-options button {
   min-width: 0 !important;
   min-height: 2.875rem;
   padding: .5rem .35rem !important;
@@ -4074,18 +4112,21 @@ body.reflow-book #content .book-cover-final .book-cover-site {
   font-weight: 700 !important;
 }
 
-.reflow-tts-voice-options button[aria-checked="true"] {
+.reflow-tts-voice-options button[aria-checked="true"],
+.reflow-tts-highlight-options button[aria-checked="true"] {
   border-color: var(--ceibal-institutional-300) !important;
   color: #fff !important;
   background: var(--ceibal-institutional-600) !important;
   box-shadow: var(--ceibal-shadow-button);
 }
 
-.reflow-tts-voice-options:has(> button[hidden]) {
+.reflow-tts-voice-options:has(> button[hidden]),
+.reflow-tts-highlight-options:has(> button[hidden]) {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.reflow-tts-voice-options > button[hidden] {
+.reflow-tts-voice-options > button[hidden],
+.reflow-tts-highlight-options > button[hidden] {
   display: none !important;
 }
 
@@ -4357,7 +4398,7 @@ body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty))
 }
 
 body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty))
-  > :is(.quiz-question, .quiz-options, .quiz-actions, .quiz-feedback) {
+  > :is(.quiz-question, .quiz-options, .quiz-actions, .quiz-feedback, .quiz-next-question, .quiz-sequence-closing) {
   transform: translateY(var(--reflow-quiz-content-shift, 0px)) !important;
 }
 
@@ -4432,11 +4473,11 @@ body.reflow-book #content .quiz-card > .quiz-feedback {
   body.reflow-book #content .quiz-card {
     /* Se recorta el relleno para compensar el hueco nuevo entre el kicker y el
        título y entre «Enviar» y la devolución, sin que el botón se corte. */
-    padding: .55rem 1rem !important;
+    padding: .35rem .85rem !important;
     /* El motor mide la separación de las opciones ANTES de enviar y la deja en
        esta variable, que su regla impone con `!important`. Con la devolución
        desplegada esa separación ya no entra en la página, así que se acota. */
-    --reflow-quiz-options-gap: .4rem !important;
+    --reflow-quiz-options-gap: .3rem !important;
   }
   /* Los selectores incluyen las dos variantes que ganaban por especificidad: la de
      letra extra grande y la del estado CON devolución
@@ -4447,18 +4488,35 @@ body.reflow-book #content .quiz-card > .quiz-feedback {
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card .quiz-options,
   body.reflow-book[data-reflow-font-size="xlarge"] #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-options {
-    gap: .4rem !important;
-    margin-top: .4rem !important;
+    gap: .3rem !important;
+    margin-top: .3rem !important;
   }
   body.reflow-book #content .quiz-card .quiz-actions,
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-actions {
-    margin-top: .35rem !important;
+    margin-top: .25rem !important;
   }
   /* La devolución ya no se encoge (conserva su fondo sobre el texto), así que en
-     esta columna baja se recorta su separación superior para que siga entrando:
-     medido, pasaba 1,81 px del techo a 947x700 con letra extra grande. */
+     esta columna baja se recorta su separación superior y su relleno para que
+     entre junto con el cierre. */
   body.reflow-book #content .quiz-card:has(.quiz-feedback:not(:empty)) .quiz-feedback {
-    margin-top: .5rem !important;
+    margin-top: .35rem !important;
+    padding: .3rem .45rem !important;
+  }
+  /* El cierre vive dentro de la tarjeta, debajo de la devolución: se aprieta su
+     ritmo para que la última pregunta entre completa, sin scroll. */
+  body.reflow-book #content .quiz-card .quiz-sequence-closing {
+    margin-top: .3rem !important;
+    padding: .3rem .5rem !important;
+  }
+}
+
+/* Columnas muy bajas (por ejemplo 800x600): el techo de la tarjeta
+   (`100dvh - nav - 4.5rem`) se quedaba corto para el enunciado + las 3 opciones +
+   la devolución + el cierre, y el cierre quedaba 43 px abajo. Se le da el alto que
+   sobra hasta la barra. */
+@media (max-height: 660px) {
+  body.reflow-book #content .quiz-card {
+    max-height: calc(100dvh - var(--nav-height, 60px) - 2rem) !important;
   }
 }
 
@@ -6309,7 +6367,8 @@ body.reflow-book .reflow-reader-panel button[aria-pressed="true"]:not([role="swi
    visible (además del relleno institucional). */
 body.reflow-book .reflow-reader-panel [role="radio"][aria-checked="true"]::after,
 body.reflow-book #reflow-tts-player .reflow-tts-voice-options button[aria-checked="true"]::after,
-body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"]::after {
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"]::after,
+body.reflow-book #reflow-tts-player .reflow-tts-highlight-options button[aria-checked="true"]::after {
   content: "✓";
   margin-inline-start: .375rem;
   font-weight: var(--ui-weight-bold);
@@ -6970,17 +7029,20 @@ body.reflow-book .reflow-reader-panel .reflow-setting-description {
 /* Los controles de voz/velocidad heredan el lenguaje del panel; se repintan con
    los tokens del tema claro para el pop-up flotante. */
 body.reflow-book #reflow-tts-player .reflow-tts-voice-options,
-body.reflow-book #reflow-tts-player .reflow-tts-speed-options {
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options,
+body.reflow-book #reflow-tts-player .reflow-tts-highlight-options {
   background: var(--ui-surface-hover);
 }
 body.reflow-book #reflow-tts-player .reflow-tts-voice-options button,
-body.reflow-book #reflow-tts-player .reflow-tts-speed-options button {
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button,
+body.reflow-book #reflow-tts-player .reflow-tts-highlight-options button {
   min-height: 2.5rem !important;
   color: var(--ui-text) !important;
   font-size: .95rem !important;
 }
 body.reflow-book #reflow-tts-player .reflow-tts-voice-options button[aria-checked="true"],
-body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"] {
+body.reflow-book #reflow-tts-player .reflow-tts-speed-options button[aria-checked="true"],
+body.reflow-book #reflow-tts-player .reflow-tts-highlight-options button[aria-checked="true"] {
   border-color: var(--ui-accent) !important;
   color: var(--ui-on-accent) !important;
   background: var(--ui-accent) !important;
@@ -7054,17 +7116,43 @@ body.reflow-book #content .quiz-option :is(span, label, p) {
    arma el libro como una fila horizontal y la corre por página; el recorte va en el
    elemento que mide la ventana. `clip` en un eje permite `visible` en el otro. */
 
-/* El botón «Siguiente pregunta» del cuestionario quedaba aplastado a 32 px de ancho
-   —medido en el estado incorrecto—, así que su texto se envolvía en vertical y se
-   veía como un recuadro suelto sobre la tarjeta. Se le da ancho mínimo y se deja que
-   envuelva dentro de él. */
-body.reflow-book #content .quiz-next-question {
+/* El botón «Siguiente pregunta» / «Saltar» va DEBAJO del cuadro de devolución,
+   dentro de la tarjeta blanca, alineado a la derecha. Estilo EVA (medido en el
+   SVG `Desktop/Eva/Siguiente_pregunta.svg` y `Saltar.svg`): pastilla de radio
+   completo, rellena para seguir (institucional-500, texto blanco) y con borde
+   para saltar (fondo blanco, texto y borde institucional-500), con la sombra
+   suave 1/1/2. Antes vivía dentro del cuadro de devolución (una grilla) y se le
+   forzaba `min-width: 12rem`. */
+body.reflow-book #content .quiz-card > .quiz-next-question {
+  align-self: flex-end;
   width: auto;
-  min-width: 12rem;
+  min-width: 0;
   max-width: 100%;
-  white-space: normal;
-  padding-inline: var(--ceibal-space-5);
+  margin-top: var(--ceibal-space-3);
+  margin-left: auto;
+  margin-right: 0;
+  padding: .6rem 1.5rem;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--eva-color-institucional-500);
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
   text-align: center;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, .1);
+}
+body.reflow-book #content .quiz-card > .quiz-next-question:hover {
+  background: var(--eva-color-institucional-600);
+}
+/* «Saltar» (respuesta incorrecta): pastilla con borde. */
+body.reflow-book #content .quiz-card > .quiz-next-question.is-skip {
+  color: var(--eva-color-institucional-500);
+  background: #fff;
+  border-color: var(--eva-color-institucional-500);
+}
+body.reflow-book #content .quiz-card > .quiz-next-question.is-skip:hover {
+  background: var(--eva-color-institucional-100);
 }
 
 /* La fila de opción no puede quedar con la altura que el motor midió antes de
@@ -7097,22 +7185,6 @@ body.reflow-book #content .quiz-feedback-actions {
 /* «Enviar» vuelve al centro: la regla anterior lo había corrido a la derecha. */
 body.reflow-book #content .quiz-actions {
   justify-content: center;
-}
-
-/* «Siguiente pregunta» va a la derecha dentro de la devolución. Medido: el
-   contenedor `.quiz-feedback` es una GRILLA de dos columnas —el icono ✓/✕ y el
-   texto—, así que `margin-left: auto` y `float` no tienen efecto: en una grilla el
-   ítem ocupa su área por defecto, que es lo que dejaba el botón en x=334 (el borde
-   izquierdo de la grilla). Se le dice en qué columna vive y que se pegue a su
-   borde derecho. */
-body.reflow-book #content .quiz-next-question {
-  display: block;
-  width: fit-content;
-  grid-column: 2;
-  justify-self: end;
-  margin-left: auto;
-  margin-right: 0;
-  margin-top: var(--ceibal-space-3);
 }
 
 /* Punto 20 · Escala tipográfica del contenido de lectura (tabla de EVA). Dos

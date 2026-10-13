@@ -210,7 +210,7 @@
   }
 
   /* Cierre de la secuencia (punto 17): aparece cuando las tres preguntas
-     quedaron respondidas, y avisa que las que quedaron mal se pueden reintentar. */
+     quedaron respondidas. */
   function revealSequenceClosing(panel) {
     var sequence = panel && panel.closest
       ? panel.closest('[data-section-type="quiz_sequence"]')
@@ -222,27 +222,34 @@
       return candidato.dataset.quizAnswered === "true";
     });
     if (!respondidas) return;
-    var pendientes = paneles.filter(function (candidato) {
-      return candidato.dataset.quizResolved !== "true";
-    });
     var cierre = sequence.querySelector(".quiz-sequence-closing");
     if (!cierre) {
       cierre = document.createElement("p");
       cierre.className = "quiz-sequence-closing";
       cierre.setAttribute("role", "status");
+      /* «¡Listo!…» y «Seguir leyendo» en la misma línea, con el botón a la derecha. */
+      var filaCierre = document.createElement("span");
+      filaCierre.className = "quiz-sequence-closing-row";
       var titulo = document.createElement("span");
+      titulo.className = "quiz-sequence-closing-title";
       titulo.textContent = "¡Listo! Respondiste las " + paneles.length + " preguntas.";
-      cierre.appendChild(titulo);
-      var nota = document.createElement("span");
-      nota.className = "quiz-sequence-closing-note";
-      cierre.appendChild(nota);
-      sequence.appendChild(cierre);
-    }
-    var notaFinal = cierre.querySelector(".quiz-sequence-closing-note");
-    if (notaFinal) {
-      notaFinal.textContent = pendientes.length
-        ? "Las que quedaron marcadas se pueden volver a intentar: elegí otra opción y volvé a enviar."
-        : "";
+      filaCierre.appendChild(titulo);
+      cierre.appendChild(filaCierre);
+      /* Debajo del cuadro de devolución de la ÚLTIMA pregunta, dentro de su
+         tarjeta: así el cierre queda a la vista, como el botón de las otras
+         preguntas. Antes iba al final de la sección y caía en la columna
+         siguiente, fuera de la pantalla de la última pregunta. */
+      var ultimaTarjeta = paneles[paneles.length - 1].querySelector(".quiz-card");
+      var ultimoFeedback = ultimaTarjeta
+        ? ultimaTarjeta.querySelector(".quiz-feedback")
+        : null;
+      if (ultimoFeedback) {
+        ultimoFeedback.insertAdjacentElement("afterend", cierre);
+      } else if (ultimaTarjeta) {
+        ultimaTarjeta.appendChild(cierre);
+      } else {
+        sequence.appendChild(cierre);
+      }
     }
     /* Punto 17 · «Seguir leyendo»: lleva al contenido que sigue a la secuencia. */
     if (!cierre.querySelector(".quiz-keep-reading")) {
@@ -251,15 +258,33 @@
       seguir.className = "quiz-keep-reading";
       seguir.textContent = "Seguir leyendo";
       seguir.addEventListener("click", function () {
-        var pagina = pageAfterSequence(sequence);
-        if (pagina && typeof window.__adtReflowGoToVisualPage === "function") {
-          window.__adtReflowGoToVisualPage(pagina);
+        /* «Seguir leyendo» lleva a la página siguiente a la del cierre. Antes se
+           buscaba «la sección siguiente» por orden del DOM: cuando esa sección
+           caía en la MISMA página (su rect quedaba en la columna actual), el
+           salto era a la página actual y el botón parecía no responder. */
+        var qa = typeof window.__adtReflowQaState === "function"
+          ? window.__adtReflowQaState()
+          : null;
+        var destino = null;
+        if (
+          qa && Number.isFinite(Number(qa.current)) &&
+          Number(qa.total) > Number(qa.current)
+        ) {
+          destino = Number(qa.current) + 1;
+        }
+        if (destino === null) {
+          var pagina = pageAfterSequence(sequence);
+          if (pagina) destino = pagina;
+        }
+        if (destino && typeof window.__adtReflowGoToVisualPage === "function") {
+          window.__adtReflowGoToVisualPage(destino);
           return;
         }
         var boton = document.getElementById("reflow-next");
-        if (boton) boton.click();
+        if (boton && !boton.disabled) boton.click();
       });
-      cierre.appendChild(seguir);
+      var filaCierreBoton = cierre.querySelector(".quiz-sequence-closing-row");
+      (filaCierreBoton || cierre).appendChild(seguir);
     }
   }
 
@@ -359,8 +384,11 @@
     if (siguiente) {
       var irAlSiguiente = document.createElement("button");
       irAlSiguiente.type = "button";
-      irAlSiguiente.className = "quiz-next-question";
-      irAlSiguiente.textContent = "Siguiente pregunta";
+      /* Estilo EVA: pastilla rellena para «Siguiente pregunta» y pastilla con
+         borde para «Saltar» (cuando la respuesta fue incorrecta). */
+      irAlSiguiente.className =
+        "quiz-next-question " + (isCorrect ? "is-next" : "is-skip");
+      irAlSiguiente.textContent = isCorrect ? "Siguiente pregunta" : "Saltar";
       irAlSiguiente.addEventListener("click", function () {
         /* La medición que pedía el traspaso: deja por escrito qué decide el salto.
            Se activa con `?quizdebug=1` para no ensuciar la consola del lector. */
@@ -392,7 +420,20 @@
         if (!boton) return;
         for (var paso = 0; paso < Math.abs(objetivo - actual); paso += 1) boton.click();
       });
-      feedback.appendChild(irAlSiguiente);
+      /* Debajo del cuadro de devolución, dentro de la tarjeta blanca. Al
+         reintentar se vuelve a crear el botón: se quita el anterior para no
+         apilar uno por intento. */
+      var tarjetaQuiz = feedback.closest(".quiz-card");
+      if (tarjetaQuiz) {
+        Array.prototype.slice
+          .call(tarjetaQuiz.querySelectorAll(":scope > .quiz-next-question"))
+          .forEach(function (anterior) {
+            anterior.remove();
+          });
+        feedback.insertAdjacentElement("afterend", irAlSiguiente);
+      } else {
+        feedback.appendChild(irAlSiguiente);
+      }
     }
     revealSequenceClosing(panel);
     feedback.focus({ preventScroll: true });

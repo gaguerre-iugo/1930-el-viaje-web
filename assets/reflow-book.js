@@ -3778,6 +3778,7 @@
     if (optionsOpen) {
       updateTtsVoiceControls();
       updateTtsSpeedControls();
+      updateTtsHighlightControls();
     }
   }
 
@@ -4287,6 +4288,14 @@
             'aria-label="Rápida, 1,5 veces" aria-checked="false">Rápida</button>' +
           '<button type="button" role="radio" data-reflow-tts-speed="2" ' +
             'aria-label="Muy rápida, 2 veces" aria-checked="false">Muy rápida</button>' +
+        '</div>' +
+        '<span class="reflow-tts-player-options-title" id="reflow-tts-player-highlight-label">Resaltado</span>' +
+        '<div class="reflow-tts-highlight-options" role="radiogroup" ' +
+          'aria-labelledby="reflow-tts-player-highlight-label">' +
+          '<button type="button" role="radio" data-reflow-tts-highlight="word" ' +
+            'aria-label="Resaltar palabra por palabra" aria-checked="false">Palabra</button>' +
+          '<button type="button" role="radio" data-reflow-tts-highlight="sentence" ' +
+            'aria-label="Resaltar la oración completa" aria-checked="false">Oración</button>' +
         '</div>' +
       '</div>' +
       '<button id="reflow-tts-fab" class="reflow-tts-fab" type="button" ' +
@@ -5610,6 +5619,7 @@
       updateFontControls();
       updateTtsVoiceControls();
       updateTtsSpeedControls();
+      updateTtsHighlightControls();
       applyReducedMotion(state.reducedMotion, false);
       syncEasyReadSwitchVisual();
     }
@@ -5648,6 +5658,13 @@
       if (!button || typeof window.__adtReflowSetAudioSpeed !== "function") return;
       window.__adtReflowSetAudioSpeed(Number(button.dataset.reflowTtsSpeed));
       updateTtsSpeedControls();
+    });
+
+    document.addEventListener("click", function (event) {
+      var button = event.target.closest("[data-reflow-tts-highlight]");
+      if (!button || typeof window.__adtReflowSetWordHighlight !== "function") return;
+      window.__adtReflowSetWordHighlight(button.dataset.reflowTtsHighlight === "word");
+      updateTtsHighlightControls();
     });
 
     document.addEventListener("click", function (event) {
@@ -5716,6 +5733,21 @@
     });
   }
 
+  /* El control de resaltado vive en el panel de Herramientas (lo renderiza el
+     runtime) y también en las opciones del reproductor flotante (lo inyecta
+     este motor). Ambos comparten el mismo estado de la runtime, así que este
+     sincronizador refleja el modo actual en los botones propios del reproductor
+     y deja que el runtime pinte los suyos. */
+  function updateTtsHighlightControls() {
+    if (typeof window.__adtReflowGetWordHighlight !== "function") return;
+    var wordHighlight = Boolean(window.__adtReflowGetWordHighlight());
+    document.querySelectorAll("[data-reflow-tts-highlight]").forEach(function (button) {
+      var selected = (button.dataset.reflowTtsHighlight === "word") === wordHighlight;
+      setAttributeIfChanged(button, "aria-checked", selected);
+      setAttributeIfChanged(button, "aria-pressed", selected);
+    });
+  }
+
   /* Word-by-word tracking becomes visually unreliable once narration is
      faster than the normal rate. Keep the runtime setting authoritative,
      expose the restriction in Settings, and re-enable the choice as soon as
@@ -5749,7 +5781,7 @@
 
     function wordHighlightButtons() {
       return Array.prototype.slice.call(document.querySelectorAll(
-        '.reflow-accessibility-panel [role="radio"]'
+        '.reflow-accessibility-panel [role="radio"], #reflow-tts-player [role="radio"]'
       )).filter(function (button) {
         return /^(palabra|word)$/.test(normalized(button.textContent));
       });
@@ -5783,6 +5815,7 @@
       if (window.__adtReflowSyncHighlightAvailability) {
         window.__adtReflowSyncHighlightAvailability();
       }
+      updateTtsHighlightControls();
       /* El contador depende de mediciones de paginación: se reescribe en el
          mismo ciclo que sigue los cambios de DOM (abrir o cerrar el panel, por
          ejemplo) para no quedar mostrando un valor viejo. */

@@ -4,8 +4,8 @@
 //
 // Mide, en cada combinación de ancho × tamaño de letra × zoom:
 //   - si la fila de opción y su texto se salen de la tarjeta del cuestionario;
-//   - si el botón «Siguiente pregunta» queda pegado al borde derecho de la
-//     devolución (el pendiente de alineación, que dependía de la grilla);
+//   - si el botón «Siguiente pregunta» queda debajo del cuadro de devolución y
+//     pegado al borde derecho de la tarjeta (estilo EVA);
 //   - si algún elemento visible asoma fuera del ancho del viewport.
 //
 // Uso:
@@ -128,7 +128,7 @@ async function medir(combinacion) {
         return caja.width > 0 && caja.left + caja.width / 2 > 0 && caja.left + caja.width / 2 < ancho;
       };
       const panel = seccion.querySelector(".quiz-panel");
-      const hayDevolucion = Boolean(seccion.querySelector(".quiz-feedback .quiz-next-question"));
+      const hayDevolucion = Boolean(seccion.querySelector(".quiz-card .quiz-next-question"));
       const opcionesEnPagina = panel
         ? [...panel.querySelectorAll(".quiz-option")].filter(centro).length
         : 0;
@@ -155,7 +155,7 @@ async function medir(combinacion) {
      horizontal, así que la columna no se mueve) para poder medir su alineación. */
   await page.evaluate((SECCION) => {
     const seccion = document.querySelector(`[data-section-id="${SECCION}"]`);
-    const boton = seccion && seccion.querySelector(".quiz-feedback .quiz-next-question");
+    const boton = seccion && seccion.querySelector(".quiz-card .quiz-next-question");
     if (!boton) return;
     const contenedor = document.getElementById("content");
     const caja = boton.getBoundingClientRect();
@@ -204,29 +204,27 @@ async function medir(combinacion) {
         };
       });
 
-      const boton = seccion.querySelector(".quiz-feedback .quiz-next-question");
+      const boton = seccion.querySelector(".quiz-card .quiz-next-question");
       let alineacion = null;
       const cajaBotonCruda = boton ? boton.getBoundingClientRect() : null;
       if (boton && cajaBotonCruda) {
         const caja = boton.getBoundingClientRect();
-        const padre = boton.parentElement;
-        const cajaPadre = padre.getBoundingClientRect();
-        /* El borde derecho del texto de la devolución es el que manda: el botón
-           tiene que terminar ahí, no en el borde de la grilla. */
-        const textoFeedback = padre.querySelector(".quiz-feedback-text");
-        const cajaTexto = textoFeedback ? textoFeedback.getBoundingClientRect() : null;
+        /* El botón vive en la tarjeta, DEBAJO del cuadro de devolución, pegado al
+           borde derecho de la tarjeta menos su relleno. */
+        const tarjeta = boton.closest(".quiz-card");
+        const cajaTarjeta = tarjeta.getBoundingClientRect();
+        const rellenoDerecho = parseFloat(getComputedStyle(tarjeta).paddingRight) || 0;
+        const feedback = tarjeta.querySelector(".quiz-feedback");
+        const cajaFeedback = feedback ? feedback.getBoundingClientRect() : null;
         alineacion = {
           botonLeft: Math.round(caja.left * 100) / 100,
           botonRight: Math.round(caja.right * 100) / 100,
-          padreRight: Math.round(cajaPadre.right * 100) / 100,
-          textoRight: cajaTexto ? Math.round(cajaTexto.right * 100) / 100 : null,
-          gridTemplateColumns: getComputedStyle(padre).gridTemplateColumns,
-          gridColumn: getComputedStyle(boton).gridColumn,
-          justifySelf: getComputedStyle(boton).justifySelf,
-          float: getComputedStyle(boton).float,
+          tarjetaRight: Math.round(cajaTarjeta.right * 100) / 100,
+          rellenoDerecho: Math.round(rellenoDerecho * 100) / 100,
+          abajoDelCuadro: cajaFeedback ? caja.top >= cajaFeedback.bottom - 1 : true,
           anchoBoton: Math.round(caja.width * 100) / 100,
           desborda: caja.right > window.innerWidth + TOLERANCIA,
-          separacionDelBorde: Math.round((cajaPadre.right - caja.right) * 100) / 100
+          separacionDelBorde: Math.round((cajaTarjeta.right - rellenoDerecho - caja.right) * 100) / 100
         };
       }
 
@@ -298,14 +296,16 @@ for (const combinacion of combinaciones) {
     continue;
   }
   const alineado = medicion.alineacion
-    ? medicion.alineacion.separacionDelBorde >= 0 && medicion.alineacion.separacionDelBorde <= 24
+    ? medicion.alineacion.separacionDelBorde >= -1 &&
+      medicion.alineacion.separacionDelBorde <= 24 &&
+      medicion.alineacion.abajoDelCuadro
     : null;
   const estado = filasMal.length || medicion.desbordes.length || alineado === false ? "FALLA" : "ok   ";
   console.log(
     `${estado} ${etiqueta} · viewport CSS ${medicion.viewport}px · escala ${medicion.escala} · ` +
       `opciones ${medicion.cantidadOpcionesEnPagina} · ` +
       (medicion.alineacion
-        ? `botón a ${medicion.alineacion.separacionDelBorde}px del borde derecho (${medicion.alineacion.gridColumn}) · `
+        ? `botón a ${medicion.alineacion.separacionDelBorde}px del borde derecho, debajo del cuadro (${medicion.alineacion.abajoDelCuadro}) · `
         : medicion.botonSinMedir
           ? `botón sin medir (left=${medicion.botonSinMedir.left}, top=${medicion.botonSinMedir.top}, ` +
             `en página ${medicion.botonSinMedir.enPaginaHorizontal}, en viewport ${medicion.botonSinMedir.dentroDelViewport}) · `
@@ -328,10 +328,10 @@ for (const combinacion of combinaciones) {
   if (medicion.alineacion && !alineado) {
     console.log(
       `      botón left=${medicion.alineacion.botonLeft} right=${medicion.alineacion.botonRight} ` +
-        `textoRight=${medicion.alineacion.textoRight} padreRight=${medicion.alineacion.padreRight} ` +
-        `grid=${medicion.alineacion.gridTemplateColumns} float=${medicion.alineacion.float}`
+        `tarjetaRight=${medicion.alineacion.tarjetaRight} relleno=${medicion.alineacion.rellenoDerecho} ` +
+        `abajoDelCuadro=${medicion.alineacion.abajoDelCuadro}`
     );
-    fail(`${etiqueta}: «Siguiente pregunta» no queda a la derecha de la devolución`);
+    fail(`${etiqueta}: «Siguiente pregunta» no queda debajo del cuadro y pegado al borde derecho de la tarjeta`);
   }
 }
 

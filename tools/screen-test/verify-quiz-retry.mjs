@@ -89,10 +89,14 @@ const estadoPanel = (SECUENCIA, indicePanel) =>
       const seccion = document.querySelector(`[data-section-id="${SECUENCIA}"]`);
       const panel = [...seccion.querySelectorAll(".quiz-panel")][indicePanel];
       const feedback = panel.querySelector(".quiz-feedback");
+      /* El botón vive en la tarjeta, debajo del cuadro de devolución (no dentro
+         del cuadro): «Siguiente pregunta» si acertó, «Saltar» si no. */
+      const botonSiguiente = panel.querySelector(".quiz-next-question");
       return {
         incorrectasMarcadas: panel.querySelectorAll(".quiz-option.is-incorrect").length,
         correctasMarcadas: panel.querySelectorAll(".quiz-option.is-correct").length,
-        siguientePregunta: Boolean(feedback.querySelector(".quiz-next-question")),
+        siguientePregunta: Boolean(botonSiguiente),
+        textoBoton: botonSiguiente ? botonSiguiente.textContent.trim() : "",
         cierre: Boolean(seccion.querySelector(".quiz-sequence-closing")),
         textoCierre: (seccion.querySelector(".quiz-sequence-closing") || {}).textContent || "",
         seguirLeyendo: Boolean(
@@ -112,6 +116,10 @@ console.log(`  elegí ${elegida} · incorrectas marcadas ${estado.incorrectasMar
 console.log(`  devolución: «${estado.textoFeedback}»`);
 if (!estado.incorrectasMarcadas) fail("la opción incorrecta no quedó marcada");
 if (!estado.siguientePregunta) fail("no se ofreció «Siguiente pregunta» en la primera pregunta");
+/* Con la respuesta incorrecta el botón se llama «Saltar» (estilo EVA secundario). */
+if (estado.siguientePregunta && estado.textoBoton !== "Saltar") {
+  fail(`tras una respuesta incorrecta el botón debería decir «Saltar» y dice «${estado.textoBoton}»`);
+}
 
 /* El lector prueba otra opción: la anterior tiene que seguir marcada. */
 await page.evaluate((SECUENCIA) => {
