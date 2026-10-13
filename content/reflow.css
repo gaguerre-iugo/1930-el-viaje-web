@@ -1187,13 +1187,15 @@ body.reflow-book[data-reflow-highlight-mode="word"]
   text-underline-offset: .12em;
 }
 
+/* El resaltado por oración usa el MISMO subrayado simple que el de palabra: una
+   sola línea. Antes era `double` y se veía como dos líneas debajo del texto. */
 body.reflow-book[data-reflow-highlight-mode="sentence"]
   #content *::highlight(adt-tts-active) {
   text-decoration-line: underline;
   text-decoration-color: #111827;
-  text-decoration-style: double;
-  text-decoration-thickness: 2px;
-  text-underline-offset: .14em;
+  text-decoration-style: solid;
+  text-decoration-thickness: 3px;
+  text-underline-offset: .12em;
 }
 
 body.reflow-book[data-reflow-highlight-mode="word"] #content
@@ -1209,9 +1211,9 @@ body.reflow-book[data-reflow-highlight-mode="sentence"] #content
   :is(.bg-yellow-300, .glossary-term.tts-glossary-covered) {
   text-decoration-line: underline !important;
   text-decoration-color: #111827 !important;
-  text-decoration-style: double !important;
-  text-decoration-thickness: 2px !important;
-  text-underline-offset: .14em !important;
+  text-decoration-style: solid !important;
+  text-decoration-thickness: 3px !important;
+  text-underline-offset: .12em !important;
 }
 
 /* A glossary wrapper has its own green background. While its text intersects
