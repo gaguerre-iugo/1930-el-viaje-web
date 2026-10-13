@@ -13096,6 +13096,11 @@
       prepareReadingFlow();
       prepareChapterTwoQuiz();
       loadQuizAnswers();
+      /* El archivo de devoluciones se pide recién con la primera respuesta; si no
+         se precarga, el texto base («La respuesta no es correcta.») queda a la
+         vista mientras llega el del archivo. Se calienta acá, como las claves de
+         corrección, para que el reemplazo sea inmediato. */
+      loadQuizFeedback();
       prepareQuizFeedbackAudio();
       installTtsMediaBridge();
       installReflowGlossaryBridge();
