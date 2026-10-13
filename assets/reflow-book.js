@@ -4144,6 +4144,18 @@
   }
 
   function stopFloatingReadAloud() {
+    /* Si lo que suena es la devolución del cuestionario, «Detener» la corta pero
+       deja la lectura en voz alta encendida: el lector sigue con «Reproducir»
+       desde la página que está viendo. Antes apagaba la lectura, escondía el
+       reproductor y dejaba el botón deshabilitado. */
+    if (state.quizFeedbackAudio) {
+      stopQuizFeedbackAudio();
+      parkPausedTtsForNavigation();
+      syncFloatingTtsPlayer();
+      requestAnimationFrame(syncPrimaryToolbar);
+      window.setTimeout(syncPrimaryToolbar, 180);
+      return;
+    }
     state.ttsPlayerStopPendingUntil = Date.now() + 600;
     /* «Detener» apaga todo, también la devolución del cuestionario si sonaba. */
     stopQuizFeedbackAudio();
@@ -11956,8 +11968,16 @@
     var inheritedPlay = mediaPrototype.play;
     state.nativeMediaPlay = inheritedPlay;
     mediaPrototype.play = function () {
-      var isTrackedTtsAudio = this === state.ttsAudio && Boolean(state.ttsCurrentAudioId);
-      state.ttsAudio = this;
+      /* El audio de la devolución del cuestionario NO es la pista de TTS: no
+         debe ocupar el lugar de `state.ttsAudio` ni pasar por el guardia de
+         fuente. Cuando lo hacía, al reanudar una devolución pausada el guardia
+         le reescribía el src con el último ítem del libro y sonaba otra frase
+         (la narración que había quedado aparcada, fuera de pantalla). */
+      var isQuizFeedbackAudio = Boolean(state.quizFeedbackAudio) &&
+        this === state.quizFeedbackAudio;
+      var isTrackedTtsAudio = !isQuizFeedbackAudio &&
+        this === state.ttsAudio && Boolean(state.ttsCurrentAudioId);
+      if (!isQuizFeedbackAudio) state.ttsAudio = this;
       /* The base reader may resume the same HTMLAudioElement through a native
          play() call that bypasses its item-start callback. Never let that
          call use the original catalogue source: restore the selected voice
@@ -12041,8 +12061,10 @@
     window.__adtReflowReadQuizFeedback = function (audioId, feedbackElement) {
       if (!audioId || !feedbackElement) return;
       if (!readAloudSettingIsEnabled()) return;
-      var api = window.__adtReflowAudio;
-      if (api && api.pause) api.pause();
+      /* La devolución no es un ítem del libro. Se aparca la narración antes de
+         leerla: así, al terminar (o al detenerla), «Reproducir» arranca desde la
+         página visible en vez de reanudar la frase donde había quedado. */
+      parkPausedTtsForNavigation();
       stopQuizFeedbackAudio();
       var filename = ttsVoiceFilename(audioId);
       if (!filename) return;
