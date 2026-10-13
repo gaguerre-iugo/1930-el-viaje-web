@@ -92,6 +92,17 @@ un 10 % más grande y nunca se mete bajo la barra. (Anular el padding de la
 página **no** sirve: repagina el libro entero.) `verify-cover-fit.mjs` (nuevo)
 lo mide en 7 tamaños y comprueba que la portada no aparezca en la página 2.
 
+**Título del capítulo 2 distinto (reportado por el usuario, corregido):** el
+título del capítulo 2 salía en **26,1 px y peso 400** mientras los otros siete
+estaban en **34 px y peso 700**. Causa: dos reglas viejas con **más
+especificidad** que el sistema tipográfico del punto 20
+(`.chapter-cover.chapter-two-cover h2` y `[data-id="pg037_n0004"]`) le ganaban
+sólo al capítulo 2. Además el 2 heredaba el `mt-3` de Tailwind (12 px) y el 1/3-8
+tenían márgenes distintos (13,6 / 7,2 px). Se quitaron las reglas viejas y el
+margen y el `white-space` se fijaron en el bloque del punto 20: las 8 portadillas
+quedan idénticas. `verify-chapter-covers.mjs` (nuevo) compara los 8 antetítulos y
+los 8 títulos campo por campo.
+
 ## Estado real de los 25 puntos
 
 Tabla de entrada rápida. **El detalle de cada punto, con las mediciones, está en el
@@ -309,6 +320,15 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
   `overflow: visible`. Lo que **no** hay que hacer es anular el padding de la
   página: cambia el alto de la columna y **repagina el libro entero** (medido:
   11→10, 8→7, 14→12 páginas).
+- **Las reglas viejas de las portadillas se cuelan por especificidad.** El sistema
+  tipográfico del punto 20 usa `.chapter-cover h2` (0,1,1), pero las reglas viejas
+  usaban `[data-id="pg037_n0004"]` (0,2,0) y `.chapter-two-cover h2` (0,2,1) y le
+  ganaban **sólo al capítulo 2**. Si una portadilla se ve distinta, listar las
+  reglas que declaran esa propiedad y comparar especificidad, no el orden.
+- **El motor normaliza los títulos de las portadillas a oración** (minúscula +
+  inicial mayúscula, con «Fede» y «Josephine»): el HTML de los capítulos 3 a 8
+  tiene el título en MAYÚSCULAS, pero se lee «Un secreto para Fede». Al comparar,
+  usar el estilo, no el texto.
 - **El botón Reproducir/Pausar no se debe reescribir en cada sincronización.** El
   reproductor sincroniza la barra en el `pointerdown` (`preserveTtsPanel`). Si esa
   sincronización reemplaza el `<path>` del icono, el objetivo del `mousedown` queda
@@ -324,7 +344,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 - Los mensajes de commit van **en español y sin acentos**.
 - Al tocar `assets/reflow-book.js`, `assets/quiz-sequence.js` o `content/reflow.css`
   hay que **subir su `?v=` en `index.html`**, si no el navegador sirve la versión
-  vieja. Valores actuales: `reflow.css?v=175-portada-margen`,
+  vieja. Valores actuales: `reflow.css?v=176-portadilla-titulos`,
   `reflow-book.js?v=204-portada-margen`, `quiz-sequence.js?v=9-cierre-listo` y
   `fonts.css?v=3-emoji-font`.
 - El servidor local está en el puerto **5501** y sigue corriendo.
@@ -350,6 +370,7 @@ cambios: se reproduce igual contra HEAD. Está sin arreglar.
 | `verify-glossary-highlight.mjs` | Punto 1: resaltado, globo, preferencia | **Intermitente**: falla ~1 de 3 corridas, también en HEAD |
 | `verify-body-size.mjs` | Punto 20 (seguimiento): `text_only` y `boxed_text` miden lo mismo en celular, laptop y pizarra | El caso de pizarra necesita un viewport ≥1600 px para ejercitar el cuerpo de 24 px |
 | `verify-cover-fit.mjs` | Portada: sin franjas laterales (la caja mantiene 738/1078), ocupa el margen y no se mete bajo la barra; tampoco aparece en la página 2 | Mide la franja real de `object-fit: contain`, no el rect del `<img>` (que siempre llena la caja) |
+| `verify-chapter-covers.mjs` | Las 8 portadillas tienen el mismo antetítulo y el mismo título (tamaño, peso, márgenes, `white-space`) | El motor normaliza el texto a oración (mayúsculas del HTML → «Un secreto para Fede»); comparar por estilo, no por texto |
 | `_diag-nav.mjs` | La navegación del libro funciona | Es el canario del paginado: corrélo después de tocar CSS del visor |
 
 ## Decisiones que NO son de código
