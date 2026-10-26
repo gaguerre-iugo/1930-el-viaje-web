@@ -1,8 +1,11 @@
 1930 — El viaje · Web Export portable
 =========================================
 
-Versión: 46 integrada (`46-integrated-50-final`)
-Contenido: introducción, capítulo 1 y capítulo 2 completos
+Versión de paquete: 48 (`v48`) — build `47-full-book-106`
+Contenido: libro completo, capítulos 1 a 8 y páginas finales
+
+Nota: el resto de este documento conserva notas de la exportación original v46.
+La versión vigente es v48. Para el resumen actual, ver LEEME-V48.txt.
 
 Esta entrega conserva los textos normales y de Lectura fácil, audios,
 imágenes, descripciones, glosario y tiempos de resaltado. Los capítulos 1 y 2

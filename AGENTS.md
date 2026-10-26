@@ -12,8 +12,11 @@ El libro cuenta la historia de **1930 — El viaje**, e incluye:
 - **Imágenes** descriptas para accesibilidad
 - **SCORM 1.2** para integración con plataformas educativas (LMS)
 
-**Versión actual:** v47 — libro completo (todo el contenido desde la exportación full-book).
+**Versión actual del paquete:** v48
+
 **Build ID:** `47-full-book-106`
+
+**Versión de contenido:** v47
 
 ---
 
@@ -245,6 +248,7 @@ El libro exporta como **SCORM 1.2**. El archivo `imsmanifest.xml` declara todos 
 | v45 | Capítulo 1 completo + integración de voces duales |
 | v46 | Integración de capítulos 1 y 2 + validaciones |
 | v47 | **Libro completo** — capítulos 3 a 8 + páginas finales |
+| v48 | Versión de paquete con `bookId`/`bookVersion` para métricas, migración de storage v47→v48. Build `47-full-book-106`. |
 
 Los cambios detallados están documentados en `docs/auditorias/` (changelogs por
 versión) y `docs/arquitectura/INTEGRATION-MANIFEST.md`.

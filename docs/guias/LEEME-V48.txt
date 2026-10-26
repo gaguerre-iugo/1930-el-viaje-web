@@ -1,0 +1,15 @@
+1930: El viaje — versión de paquete 48
+
+Build ID: 47-full-book-106
+Versión de contenido: v47
+Versión para métricas: v48
+book_id: 1930-el-viaje
+
+Esta publicación usa v48 como versión de paquete y de medición. El build
+interno y la versión de contenido se mantienen en 47-full-book-106 / v47.
+
+Incluye el libro completo, capítulos 1 a 8 y páginas finales, con textos
+normales y de Lectura fácil, audios, imágenes, descripciones, glosario,
+tiempos de resaltado y cuestionarios.
+
+Abrir index.html.

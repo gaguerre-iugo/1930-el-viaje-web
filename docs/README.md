@@ -10,7 +10,8 @@
 |---|---|
 | `guias/BOOK-MAINTENANCE-PLAYBOOK.md` | El manual de mantenimiento más completo del proyecto: cómo tocar el reflow, el TTS, los paneles y los bundles, con procedimientos y verificaciones. **Empezar por acá.** |
 | `guias/LEEME-WEB-EXPORT.txt` | Instructivo de uso de la exportación web. |
-| `guias/LEEME-V47.txt` | Notas de la versión 47. |
+| `guias/LEEME-V48.txt` | Notas de la versión de paquete 48 (build 47-full-book-106). |
+| `guias/LEEME-V47.txt` | Notas históricas de la versión 47. |
 
 ## Arquitectura y know-how
 

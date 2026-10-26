@@ -1,7 +1,12 @@
 (function () {
   "use strict";
 
+  var bookId = "1930-el-viaje";
+  var bookVersion = "v48";
+
   document.documentElement.dataset.reflowBuild = "47-full-book-106";
+  document.documentElement.dataset.bookId = bookId;
+  document.documentElement.dataset.bookVersion = bookVersion;
 
   var sections = [
     ["pg001_sec001", "index.html"],
@@ -218,13 +223,27 @@
     fileToSection[entry[1]] = { id: entry[0], index: index };
   }, true);
 
-  var progressStorageKey = "adt-reflow-progress:1930-libro-completo-v47";
-  var fontStorageKey = "adt-reflow-font-size:1930-libro-completo-v47";
-  var defaultReaderStateMigrationKey =
-    "adt-reflow-default-reader-state:47-full-book-45";
+  var progressStorageKey =
+    "adt-reflow-progress:1930-libro-completo-" + bookVersion;
+  var fontStorageKey =
+    "adt-reflow-font-size:1930-libro-completo-" + bookVersion;
+  var ttsVoiceStorageKey =
+    "adt-reflow-tts-voice:1930-libro-completo-" + bookVersion;
+  var reducedMotionStorageKey =
+    "adt-reflow-reduced-motion:1930-libro-completo-" + bookVersion;
   var retiredTextCaseStorageKey = "adt-reflow-text-case:1930-libro-completo-v47";
-  var ttsVoiceStorageKey = "adt-reflow-tts-voice:1930-libro-completo-v47";
-  var reducedMotionStorageKey = "adt-reflow-reduced-motion:1930-libro-completo-v47";
+  var legacyProgressStorageKey =
+    "adt-reflow-progress:1930-libro-completo-v47";
+  var legacyFontStorageKey =
+    "adt-reflow-font-size:1930-libro-completo-v47";
+  var legacyTtsVoiceStorageKey =
+    "adt-reflow-tts-voice:1930-libro-completo-v47";
+  var legacyReducedMotionStorageKey =
+    "adt-reflow-reduced-motion:1930-libro-completo-v47";
+  var legacyDefaultReaderStateMigrationKey =
+    "adt-reflow-default-reader-state:47-full-book-45";
+  var storageMigrationKey =
+    "adt-reflow-storage-migration:1930-libro-completo-" + bookVersion;
   var activityProgressStorageKey = "adt-reflow-activity-progress:1930-el-viaje:v1";
   var editorialTocTitles = {
     pg001_sec001: "1930: El viaje",
@@ -1219,6 +1238,8 @@
      no persiste este ajuste y su switch arranca apagado, así que el valor por
      defecto —encendido— y la elección del lector viven acá. */
   var glossaryHighlightStorageKey =
+    "adt-reflow-glossary-highlight:1930-libro-completo-" + bookVersion;
+  var legacyGlossaryHighlightStorageKey =
     "adt-reflow-glossary-highlight:1930-libro-completo-v47";
 
   function readGlossaryHighlightPreference() {
@@ -4541,19 +4562,31 @@
     document.body.dataset.reflowFontSize = state.fontSize;
   }
 
-  /* A new delivered build starts in the agreed baseline even when the same
-     browser previously opened an experimental bundle under this origin.
-     Apply the reset only once: subsequent choices made by the reader remain
-     persistent as expected. The ADT runtime stores Easy Read in this key and
-     falls back to false when it is absent. */
-  function migrateDefaultReaderState() {
+  /* v48 migrates reader preferences from the v47 keys. Copy before removing
+     and never overwrite a v48 value that already exists. The book has no
+     productive users yet; this is a safety net for local or pre-release
+     sessions. */
+  function migrateReaderStorage() {
     try {
-      if (localStorage.getItem(defaultReaderStateMigrationKey) === "done") return;
-      localStorage.removeItem(fontStorageKey);
-      localStorage.setItem("easyReadMode", "false");
-      localStorage.setItem(defaultReaderStateMigrationKey, "done");
+      if (localStorage.getItem(storageMigrationKey) === "done") return;
+      [
+        [legacyProgressStorageKey, progressStorageKey],
+        [legacyFontStorageKey, fontStorageKey],
+        [legacyTtsVoiceStorageKey, ttsVoiceStorageKey],
+        [legacyReducedMotionStorageKey, reducedMotionStorageKey],
+        [legacyGlossaryHighlightStorageKey, glossaryHighlightStorageKey]
+      ].forEach(function (keys) {
+        var legacyValue = localStorage.getItem(keys[0]);
+        if (legacyValue === null) return;
+        if (localStorage.getItem(keys[1]) === null) {
+          localStorage.setItem(keys[1], legacyValue);
+        }
+        localStorage.removeItem(keys[0]);
+      });
+      localStorage.removeItem(retiredTextCaseStorageKey);
+      localStorage.removeItem(legacyDefaultReaderStateMigrationKey);
+      localStorage.setItem(storageMigrationKey, "done");
     } catch (_error) {}
-    state.fontSize = "normal";
   }
 
   function retireTextCasePreference() {
@@ -13043,7 +13076,7 @@
         systemReducedMotion: state.systemReducedMotion
       };
     };
-    migrateDefaultReaderState();
+    migrateReaderStorage();
     loadFontPreference();
     retireTextCasePreference();
     loadTtsVoicePreference();
