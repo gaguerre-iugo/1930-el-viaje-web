@@ -56,6 +56,7 @@
       <file href="assets/fonts/AtkinsonHyperlegible-700-latin.woff2"/>
       <file href="assets/fonts/AtkinsonHyperlegible-700-latin-ext.woff2"/>
       <file href="assets/reflow-book.js"/>
+      <file href="assets/metrics.js"/>
       <file href="assets/reflow-redirect.js"/>
       <file href="assets/quiz-sequence.js"/>
       <file href="images/chapter1_cover.webp"/>

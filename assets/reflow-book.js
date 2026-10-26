@@ -222,6 +222,8 @@
   sections.forEach(function (entry, index) {
     fileToSection[entry[1]] = { id: entry[0], index: index };
   }, true);
+  /* Expuesto para el módulo de métricas y las pruebas locales. */
+  window.__adtReflowSections = sections;
 
   var progressStorageKey =
     "adt-reflow-progress:1930-libro-completo-" + bookVersion;
@@ -2503,6 +2505,83 @@
     }
   };
 
+  /* Contexto estable para el módulo de métricas. No envía nada: sólo traduce
+     la página visual actual a sección, capítulo y avance. */
+  var metricsSectionIndex = null;
+  function metricsSectionIndexMap() {
+    if (metricsSectionIndex) return metricsSectionIndex;
+    metricsSectionIndex = Object.create(null);
+    sections.forEach(function (entry, index) {
+      metricsSectionIndex[entry[0]] = index;
+    });
+    return metricsSectionIndex;
+  }
+
+  function metricsSectionIdForPage() {
+    if (!content) return null;
+    var rect = content.getBoundingClientRect();
+    var xs = [0.5, 0.3, 0.7];
+    var ys = [0.45, 0.6, 0.3];
+    for (var i = 0; i < xs.length; i += 1) {
+      for (var j = 0; j < ys.length; j += 1) {
+        var element = document.elementFromPoint(
+          rect.left + rect.width * xs[i],
+          rect.top + rect.height * ys[j]
+        );
+        var root = element && element.closest &&
+          element.closest("[data-section-id]");
+        if (root && content.contains(root)) {
+          return root.getAttribute("data-section-id");
+        }
+      }
+    }
+    if (state.currentAnchorId) {
+      var anchor = content.querySelector(
+        '[data-id="' + String(state.currentAnchorId).replace(/["\\]/g, "\\$&") + '"]'
+      );
+      var anchorRoot = anchor && anchor.closest && anchor.closest("[data-section-id]");
+      if (anchorRoot) return anchorRoot.getAttribute("data-section-id");
+    }
+    return sections.length ? sections[0][0] : null;
+  }
+
+  function metricsContext() {
+    var sectionId = metricsSectionIdForPage();
+    var indexMap = metricsSectionIndexMap();
+    var sectionIndex = sectionId && indexMap[sectionId] !== undefined
+      ? indexMap[sectionId]
+      : 0;
+    var endIndex = indexMap.pg215_sec001;
+    if (endIndex === undefined) endIndex = sections.length - 1;
+    var progressPct = endIndex <= 0
+      ? 100
+      : Math.max(0, Math.min(100, Math.round(sectionIndex / endIndex * 100)));
+    var chapter = chapterProgressAt(chapterProgressBlocks(), state.current);
+    var chapterTitle = currentChapterTitle();
+    var chapterBlock = chapter && chapter.block;
+    return {
+      bookId: bookId,
+      bookVersion: bookVersion,
+      pageIndex: state.current + 1,
+      pageTotal: state.total,
+      sectionId: sectionId,
+      sectionIndex: sectionIndex + 1,
+      sectionTotal: sections.length,
+      progressEndIndex: endIndex,
+      progressPct: progressPct,
+      chapterId: chapterBlock
+        ? (chapterBlock.chapter ? "chapter-" + chapterBlock.chapter : chapterBlock.key)
+        : null,
+      chapterIndex: chapterBlock ? chapterBlock.chapter || 0 : 0,
+      chapterTitle: chapterTitle || (chapterBlock && chapterBlock.label) || null,
+      readingMode: document.body.classList.contains("reflow-easy-read")
+        ? "lectura_facil"
+        : "normal",
+      anchorId: state.currentAnchorId || null
+    };
+  }
+  window.__adtReflowMetricsContext = metricsContext;
+
   function chapterProgressText(pageIndex) {
     var progress = chapterProgressAt(chapterProgressBlocks(), pageIndex);
     if (progress) return progress;
@@ -2732,6 +2811,16 @@
     }
     updateControls(settings.announce !== false);
     saveProgress(settings.semanticAnchorId || state.currentAnchorId);
+    if (nextPage !== previousPage) {
+      var pageChangeSource = settings.fromTts
+        ? "tts"
+        : settings.explicit ? "user" : "layout";
+      var pageDetail = metricsContext();
+      pageDetail.pageChangeSource = pageChangeSource;
+      window.dispatchEvent(new CustomEvent("adt:pagechange", {
+        detail: pageDetail
+      }));
+    }
     if (
       nextPage !== previousPage &&
       !settings.fromTts &&
@@ -13308,6 +13397,11 @@
       if (loadingText) loadingText.textContent = errorText;
       else loading.textContent = errorText;
       loading.setAttribute("role", "alert");
+      window.dispatchEvent(new CustomEvent("adt:booterror", {
+        detail: {
+          message: error && error.message ? error.message : String(error)
+        }
+      }));
       return;
     }
 
@@ -13361,6 +13455,9 @@
     spaceObserver.observe(content, { childList: true, subtree: true });
     window.setTimeout(function () { spaceObserver.disconnect(); }, 4000);
     loading.remove();
+    window.dispatchEvent(new CustomEvent("adt:ready", {
+      detail: metricsContext()
+    }));
   }
 
   boot();
