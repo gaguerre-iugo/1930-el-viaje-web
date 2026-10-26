@@ -2294,6 +2294,19 @@
     window.ADTMetrics.a11y(feature, action, value, via, extra);
   }
 
+  var lastEasyReadMetricState = document.body.classList.contains("reflow-easy-read");
+  new MutationObserver(function () {
+    var current = document.body.classList.contains("reflow-easy-read");
+    if (current === lastEasyReadMetricState) return;
+    lastEasyReadMetricState = current;
+    reportA11y(
+      "lectura_facil",
+      current ? "activar" : "desactivar",
+      current,
+      "configuracion"
+    );
+  }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+
   function syncReadAloudSetting(enabled) {
     if (window.__adtReflowSetReadAloud) {
       window.__adtReflowSetReadAloud(Boolean(enabled));
@@ -8518,6 +8531,17 @@
     return false;
   }
 
+  function isReadAloudSwitch(control) {
+    var label = accessibleControlLabel(control);
+    if (/^(Activar lectura en voz alta|Lectura en voz alta)$/i.test(label)) return true;
+    var ancestor = control && control.parentElement;
+    for (var depth = 0; ancestor && depth < 4; depth += 1, ancestor = ancestor.parentElement) {
+      var text = String(ancestor.textContent || "").replace(/\s+/g, " ").trim();
+      if (/^(Activar lectura en voz alta|Lectura en voz alta)(\b|$)/i.test(text)) return true;
+    }
+    return false;
+  }
+
   function setEasyReadSwitchVisual(control, enabled) {
     if (!control) return;
     control.setAttribute("aria-checked", String(enabled));
@@ -8636,10 +8660,74 @@
     try { window.localStorage.setItem("easyReadMode", String(requested)); } catch (error) {}
     document.body.classList.toggle("reflow-easy-read", requested);
     setEasyReadSwitchVisual(control, requested);
+    reportA11y(
+      "lectura_facil",
+      requested ? "activar" : "desactivar",
+      requested,
+      "configuracion"
+    );
     applyEasyReadTextDirectly(requested);
     normalizeSemanticChainSpacing();
     updateEasyReadClass.lastState = null;
     scheduleSettingsRepaginationFinalize(220);
+  }, true);
+
+  function a11ySwitchLabel(control) {
+    var parts = [];
+    if (control) {
+      parts.push(control.getAttribute("aria-label") || "");
+      var labelledBy = control.getAttribute("aria-labelledby");
+      if (labelledBy) {
+        labelledBy.split(/\s+/).forEach(function (id) {
+          var label = document.getElementById(id);
+          if (label) parts.push(label.textContent || "");
+        });
+      }
+      var row = control.closest(".reflow-setting-row");
+      if (row) parts.push(row.textContent || "");
+    }
+    return parts.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  document.addEventListener("click", function (event) {
+    var control = event.target && event.target.closest
+      ? event.target.closest('[role="switch"]')
+      : null;
+    if (!control) return;
+    var text = a11ySwitchLabel(control).toLocaleLowerCase("es");
+    window.setTimeout(function () {
+      var enabled = control.getAttribute("aria-checked") === "true";
+      if (/lectura en voz alta/.test(text)) {
+        state.lastA11yReadAloud = enabled;
+        reportA11y(
+          "tts",
+          enabled ? "activar" : "desactivar",
+          enabled,
+          "configuracion"
+        );
+      } else if (/lectura fácil/.test(text)) {
+        reportA11y(
+          "lectura_facil",
+          enabled ? "activar" : "desactivar",
+          enabled,
+          "configuracion"
+        );
+      } else if (/reducir movimiento/.test(text)) {
+        reportA11y(
+          "movimiento_reducido",
+          enabled ? "activar" : "desactivar",
+          enabled,
+          "configuracion"
+        );
+      } else if (/descripción de imágenes/.test(text)) {
+        reportA11y(
+          "descripcion_imagenes",
+          enabled ? "activar" : "desactivar",
+          enabled,
+          "configuracion"
+        );
+      }
+    }, 0);
   }, true);
 
   function updateEasyReadClass() {

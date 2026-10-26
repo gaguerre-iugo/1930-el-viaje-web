@@ -56,6 +56,8 @@
   var maxProgressPct = 0;
   var lcpMs = 0;
   var readyPoll = 0;
+  var lastA11yKey = "";
+  var lastA11yAt = 0;
 
   var originValues = ["landing", "biblioteca_pais", "crea", "directo", "otro", "desconocido"];
   var roleValues = ["docente", "estudiante", "familia", "otro", "sin_dato"];
@@ -407,6 +409,11 @@
     /* Las restauraciones de preferencias durante el arranque no son uso real:
        no cuentan como activación de accesibilidad. */
     if (!readySent) return null;
+    var a11yKey = String(feature) + "|" + String(action) + "|" + String(value);
+    var a11yNow = now();
+    if (a11yKey === lastA11yKey && a11yNow - lastA11yAt < 1000) return null;
+    lastA11yKey = a11yKey;
+    lastA11yAt = a11yNow;
     var ctx = context() || lastContext;
     var data = {
       feature: feature,
