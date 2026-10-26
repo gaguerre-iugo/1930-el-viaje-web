@@ -346,6 +346,7 @@
     ttsResumeAfterSeek: true,
     ttsManuallyPaused: false,
     ttsExplicitlyStarted: false,
+    lastA11yReadAloud: null,
     ttsAudio: null,
     /* The runtime assigns its stock source just before it calls play(). Keep
        the semantic id independently so the bridge can reject that source if
@@ -1640,6 +1641,12 @@
       window.__adtReflowGlossaryHighlightPreference(next);
     }
     writeGlossaryHighlightPreference(next);
+    reportA11y(
+      "glosario_resaltado",
+      next ? "activar" : "desactivar",
+      next,
+      "configuracion"
+    );
   }
 
   function installReflowGlossaryBridge() {
@@ -2282,9 +2289,25 @@
     window.setTimeout(clearTtsRangeHighlight, 0);
   }
 
+  function reportA11y(feature, action, value, via, extra) {
+    if (!window.ADTMetrics || typeof window.ADTMetrics.a11y !== "function") return;
+    window.ADTMetrics.a11y(feature, action, value, via, extra);
+  }
+
   function syncReadAloudSetting(enabled) {
     if (window.__adtReflowSetReadAloud) {
       window.__adtReflowSetReadAloud(Boolean(enabled));
+    }
+    var metricsEnabled = Boolean(enabled);
+    var previousMetricsEnabled = state.lastA11yReadAloud;
+    state.lastA11yReadAloud = metricsEnabled;
+    if (previousMetricsEnabled !== null && previousMetricsEnabled !== metricsEnabled) {
+      reportA11y(
+        "tts",
+        metricsEnabled ? "activar" : "desactivar",
+        metricsEnabled,
+        "configuracion"
+      );
     }
   }
 
@@ -4733,6 +4756,7 @@
   }
 
   function applyReducedMotion(enabled, persist) {
+    var previousReducedMotion = state.reducedMotion;
     if (persist) {
       state.reducedMotionOverride = Boolean(enabled);
       try {
@@ -4740,6 +4764,14 @@
       } catch (_error) {}
     }
     state.reducedMotion = Boolean(enabled);
+    if (persist && previousReducedMotion !== state.reducedMotion) {
+      reportA11y(
+        "movimiento_reducido",
+        state.reducedMotion ? "activar" : "desactivar",
+        state.reducedMotion,
+        "configuracion"
+      );
+    }
     document.body.dataset.reflowReduceMotion = String(state.reducedMotion);
     document.body.dataset.reflowMotionPreference =
       state.reducedMotionOverride === null ? "system" : "manual";
@@ -5333,7 +5365,11 @@
     var anchorId = state.quizRepaginationAnchorId ||
       livePendingSettingsAnchorId() || visibleSemanticAnchorId() ||
       state.currentAnchorId || anchorIdForPage(state.current);
+    var previousFontSize = state.fontSize;
     state.fontSize = size;
+    if (previousFontSize !== size) {
+      reportA11y("tamano_texto", "cambiar", size, "configuracion");
+    }
     content.style.setProperty("--reflow-font-scale", String(fontScales[size]));
     document.documentElement.style.setProperty("--reflow-font-scale", String(fontScales[size]));
     document.body.dataset.reflowFontSize = size;
@@ -8621,9 +8657,18 @@
       : (storedState !== null
         ? storedState
         : Boolean(probe && /Javier es un joven alto y delgado/i.test(probe.textContent)));
-    if (updateEasyReadClass.lastState === easyRead) return;
+    var previousEasyRead = updateEasyReadClass.lastState;
+    if (previousEasyRead === easyRead) return;
     updateEasyReadClass.lastState = easyRead;
     document.body.classList.toggle("reflow-easy-read", easyRead);
+    if (previousEasyRead !== null) {
+      reportA11y(
+        "lectura_facil",
+        easyRead ? "activar" : "desactivar",
+        easyRead,
+        "configuracion"
+      );
+    }
     applyEasyReadTextDirectly(easyRead);
     normalizeSemanticChainSpacing();
     /* Locale reconciliation and sentence-chain composition finish shortly

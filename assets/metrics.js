@@ -404,6 +404,9 @@
   }
 
   function a11y(feature, action, value, via, extra) {
+    /* Las restauraciones de preferencias durante el arranque no son uso real:
+       no cuentan como activación de accesibilidad. */
+    if (!readySent) return null;
     var ctx = context() || lastContext;
     var data = {
       feature: feature,
