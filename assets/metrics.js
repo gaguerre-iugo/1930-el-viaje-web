@@ -60,12 +60,8 @@
   var lastA11yAt = 0;
 
   var originValues = ["landing", "biblioteca_pais", "crea", "directo", "otro", "desconocido"];
-  var roleValues = ["docente", "estudiante", "familia", "otro", "sin_dato"];
   var origin = queryValue("origin") || "directo";
   if (originValues.indexOf(origin) < 0) origin = "otro";
-  var role = queryValue("role") || "sin_dato";
-  if (roleValues.indexOf(role) < 0) role = "sin_dato";
-  var roleSource = queryValue("role_source") || "desconocido";
 
   function now() {
     return window.performance && performance.now
@@ -103,8 +99,6 @@
       surface: "libro",
       language: "es-UY",
       origin: origin,
-      role: role,
-      role_source: roleSource,
       device_class: deviceClass()
     };
   }
