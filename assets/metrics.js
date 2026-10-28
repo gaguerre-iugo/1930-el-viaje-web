@@ -33,7 +33,7 @@
     return;
   }
 
-  var bookId = document.documentElement.dataset.bookId || "1930-el-viaje";
+  var bookId = document.documentElement.dataset.bookId || "1930-El-Viaje";
   var bookVersion = document.documentElement.dataset.bookVersion || "v48";
   var bookTitle = "1930 El viaje";
   var startedAt = now();

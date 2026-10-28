@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var bookId = "1930-el-viaje";
+  var bookId = "1930-El-Viaje";
   var bookVersion = "v48";
 
   document.documentElement.dataset.reflowBuild = "47-full-book-106";
