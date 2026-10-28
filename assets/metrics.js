@@ -1,8 +1,8 @@
 /* Métricas ADT — capa de eventos del libro.
  *
- * No carga GTM, no envía datos a Google y no crea cookies.
- * Sólo empuja eventos a window.dataLayer para que GTM/GA4 los tome cuando
- * estén habilitados. Para pruebas locales:
+ * Empuja eventos a window.dataLayer. GTM (instalado en index.html) los envía
+ * a GA4. No crea cookies propias ni envía datos personales. Para pruebas
+ * locales:
  *
  *   index.html?metrics=1&metricsForce=1
  *
