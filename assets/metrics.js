@@ -116,7 +116,6 @@
       book_id: bookId,
       book_title: bookTitle,
       book_version: bookVersion,
-      surface: "libro",
       language: "es-UY",
       origin: origin,
       device_class: deviceClass()
