@@ -2650,6 +2650,7 @@
     var chapterTitle = currentChapterTitle();
     var chapterBlock = chapter && chapter.block;
     var chapterInfo = metricsChapterInfo(chapterBlock);
+    var listening = ttsPlaybackIsRunning();
     return {
       bookId: bookId,
       bookVersion: bookVersion,
@@ -2670,9 +2671,7 @@
       chapterProgressPct: chapter && chapter.pages
         ? Math.max(0, Math.min(100, Math.round(chapter.page / chapter.pages * 100)))
         : null,
-      readingMode: document.body.classList.contains("reflow-easy-read")
-        ? "lectura_facil"
-        : "normal",
+      readingMode: listening ? "listening" : "visual",
       anchorId: state.currentAnchorId || null
     };
   }

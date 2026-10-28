@@ -43,6 +43,10 @@
   var heartbeatTimer = 0;
   var heartbeatSequence = 0;
   var activeMs = 0;
+  var listeningMs = 0;
+  var listeningTimer = 0;
+  var listeningTickAt = 0;
+  var ttsUseSent = false;
   var lastTickAt = startedAt;
   var lastContext = null;
   var lastPageIndex = null;
@@ -91,6 +95,20 @@
       return "ceibal_laptop";
     }
     return "desktop";
+  }
+
+  function audioIsPlaying() {
+    var api = window.__adtReflowAudio;
+    if (!api) return false;
+    if (typeof api.isPlaying === "boolean") return api.isPlaying;
+    if (typeof api.isPlaying === "function") {
+      try {
+        return Boolean(api.isPlaying());
+      } catch (_error) {
+        return false;
+      }
+    }
+    return false;
   }
 
   function baseParams() {
@@ -223,6 +241,7 @@
     emitBookOpen(ctx);
     emitSectionView(ctx, "boot", false);
     startHeartbeat();
+    startListeningTracker();
   }
 
   function emitBookLoad(ctx) {
@@ -349,12 +368,13 @@
     if (!readySent) onReady(ctx);
     var source = ctx.pageChangeSource || "layout";
     var jumped = lastPageIndex !== null && Math.abs(ctx.pageIndex - lastPageIndex) > 1;
+    var trigger = source === "tts" || audioIsPlaying() ? "tts" : "page_change";
 
-    emitSectionView(ctx, "page_change", jumped);
-    maybeChapterComplete(ctx, "page_change");
+    emitSectionView(ctx, trigger, jumped);
+    maybeChapterComplete(ctx, trigger);
     if (source !== "layout") {
-      emitProgress(ctx, "page_change", jumped);
-      emitComplete(ctx, "page_change");
+      emitProgress(ctx, trigger, jumped);
+      emitComplete(ctx, trigger);
     }
 
     lastContext = ctx;
@@ -388,15 +408,44 @@
     }, 30000);
   }
 
+  function startListeningTracker() {
+    if (listeningTimer) return;
+    listeningTickAt = now();
+    listeningTimer = window.setInterval(function () {
+      var current = now();
+      var delta = Math.max(0, current - listeningTickAt);
+      listeningTickAt = current;
+      if (document.visibilityState !== "visible" || !audioIsPlaying()) return;
+      listeningMs += delta;
+      if (ttsUseSent || listeningMs < 10000) return;
+      ttsUseSent = true;
+      var ctx = context() || lastContext;
+      emit("a11y_feature", {
+        feature: "tts",
+        action: "use",
+        via: "user",
+        section_id: ctx ? ctx.sectionId : null,
+        chapter_id: ctx ? ctx.chapterId : null
+      });
+    }, 1000);
+  }
+
   function sessionEnd() {
     if (!readySent || sessionEnded) return;
     sessionEnded = true;
+    var endedAt = now();
+    if (document.visibilityState === "visible") {
+      activeMs += Math.max(0, endedAt - lastTickAt);
+    }
+    lastTickAt = endedAt;
+    var activeSeconds = Math.round(activeMs / 1000);
+    var listeningSeconds = Math.round(listeningMs / 1000);
     var ctx = context() || lastContext;
     emit("book_session_end", {
-      active_seconds_total: Math.round(activeMs / 1000),
-      visual_seconds: Math.round((now() - startedAt) / 1000),
-      listening_seconds: 0,
-      elapsed_seconds: Math.round((now() - startedAt) / 1000),
+      active_seconds_total: activeSeconds,
+      visual_seconds: Math.max(0, activeSeconds - listeningSeconds),
+      listening_seconds: listeningSeconds,
+      elapsed_seconds: Math.round((endedAt - startedAt) / 1000),
       sections_seen: sectionsSeenCount(),
       max_progress_pct: maxProgressPct,
       last_section_id: ctx ? ctx.sectionId : null,
