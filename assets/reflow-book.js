@@ -2553,6 +2553,60 @@
     return metricsSectionIndex;
   }
 
+  var metricsChapterRangesCache = { signature: "", value: null };
+  function metricsChapterRanges() {
+    var signature = [
+      chapterProgressSignature(),
+      sections.length,
+      (window.__adtReflowTocEntries || []).length
+    ].join(":");
+    if (metricsChapterRangesCache.signature === signature) {
+      return metricsChapterRangesCache.value;
+    }
+    var indexMap = metricsSectionIndexMap();
+    var entries = window.__adtReflowTocEntries || [];
+    var chapterStarts = entries.filter(function (entry) {
+      return entry && entry.group === "chapter" && entry.section_id &&
+        indexMap[entry.section_id] !== undefined;
+    }).map(function (entry) {
+      return entry.section_id;
+    }).sort(function (left, right) {
+      return indexMap[left] - indexMap[right];
+    });
+    var sobreStarts = entries.filter(function (entry) {
+      return entry && entry.group === "sobre" && entry.section_id &&
+        indexMap[entry.section_id] !== undefined;
+    }).map(function (entry) {
+      return entry.section_id;
+    }).sort(function (left, right) {
+      return indexMap[left] - indexMap[right];
+    });
+    var sobreIndex = sobreStarts.length ? indexMap[sobreStarts[0]] : sections.length;
+    var ranges = chapterStarts.map(function (sectionId, index) {
+      var start = indexMap[sectionId];
+      var next = index + 1 < chapterStarts.length
+        ? indexMap[chapterStarts[index + 1]]
+        : sobreIndex;
+      var end = Math.max(start, next - 1);
+      var contentIds = [];
+      for (var cursor = start; cursor <= end; cursor += 1) {
+        var id = sections[cursor] && sections[cursor][0];
+        if (id && !/^(qz|quiz)/.test(id)) contentIds.push(id);
+      }
+      return {
+        total: contentIds.length,
+        lastSectionId: contentIds.length ? contentIds[contentIds.length - 1] : null
+      };
+    });
+    metricsChapterRangesCache = { signature: signature, value: ranges };
+    return ranges;
+  }
+
+  function metricsChapterInfo(block) {
+    if (!block || block.group !== "chapter" || !block.chapter) return null;
+    return metricsChapterRanges()[block.chapter - 1] || null;
+  }
+
   function metricsSectionIdForPage() {
     if (!content) return null;
     var rect = content.getBoundingClientRect();
@@ -2595,6 +2649,7 @@
     var chapter = chapterProgressAt(chapterProgressBlocks(), state.current);
     var chapterTitle = currentChapterTitle();
     var chapterBlock = chapter && chapter.block;
+    var chapterInfo = metricsChapterInfo(chapterBlock);
     return {
       bookId: bookId,
       bookVersion: bookVersion,
@@ -2610,6 +2665,11 @@
         : null,
       chapterIndex: chapterBlock ? chapterBlock.chapter || 0 : 0,
       chapterTitle: chapterTitle || (chapterBlock && chapterBlock.label) || null,
+      chapterSectionTotal: chapterInfo ? chapterInfo.total : null,
+      chapterLastSectionId: chapterInfo ? chapterInfo.lastSectionId : null,
+      chapterProgressPct: chapter && chapter.pages
+        ? Math.max(0, Math.min(100, Math.round(chapter.page / chapter.pages * 100)))
+        : null,
       readingMode: document.body.classList.contains("reflow-easy-read")
         ? "lectura_facil"
         : "normal",

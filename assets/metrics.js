@@ -52,6 +52,8 @@
   var lastChapterTitle = null;
   var seenSections = Object.create(null);
   var seenChapters = Object.create(null);
+  var seenByChapter = Object.create(null);
+  var chapterCompleteSent = Object.create(null);
   var seenErrors = Object.create(null);
   var maxProgressPct = 0;
   var lcpMs = 0;
@@ -166,10 +168,25 @@
     return Object.keys(seenChapters).length;
   }
 
+  function chaptersCompletedCount() {
+    return Object.keys(chapterCompleteSent).length;
+  }
+
   function coveragePct(ctx) {
     if (!ctx || !ctx.progressEndIndex) return 0;
     return Math.max(0, Math.min(100, Math.round(
       sectionsSeenCount() / ctx.progressEndIndex * 100
+    )));
+  }
+
+  function isActivitySection(sectionId) {
+    return /^(qz|quiz)/.test(sectionId || "");
+  }
+
+  function chapterCoveragePct(ctx) {
+    if (!ctx || !ctx.chapterSectionTotal) return 0;
+    return Math.max(0, Math.min(100, Math.round(
+      (seenByChapter[ctx.chapterId] || 0) / ctx.chapterSectionTotal * 100
     )));
   }
 
@@ -257,7 +274,12 @@
     var firstView = !seenSections[ctx.sectionId];
     if (!firstView) return;
     seenSections[ctx.sectionId] = true;
-    if (ctx.chapterId) seenChapters[ctx.chapterId] = true;
+    if (ctx.chapterId) {
+      seenChapters[ctx.chapterId] = true;
+      if (!isActivitySection(ctx.sectionId)) {
+        seenByChapter[ctx.chapterId] = (seenByChapter[ctx.chapterId] || 0) + 1;
+      }
+    }
     emit("book_section_view", Object.assign(sectionParams(ctx, trigger, jumped), {
       coverage_pct: coveragePct(ctx),
       sections_seen: sectionsSeenCount()
@@ -279,33 +301,44 @@
     if (ctx.progressPct > maxProgressPct) maxProgressPct = ctx.progressPct;
   }
 
-  function emitChapterComplete(previousChapterId, previousChapterTitle) {
-    if (!previousChapterId || previousChapterId === "antes" || previousChapterId === "sobre") return;
+  function maybeChapterComplete(ctx, trigger) {
+    if (!ctx || !ctx.chapterId || !ctx.chapterLastSectionId || !ctx.chapterSectionTotal) return;
+    if (ctx.chapterId.indexOf("chapter-") !== 0) return;
+    if (chapterCompleteSent[ctx.chapterId]) return;
+    if (!seenSections[ctx.chapterLastSectionId]) return;
+    var coverage = chapterCoveragePct(ctx);
+    if (coverage < 75) return;
+    chapterCompleteSent[ctx.chapterId] = true;
     emit("chapter_complete", {
-      chapter_id: previousChapterId,
-      chapter_title: previousChapterTitle || previousChapterId,
-      chapter_index: lastContext ? lastContext.chapterIndex : 0,
-      last_section_id: lastSectionId,
-      progress_pct: lastContext ? lastContext.progressPct : 0,
-      completion_rule: "chapter_change",
-      trigger: "page_change"
+      chapter_id: ctx.chapterId,
+      chapter_title: ctx.chapterTitle || ctx.chapterId,
+      chapter_index: ctx.chapterIndex || 0,
+      chapter_section_total: ctx.chapterSectionTotal,
+      chapter_sections_seen: seenByChapter[ctx.chapterId] || 0,
+      chapter_coverage_pct: coverage,
+      last_section_id: ctx.chapterLastSectionId,
+      progress_pct: ctx.progressPct,
+      completion_rule: "chapter_75_last_section",
+      trigger: trigger || "page_change"
     });
   }
 
   function emitComplete(ctx, trigger) {
     if (completeSent || !ctx) return;
-    /* 100 % del libro = llegar a la sección final pg215. Las páginas
-       posteriores (Sobre la autora, etc.) no vuelven a completar el libro. */
+    /* 100 % del libro = llegar a la sección final pg215 con al menos 75 %
+       de cobertura. Las páginas posteriores no vuelven a completar el libro. */
     if (ctx.sectionId !== "pg215_sec001") return;
+    var coverage = coveragePct(ctx);
+    if (coverage < 75) return;
     completeSent = true;
     emit("book_complete", {
       end_section_id: ctx.sectionId,
       progress_pct: ctx.progressPct,
-      overall_coverage_pct: coveragePct(ctx),
+      overall_coverage_pct: coverage,
       sections_seen: sectionsSeenCount(),
-      chapters_completed: chaptersSeenCount(),
+      chapters_completed: chaptersCompletedCount(),
       final_quiz_completed: false,
-      completion_rule: "section_pg215",
+      completion_rule: "section_pg215_coverage_75",
       trigger: trigger
     });
   }
@@ -315,19 +348,10 @@
     if (!ctx) return;
     if (!readySent) onReady(ctx);
     var source = ctx.pageChangeSource || "layout";
-    var previous = lastContext;
     var jumped = lastPageIndex !== null && Math.abs(ctx.pageIndex - lastPageIndex) > 1;
 
-    if (
-      previous &&
-      previous.chapterId &&
-      ctx.chapterId &&
-      previous.chapterId !== ctx.chapterId
-    ) {
-      emitChapterComplete(previous.chapterId, previous.chapterTitle);
-    }
-
     emitSectionView(ctx, "page_change", jumped);
+    maybeChapterComplete(ctx, "page_change");
     if (source !== "layout") {
       emitProgress(ctx, "page_change", jumped);
       emitComplete(ctx, "page_change");
