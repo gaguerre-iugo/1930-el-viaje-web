@@ -7,6 +7,21 @@
     <title>1930 El viaje</title>
     <meta name="title-id" content="pg001_sec001" />
     <meta name="page-section-id" content="1" />
+    <script>
+      /* Paquete unico: ?kiosco=1 fuerza el visor pre-renderizado; si no,
+         autodeteccion de pantalla interactiva; si no, libro normal. */
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        var kiosk = params.get("kiosco") === "1" || params.get("kiosk") === "1";
+        if (!kiosk) {
+          var ua = navigator.userAgent || "";
+          var touch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+          var big = Math.max(window.screen.width, window.screen.height) >= 1920;
+          kiosk = /Haier/i.test(ua) || (/Android/i.test(ua) && touch && big);
+        }
+        if (kiosk) window.location.replace("kiosk.html");
+      })();
+    </script>
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-W456LVKC');</script>
     <!-- End Google Tag Manager -->

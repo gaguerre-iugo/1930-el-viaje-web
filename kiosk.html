@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es-UY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>1930: El viaje — kiosco</title>
+<link href="./assets/fonts.css?v=3-emoji-font" rel="stylesheet">
+<style>
+:root{
+  --ink:#15171a; --muted:#565b66; --line:#e1e3e6; --line-strong:#a6aab3;
+  --accent:#00635d; --accent-hover:#00504b; --accent-soft:#ccecea;
+  --surface:#fff; --soft:#eef7f6;
+}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:'Atkinson Hyperlegible',system-ui,sans-serif}
+#stage{position:absolute;inset:0 0 84px;display:flex;align-items:center;justify-content:center;background:#fff}
+#pageWrap{position:relative;display:flex;max-width:100%;max-height:100%;line-height:0}
+#page{display:block;max-width:100%;max-height:100%;width:auto;height:auto;user-select:none;-webkit-user-drag:none}
+#hotspots{position:absolute;inset:0}
+#hotspots button{position:absolute;background:transparent;border:0;padding:0;margin:0;cursor:pointer;border-radius:4px}
+#hotspots button:hover,#hotspots button:focus-visible{background:rgba(0,99,93,.16);outline:2px dashed #00635d;outline-offset:1px}
+#term{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);width:min(560px,90vw);background:#fff;color:var(--ink);border-radius:14px;border-top:5px solid var(--accent);box-shadow:0 10px 32px rgba(0,0,0,.3);padding:1rem 1.2rem;z-index:12;font-size:1.02rem}
+#term h3{margin:0 0 .4rem;color:var(--accent);font-size:1.15rem}
+#term p{margin:0 0 .9rem;line-height:1.45}
+#term .actions{display:flex;gap:.5rem;justify-content:flex-end}
+
+/* Barra inferior */
+#bar{position:fixed;left:0;right:0;bottom:0;height:84px;display:flex;gap:.5rem;align-items:center;justify-content:center;padding:0 .8rem;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(21,23,26,.12);color:var(--ink);z-index:6}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;height:52px;padding:0 1rem;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:600 1rem 'Atkinson Hyperlegible',sans-serif;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--soft);border-color:#66c6c0}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.icon{width:52px;padding:0}
+.btn:disabled{opacity:.4;cursor:default}
+.btn svg{width:22px;height:22px;flex:0 0 auto}
+#count{min-width:170px;text-align:center;color:var(--muted);font-size:.95rem}
+
+/* Riel (indice + glosario) */
+#backdrop{position:fixed;inset:0 0 84px;background:rgba(21,23,26,.45);z-index:9;display:none}
+#backdrop.open{display:block}
+#rail{position:fixed;top:0;left:0;bottom:84px;width:min(400px,88vw);background:var(--surface);border-right:1px solid var(--line);box-shadow:8px 0 24px rgba(21,23,26,.18);z-index:10;transform:translateX(-102%);transition:transform .22s ease;display:flex;flex-direction:column;color:var(--ink)}
+#rail.open{transform:none}
+#rail.right{left:auto;right:0;border-right:0;border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(21,23,26,.18);transform:translateX(102%)}
+#rail.right.open{transform:none}
+#rail header{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem .5rem}
+#rail h2{color:var(--accent);font-size:1.2rem;margin:0}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:.3rem;padding:0 1rem .6rem;border-bottom:1px solid var(--line)}
+.tabs button{height:40px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font:600 .95rem 'Atkinson Hyperlegible',sans-serif;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+#glossary-search{margin:.7rem 1rem .3rem;height:44px;border:1px solid var(--line);border-radius:10px;padding:0 .8rem;font:400 1rem 'Atkinson Hyperlegible',sans-serif;color:var(--ink)}
+#glossary-search:focus{outline:3px solid var(--accent);outline-offset:1px}
+.list{overflow:auto;padding:.5rem .6rem 1.5rem;flex:1}
+.entry{display:block;width:100%;text-align:left;border:1px solid transparent;border-radius:10px;background:var(--surface);color:var(--ink);font:400 1.02rem 'Atkinson Hyperlegible',sans-serif;padding:.6rem .8rem;cursor:pointer}
+.entry:hover{background:var(--soft);border-color:#66c6c0}
+.entry.lvl2{margin-left:1rem;width:calc(100% - 1rem);font-size:.97rem;color:var(--muted)}
+.entry .def{display:block;font-size:.85rem;color:var(--muted);margin-top:.15rem}
+
+/* Reproductor */
+#player{position:fixed;right:1rem;bottom:100px;z-index:8;display:flex;flex-direction:column;align-items:flex-end;gap:.4rem}
+#player.min .p-main{display:none}
+#player.min #fab{display:inline-flex}
+#fab{display:none}
+.p-main{display:flex;align-items:center;gap:.25rem;padding:.35rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;box-shadow:0 4px 16px rgba(21,23,26,.18)}
+.p-main .pbtn{width:44px;height:44px;border:0;border-radius:999px;background:transparent;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.p-main .pbtn:hover{background:var(--soft);color:var(--accent)}
+.p-main .pbtn.play{background:var(--accent);color:#fff}
+.p-main .pbtn.play:hover{background:var(--accent-hover)}
+.p-main .pbtn svg{width:20px;height:20px}
+.p-options{width:280px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(21,23,26,.22);padding:1rem;color:var(--ink)}
+.p-options p{font-weight:700;font-size:.95rem;margin:.6rem 0 .35rem}
+.p-options p:first-child{margin-top:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:.35rem}
+.seg button{height:42px;border:1px solid transparent;border-radius:9px;background:var(--soft);color:var(--ink);font:600 .95rem 'Atkinson Hyperlegible',sans-serif;cursor:pointer}
+.seg button:hover{border-color:#66c6c0}
+.seg button[aria-checked="true"]{background:var(--accent);color:#fff}
+
+@media (max-width:900px){.btn .label{display:none}#bar{gap:.35rem}}
+</style>
+</head>
+<body>
+<div id="stage"><div id="pageWrap"><img id="page" alt="Página del libro"><div id="hotspots"></div></div></div>
+<div id="term" hidden role="dialog" aria-label="Definición del glosario">
+  <h3 id="term-title"></h3>
+  <p id="term-def"></p>
+  <div class="actions">
+    <button id="term-play" class="btn">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+      <span class="label">Escuchar</span>
+    </button>
+    <button id="term-close" class="btn">Cerrar</button>
+  </div>
+</div>
+
+<div id="backdrop"></div>
+<aside id="rail" role="dialog" aria-modal="true" aria-label="Índice y glosario">
+  <header>
+    <h2 id="rail-title">Índice</h2>
+    <button id="close-rail" class="btn icon" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </header>
+  <div class="tabs" role="tablist">
+    <button role="tab" data-tab="toc" aria-selected="true">Índice</button>
+    <button role="tab" data-tab="glossary" aria-selected="false">Glosario</button>
+  </div>
+  <input id="glossary-search" type="search" placeholder="Buscar término" hidden>
+  <div class="list" id="toc"></div>
+  <div class="list" id="glossary-list" hidden></div>
+</aside>
+
+<div id="bar">
+  <button id="idx" class="btn" aria-label="Abrir índice">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg>
+    <span class="label">Índice</span>
+  </button>
+  <button id="prev" class="btn primary" aria-label="Página anterior">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.8 12H7.1"/><path d="M7.44 8.04 4.44 12l3 3.96"/></svg>
+    <span class="label">Anterior</span>
+  </button>
+  <span id="count">Cargando…</span>
+  <button id="next" class="btn primary" aria-label="Página siguiente">
+    <span class="label">Siguiente</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 12h12.7"/><path d="M16.56 8.04 19.56 12l-3 3.96"/></svg>
+  </button>
+  <button id="gloss" class="btn" aria-label="Abrir glosario">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.4 2.4 3.5 9.7"/><path d="M6.4 2.4l2.9 7.3"/><path d="M4.5 7.1h3.8"/><circle cx="16.4" cy="7.6" r="2.15"/><path d="M18.55 5.45v4.3"/><path d="M2.8 14.4c3-1.3 6.2-1.3 9.2 0 3-1.3 6.2-1.3 9.2 0"/><path d="M12 14.4v4.6"/><path d="M2.8 14.4v4.6c3-1.3 6.2-1.3 9.2 0 3-1.3 6.2-1.3 9.2 0v-4.6"/></svg>
+    <span class="label">Glosario</span>
+  </button>
+</div>
+
+<div id="player">
+  <button id="fab" class="btn primary" aria-label="Mostrar reproductor">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+  <div class="p-main" role="group" aria-label="Reproductor">
+    <button id="p-prev" class="pbtn" aria-label="Audio anterior">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.64 5.28 7.44 12l13.2 6.72zM3.84 5.28h1.92v13.44H3.84z"/></svg>
+    </button>
+    <button id="p-play" class="pbtn play" aria-label="Reproducir" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+    <button id="p-next" class="pbtn" aria-label="Audio siguiente">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3.36 5.28 16.56 12 3.36 18.72zM18.24 5.28h1.92v13.44h-1.92z"/></svg>
+    </button>
+    <button id="p-options" class="pbtn" aria-label="Opciones de voz y velocidad" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.14 12.94a7.5 7.5 0 0 0 .06-.94 7.5 7.5 0 0 0-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.3 7.3 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.55-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.74 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.5 7.5 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.44.34.7.22l2.39-.96c.5.39 1.04.7 1.62.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.58-.24 1.12-.55 1.62-.94l2.39.96c.26.12.56.02.7-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+    </button>
+    <button id="p-min" class="pbtn" aria-label="Minimizar reproductor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 9.5 12 15.5 18 9.5"/></svg>
+    </button>
+    <button id="p-close" class="pbtn" aria-label="Cerrar reproductor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="p-options" id="p-options-panel" hidden>
+    <p>Voz del narrador</p>
+    <div class="seg" id="voices">
+      <button data-voice="valentina" aria-checked="true">Valentina</button>
+      <button data-voice="mateo" aria-checked="false">Mateo</button>
+    </div>
+    <p>Velocidad</p>
+    <div class="seg" id="speeds">
+      <button data-speed="0.5">Lenta</button>
+      <button data-speed="1" aria-checked="true">Normal</button>
+      <button data-speed="1.5">Rápida</button>
+      <button data-speed="2">Muy rápida</button>
+    </div>
+  </div>
+</div>
+
+<audio id="audio" preload="auto"></audio>
+<audio id="term-audio" preload="auto"></audio>
+<script>
+let manifest = null, i = 0, voice = 'valentina', speed = 1;
+let queue = [], qpos = 0, playing = false;
+let glossary = null, currentTerm = null, firstPage = {};
+const img = document.getElementById('page');
+const count = document.getElementById('count');
+const audio = document.getElementById('audio');
+const termAudio = document.getElementById('term-audio');
+const player = document.getElementById('player');
+const playBtn = document.getElementById('p-play');
+const optionsBtn = document.getElementById('p-options');
+const optionsPanel = document.getElementById('p-options-panel');
+
+const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
+
+function matchPageBackground() {
+  try {
+    const c = document.createElement('canvas'); c.width = 1; c.height = 1;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0, 1, 1);
+    const d = ctx.getImageData(0, 0, 1, 1).data;
+    document.getElementById('stage').style.background = 'rgb(' + d[0] + ',' + d[1] + ',' + d[2] + ')';
+  } catch (e) {}
+}
+img.addEventListener('load', matchPageBackground);
+
+function pageIds() {
+  const p = manifest && manifest.pages[i];
+  return ((p && p.audio) || []).map((a) => a.split('/').pop().split('?')[0].replace(/\.mp3$/, ''));
+}
+function buildQueue() {
+  return pageIds().map((id) => `content/i18n/es-UY/voices/${voice}/audio/${id}.mp3`);
+}
+function setPlaying(value) {
+  playing = value;
+  playBtn.innerHTML = value ? ICON_PAUSE : ICON_PLAY;
+  playBtn.setAttribute('aria-pressed', String(value));
+  playBtn.setAttribute('aria-label', value ? 'Pausar' : 'Reproducir');
+}
+function stopAudio() {
+  try { audio.pause(); audio.currentTime = 0; } catch (e) {}
+  setPlaying(false);
+}
+function playClip() {
+  if (qpos >= queue.length) { stopAudio(); return; }
+  audio.src = queue[qpos++];
+  audio.playbackRate = speed;
+  audio.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+}
+function startAudio(fromIndex) {
+  queue = buildQueue();
+  if (!queue.length) { count.textContent = 'Página ' + (i + 1) + ' — sin audio'; return; }
+  qpos = Math.max(0, Math.min(queue.length - 1, fromIndex || 0));
+  playClip();
+}
+function toggleAudio() {
+  if (playing) { audio.pause(); setPlaying(false); return; }
+  if (audio.src && audio.paused && qpos > 0 && qpos <= queue.length) {
+    audio.playbackRate = speed;
+    audio.play().then(() => setPlaying(true)).catch(() => startAudio(0));
+    return;
+  }
+  startAudio(0);
+}
+
+function renderHotspots() {
+  const box = document.getElementById('hotspots');
+  box.innerHTML = '';
+  const pageData = glossary && glossary.pages ? glossary.pages[i] : null;
+  if (!pageData || !pageData.items) return;
+  pageData.items.forEach((it) => {
+    if (!glossary.terms[it.key]) return;
+    const b = document.createElement('button');
+    b.style.left = (it.x / glossary.width * 100) + '%';
+    b.style.top = (it.y / glossary.height * 100) + '%';
+    b.style.width = (it.w / glossary.width * 100) + '%';
+    b.style.height = (it.h / glossary.height * 100) + '%';
+    b.setAttribute('aria-label', 'Definición de ' + it.key);
+    b.onclick = () => openTerm(it.key, false);
+    box.appendChild(b);
+  });
+}
+function openTerm(key, jump) {
+  const t = glossary && glossary.terms[key];
+  if (!t) return;
+  if (jump && firstPage[key] !== undefined && firstPage[key] !== i) {
+    show(firstPage[key]);
+  }
+  currentTerm = t;
+  document.getElementById('term-title').textContent = t.word;
+  document.getElementById('term-def').textContent = t.definition;
+  document.getElementById('term').hidden = false;
+}
+function closeTerm() { document.getElementById('term').hidden = true; currentTerm = null; }
+function playTermAudio() {
+  if (!currentTerm || !currentTerm.audioId) { count.textContent = 'Sin audio para esta definición'; return; }
+  termAudio.src = `content/i18n/es-UY/voices/${voice}/audio/${currentTerm.audioId}_def.mp3`;
+  termAudio.playbackRate = speed;
+  termAudio.play().catch(() => {});
+}
+document.getElementById('term-close').onclick = closeTerm;
+document.getElementById('term-play').onclick = playTermAudio;
+
+function show(n) {
+  if (!manifest) return;
+  i = Math.max(0, Math.min(manifest.pages.length - 1, n));
+  stopAudio();
+  queue = []; qpos = 0;
+  img.src = manifest.pages[i].img;
+  count.textContent = 'Página ' + (i + 1) + ' de ' + manifest.pages.length;
+  document.getElementById('prev').disabled = i === 0;
+  document.getElementById('next').disabled = i === manifest.pages.length - 1;
+  document.title = '1930: El viaje — ' + (i + 1) + '/' + manifest.pages.length;
+  history.replaceState(null, '', '?p=' + (i + 1));
+  renderHotspots();
+  closeTerm();
+  if (manifest.pages[i + 1]) { const im = new Image(); im.src = manifest.pages[i + 1].img; }
+}
+
+function setTab(tab) {
+  document.querySelectorAll('.tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  document.getElementById('rail-title').textContent = tab === 'glossary' ? 'Glosario' : 'Índice';
+  document.getElementById('toc').hidden = tab !== 'toc';
+  document.getElementById('glossary-list').hidden = tab !== 'glossary';
+  document.getElementById('glossary-search').hidden = tab !== 'glossary';
+  if (tab === 'glossary') document.getElementById('glossary-search').focus();
+}
+function openRail(tab) {
+  setTab(tab);
+  const rail = document.getElementById('rail');
+  rail.classList.toggle('right', tab === 'glossary');
+  rail.classList.add('open');
+  document.getElementById('backdrop').classList.add('open');
+}
+function closeRail() {
+  document.getElementById('rail').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('open');
+}
+function buildIndex() {
+  const toc = document.getElementById('toc');
+  manifest.index.forEach((entry) => {
+    if (!entry.page) return;
+    const b = document.createElement('button');
+    b.className = 'entry' + (entry.level >= 2 ? ' lvl2' : '');
+    b.textContent = entry.title;
+    b.onclick = () => { show(entry.page - 1); closeRail(); };
+    toc.appendChild(b);
+  });
+}
+function buildGlossary() {
+  const list = document.getElementById('glossary-list');
+  const keys = Object.keys(glossary.terms).sort((a, b) => a.localeCompare(b, 'es'));
+  keys.forEach((key) => {
+    const t = glossary.terms[key];
+    const b = document.createElement('button');
+    b.className = 'entry';
+    b.dataset.search = (key + ' ' + t.definition).toLowerCase();
+    b.innerHTML = '<strong>' + t.word + '</strong><span class="def">' + t.definition + '</span>';
+    b.onclick = () => { closeRail(); openTerm(key, true); };
+    list.appendChild(b);
+  });
+  document.getElementById('glossary-search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    list.querySelectorAll('.entry').forEach((b) => { b.style.display = !q || b.dataset.search.includes(q) ? '' : 'none'; });
+  });
+}
+
+document.getElementById('prev').onclick = () => show(i - 1);
+document.getElementById('next').onclick = () => show(i + 1);
+document.getElementById('idx').onclick = () => openRail('toc');
+document.getElementById('gloss').onclick = () => openRail('glossary');
+document.getElementById('close-rail').onclick = closeRail;
+document.getElementById('backdrop').onclick = closeRail;
+playBtn.onclick = toggleAudio;
+document.getElementById('p-prev').onclick = () => { if (queue.length) { qpos = Math.max(0, qpos - 2); playClip(); } };
+document.getElementById('p-next').onclick = () => { if (queue.length) playClip(); };
+document.getElementById('p-min').onclick = () => player.classList.add('min');
+document.getElementById('fab').onclick = () => player.classList.remove('min');
+document.getElementById('p-close').onclick = () => { stopAudio(); player.classList.add('min'); };
+optionsBtn.onclick = () => {
+  const open = optionsPanel.hidden;
+  optionsPanel.hidden = !open;
+  optionsBtn.setAttribute('aria-expanded', String(open));
+};
+document.querySelectorAll('#voices button').forEach((b) => {
+  b.onclick = () => {
+    voice = b.getAttribute('data-voice');
+    document.querySelectorAll('#voices button').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+    stopAudio(); queue = []; qpos = 0;
+  };
+});
+document.querySelectorAll('#speeds button').forEach((b) => {
+  b.onclick = () => {
+    speed = Number(b.getAttribute('data-speed')) || 1;
+    document.querySelectorAll('#speeds button').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
+    audio.playbackRate = speed;
+  };
+});
+audio.addEventListener('ended', () => { if (qpos < queue.length) playClip(); else stopAudio(); });
+audio.addEventListener('error', () => setPlaying(false));
+addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { if (!document.getElementById('term').hidden) { closeTerm(); return; } closeRail(); return; }
+  if (e.target && e.target.closest && e.target.closest('#rail, #term')) return;
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(i + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+});
+
+Promise.all([
+  fetch('kiosk-manifest.json').then((r) => r.json()),
+  fetch('kiosk-glossary.json').then((r) => r.json()).catch(() => null),
+]).then(([m, g]) => {
+  manifest = m;
+  glossary = g;
+  if (glossary && glossary.pages) {
+    glossary.pages.forEach((p, idx) => { (p.items || []).forEach((it) => { if (firstPage[it.key] === undefined) firstPage[it.key] = idx; }); });
+  }
+  buildIndex();
+  if (glossary) buildGlossary();
+  const start = Math.max(0, Math.min(m.pages.length - 1, (Number(new URLSearchParams(location.search).get('p')) || 1) - 1));
+  show(start);
+}).catch(() => { count.textContent = 'No se pudo cargar el manifiesto'; });
+</script>
+</body>
+</html>
