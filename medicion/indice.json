@@ -1,0 +1,29 @@
+[
+  {
+    "pagina": 9,
+    "imagen": "pages/009.webp",
+    "pos": "medicion/p009-pos.html",
+    "flujo": "medicion/p009-flujo.html",
+    "pesoImagen": 171164,
+    "pesoPos": 916,
+    "pesoFlu": 874
+  },
+  {
+    "pagina": 13,
+    "imagen": "pages/013.webp",
+    "pos": "medicion/p013-pos.html",
+    "flujo": "medicion/p013-flujo.html",
+    "pesoImagen": 109568,
+    "pesoPos": 5164,
+    "pesoFlu": 4837
+  },
+  {
+    "pagina": 21,
+    "imagen": "pages/021.webp",
+    "pos": "medicion/p021-pos.html",
+    "flujo": "medicion/p021-flujo.html",
+    "pesoImagen": 54790,
+    "pesoPos": 5468,
+    "pesoFlu": 5077
+  }
+]
