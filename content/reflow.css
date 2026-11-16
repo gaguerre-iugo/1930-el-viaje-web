@@ -7265,3 +7265,43 @@ body.reflow-book #content :is(.adt-body, .reading-sentence) {
   font-size: calc(var(--adt-cuerpo) * var(--reflow-font-scale)) !important;
   line-height: 1.6 !important;
 }
+
+/* ---------------------------------------------------------------------------
+   Modo pantalla fija (`?pantalla-fija=1`)
+
+   En el aula la ventana y la tipografía son parte del mueble. Los dos
+   controles que obligan a recomponer el libro entero quedan a la vista pero
+   apagados, con su explicación: perder una función sin avisar es peor que
+   mostrarla deshabilitada.
+   --------------------------------------------------------------------------- */
+body[data-reflow-fixed-screen] [data-reflow-font-size] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+body[data-reflow-fixed-screen] .reflow-setting-disabled {
+  opacity: 0.6;
+}
+
+body[data-reflow-fixed-screen] .reflow-setting-disabled [role="switch"] {
+  cursor: not-allowed;
+}
+
+body[data-reflow-fixed-screen] .reflow-fixed-screen-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+/* Composición congelada: el ancho, el alto y la columna se fijan en píxeles.
+   `#content` se dimensiona con 100vw/vh, así que sin esto basta un píxel de
+   diferencia en el viewport para que el navegador recomponga el libro entero. */
+body.reflow-book[data-reflow-fixed-screen="frozen"] #content {
+  width: var(--reflow-frozen-width);
+  height: var(--reflow-frozen-height);
+  column-width: var(--reflow-frozen-column);
+  padding-top: var(--reflow-frozen-padding-y);
+  padding-bottom: var(--reflow-frozen-padding-y);
+  padding-left: var(--reflow-frozen-gutter);
+  padding-right: var(--reflow-frozen-gutter);
+}

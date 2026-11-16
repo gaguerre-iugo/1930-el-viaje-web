@@ -297,6 +297,121 @@
     }
   };
 
+  /* ------------------------------------------------------------------------
+     Modo pantalla fija (pantallas interactivas de aula)
+
+     En el aula la ventana y la tipografía forman parte del mueble: nadie
+     redimensiona y nadie cambia el tamaño de letra. Congelar esos dos ejes
+     evita que cada resize o cada toque de tipografía recomponga las 208
+     secciones del libro, que es el costo más caro de la barra.
+
+     Se activa de forma explícita, nunca adivinando por dispositivo: una
+     tablet Android cualquiera tiene que seguir pudiendo agrandar la letra.
+
+       · `?pantalla-fija=1` en la URL  (o `0` para forzarlo apagado)
+       · `window.__ADT_FIXED_SCREEN = true` desde un envoltorio o LMS
+
+     La composición se congela recién cuando la primera paginación quedó
+     estable, porque hasta entonces el motor todavía tiene que recalcular
+     mientras entran las fuentes y las imágenes.
+     ------------------------------------------------------------------------ */
+  var FIXED_SCREEN_PARAM = "pantalla-fija";
+  var fixedScreenMode = false;
+  var fixedScreenFrozen = false;
+  var fixedScreenPageWidth = 0;
+  var fixedScreenPageHeight = 0;
+
+  function resolveFixedScreenMode() {
+    var requested = null;
+    try {
+      var raw = new URLSearchParams(window.location.search).get(FIXED_SCREEN_PARAM);
+      if (raw === "1" || raw === "true") requested = true;
+      else if (raw === "0" || raw === "false") requested = false;
+    } catch (_error) {}
+    if (requested === null && typeof window.__ADT_FIXED_SCREEN === "boolean") {
+      requested = window.__ADT_FIXED_SCREEN;
+    }
+    fixedScreenMode = requested === true;
+    if (!fixedScreenMode) return;
+    document.documentElement.dataset.reflowFixedScreen = "true";
+    if (document.body) document.body.dataset.reflowFixedScreen = "true";
+  }
+
+  function freezeFixedScreenLayout() {
+    if (!fixedScreenMode || fixedScreenFrozen || !content) return;
+    var styles = window.getComputedStyle(content);
+    var columnWidth = parseFloat(styles.columnWidth) || 0;
+    fixedScreenPageWidth = Math.max(1, content.clientWidth || window.innerWidth);
+    fixedScreenPageHeight = Math.max(1, content.clientHeight || window.innerHeight);
+    /* `#content` se dimensiona con 100vw/vh y columnas de `100vw - gutter`: si
+       el viewport cambia, aunque sea un píxel, el navegador recompone las 208
+       secciones. Fijar ancho, alto y ancho de columna en píxeles es lo que
+       congela el reflow de verdad; bloquear el listener no alcanza, porque la
+       re-paginación la dispara también el ResizeObserver. El relleno entra en
+       la cuenta porque `--reflow-block-padding` es `clamp(1.5rem, 4vh, 3rem)`
+       y cambia con el alto del viewport. */
+    document.documentElement.style.setProperty(
+      "--reflow-frozen-width", fixedScreenPageWidth + "px"
+    );
+    document.documentElement.style.setProperty(
+      "--reflow-frozen-height", fixedScreenPageHeight + "px"
+    );
+    document.documentElement.style.setProperty(
+      "--reflow-frozen-gutter", (parseFloat(styles.paddingLeft) || 0) + "px"
+    );
+    document.documentElement.style.setProperty(
+      "--reflow-frozen-padding-y", (parseFloat(styles.paddingTop) || 0) + "px"
+    );
+    if (columnWidth > 0) {
+      document.documentElement.style.setProperty(
+        "--reflow-frozen-column", columnWidth + "px"
+      );
+    }
+    fixedScreenFrozen = true;
+    document.documentElement.dataset.reflowFixedScreen = "frozen";
+    if (document.body) document.body.dataset.reflowFixedScreen = "frozen";
+  }
+
+  /* El lector no puede ver que un control está apagado si no se le avisa. */
+  function announceFixedScreenLimit(message) {
+    if (announcer) announcer.textContent = message;
+  }
+
+  function fixedScreenAllowsTypographyChange() {
+    return !fixedScreenMode;
+  }
+
+  /* Deja a la vista —y al lector de pantalla— que esas dos funciones no están
+     disponibles en el aula, en vez de un control que no responde. El panel se
+     vuelve a montar por su cuenta, así que la marca es idempotente y se
+     reaplica cada vez. */
+  function syncFixedScreenControls() {
+    if (!fixedScreenMode) return;
+    Array.prototype.slice.call(
+      document.querySelectorAll("[data-reflow-font-size]")
+    ).forEach(function (button) {
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+      button.title = "El tamaño de letra no se cambia en la pantalla del aula";
+    });
+    var easyRow = document.querySelector(".reflow-setting-easy-read");
+    if (!easyRow) return;
+    easyRow.setAttribute("aria-disabled", "true");
+    easyRow.classList.add("reflow-setting-disabled");
+    var easySwitch = easyRow.querySelector('[role="switch"]');
+    if (easySwitch) {
+      easySwitch.setAttribute("aria-checked", "false");
+      easySwitch.setAttribute("aria-disabled", "true");
+      easySwitch.tabIndex = -1;
+    }
+    if (!easyRow.querySelector(".reflow-fixed-screen-note")) {
+      var note = document.createElement("p");
+      note.className = "reflow-setting-description reflow-fixed-screen-note";
+      note.textContent = "No disponible en la pantalla del aula.";
+      easyRow.appendChild(note);
+    }
+  }
+
   /* Plazo máximo que la barra de navegación espera al runtime empaquetado antes
      de mostrarse igual. El libro ya es navegable con Anterior/Siguiente sin el
      runtime, así que nunca conviene dejarla oculta más que esto. */
@@ -823,6 +938,11 @@
     // #content. En Chrome puede ser un píxel menor que window.innerWidth por
     // el redondeo del viewport; usar el ancho de la ventana acumula ese error
     // y vuelve inalcanzable la última página tras cientos de columnas.
+    /* En pantalla fija el ancho no puede cambiar sin recomponer el libro: si
+       el navegador lo cambiara igual (barra de sistema, teclado), las cuentas
+       de página se correrían sin que nadie haya repaginado. Se usa el ancho
+       con el que se congeló la composición. */
+    if (fixedScreenFrozen && fixedScreenPageWidth > 0) return fixedScreenPageWidth;
     return Math.max(1, content && content.clientWidth || window.innerWidth);
   }
 
@@ -4735,11 +4855,18 @@
   }
 
   function loadFontPreference() {
-    try {
-      var stored = localStorage.getItem(fontStorageKey);
-      if (Object.prototype.hasOwnProperty.call(fontScales, stored)) state.fontSize = stored;
-    } catch (_error) {
+    if (!fixedScreenAllowsTypographyChange()) {
+      /* En pantalla fija la tipografía es la de la composición congelada: no
+         se restaura la preferencia guardada, que en un equipo reutilizado
+         puede venir de otra sesión y forzar una repaginación al arrancar. */
       state.fontSize = "normal";
+    } else {
+      try {
+        var stored = localStorage.getItem(fontStorageKey);
+        if (Object.prototype.hasOwnProperty.call(fontScales, stored)) state.fontSize = stored;
+      } catch (_error) {
+        state.fontSize = "normal";
+      }
     }
     content.style.setProperty("--reflow-font-scale", String(fontScales[state.fontSize]));
     document.documentElement.style.setProperty("--reflow-font-scale", String(fontScales[state.fontSize]));
@@ -5434,6 +5561,13 @@
 
   function applyFontSize(size) {
     if (!Object.prototype.hasOwnProperty.call(fontScales, size)) return;
+    /* En pantalla fija, cambiar el tamaño obliga a recomponer todo el libro:
+       es la función que negocio acepta perder en el aula. */
+    if (!fixedScreenAllowsTypographyChange()) {
+      announceFixedScreenLimit("El tamaño de letra no se cambia en la pantalla del aula.");
+      updateFontControls();
+      return;
+    }
     var anchorId = state.quizRepaginationAnchorId ||
       livePendingSettingsAnchorId() || visibleSemanticAnchorId() ||
       state.currentAnchorId || anchorIdForPage(state.current);
@@ -5911,6 +6045,7 @@
         if (settingsPanelObserver) settingsPanelObserver.disconnect();
         try {
           mountInSettingsPanel();
+          syncFixedScreenControls();
         } finally {
           observeSettingsPanel();
         }
@@ -7806,6 +7941,11 @@
     }, { passive: true });
 
     window.addEventListener("resize", function () {
+      /* Pantalla fija: si el navegador cambia el viewport igual (una barra de
+         sistema, un teclado en pantalla), recomponer el libro entero cuesta
+         más que convivir con el corrimiento. La composición ya está congelada
+         y `pageWidth()` sigue devolviendo el ancho original. */
+      if (fixedScreenFrozen) return;
       window.clearTimeout(state.resizeTimer);
       state.resizeTimer = window.setTimeout(function () {
         balanceCoverMargins();
@@ -7829,16 +7969,26 @@
     if (typeof ResizeObserver !== "function" || state.layoutObserver) return;
     var initialized = false;
     var layoutSignature = function () {
+      /* Con la composición congelada, el viewport deja de ser parte de la
+         firma: sólo un cambio real de contenido (o de altura de columna)
+         justifica volver a paginar. Sin esto, cada aparición de una barra del
+         sistema disparaba una repaginación completa. */
       return [
         Math.round(content.scrollWidth),
         Math.round(content.scrollHeight),
-        Math.round(content.clientWidth),
+        fixedScreenFrozen ? fixedScreenPageWidth : Math.round(content.clientWidth),
         document.body.dataset.reflowFontSize || "normal",
         document.body.classList.contains("reflow-easy-read") ? "easy" : "standard"
       ].join("|");
     };
     var scheduleLayoutRefresh = function (entries) {
       if (!initialized || state.ttsMarkupRestoring) return;
+      /* Composición congelada: el tamaño de caja ya no es una señal válida. Con
+         el viewport fijo, cualquier diferencia de geometría viene de una barra
+         del sistema o de un asentamiento tardío, y recomponer el libro entero
+         por eso cuesta más que el corrimiento. Los cambios reales de contenido
+         siguen entrando por el MutationObserver. */
+      if (fixedScreenFrozen) return;
       if (state.settingsRepaginationActive) {
         scheduleSettingsRepaginationFinalize(280);
         return;
@@ -8707,6 +8857,17 @@
       : null;
     if (!control || !isEasyReadSwitch(control)) return;
     if (!state.textCatalog) return;
+    /* Lectura fácil reemplaza todo el texto y vuelve a paginar: en pantalla
+       fija no se ofrece, igual que el tamaño de letra. */
+    if (!fixedScreenAllowsTypographyChange()) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setEasyReadSwitchVisual(control, false);
+      announceFixedScreenLimit(
+        "Lectura fácil no está disponible en la pantalla del aula."
+      );
+      return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     var readingAnchor = captureReadingAnchor();
@@ -8804,6 +8965,9 @@
       : (storedState !== null
         ? storedState
         : Boolean(probe && /Javier es un joven alto y delgado/i.test(probe.textContent)));
+    /* La pantalla fija compone siempre con el texto completo: una preferencia
+       guardada de otra sesión no puede reactivar la lectura fácil al abrir. */
+    if (!fixedScreenAllowsTypographyChange()) easyRead = false;
     var previousEasyRead = updateEasyReadClass.lastState;
     if (previousEasyRead === easyRead) return;
     updateEasyReadClass.lastState = easyRead;
@@ -12274,7 +12438,10 @@
         easyRead: document.body.classList.contains("reflow-easy-read"),
         reducedMotion: state.reducedMotion,
         reducedMotionSource: state.reducedMotionOverride === null ? "system" : "manual",
-        systemReducedMotion: state.systemReducedMotion
+        systemReducedMotion: state.systemReducedMotion,
+        fixedScreen: fixedScreenMode,
+        fixedScreenFrozen: fixedScreenFrozen,
+        fixedScreenPageWidth: fixedScreenPageWidth
       };
     };
     var mediaPrototype = window.HTMLMediaElement && window.HTMLMediaElement.prototype;
@@ -13081,18 +13248,25 @@
       } else if (action === "easy") {
         var requested = payload.enabled === true ||
           (payload.enabled == null && bridge.dataset.enabled === "true");
-        var anchorId = visibleSemanticAnchorId() || state.currentAnchorId ||
-          anchorIdForPage(state.current);
-        try { window.localStorage.setItem("easyReadMode", String(requested)); } catch (error) {}
-        document.body.classList.toggle("reflow-easy-read", requested);
-        applyEasyReadTextDirectly(requested);
-        normalizeSemanticChainSpacing();
-        updateEasyReadClass.lastState = requested;
-        syncEasyReadSwitchVisual();
-        settleAllIllustratedPages();
-        repairParagraphMarkers();
-        updateReadingBlockSizing();
-        recalculate({ anchorId: anchorId, preserveTts: true });
+        if (!fixedScreenAllowsTypographyChange() && requested) {
+          announceFixedScreenLimit(
+            "Lectura fácil no está disponible en la pantalla del aula."
+          );
+          syncEasyReadSwitchVisual();
+        } else {
+          var anchorId = visibleSemanticAnchorId() || state.currentAnchorId ||
+            anchorIdForPage(state.current);
+          try { window.localStorage.setItem("easyReadMode", String(requested)); } catch (error) {}
+          document.body.classList.toggle("reflow-easy-read", requested);
+          applyEasyReadTextDirectly(requested);
+          normalizeSemanticChainSpacing();
+          updateEasyReadClass.lastState = requested;
+          syncEasyReadSwitchVisual();
+          settleAllIllustratedPages();
+          repairParagraphMarkers();
+          updateReadingBlockSizing();
+          recalculate({ anchorId: anchorId, preserveTts: true });
+        }
       } else if (action === "scanBlank") {
         var occupiedPages = Object.create(null);
         Array.prototype.slice.call(content.querySelectorAll(
@@ -13337,6 +13511,9 @@
   async function boot() {
     document.body.classList.add("reflow-book");
     content = document.getElementById("content");
+    /* Antes de leer preferencias: en pantalla fija no se restaura ni el tamaño
+       de letra ni la lectura fácil guardados por una sesión anterior. */
+    resolveFixedScreenMode();
     installQaDomBridge();
     /* Direct-QA bridge: install it at the earliest point of every document
        load. Keeping this outside the media bridge avoids losing the hooks
@@ -13354,7 +13531,10 @@
         easyRead: document.body.classList.contains("reflow-easy-read"),
         reducedMotion: state.reducedMotion,
         reducedMotionSource: state.reducedMotionOverride === null ? "system" : "manual",
-        systemReducedMotion: state.systemReducedMotion
+        systemReducedMotion: state.systemReducedMotion,
+        fixedScreen: fixedScreenMode,
+        fixedScreenFrozen: fixedScreenFrozen,
+        fixedScreenPageWidth: fixedScreenPageWidth
       };
     };
     migrateReaderStorage();
@@ -13650,6 +13830,10 @@
     window.dispatchEvent(new CustomEvent("adt:ready", {
       detail: metricsContext()
     }));
+    /* Pantalla fija: recién acá el libro está compuesto y visible. Congelar
+       antes dejaría la composición a medio asentar; después, un cambio de
+       viewport tardío volvería a paginar las 208 secciones. */
+    if (fixedScreenMode) window.setTimeout(freezeFixedScreenLayout, 900);
   }
 
   boot();
