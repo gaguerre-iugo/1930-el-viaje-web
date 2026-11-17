@@ -1577,18 +1577,37 @@
     return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
   }
 
-  function panelEffectiveBackground(elemento) {
+  function panelEffectiveBackground(elemento, cache) {
     var nodo = elemento;
+    var recorrido = [];
     while (nodo && nodo !== document.documentElement) {
+      /* El color efectivo se memoiza: sin esto, cada elemento del panel volvía a
+         pedir el estilo calculado de toda su cadena de ancestros. */
+      if (cache && cache.has(nodo)) {
+        var conocido = cache.get(nodo);
+        for (var r = 0; r < recorrido.length; r += 1) cache.set(recorrido[r], conocido);
+        return conocido;
+      }
+      recorrido.push(nodo);
       var fondo = panelRgb(window.getComputedStyle(nodo).backgroundColor);
-      if (fondo.a > 0.4) return fondo;
+      if (fondo.a > 0.4) {
+        if (cache) {
+          for (var c = 0; c < recorrido.length; c += 1) cache.set(recorrido[c], fondo);
+        }
+        return fondo;
+      }
       nodo = nodo.parentElement;
     }
-    return { r: 255, g: 255, b: 255, a: 1 };
+    var blanco = { r: 255, g: 255, b: 255, a: 1 };
+    if (cache) {
+      for (var b = 0; b < recorrido.length; b += 1) cache.set(recorrido[b], blanco);
+    }
+    return blanco;
   }
 
   function repairPanelContrast(raiz) {
     var elementos = raiz.querySelectorAll("*");
+    var cache = new Map();
     for (var i = 0; i < elementos.length; i++) {
       var elemento = elementos[i];
       var propio = "";
@@ -1599,7 +1618,7 @@
       if (!propio.trim()) continue;
       var estilo = window.getComputedStyle(elemento);
       if (estilo.display === "none" || estilo.visibility === "hidden") continue;
-      var fondo = panelEffectiveBackground(elemento);
+      var fondo = panelEffectiveBackground(elemento, cache);
       if (panelContrast(panelRgb(estilo.color), fondo) >= 4.5) continue;
       var elegido;
       if (panelLuminance(fondo) < 0.5) {
@@ -1695,8 +1714,12 @@
     var aplicar = function () {
       var paneles = document.querySelectorAll(".reflow-reader-panel");
       for (var i = 0; i < paneles.length; i++) {
-        applyPanelInlineTheme(paneles[i]);
-        repairPanelContrast(paneles[i]);
+        var panel = paneles[i];
+        /* Un panel montado pero cerrado no necesita reparación: recorrerlo
+           costaba lo mismo que el que está a la vista. */
+        if (panel.hidden || panel.getAttribute("aria-hidden") === "true") continue;
+        applyPanelInlineTheme(panel);
+        repairPanelContrast(panel);
       }
       applyPopupInlineTheme();
       syncQuizOptionAccent();
@@ -1715,7 +1738,11 @@
       panelInlineObserver = new MutationObserver(programar);
       /* No se observa "style" para no reaccionar a lo que escribe este mismo
          pase (sería un ciclo). */
-      panelInlineObserver.observe(document.body, {
+      /* Los paneles viven dentro de #interface-container: observar todo el body
+         hacía que cada cambio de la barra o del reproductor volviera a recorrer
+         los paneles completos. */
+      panelInlineObserver.observe(
+        document.getElementById("interface-container") || document.body, {
         childList: true,
         subtree: true,
         attributes: true,
@@ -1735,11 +1762,22 @@
        intervalo se corta solo cuando no hay ningún panel abierto. */
     if (!panelInlineInterval) {
       panelInlineInterval = window.setInterval(function () {
-        if (!document.querySelector(".reflow-reader-panel")) {
+        var paneles = document.querySelectorAll(".reflow-reader-panel");
+        if (!paneles.length) {
           window.clearInterval(panelInlineInterval);
           panelInlineInterval = 0;
           return;
         }
+        /* Con todos los paneles cerrados no hay nada que repintar: el repaso
+           cada 400 ms sólo tiene sentido mientras uno está a la vista. */
+        var visible = false;
+        for (var i = 0; i < paneles.length; i += 1) {
+          if (!paneles[i].hidden && paneles[i].getAttribute("aria-hidden") !== "true") {
+            visible = true;
+            break;
+          }
+        }
+        if (!visible) return;
         aplicar();
       }, 400);
     }
