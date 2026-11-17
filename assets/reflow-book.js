@@ -393,8 +393,13 @@
      reaplica cada vez. */
   function syncFixedScreenControls() {
     if (!fixedScreenMode) return;
+    /* Los controles son `<button>`. El selector no puede ser suelto: el
+       `<body>` también lleva `data-reflow-font-size` con el tamaño activo, y
+       este bucle le ponía `disabled`, `aria-disabled="true"` y el `title` a todo
+       el documento. Un lector de pantalla anunciaba el libro entero como
+       deshabilitado y el tooltip tapaba la página. */
     Array.prototype.slice.call(
-      document.querySelectorAll("[data-reflow-font-size]")
+      document.querySelectorAll("button[data-reflow-font-size]")
     ).forEach(function (button) {
       button.disabled = true;
       button.setAttribute("aria-disabled", "true");
@@ -5486,7 +5491,9 @@
   }
 
   function updateFontControls() {
-    Array.prototype.slice.call(document.querySelectorAll("[data-reflow-font-size]")).forEach(function (button) {
+    /* Sólo los botones: el `<body>` también declara `data-reflow-font-size` con
+       el tamaño activo y quedaba con `aria-pressed` propio. */
+    Array.prototype.slice.call(document.querySelectorAll("button[data-reflow-font-size]")).forEach(function (button) {
       var selected = button.dataset.reflowFontSize === state.fontSize;
       button.setAttribute("aria-pressed", String(selected));
       if (button.getAttribute("role") === "radio") button.setAttribute("aria-checked", String(selected));
