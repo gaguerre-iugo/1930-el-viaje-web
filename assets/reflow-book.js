@@ -418,6 +418,75 @@
     }
   }
 
+  /* Precalentado del índice.
+     El primer montaje del panel del runtime cuesta unas tres veces más que los
+     siguientes (medido a 6×: 2.660 ms contra 850 ms). Es el mismo panel, así
+     que basta con montarlo una vez durante el arranque, oculto, y cerrarlo: el
+     lector lo abre después y ya está dibujado.
+     Se hace una sola vez, sólo en pantalla fija, sólo si nadie tocó nada
+     todavía, y el panel queda oculto desde el primer pintado. */
+  var prewarmPanel = null;
+  function prewarmIndexPanel() {
+    if (!fixedScreenMode) return;
+    if (typeof window.__adtReflowSetDockMenu !== "function") return;
+    if (document.body.dataset.reflowPrewarm) return;
+    if (document.querySelector(".reflow-reader-panel")) return;
+    document.body.dataset.reflowPrewarm = "running";
+    document.documentElement.classList.add("reflow-prewarming");
+    var terminar = function () {
+      document.documentElement.classList.remove("reflow-prewarming");
+      document.body.dataset.reflowPrewarm = "done";
+      prewarmPanel = null;
+    };
+    var cerrar = function () {
+      /* Si mientras tanto se abrió otro panel —porque el lector tocó algo— no
+         se cierra: sólo se retira el ocultamiento. */
+      var abierto = document.querySelector(
+        '.reflow-reader-panel[aria-hidden="false"], [role="dialog"][data-slot="popover-content"]'
+      );
+      if (!prewarmPanel || !abierto || abierto !== prewarmPanel) {
+        terminar();
+        return;
+      }
+      if (typeof window.__adtReflowSetDockMenu === "function") {
+        window.__adtReflowSetDockMenu("");
+      }
+      window.setTimeout(terminar, 240);
+    };
+    var intentos = 0;
+    var esperar = function () {
+      intentos += 1;
+      var panel = document.querySelector(
+        '.reflow-reader-panel, [role="dialog"][data-slot="popover-content"]'
+      );
+      var listo = panel && !panel.classList.contains("reflow-panel-pending") &&
+        panel.querySelector("button");
+      if (listo) {
+        prewarmPanel = panel;
+        cerrar();
+        return;
+      }
+      if (intentos > 120) {
+        cerrar();
+        return;
+      }
+      window.setTimeout(esperar, 50);
+    };
+    try {
+      /* "toc" es el valor del dock del runtime para el índice (ver
+         toggleRuntimePanel): "navigation" no abre nada. */
+      window.__adtReflowSetDockMenu("toc");
+    } catch (_error) {
+      terminar();
+      return;
+    }
+    window.setTimeout(esperar, 60);
+    /* Red de seguridad: el ocultamiento nunca dura más de seis segundos. */
+    window.setTimeout(function () {
+      if (document.documentElement.classList.contains("reflow-prewarming")) terminar();
+    }, 6000);
+  }
+
   /* Plazo máximo que la barra de navegación espera al runtime empaquetado antes
      de mostrarse igual. El libro ya es navegable con Anterior/Siguiente sin el
      runtime, así que nunca conviene dejarla oculta más que esto. */
@@ -13998,7 +14067,12 @@
        que las páginas ilustradas terminen de repartir su texto (pases de 140 y
        650 ms, varios ciclos): congelar antes dejaba el reparto a mitad de
        camino. Después, un cambio de viewport ya no puede recompaginar. */
-    if (fixedScreenMode) window.setTimeout(freezeFixedScreenLayout, 3500);
+    if (fixedScreenMode) {
+      window.setTimeout(freezeFixedScreenLayout, 3500);
+      /* El índice se monta una vez, oculto, para que la primera apertura no
+         pague el primer dibujado. Se espera a que el libro esté compuesto. */
+      window.setTimeout(prewarmIndexPanel, 6000);
+    }
   }
 
   boot();

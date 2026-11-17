@@ -7293,6 +7293,19 @@ body[data-reflow-fixed-screen] .reflow-fixed-screen-note {
   font-style: italic;
 }
 
+/* Precalentado del índice: el panel se monta oculto durante el arranque para
+   que la primera apertura no pague el primer dibujado. Cualquier capa que el
+   runtime cree mientras tanto queda invisible desde su primer pintado. */
+html.reflow-prewarming .reflow-reader-panel,
+html.reflow-prewarming [role="dialog"],
+html.reflow-prewarming [data-slot="popover-content"],
+html.reflow-prewarming [data-slot="dialog-overlay"],
+html.reflow-prewarming [data-radix-popper-content-wrapper] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Composición congelada: el ancho, el alto y la columna se fijan en píxeles.
    `#content` se dimensiona con 100vw/vh, así que sin esto basta un píxel de
    diferencia en el viewport para que el navegador recomponga el libro entero. */
