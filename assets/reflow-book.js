@@ -443,6 +443,9 @@
     backMatterPages: Object.create(null),
     pageKindCacheReady: false,
     mutationTimer: 0,
+    /* Freno del bucle observador → pase → mutación → observador (pantalla fija). */
+    contentPassBusy: false,
+    contentPassIgnoreUntil: 0,
     lastContentReflowAt: 0,
     settingsRepaginationActive: false,
     settingsRepaginationFinalizing: false,
@@ -13727,6 +13730,13 @@
       var contentObserver = new MutationObserver(function (mutations) {
         if (state.ttsMarkupRestoring) return;
         if (Date.now() <= state.glossaryMarkupIgnoreUntil) return;
+        /* Bucle de autoalimentación: los pases de asentamiento mueven nodos y
+           este observador vuelve a dispararse con esas mismas mutaciones, así
+           que el libro se recompone sin pausa. Medido en reposo con el libro
+           quieto: 47.686 mutaciones en tres segundos. Mientras un pase trabaja y
+           durante su cola, las mutaciones son propias y no reabren el ciclo. */
+        if (state.contentPassBusy) return;
+        if (Date.now() <= state.contentPassIgnoreUntil) return;
         if (state.settingsRepaginationActive) {
           scheduleSettingsRepaginationFinalize(280);
           return;
@@ -13745,48 +13755,63 @@
             return;
           }
           if (Date.now() <= state.settingsRepaginationIgnoreUntil) return;
-          updateEasyReadClass();
-          normalizeLaterBookStructure();
-          fitChapterFiveChat();
-          /* Una mutación de contenido puede cambiar el texto que se reparte al
-             lado de las ilustraciones. */
-          settleAllIllustratedPages();
-          repairParagraphMarkers();
-          /* Locale reconciliation may move an inserted whitespace node to
-             the end of a semantic chain. Repair once React has finished its
-             batch so visible text, innerText, search and TTS stay identical. */
-          normalizeSemanticChainSpacing();
-          updateReadingBlockSizing();
-          scheduleIllustratedSettlement();
-          balanceCoverMargins();
-          var currentHash = decodeURIComponent(window.location.hash.slice(1));
-          var keepAnchored = sections.some(function (entry) {
-            return entry[0] === currentHash;
-          });
-          var active = activeTtsElement();
-          var pendingAnchorId = livePendingSettingsAnchorId();
-          var preserveActiveTts = Boolean(
-            !state.initialHashSectionId &&
-            (pendingAnchorId || active) &&
-            readAloudSettingIsEnabled()
-          );
-          var guardedAnchorId = state.quizRepaginationAnchorId;
-          recalculate({
-            sectionId: state.initialHashSectionId ||
-              (keepAnchored && !preserveActiveTts ? currentHash : null),
-            anchorId: pendingAnchorId || (preserveActiveTts
-              ? active.dataset.id
-              : (guardedAnchorId || (keepAnchored ? null : state.currentAnchorId))),
-            preserveTts: preserveActiveTts
-          });
-          if (pendingAnchorId) {
-            var pendingElement = content.querySelector('[data-id="' + pendingAnchorId + '"]');
-            if (pendingElement) {
-              lockTtsToExplicitNavigation(livePageForTtsElement(pendingElement));
+          /* El freno se aplica sólo en pantalla fija: en el libro normal queda
+             exactamente el comportamiento publicado hasta validar que este
+             límite no altera composiciones. */
+          var frenaBucle = fixedScreenMode;
+          if (frenaBucle) state.contentPassBusy = true;
+          try {
+            updateEasyReadClass();
+            normalizeLaterBookStructure();
+            fitChapterFiveChat();
+            /* Una mutación de contenido puede cambiar el texto que se reparte al
+               lado de las ilustraciones. */
+            settleAllIllustratedPages();
+            repairParagraphMarkers();
+            /* Locale reconciliation may move an inserted whitespace node to
+               the end of a semantic chain. Repair once React has finished its
+               batch so visible text, innerText, search and TTS stay identical. */
+            normalizeSemanticChainSpacing();
+            updateReadingBlockSizing();
+            scheduleIllustratedSettlement();
+            balanceCoverMargins();
+            var currentHash = decodeURIComponent(window.location.hash.slice(1));
+            var keepAnchored = sections.some(function (entry) {
+              return entry[0] === currentHash;
+            });
+            var active = activeTtsElement();
+            var pendingAnchorId = livePendingSettingsAnchorId();
+            var preserveActiveTts = Boolean(
+              !state.initialHashSectionId &&
+              (pendingAnchorId || active) &&
+              readAloudSettingIsEnabled()
+            );
+            var guardedAnchorId = state.quizRepaginationAnchorId;
+            recalculate({
+              sectionId: state.initialHashSectionId ||
+                (keepAnchored && !preserveActiveTts ? currentHash : null),
+              anchorId: pendingAnchorId || (preserveActiveTts
+                ? active.dataset.id
+                : (guardedAnchorId || (keepAnchored ? null : state.currentAnchorId))),
+              preserveTts: preserveActiveTts
+            });
+            if (pendingAnchorId) {
+              var pendingElement = content.querySelector('[data-id="' + pendingAnchorId + '"]');
+              if (pendingElement) {
+                lockTtsToExplicitNavigation(livePageForTtsElement(pendingElement));
+              }
+            }
+            state.lastContentReflowAt = Date.now();
+            if (state.quizRepaginationOverlay) finishQuizRepaginationAfterPaint();
+          } finally {
+            if (frenaBucle) {
+              state.contentPassBusy = false;
+              /* La cola incluye los pases diferidos de asentamiento (140 y
+                 650 ms). El de 1.500 ms es sólo de alineación visual y no mueve
+                 texto entre páginas. */
+              state.contentPassIgnoreUntil = Date.now() + 900;
             }
           }
-          state.lastContentReflowAt = Date.now();
-          if (state.quizRepaginationOverlay) finishQuizRepaginationAfterPaint();
         }, 180);
       });
       contentObserver.observe(content, { childList: true, characterData: true, subtree: true });
