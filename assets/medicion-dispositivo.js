@@ -45,6 +45,44 @@
 
   window.addEventListener("load", function () { loadMs = Math.round(performance.now()); });
 
+  /* Cuenta de audios que arrancan. `currentIndex` del motor no sirve para esto:
+     cambia por archivo de audio, no por palabra, así que dentro de un audio
+     largo se queda quieto aunque el resaltado avance. Este enganche sí ve cada
+     reproducción, porque el arnés se carga antes que el libro. */
+  var reproducciones = 0;
+  var elementosDeAudio = [];
+  try {
+    var reproducirOriginal = HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play = function () {
+      reproducciones += 1;
+      if (elementosDeAudio.indexOf(this) === -1) elementosDeAudio.push(this);
+      return reproducirOriginal.apply(this, arguments);
+    };
+  } catch (_error) {}
+
+  /* ¿Hay audio sonando ahora? Se mira el elemento real: `isPlaying` del motor es
+     una copia congelada del estado con que se armó, no un valor vivo. */
+  function suenaAhora() {
+    return elementosDeAudio.some(function (elemento) {
+      return !elemento.paused && elemento.currentTime > 0;
+    });
+  }
+
+  /* Huella del resaltado de lectura (Custom Highlight `adt-tts-active`). Cada
+     palabra u oración nueva deja una huella distinta: contarlas mide lo que la
+     persona ve avanzar. */
+  function claveResaltado() {
+    try {
+      var highlights = window.CSS && window.CSS.highlights;
+      var activo = highlights && highlights.get("adt-tts-active");
+      if (!activo || !activo.size) return "";
+      return Array.from(activo).slice(0, 3).map(function (rango) {
+        return rango.startOffset + "-" + rango.endOffset + ":" +
+          String(rango.startContainer && rango.startContainer.nodeValue || "").slice(0, 6);
+      }).join("|");
+    } catch (_error) { return ""; }
+  }
+
   /* El libro queda usable cuando retira su capa de carga. Hay que esperar a que
      la capa aparezca: al principio del documento todavía no existe y medir su
      ausencia daría 50 ms. */
@@ -99,8 +137,9 @@
     }
     return "1930|etapa=leer|" + comun() +
       "|sonando=" + (medida.sonando ? "si" : "no") +
-      "|avances=" + medida.avances +
-      "|ms_por_avance=" + medida.msPorAvance +
+      "|pasos=" + medida.pasos +
+      "|audios=" + medida.audios +
+      "|ms_por_paso=" + medida.msPorPaso +
       "|fps=" + medida.fps +
       "|maxlong_lect=" + medida.maxlongLect +
       "|ms_trabados=" + medida.msTrabados;
@@ -225,7 +264,8 @@
       var l = medidas.leer;
       partes.push(seccion("LECTURA EN VOZ ALTA",
         renglon("Audio sonando", l.sonando ? "sí" : "no") +
-        renglon("Avances en 8 segundos", String(l.avances)) +
+        renglon("Avances del resaltado en 8 s", String(l.pasos)) +
+        renglon("Audios que arrancaron", String(l.audios)) +
         renglon("Cuadros por segundo", String(l.fps)) +
         renglon("Bloqueo más largo", l.maxlongLect + " ms") +
         renglon("Tiempo trabado en total", l.msTrabados + " ms")));
@@ -344,30 +384,39 @@
 
     function muestrear() {
       var cuadros = 0;
+      var pasos = 0;
+      var sonoAlgun = false;
+      var ultimaClave = claveResaltado();
+      var audiosAlEmpezar = reproducciones;
       var t0 = performance.now();
-      var inicioIndice = api && Number.isFinite(Number(api.currentIndex))
-        ? Number(api.currentIndex) : null;
       var tareasInicio = tareas.length;
       (function cuadro() {
         cuadros += 1;
+        if (suenaAhora()) sonoAlgun = true;
+        var clave = claveResaltado();
+        if (clave && clave !== ultimaClave) {
+          pasos += 1;
+          ultimaClave = clave;
+        }
         if (performance.now() - t0 < 8000) { window.requestAnimationFrame(cuadro); return; }
         var transcurrido = performance.now() - t0;
-        var finIndice = api && Number.isFinite(Number(api.currentIndex))
-          ? Number(api.currentIndex) : null;
-        var avances = (inicioIndice !== null && finIndice !== null)
-          ? finIndice - inicioIndice : null;
+        var audios = reproducciones - audiosAlEmpezar;
         var nuevas = tareas.slice(tareasInicio);
         medidas.leer = {
-          sonando: !!(api && api.isPlaying),
-          avances: avances === null ? "sin-api" : avances,
-          msPorAvance: avances ? Math.round(transcurrido / avances) : 0,
+          /* «Sonando» describe la ventana medida, no el último instante: al
+             terminar los ocho segundos el audio puede estar en pausa y eso no
+             significa que no haya sonado. */
+          sonando: sonoAlgun,
+          pasos: pasos,
+          audios: audios,
+          msPorPaso: pasos ? Math.round(transcurrido / pasos) : 0,
           fps: Math.round(cuadros / (transcurrido / 1000)),
           maxlongLect: nuevas.length
             ? Math.max.apply(null, nuevas.map(function (t) { return t.ms; })) : 0,
           msTrabados: Math.round(nuevas.reduce(function (suma, t) { return suma + t.ms; }, 0))
         };
         pintar();
-        if (avances === 0) {
+        if (!pasos && !audios) {
           salida.textContent = bloqueTexto() +
             "\n\nla lectura no avanzó: revisá que el audio suene en el equipo";
         }
