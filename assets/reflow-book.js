@@ -315,7 +315,6 @@
      estable, porque hasta entonces el motor todavía tiene que recalcular
      mientras entran las fuentes y las imágenes.
      ------------------------------------------------------------------------ */
-  var FIXED_SCREEN_PARAM = "pantalla-fija";
   var fixedScreenMode = false;
   var fixedScreenFrozen = false;
   var fixedScreenPageWidth = 0;
@@ -324,9 +323,16 @@
   function resolveFixedScreenMode() {
     var requested = null;
     try {
-      var raw = new URLSearchParams(window.location.search).get(FIXED_SCREEN_PARAM);
-      if (raw === "1" || raw === "true") requested = true;
-      else if (raw === "0" || raw === "false") requested = false;
+      var params = new URLSearchParams(window.location.search);
+      /* Dos formas de pedir lo mismo: `pantalla-fija` (descriptivo) y `kiosco`
+         (el que se usa en la escuela). Un `0` explícito gana sobre la marca del
+         envoltorio. */
+      ["pantalla-fija", "kiosco"].forEach(function (nombre) {
+        if (requested !== null) return;
+        var raw = params.get(nombre);
+        if (raw === "1" || raw === "true") requested = true;
+        else if (raw === "0" || raw === "false") requested = false;
+      });
     } catch (_error) {}
     if (requested === null && typeof window.__ADT_FIXED_SCREEN === "boolean") {
       requested = window.__ADT_FIXED_SCREEN;
