@@ -1803,13 +1803,26 @@
       syncQuizOptionGeometry();
     };
     var pendiente = false;
+    var ultimaAplicacion = 0;
+    /* Mientras el índice está abierto, el runtime reescribe el estilo de sus
+       botones unas ciento veinte veces por segundo. Cada escritura disparaba el
+       arreglo completo de contraste —recorrer el panel pidiendo el estilo
+       calculado de cada nodo— y con el índice a la vista eso costaba 1,95 s de
+       CPU por cada seis segundos, sin que el lector tocara nada. El resultado
+       visual no cambia si la reparación llega un cuarto de segundo después: se
+       aplica enseguida si pasó el intervalo, y si no se encola una sola vez. */
+    var PANEL_THEME_MIN_MS = 250;
     var programar = function () {
       if (pendiente) return;
+      var espera = Math.max(0, PANEL_THEME_MIN_MS - (Date.now() - ultimaAplicacion));
       pendiente = true;
-      window.requestAnimationFrame(function () {
-        pendiente = false;
-        aplicar();
-      });
+      window.setTimeout(function () {
+        window.requestAnimationFrame(function () {
+          pendiente = false;
+          ultimaAplicacion = Date.now();
+          aplicar();
+        });
+      }, espera);
     };
     if (!panelInlineObserver) {
       panelInlineObserver = new MutationObserver(programar);
@@ -10836,8 +10849,30 @@
     content.style.setProperty("--reflow-chat-message-line-height", winner.lineHeight + "px");
   }
 
+  /* Esta pasada mide la altura real de cada página de chat del capítulo 5 y cada
+     medición obliga a recomponer el libro entero. Corría en cada pase del
+     observador de contenido, incluidas las aperturas de panel, que no cambian
+     nada del chat: medido, 125-214 ms de CPU por cada apertura de índice o
+     glosario. Se firma con lo único que puede cambiar el resultado. */
+  var chapterFiveFitSignature = "";
+
   function fitChapterFiveChat() {
     if (!content) return;
+    var firma = [
+      state.fontSize,
+      document.body.classList.contains("reflow-easy-read") ? "facil" : "normal",
+      document.fonts && document.fonts.status ? document.fonts.status : "-",
+      /* La caja del contenido sale del viewport y de la reserva de la barra: se
+         firma con esas dos cosas y no con `content.clientWidth`, porque leer esa
+         propiedad obliga a recomponer el libro entero (medido: 146 ms) y era
+         justo lo que esta guarda quiere ahorrar. */
+      window.innerWidth,
+      window.innerHeight,
+      state.primaryToolbarHeight,
+      content.querySelectorAll(".chapter5-chat-page").length
+    ].join(":");
+    if (firma === chapterFiveFitSignature) return;
+    chapterFiveFitSignature = firma;
     synchronizeChatTypography();
     requestAnimationFrame(synchronizeChatTypography);
     Array.prototype.slice.call(content.querySelectorAll(".chapter5-chat-page"))
