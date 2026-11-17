@@ -591,6 +591,7 @@
     ttsPlayerOptionsOpen: false,
     ttsPlayerAutoMinimized: false,
     ttsPlayerExpandedHeight: 0,
+    ttsPlayerModeSignature: "",
     ttsPlayerReserve: 0,
     ttsPlayerStopPendingUntil: 0,
     reducedMotion: false,
@@ -4243,7 +4244,18 @@
       ttsPlayerOptionsButton.setAttribute("aria-expanded", String(optionsOpen));
     }
     if (!minimized) {
-      state.ttsPlayerExpandedHeight = ttsPlayer.getBoundingClientRect().height;
+      /* Medir la altura cuesta un layout forzado del documento completo, y esta
+         función se llama decenas de veces durante el arranque casi siempre sin
+         cambios: medido a 6×, se llevaba 5,5 s del arranque. Sólo se vuelve a
+         medir cuando cambia el modo, las opciones o la visibilidad. */
+      var firmaModo = [
+        optionsOpen ? "open" : "closed",
+        ttsPlayer.hidden ? "hidden" : "shown"
+      ].join(":");
+      if (firmaModo !== state.ttsPlayerModeSignature) {
+        state.ttsPlayerModeSignature = firmaModo;
+        state.ttsPlayerExpandedHeight = ttsPlayer.getBoundingClientRect().height;
+      }
     }
     if (optionsOpen) {
       updateTtsVoiceControls();
@@ -14068,10 +14080,14 @@
        650 ms, varios ciclos): congelar antes dejaba el reparto a mitad de
        camino. Después, un cambio de viewport ya no puede recompaginar. */
     if (fixedScreenMode) {
-      window.setTimeout(freezeFixedScreenLayout, 3500);
+      /* Se congela cuando el reparto de las páginas ilustradas terminó de
+         asentarse. Con 3,5 s quedaba a mitad de camino y el resultado variaba
+         entre cargas (5 de 15 secciones distintas en dos cargas iguales); con
+         6,5 s la composición es estable y coincide con el libro normal. */
+      window.setTimeout(freezeFixedScreenLayout, 6500);
       /* El índice se monta una vez, oculto, para que la primera apertura no
-         pague el primer dibujado. Se espera a que el libro esté compuesto. */
-      window.setTimeout(prewarmIndexPanel, 6000);
+         pague el primer dibujado. Después del congelamiento, para no competir. */
+      window.setTimeout(prewarmIndexPanel, 8000);
     }
   }
 
