@@ -2356,7 +2356,30 @@
     'button[aria-label="Activar lectura en voz alta"]'
   ].join(",");
 
+  /* Pedir este estado cuesta un selector de atributos sobre todo el documento, y
+     durante la lectura en voz alta se pedía unas cuarenta veces por segundo:
+     medido, 415 consultas y 522 ms de CPU en diez segundos de lectura, el ítem
+     más caro del flujo. La respuesta sólo cambia cuando el lector toca el
+     interruptor del panel, así que se memoriza por una ventana corta y se
+     descarta en cuanto el libro escribe ese estado (ver syncReadAloudSetting). */
+  var readAloudSettingSnapshot = { at: 0, value: false };
+
+  function forgetReadAloudSetting() {
+    readAloudSettingSnapshot.at = 0;
+  }
+
   function readAloudSettingIsEnabled() {
+    var ahora = Date.now();
+    if (ahora - readAloudSettingSnapshot.at < 250) {
+      return readAloudSettingSnapshot.value;
+    }
+    var valor = resolveReadAloudSetting();
+    readAloudSettingSnapshot.at = ahora;
+    readAloudSettingSnapshot.value = valor;
+    return valor;
+  }
+
+  function resolveReadAloudSetting() {
     if (document.querySelector(readAloudEnabledSelector)) return true;
     if (document.querySelector(readAloudDisabledSelector)) return false;
     var labelledSwitch = Array.prototype.slice.call(
@@ -2555,6 +2578,7 @@
   }).observe(document.body, { attributes: true, attributeFilter: ["class"] });
 
   function syncReadAloudSetting(enabled) {
+    forgetReadAloudSetting();
     if (window.__adtReflowSetReadAloud) {
       window.__adtReflowSetReadAloud(Boolean(enabled));
     }
