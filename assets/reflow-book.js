@@ -606,6 +606,8 @@
     systemReducedMotion: false,
     reducedMotionMediaQuery: null,
     sentencePaginationKey: "",
+    sentencePaginationTotal: -1,
+    sentencePaginationAt: 0,
     runtimeMenu: null,
     panelFocusOrigin: null,
     panelChosenAnchorId: null,
@@ -1111,24 +1113,39 @@
     return element;
   }
 
+  /* Medir en qué páginas cae un elemento pedía tres lecturas de geometría del
+     libro entero: la caja del contenido, su scrollLeft y el ancho de página. El
+     mapa de la lectura en voz alta recorre más de mil elementos, así que esas
+     tres se toman una sola vez por mapa y se pasan ya resueltas. */
+  function pageContexto() {
+    return {
+      rect: content.getBoundingClientRect(),
+      scrollLeft: content.scrollLeft,
+      ancho: pageWidth()
+    };
+  }
+
+  function pagesDeRects(rects, contexto) {
+    var ocupadas = Object.create(null);
+    Array.prototype.slice.call(rects).forEach(function (rect) {
+      if (rect.width <= 0 && rect.height <= 0) return;
+      var absoluta = contexto.scrollLeft + rect.left - contexto.rect.left;
+      var primera = Math.max(0, Math.floor((absoluta + 1) / contexto.ancho));
+      var ultima = Math.max(
+        primera,
+        Math.floor((absoluta + Math.max(1, rect.width) - 1) / contexto.ancho)
+      );
+      for (var pagina = primera; pagina <= ultima; pagina += 1) ocupadas[pagina] = true;
+    });
+    return Object.keys(ocupadas).map(Number).sort(function (izquierda, derecha) {
+      return izquierda - derecha;
+    });
+  }
+
   function pagesForElement(element) {
     element = paginationGeometryElement(element);
     if (!element || !content) return [];
-    var contentRect = content.getBoundingClientRect();
-    var occupied = Object.create(null);
-    Array.prototype.slice.call(element.getClientRects()).forEach(function (rect) {
-      if (rect.width <= 0 && rect.height <= 0) return;
-      var absoluteLeft = content.scrollLeft + rect.left - contentRect.left;
-      var firstPage = Math.max(0, Math.floor((absoluteLeft + 1) / pageWidth()));
-      var lastPage = Math.max(
-        firstPage,
-        Math.floor((absoluteLeft + Math.max(1, rect.width) - 1) / pageWidth())
-      );
-      for (var page = firstPage; page <= lastPage; page += 1) occupied[page] = true;
-    });
-    return Object.keys(occupied).map(Number).sort(function (left, right) {
-      return left - right;
-    });
+    return pagesDeRects(element.getClientRects(), pageContexto());
   }
 
   function glossaryExcludedElement(element, includeGlossaryTerms) {
@@ -3242,11 +3259,15 @@
     ) {
       return;
     }
+    var contexto = pageContexto();
     var pageMap = new WeakMap();
     items.forEach(function (item) {
       var geometryElement = item && paginationGeometryElement(item.el);
-      if (!item || !item.el || !geometryElement || !geometryElement.getClientRects().length) return;
-      pageMap.set(item.el, pageForElement(item.el));
+      if (!item || !item.el || !geometryElement) return;
+      var rects = geometryElement.getClientRects();
+      if (!rects.length) return;
+      var paginas = pagesDeRects(rects, contexto);
+      pageMap.set(item.el, paginas.length ? paginas[0] : 0);
     });
     state.ttsPageMap = pageMap;
     state.ttsPageMapRevision = state.ttsLayoutRevision;
@@ -3272,15 +3293,24 @@
     return livePages.length ? livePages[0] : stablePageForTtsElement(element);
   }
 
+  /* Estas dos búsquedas recorren todos los anclajes del libro (más de cuatro mil
+     en la versión completa). Antes, cada candidato volvía a pedir la caja del
+     contenido y el ancho de página, y `visibleSemanticAnchorId` lo pedía una vez
+     por rectángulo: medido al responder un cuestionario, 8.533 lecturas de
+     geometría en los primeros 150 ms, con una tarea larga de 504 ms. La
+     geometría se toma una sola vez por búsqueda y los rectángulos se reutilizan. */
   function anchorIdForPage(pageIndex) {
     var candidates = Array.prototype.slice.call(content.querySelectorAll(
       '.reading-sentence[data-id], .quiz-question[data-id], .quiz-option-text[data-id], ' +
       'h1[data-id], h2[data-id], img[data-id], [data-reflow-anchor-id]'
     ));
+    var contexto = pageContexto();
     for (var index = 0; index < candidates.length; index += 1) {
       var candidate = candidates[index];
-      if (!candidate.getClientRects().length) continue;
-      if (pageForElement(candidate) === pageIndex) {
+      var rects = candidate.getClientRects();
+      if (!rects.length) continue;
+      var paginas = pagesDeRects(rects, contexto);
+      if ((paginas.length ? paginas[0] : 0) === pageIndex) {
         return candidate.dataset.reflowAnchorId || candidate.dataset.id || null;
       }
     }
@@ -3293,9 +3323,12 @@
      relocate that exact item after repagination. */
   function visibleSemanticAnchorId() {
     if (!content) return null;
-    var currentPage = visiblePageIndex();
-    var contentRect = content.getBoundingClientRect();
-    var centreY = contentRect.top + (contentRect.height / 2);
+    var contexto = pageContexto();
+    var currentPage = Math.max(
+      0,
+      Math.min(state.total - 1, Math.round(contexto.scrollLeft / contexto.ancho))
+    );
+    var centreY = contexto.rect.top + (contexto.rect.height / 2);
     var best = null;
     var bestScore = Infinity;
     var candidates = Array.prototype.slice.call(content.querySelectorAll(
@@ -3307,11 +3340,14 @@
     candidates.forEach(function (candidate) {
       if (candidate.closest('[aria-hidden="true"], .quiz-explanation-bank')) return;
       var id = candidate.dataset.reflowAnchorId || candidate.dataset.id;
-      if (!id || pagesForElement(candidate).indexOf(currentPage) < 0) return;
-      Array.prototype.slice.call(candidate.getClientRects()).forEach(function (rect) {
+      if (!id) return;
+      var rects = candidate.getClientRects();
+      if (!rects.length) return;
+      if (pagesDeRects(rects, contexto).indexOf(currentPage) < 0) return;
+      Array.prototype.slice.call(rects).forEach(function (rect) {
         if (rect.width <= 1 || rect.height <= 1) return;
-        var absoluteLeft = content.scrollLeft + rect.left - contentRect.left;
-        var rectPage = Math.max(0, Math.floor((absoluteLeft + 1) / pageWidth()));
+        var absoluteLeft = contexto.scrollLeft + rect.left - contexto.rect.left;
+        var rectPage = Math.max(0, Math.floor((absoluteLeft + 1) / contexto.ancho));
         if (rectPage !== currentPage) return;
         var score = Math.abs((rect.top + (rect.height / 2)) - centreY);
         if (score < bestScore) {
@@ -3608,14 +3644,34 @@
        by the previous pass in that case: doing so made a sentence briefly
        correct and then split it again on the next identical reflow. A real
        size/Easy Read/viewport change produces a new key and starts clean. */
+    /* La firma se arma sin tocar el layout: leer `content.clientWidth` y
+       `content.clientHeight` obliga a recomponer el libro entero —medido: dos
+       lecturas de ~106 ms al responder una opción de cuestionario— y la caja del
+       contenido sale del viewport menos la reserva de la barra. */
     var paginationKey = [
       state.fontSize,
       document.body.classList.contains("reflow-easy-read") ? "easy" : "full",
-      content.clientWidth,
-      content.clientHeight,
+      window.innerWidth,
+      window.innerHeight,
+      state.primaryToolbarHeight,
       sentences.length
     ].join(":");
     var geometryChanged = state.sentencePaginationKey !== paginationKey;
+    /* Una respuesta de cuestionario repagina dos veces seguidas y cada corrida
+       paga un layout completo del libro para recalcular exactamente lo mismo
+       (medido: dos lecturas de `content.clientHeight` de ~102 ms). Si la
+       geometría, el total de páginas y la cantidad de oraciones no cambiaron y
+       la corrida anterior es de hace un instante, el resultado no puede
+       diferir; se sale ANTES de tocar las clases para no dejarlas a medio
+       poner. */
+    if (
+      !geometryChanged &&
+      state.sentencePaginationTotal === state.total &&
+      state.sentencePaginationAt &&
+      Date.now() - state.sentencePaginationAt < 300
+    ) {
+      return;
+    }
     state.sentencePaginationKey = paginationKey;
     sentences.forEach(function (sentence) {
       if (geometryChanged) sentence.classList.remove("reflow-avoid-page-split");
@@ -3663,6 +3719,8 @@
       });
     }
     stabilizeShortLineOrphans(sentences);
+    state.sentencePaginationTotal = state.total;
+    state.sentencePaginationAt = Date.now();
   }
 
   /* A single short sentence must not occupy a whole visual page by itself.
