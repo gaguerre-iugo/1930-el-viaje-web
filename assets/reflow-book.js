@@ -432,7 +432,9 @@
      todavía, y el panel queda oculto desde el primer pintado. */
   var prewarmPanel = null;
   function prewarmIndexPanel() {
-    if (!fixedScreenMode) return;
+    /* Vale para todo el libro, no sólo para pantalla fija: en escritorio la
+       primera apertura del índice también pagaba el primer dibujado del panel
+       (medido: 297 ms hasta abrir y 1.136 ms hasta quedar lleno). */
     if (typeof window.__adtReflowSetDockMenu !== "function") return;
     if (document.body.dataset.reflowPrewarm) return;
     if (document.querySelector(".reflow-reader-panel")) return;
@@ -13930,11 +13932,14 @@
             return;
           }
           if (Date.now() <= state.settingsRepaginationIgnoreUntil) return;
-          /* El freno se aplica sólo en pantalla fija: en el libro normal queda
-             exactamente el comportamiento publicado hasta validar que este
-             límite no altera composiciones. */
-          var frenaBucle = fixedScreenMode;
-          if (frenaBucle) state.contentPassBusy = true;
+          /* El freno vale para todo el libro, no sólo para pantalla fija. Se
+             aplicaba únicamente ahí por prudencia, y medido en escritorio con
+             el libro quieto el libro normal gastaba 3.694 ms de CPU por cada
+             cinco segundos de reposo: 1.500 pases de asentamiento encadenados
+             por sus propias mutaciones (47.572 mutaciones en tres segundos).
+             El pase devuelve la página a su sitio y no se reabre desde sus
+             propias escrituras. */
+          state.contentPassBusy = true;
           try {
             updateEasyReadClass();
             normalizeLaterBookStructure();
@@ -13979,17 +13984,15 @@
             state.lastContentReflowAt = Date.now();
             if (state.quizRepaginationOverlay) finishQuizRepaginationAfterPaint();
           } finally {
-            if (frenaBucle) {
-              state.contentPassBusy = false;
-              /* La cola incluye los pases diferidos de asentamiento (140 y
-                 650 ms). Antes de congelar la composición conviene dejar pasar
-                 más pases: son los que terminan de repartir el texto de las
-                 páginas ilustradas. Con la composición ya congelada, el freno
-                 largo es el que evita que un cambio de viewport dispare la
-                 cadena entera otra vez. */
-              state.contentPassIgnoreUntil =
-                Date.now() + (fixedScreenFrozen ? 900 : 300);
-            }
+            state.contentPassBusy = false;
+            /* La cola incluye los pases diferidos de asentamiento (140 y
+               650 ms). Antes de congelar la composición conviene dejar pasar
+               más pases: son los que terminan de repartir el texto de las
+               páginas ilustradas. Con la composición ya congelada, el freno
+               largo es el que evita que un cambio de viewport dispare la
+               cadena entera otra vez. */
+            state.contentPassIgnoreUntil =
+              Date.now() + (fixedScreenFrozen ? 900 : 300);
           }
         }, 180);
       });
@@ -14095,7 +14098,25 @@
       /* El índice se monta una vez, oculto, para que la primera apertura no
          pague el primer dibujado. Después del congelamiento, para no competir. */
       window.setTimeout(prewarmIndexPanel, 8000);
+      return;
     }
+    /* En el libro normal no hay congelamiento, pero sí el mismo costo de primer
+       dibujado del índice. Se espera a que pasen los pases de asentamiento
+       (140, 650 y 1500 ms) para no competir con la composición inicial, y se
+       omite si el lector ya empezó a usar el libro: el ocultamiento del
+       precalentado tapa cualquier diálogo mientras dura, y en el aula o en la
+       casa eso se vería como un panel que no abre. */
+    var huboInteraccion = false;
+    var marcarInteraccion = function () { huboInteraccion = true; };
+    ["pointerdown", "keydown", "wheel"].forEach(function (evento) {
+      window.addEventListener(evento, marcarInteraccion, {
+        capture: true, passive: true, once: true
+      });
+    });
+    window.setTimeout(function () {
+      if (huboInteraccion) return;
+      prewarmIndexPanel();
+    }, 7000);
   }
 
   boot();
