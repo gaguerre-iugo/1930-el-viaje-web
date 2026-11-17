@@ -3682,13 +3682,30 @@
     coverHeight = Math.min(coverHeight, horizontalRoom / coverRatio);
     var coverWidth = coverHeight * coverRatio;
 
+    /* Escribir sobre la portada no sólo mueve la portada: invalida el estilo y
+       el layout de todo el libro. Medido a 6x con el perfilador, esta función
+       se llevaba el 25% de la CPU de cada cambio de página reescribiendo los
+       mismos valores en cada pasada. Si el nodo ya tiene los valores
+       calculados, no se toca nada. Se comparan números y no cadenas: el
+       navegador serializa "980.00px" como "980px". */
+    var targetWidth = coverWidth + "px";
+    var targetHeight = coverHeight + "px";
+    if (
+      Math.abs((parseFloat(cover.style.width) || 0) - coverWidth) < 0.01 &&
+      Math.abs((parseFloat(cover.style.height) || 0) - coverHeight) < 0.01 &&
+      cover.style.maxWidth === "none" &&
+      cover.style.maxHeight === "none" &&
+      cover.style.flex === "0 0 auto" &&
+      cover.style.transform === "none"
+    ) return;
+
     /* Width and height must travel together and win over the stylesheet: the
        CSS pins the wrapper width with `!important` (`min(100%, 57dvh, 40rem)`).
        When only the height came from here, the box ended up wider than the
        738/1078 artwork, so `object-fit: contain` drew two side bars of the
        `#210f1c` background — the lateral columns reported on the cover. */
-    cover.style.setProperty("width", coverWidth + "px", "important");
-    cover.style.setProperty("height", coverHeight + "px", "important");
+    cover.style.setProperty("width", targetWidth, "important");
+    cover.style.setProperty("height", targetHeight, "important");
     cover.style.setProperty("max-width", "none", "important");
     cover.style.setProperty("max-height", "none", "important");
     cover.style.setProperty("flex", "0 0 auto", "important");
@@ -10598,8 +10615,24 @@
     section.dataset.reflowChatComposed = "true";
   }
 
+  var chatTypographySignature = "";
+
   function synchronizeChatTypography() {
     if (!content) return;
+    /* Esta pasada recorre TODAS las oraciones del libro y pide el estilo
+       calculado de cada una. El resultado sólo puede cambiar cuando cambia la
+       tipografía, la lectura fácil o la paginación; sin nada de eso es trabajo
+       perdido, y se repetía en cada aplicación y dos veces por llamada.
+       Medido a 6x con el perfilador: 4,7 s de CPU cada cinco cambios de
+       página. */
+    var signature = [
+      state.fontSize,
+      document.body.classList.contains("reflow-easy-read") ? "easy" : "standard",
+      state.ttsLayoutRevision,
+      Math.round(state.lastContentReflowAt)
+    ].join(":");
+    if (signature === chatTypographySignature) return;
+    chatTypographySignature = signature;
     var buckets = Object.create(null);
     Array.prototype.slice.call(content.querySelectorAll(".reading-sentence[data-id]"))
       .forEach(function (node) {
@@ -13657,7 +13690,22 @@
          the cover whenever that real lower boundary appears or changes size,
          so later runtime/UI changes cannot reintroduce unequal margins. */
       var navLayoutNode = document.getElementById("nav-container");
+      /* La barra cambia texto en cada cambio de página (el contador), y este
+         observador se dispara con cualquier mutación. Medir la portada obliga a
+         resolver el estilo y el layout de las 208 secciones: a 6x se llevaba
+         12,8 s de CPU cada cinco cambios de página. La portada sólo depende del
+         alto real de la barra, del viewport y del total de páginas, así que la
+         firma se calcula sin tocar el layout. */
+      var coverBalanceSignature = "";
       var scheduleCoverBalance = function () {
+        var signature = [
+          state.primaryToolbarHeight,
+          window.innerWidth,
+          window.innerHeight,
+          state.total
+        ].join(":");
+        if (signature === coverBalanceSignature) return;
+        coverBalanceSignature = signature;
         requestAnimationFrame(function () {
           requestAnimationFrame(balanceCoverMargins);
         });
