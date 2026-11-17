@@ -6187,6 +6187,14 @@
     var lastRestricted = null;
     var restoreWordAfterRestriction = false;
     var scheduled = false;
+    /* Este observador escucha `aria-label` y `aria-checked` en TODO el body, y
+       la sincronización que dispara escribe exactamente esos atributos: los
+       radios del panel, el contador de página y el modo de resaltado. Cada
+       escritura volvía a dispararla, cuadro a cuadro: 4,1 s de CPU por cada
+       5 s de reposo sin que nadie tocara nada. Se sincroniza a lo sumo unas
+       pocas veces por segundo y las escrituras propias no reabren el ciclo. */
+    var syncing = false;
+    var ignoreUntil = 0;
 
     function normalized(value) {
       return String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
@@ -6229,6 +6237,9 @@
 
     function sync() {
       scheduled = false;
+      if (syncing) return;
+      syncing = true;
+      try {
       var restricted = currentSpeed() > 1;
       var ttsEnabled = readAloudSettingIsEnabled();
       document.body.dataset.reflowWordHighlightRestricted = String(restricted);
@@ -6284,10 +6295,14 @@
           ? "word"
           : "sentence";
       }, 0);
+      } finally {
+        syncing = false;
+        ignoreUntil = Date.now() + 200;
+      }
     }
 
     function schedule() {
-      if (scheduled) return;
+      if (scheduled || syncing || Date.now() <= ignoreUntil) return;
       scheduled = true;
       requestAnimationFrame(sync);
     }
@@ -13807,9 +13822,13 @@
             if (frenaBucle) {
               state.contentPassBusy = false;
               /* La cola incluye los pases diferidos de asentamiento (140 y
-                 650 ms). El de 1.500 ms es sólo de alineación visual y no mueve
-                 texto entre páginas. */
-              state.contentPassIgnoreUntil = Date.now() + 900;
+                 650 ms). Antes de congelar la composición conviene dejar pasar
+                 más pases: son los que terminan de repartir el texto de las
+                 páginas ilustradas. Con la composición ya congelada, el freno
+                 largo es el que evita que un cambio de viewport dispare la
+                 cadena entera otra vez. */
+              state.contentPassIgnoreUntil =
+                Date.now() + (fixedScreenFrozen ? 900 : 300);
             }
           }
         }, 180);
@@ -13903,10 +13922,11 @@
     window.dispatchEvent(new CustomEvent("adt:ready", {
       detail: metricsContext()
     }));
-    /* Pantalla fija: recién acá el libro está compuesto y visible. Congelar
-       antes dejaría la composición a medio asentar; después, un cambio de
-       viewport tardío volvería a paginar las 208 secciones. */
-    if (fixedScreenMode) window.setTimeout(freezeFixedScreenLayout, 900);
+    /* Pantalla fija: recién acá el libro está compuesto y visible. Se espera a
+       que las páginas ilustradas terminen de repartir su texto (pases de 140 y
+       650 ms, varios ciclos): congelar antes dejaba el reparto a mitad de
+       camino. Después, un cambio de viewport ya no puede recompaginar. */
+    if (fixedScreenMode) window.setTimeout(freezeFixedScreenLayout, 3500);
   }
 
   boot();
