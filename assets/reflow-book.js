@@ -505,6 +505,9 @@
     explicitPageLockUntil: 0,
     explicitPageLockTimer: 0,
     ttsRangeClearTimer: 0,
+    /* Última caja activa para la que se corrió la regla de no tapar la oración. */
+    ttsAvoidanceKey: "",
+    ttsAvoidanceLastAt: 0,
     ttsManualHandoffPending: false,
     ttsManualHandoffGeneration: 0,
     ttsManualHandoffTimer: 0,
@@ -12113,7 +12116,7 @@
     }
   }
 
-  function paintTtsRange(range) {
+  function paintTtsRange(range, avoidKey) {
     if (!range || !supportsTtsRangeHighlight()) return;
     window.clearTimeout(state.ttsRangeClearTimer);
     state.ttsRangeClearTimer = 0;
@@ -12139,9 +12142,19 @@
     CSS.highlights.set("adt-tts-active", new Highlight(range));
     finishTtsManualHandoff();
     /* El resaltado por Custom Highlight no muta el DOM, así que ningún
-       observador dispara la evitación: se engancha acá, en cada repintado de
-       palabra u oración, que es cuando la caja activa cambia de lugar. */
-    syncTtsPlayerAvoidance();
+       observador dispara la evitación. Se llamaba en cada repintado —sesenta
+       veces por segundo— y cada llamada resuelve el layout del libro para
+       medir la caja activa y la franja del reproductor.
+       Ahora corre siempre que cambia el bloque leído (palabra → palabra nueva,
+       oración → oración nueva) y, en modo palabra, a lo sumo cada 250 ms para
+       que una palabra no quede debajo del reproductor al cortar la línea. */
+    var ahora = Date.now();
+    var clave = avoidKey || "";
+    if (clave !== state.ttsAvoidanceKey || ahora - state.ttsAvoidanceLastAt >= 250) {
+      state.ttsAvoidanceKey = clave;
+      state.ttsAvoidanceLastAt = ahora;
+      syncTtsPlayerAvoidance();
+    }
   }
 
   function createTextRange(textNode, start, end) {
@@ -12227,7 +12240,10 @@
       /* Paint the first token before returning control to React. The old and
          new CSS Highlights are replaced in one task, so the browser cannot
          compose a blank intermediate frame even if audio.play() is delayed. */
-      paintTtsRange(highlightRanges[0]);
+      paintTtsRange(
+        highlightRanges[0],
+        (element.dataset && element.dataset.id) || ""
+      );
       return {
         el: element,
         mode: "word",
@@ -12336,7 +12352,10 @@
         finishTtsManualHandoff();
         return { el: element, mode: "block", timestamps: [] };
       }
-      paintTtsRange(nativeRanges[0]);
+      paintTtsRange(
+        nativeRanges[0],
+        ((element.dataset && element.dataset.id) || "") + ":s0"
+      );
       return {
         el: element,
         mode: "sentence",
@@ -12411,7 +12430,10 @@
       if (sentenceIndex < 0 || sentenceIndex === active.__adtReflowLastSentenceIndex) return;
       if (active.rangeHighlight) {
         var sentenceRange = active.highlightRanges && active.highlightRanges[sentenceIndex];
-        paintTtsRange(sentenceRange);
+        paintTtsRange(
+          sentenceRange,
+          ((active.el.dataset && active.el.dataset.id) || "") + ":s" + sentenceIndex
+        );
         if (!trackingRange) followTtsVisualTarget(sentenceRange);
         active.__adtReflowLastSentenceIndex = sentenceIndex;
         return;
@@ -12437,7 +12459,13 @@
         Math.min((active.highlightRanges || []).length - 1, visibleRangeIndex)
       );
       var visibleRange = active.highlightRanges && active.highlightRanges[visibleRangeIndex];
-      paintTtsRange(visibleRange);
+      /* Modo palabra: la clave no cambia dentro del párrafo, así que manda el
+         límite de 250 ms (una palabra puede cambiar de línea y quedar debajo
+         del reproductor). */
+      paintTtsRange(
+        visibleRange,
+        ((active.el.dataset && active.el.dataset.id) || "") + ":w"
+      );
       followTtsVisualTarget(visibleRange);
       active.__adtReflowLastWordIndex = visibleRangeIndex;
       return;
