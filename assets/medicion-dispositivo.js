@@ -383,7 +383,20 @@
     var inicio = etiquetaPagina();
     salida.textContent = bloqueTexto() + "\n\nmidiendo cinco cambios de página…";
 
-    function paso(indice) {
+    /* Justo después de abrir, el libro todavía está asentando su paginación y
+       puede tragarse el primer toque (medido: el primer cambio quedaba sin
+       efecto). Se espera a que el contador de página quede quieto. */
+    var etiquetaPrevia = etiquetaPagina();
+    var quietos = 0;
+    (function esperarQuieto() {
+      var actual = etiquetaPagina();
+      if (actual === etiquetaPrevia && actual) quietos += 1;
+      else { quietos = 0; etiquetaPrevia = actual; }
+      if (quietos >= 2) { paso(0); return; }
+      window.setTimeout(esperarQuieto, 400);
+    })();
+
+    function paso(indice, reintentos) {
       if (indice >= 5) { terminar(); return; }
       var antes = etiquetaPagina();
       var t0 = performance.now();
@@ -398,7 +411,14 @@
           });
           return;
         }
-        if (performance.now() - t0 > 20000) {
+        var transcurrido = performance.now() - t0;
+        /* Un toque sin efecto se reintenta: el libro puede estar terminando de
+           componer. Se rinde a los ocho segundos por cambio. */
+        if (transcurrido > 1200 && reintentos < 3) {
+          paso(indice, reintentos + 1);
+          return;
+        }
+        if (transcurrido > 8000) {
           tiempos.push(-1);
           paso(indice + 1);
           return;
