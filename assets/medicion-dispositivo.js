@@ -1,4 +1,4 @@
-﻿/* Arnés de medición en el propio equipo.
+/* Arnés de medición en el propio equipo.
    Se activa con `?medicion=1` sobre el paquete real: mismo código, mismo
    camino, un parámetro más. Sin el parámetro no hace absolutamente nada, así
    que el libro que usan los chicos no cambia.
@@ -164,8 +164,28 @@
 
   document.addEventListener("DOMContentLoaded", montar);
   if (document.readyState !== "loading") montar();
+  window.addEventListener("load", function () {
+    montar();
+    vigilarPanel();
+  });
+
+  /* El libro reemplaza el contenido del cuerpo cuando termina de arrancar. Si el
+     arranque es rápido (segunda visita, servido desde caché), el panel quedaba
+     montado antes de ese reemplazo y desaparecía: en GitHub Pages pasó con el
+     libro ya en caché. Se cuelga del elemento raíz, que el libro no reemplaza, y
+     además se revisa cada segundo por si algo lo saca. */
+  function vigilarPanel() {
+    window.setInterval(function () {
+      if (!panel) return;
+      if (panel.parentNode !== document.documentElement) {
+        document.documentElement.appendChild(panel);
+        salida = document.getElementById("medicion-salida");
+      }
+    }, 1000);
+  }
 
   function montar() {
+    if (panel && panel.isConnected) return;
     if (document.getElementById("medicion-panel")) return;
     panel = document.createElement("div");
     panel.id = "medicion-panel";
@@ -188,7 +208,7 @@
       '<pre id="medicion-salida" style="margin:10px 0 0;white-space:pre-wrap;' +
         'word-break:break-word;font:12px/1.55 ui-monospace,Consolas,monospace;' +
         'color:#e8eef5;max-height:44vh;overflow:auto"></pre>';
-    document.body.appendChild(panel);
+    document.documentElement.appendChild(panel);
     salida = document.getElementById("medicion-salida");
     pintar();
     panel.addEventListener("click", alTocar);
