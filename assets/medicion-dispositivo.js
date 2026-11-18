@@ -385,16 +385,36 @@
 
     /* Justo después de abrir, el libro todavía está asentando su paginación y
        puede tragarse el primer toque (medido: el primer cambio quedaba sin
-       efecto). Se espera a que el contador de página quede quieto. */
+       efecto). Se espera a que el contador de página quede quieto y después se
+       hace un toque de calentamiento que NO se cronometra. */
     var etiquetaPrevia = etiquetaPagina();
     var quietos = 0;
     (function esperarQuieto() {
       var actual = etiquetaPagina();
       if (actual === etiquetaPrevia && actual) quietos += 1;
       else { quietos = 0; etiquetaPrevia = actual; }
-      if (quietos >= 2) { paso(0); return; }
+      if (quietos >= 2) { calentar(0); return; }
       window.setTimeout(esperarQuieto, 400);
     })();
+
+    function calentar(intentos) {
+      var antes = etiquetaPagina();
+      siguiente.click();
+      var limite = performance.now() + 1500;
+      (function mirar() {
+        if (etiquetaPagina() !== antes) {
+          inicio = etiquetaPagina();
+          paso(0);
+          return;
+        }
+        if (performance.now() > limite) {
+          if (intentos < 4) calentar(intentos + 1);
+          else { inicio = etiquetaPagina(); paso(0); }
+          return;
+        }
+        window.requestAnimationFrame(mirar);
+      })();
+    }
 
     /* Cada intento invalida al anterior: si no, el vigilante viejo sigue mirando
        y anota el mismo cambio dos veces (medido: diez valores en vez de cinco). */
