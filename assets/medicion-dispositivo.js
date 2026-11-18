@@ -83,14 +83,24 @@
     } catch (_error) { return ""; }
   }
 
-  /* El libro queda usable cuando retira su capa de carga. Hay que esperar a que
-     la capa aparezca: al principio del documento todavía no existe y medir su
-     ausencia daría 50 ms. */
+  /* El libro está usable cuando retiró la capa de carga Y ya tiene su barra de
+     navegación. Cuando se sirve rápido (segunda visita, caché), la capa
+     desaparece antes de que existan los botones de página: quedarse con la sola
+     capa daba un arranque corto y dejaba la medición de páginas sin botón. */
+  var libroListo = false;
+
+  function libroEstaUsable() {
+    return !document.getElementById("reflow-loading") &&
+      !!document.getElementById("reflow-next") &&
+      !!document.getElementById("reflow-page-status");
+  }
+
   (function esperarArranque() {
     if (arranqueMs !== null) return;
-    if (document.getElementById("reflow-loading")) { vioCapa = true; }
-    else if (vioCapa) {
+    if (document.getElementById("reflow-loading")) vioCapa = true;
+    else if (vioCapa && libroEstaUsable()) {
       arranqueMs = Math.round(performance.now());
+      libroListo = true;
       medidas.arranque = {
         arr: arranqueMs,
         fcp: fcpMs,
@@ -340,10 +350,33 @@
     return encontrado ? encontrado[1] : null;
   }
 
+  var paginasEsperando = false;
+
   function medirPaginas() {
     var siguiente = document.getElementById("reflow-next");
     if (!siguiente) {
-      salida.textContent = bloqueTexto() + "\n\nno encontré el botón de página siguiente";
+      /* El libro puede estar todavía montando su barra. Se espera hasta medio
+         minuto antes de rendirse, y se avisa en pantalla qué está pasando. */
+      if (paginasEsperando) return;
+      paginasEsperando = true;
+      salida.textContent = bloqueTexto() + "\n\nesperando que el libro termine de abrir…";
+      var intentos = 0;
+      var esperar = function () {
+        intentos += 1;
+        if (document.getElementById("reflow-next")) {
+          paginasEsperando = false;
+          medirPaginas();
+          return;
+        }
+        if (intentos > 600) {
+          paginasEsperando = false;
+          salida.textContent = bloqueTexto() +
+            "\n\nel libro no terminó de abrir: recargá la página y probá otra vez";
+          return;
+        }
+        window.setTimeout(esperar, 50);
+      };
+      esperar();
       return;
     }
     var tiempos = [];
