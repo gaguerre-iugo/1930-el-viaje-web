@@ -396,15 +396,23 @@
       window.setTimeout(esperarQuieto, 400);
     })();
 
+    /* Cada intento invalida al anterior: si no, el vigilante viejo sigue mirando
+       y anota el mismo cambio dos veces (medido: diez valores en vez de cinco). */
+    var generacion = 0;
+
     function paso(indice, reintentos) {
       if (indice >= 5) { terminar(); return; }
+      generacion += 1;
+      var miGeneracion = generacion;
       var antes = etiquetaPagina();
       var t0 = performance.now();
       siguiente.click();
       (function esperar() {
+        if (miGeneracion !== generacion) return;
         if (etiquetaPagina() !== antes) {
           window.requestAnimationFrame(function () {
             window.requestAnimationFrame(function () {
+              if (miGeneracion !== generacion) return;
               tiempos.push(Math.round(performance.now() - t0));
               paso(indice + 1);
             });
