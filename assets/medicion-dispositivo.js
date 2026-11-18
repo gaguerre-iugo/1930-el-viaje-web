@@ -1,4 +1,4 @@
-/* Arnés de medición en el propio equipo.
+﻿/* Arnés de medición en el propio equipo.
    Se activa con `?medicion=1` sobre el paquete real: mismo código, mismo
    camino, un parámetro más. Sin el parámetro no hace absolutamente nada, así
    que el libro que usan los chicos no cambia.
@@ -245,7 +245,7 @@
     var partes = [];
     if (medidas.arranque) {
       partes.push(seccion("ARRANQUE",
-        renglon("Libro usable en el equipo", ms(medidas.arranque.arr) + " ms") +
+        renglon("Libro usable en la pantalla", ms(medidas.arranque.arr) + " ms") +
         renglon("Primer contenido en pantalla", ms(medidas.arranque.fcp) + " ms") +
         renglon("Carga completa", ms(medidas.arranque.load) + " ms") +
         renglon("Bloqueo más largo", ms(medidas.arranque.maxlong) + " ms") +
@@ -418,7 +418,7 @@
         pintar();
         if (!pasos && !audios) {
           salida.textContent = bloqueTexto() +
-            "\n\nla lectura no avanzó: revisá que el audio suene en el equipo";
+            "\n\nla lectura no avanzó: revisá que el audio suene en la pantalla";
         }
       })();
     }
